@@ -9,20 +9,19 @@ export interface DigimonStats {
 export interface Tech {
   id: string;
   name: string;
-  mpCost: number;
-  power: number;
-  type: 'Physical' | 'Magic' | 'Support';
-  element: 'Fire' | 'Water' | 'Earth' | 'Air' | 'Nature' | 'Dark' | 'Machine' | 'Neutral';
-  target: 'Single' | 'All' | 'Self' | 'Team';
-  description: string;
+  ap: number;
+  type?: 'Physical' | 'Magic' | 'Support';
+  element: 'Fire' | 'Water' | 'Earth' | 'Air' | 'Nature' | 'Dark' | 'Machine' | 'None' | 'Wave' | 'Darkness' | 'Neutral';
+  target: 'Single' | 'All';
+  isCounter: boolean;
 }
 
 export interface Digimon {
   id: string;
   name: string;
   baseStats: DigimonStats;
-  type: string;
-  level: number;
+  type: 'Vaccine' | 'Data' | 'Virus';
+  specialty: 'Fire' | 'Water' | 'Earth' | 'Air' | 'Nature' | 'Dark' | 'Machine' | 'None' | 'Wave' | 'Darkness' | 'Neutral';
   sprite?: string;
 }
 

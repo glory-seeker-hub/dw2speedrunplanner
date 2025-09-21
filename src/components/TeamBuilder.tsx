@@ -82,7 +82,7 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
                           {selectedDigimons[slotIndex].digimon.name}
                         </h3>
                         <Badge variant="secondary" className="mt-1">
-                          Lv.{selectedDigimons[slotIndex].digimon.level}
+                          {selectedDigimons[slotIndex].digimon.type}
                         </Badge>
                         <div className="text-xs text-muted-foreground mt-2">
                           {selectedDigimons[slotIndex].techs.length}/12 Techs

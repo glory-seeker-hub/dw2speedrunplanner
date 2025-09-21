@@ -23,7 +23,7 @@ export const DigimonCard = ({ digimon, isSelected, onSelect }: DigimonCardProps)
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-bold text-foreground">{digimon.name}</CardTitle>
           <Badge variant="secondary" className="bg-secondary/20 text-secondary">
-            Lv.{digimon.level}
+            {digimon.specialty}
           </Badge>
         </div>
         <Badge variant="outline" className="w-fit text-xs">

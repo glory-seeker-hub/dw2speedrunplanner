@@ -84,7 +84,7 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                       <span className={getElementColor(tech.element)}>
                         {tech.element}
                       </span>
-                      <span>MP: {tech.mpCost}</span>
+                       <span>AP: {tech.ap}</span>
                     </div>
                   </div>
                   <Button
@@ -156,13 +156,10 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                             <span className={getElementColor(tech.element)}>
                               {tech.element}
                             </span>
-                            <span>MP: {tech.mpCost}</span>
-                            <span>PWR: {tech.power}</span>
+                            <span>AP: {tech.ap}</span>
+                            {tech.isCounter && <span className="text-amber-400">Counter</span>}
                             <span>{tech.target}</span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {tech.description}
-                          </p>
                         </div>
                         <Button
                           size="sm"
