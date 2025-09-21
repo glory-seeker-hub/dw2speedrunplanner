@@ -47,6 +47,13 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        digital: {
+          blue: "hsl(var(--digital-blue))",
+          purple: "hsl(var(--digital-purple))",
+          cyan: "hsl(var(--digital-cyan))",
+          magenta: "hsl(var(--digital-magenta))",
+          glow: "hsl(var(--digital-glow))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -80,10 +87,39 @@ export default {
             height: "0",
           },
         },
+        "digital-pulse": {
+          "0%, 100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: "0.8",
+            transform: "scale(1.05)",
+          },
+        },
+        "glow": {
+          "0%, 100%": {
+            "box-shadow": "0 0 20px hsl(var(--digital-glow) / 0.5)",
+          },
+          "50%": {
+            "box-shadow": "0 0 30px hsl(var(--digital-glow) / 0.8)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "digital-pulse": "digital-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "glow": "glow 2s ease-in-out infinite alternate",
+      },
+      backgroundImage: {
+        "gradient-digital": "var(--gradient-digital)",
+        "gradient-card": "var(--gradient-card)",
+        "gradient-button": "var(--gradient-button)",
+      },
+      boxShadow: {
+        "digital": "var(--shadow-digital)",
+        "card": "var(--shadow-card)",
       },
     },
   },

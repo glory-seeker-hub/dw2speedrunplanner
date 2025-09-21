@@ -1,0 +1,88 @@
+import { Digimon } from '@/types/digimon';
+
+export const DIGIMONS: Digimon[] = [
+  {
+    id: 'agumon',
+    name: 'Agumon',
+    baseStats: { hp: 1000, mp: 200, atk: 150, def: 120, spd: 100 },
+    type: 'Vaccine',
+    level: 1,
+  },
+  {
+    id: 'gabumon',
+    name: 'Gabumon',
+    baseStats: { hp: 950, mp: 250, atk: 130, def: 140, spd: 110 },
+    type: 'Data',
+    level: 1,
+  },
+  {
+    id: 'patamon',
+    name: 'Patamon',
+    baseStats: { hp: 800, mp: 300, atk: 120, def: 100, spd: 140 },
+    type: 'Data',
+    level: 1,
+  },
+  {
+    id: 'tentomon',
+    name: 'Tentomon',
+    baseStats: { hp: 850, mp: 220, atk: 140, def: 130, spd: 120 },
+    type: 'Vaccine',
+    level: 1,
+  },
+  {
+    id: 'gomamon',
+    name: 'Gomamon',
+    baseStats: { hp: 900, mp: 280, atk: 125, def: 115, spd: 130 },
+    type: 'Vaccine',
+    level: 1,
+  },
+  {
+    id: 'palmon',
+    name: 'Palmon',
+    baseStats: { hp: 920, mp: 260, atk: 110, def: 125, spd: 105 },
+    type: 'Data',
+    level: 1,
+  },
+  {
+    id: 'greymon',
+    name: 'Greymon',
+    baseStats: { hp: 1800, mp: 350, atk: 280, def: 200, spd: 140 },
+    type: 'Vaccine',
+    level: 2,
+  },
+  {
+    id: 'garurumon',
+    name: 'Garurumon',
+    baseStats: { hp: 1600, mp: 400, atk: 260, def: 220, spd: 180 },
+    type: 'Data',
+    level: 2,
+  },
+  {
+    id: 'angemon',
+    name: 'Angemon',
+    baseStats: { hp: 1400, mp: 500, atk: 240, def: 180, spd: 200 },
+    type: 'Vaccine',
+    level: 2,
+  },
+  {
+    id: 'metalgreymon',
+    name: 'MetalGreymon',
+    baseStats: { hp: 2800, mp: 500, atk: 420, def: 350, spd: 200 },
+    type: 'Vaccine',
+    level: 3,
+  },
+  {
+    id: 'weregarurumon',
+    name: 'WereGarurumon',
+    baseStats: { hp: 2600, mp: 600, atk: 400, def: 300, spd: 280 },
+    type: 'Data',
+    level: 3,
+  },
+  {
+    id: 'machinedramon',
+    name: 'Machinedramon',
+    baseStats: { hp: 4000, mp: 800, atk: 650, def: 500, spd: 250 },
+    type: 'Virus',
+    level: 4,
+  },
+];
