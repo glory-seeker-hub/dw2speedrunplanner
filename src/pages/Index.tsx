@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TeamBuilder } from '@/components/TeamBuilder';
+import { BattleSimulation } from '@/components/BattleSimulation';
 import { TeamDigimon } from '@/types/digimon';
 import { Database, Zap, Trophy, Settings } from 'lucide-react';
 
@@ -87,18 +88,14 @@ const Index = () => {
 
           {/* Main Tabs */}
           <Tabs defaultValue="team-builder" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="team-builder" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 Team Builder
               </TabsTrigger>
-              <TabsTrigger value="battle-setup" disabled>
+              <TabsTrigger value="battle-simulation">
                 <Zap className="h-4 w-4 mr-2" />
-                Battle Setup
-              </TabsTrigger>
-              <TabsTrigger value="simulation" disabled>
-                <Settings className="h-4 w-4 mr-2" />
-                Simulation
+                Battle Simulation
               </TabsTrigger>
               <TabsTrigger value="results" disabled>
                 <Trophy className="h-4 w-4 mr-2" />
@@ -110,30 +107,8 @@ const Index = () => {
               <TeamBuilder onSaveTeam={handleSaveTeam} />
             </TabsContent>
 
-            <TabsContent value="battle-setup" className="mt-6">
-              <Card className="bg-gradient-card border-border">
-                <CardHeader>
-                  <CardTitle>Battle Setup</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Battle setup will be available after creating your team.
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="simulation" className="mt-6">
-              <Card className="bg-gradient-card border-border">
-                <CardHeader>
-                  <CardTitle>Battle Simulation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Simulation controls will be available after setting up your battle.
-                  </p>
-                </CardContent>
-              </Card>
+            <TabsContent value="battle-simulation" className="mt-6">
+              <BattleSimulation savedTeams={savedTeams} />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
