@@ -20,6 +20,7 @@ interface TeamBuilderProps {
 export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
   const [selectedDigimons, setSelectedDigimons] = useState<TeamDigimon[]>([]);
   const [activeSlot, setActiveSlot] = useState<number>(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const addDigimon = (digimon: Digimon) => {
     if (selectedDigimons.length < 3) {
@@ -123,18 +124,31 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
             </TabsList>
 
             <TabsContent value="select" className="mt-4">
-              <ScrollArea className="h-[400px]">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {DIGIMONS.map((digimon) => (
-                    <DigimonCard
-                      key={digimon.id}
-                      digimon={digimon}
-                      isSelected={selectedDigimons.some(td => td.digimon.id === digimon.id)}
-                      onSelect={addDigimon}
-                    />
-                  ))}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Plus className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search Digimon..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
                 </div>
-              </ScrollArea>
+                <ScrollArea className="h-[400px]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {DIGIMONS.filter(digimon => 
+                      digimon.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    ).map((digimon) => (
+                      <DigimonCard
+                        key={digimon.id}
+                        digimon={digimon}
+                        isSelected={selectedDigimons.some(td => td.digimon.id === digimon.id)}
+                        onSelect={addDigimon}
+                      />
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
             </TabsContent>
 
             <TabsContent value="stats" className="mt-4">

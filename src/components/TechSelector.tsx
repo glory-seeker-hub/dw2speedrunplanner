@@ -15,13 +15,10 @@ interface TechSelectorProps {
 
 export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'All' | 'Physical' | 'Magic' | 'Support'>('All');
 
-  const filteredTechs = TECHS.filter(tech => {
-    const matchesSearch = tech.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'All' || tech.type === filterType;
-    return matchesSearch && matchesType;
-  });
+  const filteredTechs = TECHS.filter(tech => 
+    tech.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const addTech = (tech: Tech) => {
     if (selectedTechs.length < 12 && !selectedTechs.find(t => t.id === tech.id)) {
@@ -106,28 +103,14 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
       <Card className="bg-muted/20">
         <CardHeader>
           <CardTitle className="text-lg">Available Techs</CardTitle>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search techs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            <div className="flex gap-1">
-              {['All', 'Physical', 'Magic', 'Support'].map((type) => (
-                <Button
-                  key={type}
-                  variant={filterType === type ? "secondary" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterType(type as any)}
-                >
-                  {type}
-                </Button>
-              ))}
-            </div>
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search techs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
           </div>
         </CardHeader>
         <CardContent>
