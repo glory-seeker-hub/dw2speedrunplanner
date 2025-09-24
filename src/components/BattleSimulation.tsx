@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,6 +34,7 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
   const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(null);
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(1000);
+  const [encounterSearch, setEncounterSearch] = useState<string>('');
 
   const handleSimulate = () => {
     console.log('Simulating battle with:', {
@@ -48,6 +49,25 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
   const canSimulate = selectedPlayerTeam !== null && 
     ((selectedEnemyTeam === 'encounter' && selectedEncounter !== null) || 
      (selectedEnemyTeam === 'saved' && selectedEnemySaved !== null));
+
+  const filteredEncounters = useMemo(() => {
+    if (!encounterSearch) return encounters;
+    return encounters.filter(encounter => 
+      encounter.id.toString().includes(encounterSearch) ||
+      encounter.digimons.some(digimon => 
+        digimon.name.toLowerCase().includes(encounterSearch.toLowerCase())
+      )
+    );
+  }, [encounterSearch]);
+
+  const selectedEnemyData = useMemo(() => {
+    if (selectedEnemyTeam === 'encounter' && selectedEncounter !== null) {
+      return encounters.find(e => e.id === selectedEncounter);
+    } else if (selectedEnemyTeam === 'saved' && selectedEnemySaved !== null) {
+      return savedTeams[selectedEnemySaved];
+    }
+    return null;
+  }, [selectedEnemyTeam, selectedEncounter, selectedEnemySaved, savedTeams]);
 
   return (
     <div className="space-y-6">
@@ -87,27 +107,34 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
               </TabsList>
               
               <TabsContent value="encounter" className="space-y-2">
-                <Select value={selectedEncounter?.toString() || ''} onValueChange={(value) => setSelectedEncounter(parseInt(value))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose enemy encounter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {encounters.map((encounter) => (
-                      <SelectItem key={encounter.id} value={encounter.id.toString()}>
-                        <div className="flex items-center gap-2">
-                          Fight {encounter.id}
-                          <div className="flex gap-1">
-                            {encounter.digimons.map((digimon, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {digimon.name} Lv.{digimon.level}
-                              </Badge>
-                            ))}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Search encounters by ID or Digimon name..."
+                    value={encounterSearch}
+                    onChange={(e) => setEncounterSearch(e.target.value)}
+                  />
+                  <Select value={selectedEncounter?.toString() || ''} onValueChange={(value) => setSelectedEncounter(parseInt(value))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose enemy encounter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredEncounters.map((encounter) => (
+                        <SelectItem key={encounter.id} value={encounter.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            Fight {encounter.id}
+                            <div className="flex gap-1">
+                              {encounter.digimons.map((digimon, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {digimon.name} Lv.{digimon.level}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </TabsContent>
               
               <TabsContent value="saved" className="space-y-2">
@@ -191,6 +218,45 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
                   </div>
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Preview Selected Enemy Team */}
+      {selectedEnemyData && (
+        <Card className="bg-gradient-card border-border">
+          <CardHeader>
+            <CardTitle>Selected Enemy Team</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {'digimons' in selectedEnemyData ? (
+                // Encounter team
+                selectedEnemyData.digimons.map((digimon, index) => (
+                  <div key={index} className="p-3 bg-muted/20 rounded-lg">
+                    <h4 className="font-semibold">{digimon.name}</h4>
+                    <div className="text-sm text-muted-foreground">
+                      <p>Level: {digimon.level}</p>
+                      <p>HP: {digimon.hp} | MP: {digimon.mp}</p>
+                      <p>ATK: {digimon.atk} | DEF: {digimon.def} | SPD: {digimon.spd}</p>
+                      <p>Techs: {digimon.techs.join(', ')}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Saved team
+                selectedEnemyData.map((digimon, index) => (
+                  <div key={index} className="p-3 bg-muted/20 rounded-lg">
+                    <h4 className="font-semibold">{digimon.digimon.name}</h4>
+                    <div className="text-sm text-muted-foreground">
+                      <p>HP: {digimon.customStats.hp} | MP: {digimon.customStats.mp}</p>
+                      <p>ATK: {digimon.customStats.atk} | DEF: {digimon.customStats.def} | SPD: {digimon.customStats.spd}</p>
+                      <p>Techs: {digimon.techs.length}/3</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
