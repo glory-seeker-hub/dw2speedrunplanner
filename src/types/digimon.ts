@@ -59,5 +59,26 @@ export interface BattleTurn {
   tech: string;
   target: string;
   damage: number;
+  hpRemaining: number;
   result: string;
+}
+
+export interface BattleDigimon {
+  id: string;
+  name: string;
+  type: 'Vaccine' | 'Data' | 'Virus';
+  specialty: 'Fire' | 'Water' | 'Earth' | 'Air' | 'Nature' | 'Dark' | 'Machine' | 'None' | 'Wave' | 'Darkness' | 'Neutral';
+  stats: DigimonStats;
+  currentHp: number;
+  techs: Tech[];
+  isAlive: boolean;
+}
+
+export interface SimulationResult {
+  winRate: number;
+  totalSimulations: number;
+  minTurns: number;
+  avgTurns: number;
+  maxTurns: number;
+  fastestBattleHistory: BattleTurn[];
 }

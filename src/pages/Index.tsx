@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TeamBuilder } from '@/components/TeamBuilder';
 import { BattleSimulation } from '@/components/BattleSimulation';
-import { TeamDigimon } from '@/types/digimon';
+import { BattleResults } from '@/components/BattleResults';
+import { TeamDigimon, SimulationResult } from '@/types/digimon';
 import { Database, Zap, Trophy, Settings } from 'lucide-react';
 
 const Index = () => {
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
+  const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('team-builder');
 
   const handleSaveTeam = (team: TeamDigimon[]) => {
     if (team.length > 0) {
@@ -16,6 +19,11 @@ const Index = () => {
       console.log('Team saved:', team);
       // Here you would typically save to localStorage or a database
     }
+  };
+
+  const handleSimulationComplete = (results: SimulationResult) => {
+    setSimulationResults(results);
+    setActiveTab('results');
   };
 
   return (
@@ -87,7 +95,7 @@ const Index = () => {
           </Card>
 
           {/* Main Tabs */}
-          <Tabs defaultValue="team-builder" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="team-builder" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
@@ -97,7 +105,7 @@ const Index = () => {
                 <Zap className="h-4 w-4 mr-2" />
                 Battle Simulation
               </TabsTrigger>
-              <TabsTrigger value="results" disabled>
+              <TabsTrigger value="results" disabled={!simulationResults}>
                 <Trophy className="h-4 w-4 mr-2" />
                 Results
               </TabsTrigger>
@@ -108,20 +116,27 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="battle-simulation" className="mt-6">
-              <BattleSimulation savedTeams={savedTeams} />
+              <BattleSimulation 
+                savedTeams={savedTeams} 
+                onSimulationComplete={handleSimulationComplete}
+              />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
-              <Card className="bg-gradient-card border-border">
-                <CardHeader>
-                  <CardTitle>Battle Results</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Results and statistics will appear here after running simulations.
-                  </p>
-                </CardContent>
-              </Card>
+              {simulationResults ? (
+                <BattleResults results={simulationResults} />
+              ) : (
+                <Card className="bg-gradient-card border-border">
+                  <CardHeader>
+                    <CardTitle>Battle Results</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Results and statistics will appear here after running simulations.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
         </div>

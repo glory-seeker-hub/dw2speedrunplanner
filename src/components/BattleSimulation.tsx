@@ -4,13 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TeamDigimon } from '@/types/digimon';
+import { TeamDigimon, SimulationResult } from '@/types/digimon';
 import { encounters } from '@/data/encounters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { runBattleSimulation } from '@/utils/battleEngine';
+import { Loader2 } from 'lucide-react';
 
 interface BattleSimulationProps {
   savedTeams: TeamDigimon[][];
+  onSimulationComplete: (results: SimulationResult) => void;
 }
 
 interface FloorSpecialty {
@@ -27,7 +30,7 @@ const floorSpecialties: FloorSpecialty[] = [
   { id: 'nature', name: 'Nature' }
 ];
 
-export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
+export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSimulationProps) => {
   const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<number | null>(null);
   const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>('encounter');
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
@@ -35,15 +38,41 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(1000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
+  const [isSimulating, setIsSimulating] = useState<boolean>(false);
 
-  const handleSimulate = () => {
-    console.log('Simulating battle with:', {
-      playerTeam: selectedPlayerTeam !== null ? savedTeams[selectedPlayerTeam] : null,
-      enemyTeam: selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter) : (selectedEnemySaved !== null ? savedTeams[selectedEnemySaved] : null),
-      floorSpecialty,
-      simulationCount
-    });
-    // Simulation logic will be implemented in the next step
+  const handleSimulate = async () => {
+    if (selectedPlayerTeam === null) return;
+    
+    setIsSimulating(true);
+    
+    try {
+      const playerTeam = savedTeams[selectedPlayerTeam];
+      let enemyTeam;
+      
+      if (selectedEnemyTeam === 'encounter' && selectedEncounter !== null) {
+        enemyTeam = encounters.find(e => e.id === selectedEncounter);
+      } else if (selectedEnemyTeam === 'saved' && selectedEnemySaved !== null) {
+        enemyTeam = savedTeams[selectedEnemySaved];
+      }
+      
+      if (!enemyTeam) return;
+      
+      // Run simulation in a setTimeout to allow UI to update
+      setTimeout(() => {
+        const results = runBattleSimulation(
+          playerTeam,
+          enemyTeam,
+          floorSpecialty,
+          simulationCount
+        );
+        
+        onSimulationComplete(results);
+        setIsSimulating(false);
+      }, 100);
+    } catch (error) {
+      console.error('Simulation error:', error);
+      setIsSimulating(false);
+    }
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -191,11 +220,20 @@ export const BattleSimulation = ({ savedTeams }: BattleSimulationProps) => {
           {/* Simulate Button */}
           <Button 
             onClick={handleSimulate} 
-            disabled={!canSimulate}
+            disabled={!canSimulate || isSimulating}
             className="w-full"
             size="lg"
           >
-            {canSimulate ? 'Start Simulation' : 'Select teams to simulate'}
+            {isSimulating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Simulating...
+              </>
+            ) : canSimulate ? (
+              'Start Simulation'
+            ) : (
+              'Select teams to simulate'
+            )}
           </Button>
         </CardContent>
       </Card>
