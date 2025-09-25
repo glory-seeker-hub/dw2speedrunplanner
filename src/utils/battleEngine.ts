@@ -58,11 +58,12 @@ function calculateDamage(
   const defense = defender.stats.def;
   const defenderBonus = getDefenderBonus(defender.specialty, floorSpecialty);
 
-  // Damage formula: floor(floor(type bonus * specialty bonus * attack power * tile bonus) * Attack / floor(Defense * defender bonus))
+  // Damage formula: floor(floor(type bonus * specialty bonus * attack power * tech tile bonus) * attacker attack / floor(defender defense * defender tile bonus))
   const baseDamage = Math.floor(typeBonus * specialtyBonus * attackPower * tileBonus);
   const adjustedDefense = Math.floor(defense * defenderBonus);
   
-  const finalDamage = Math.floor((baseDamage * attack) / Math.max(1, adjustedDefense));
+  // Use integer arithmetic to avoid floating-point precision issues
+  const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
   
   return Math.max(0, finalDamage);
 }
