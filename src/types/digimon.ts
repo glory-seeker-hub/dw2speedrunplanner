@@ -61,6 +61,8 @@ export interface BattleTurn {
   damage: number;
   hpRemaining: number;
   result: string;
+  timeSeconds: number;
+  targetsHit: number;
 }
 
 export interface BattleDigimon {
@@ -80,5 +82,9 @@ export interface SimulationResult {
   minTurns: number;
   avgTurns: number;
   maxTurns: number;
+  minTime: number;
+  avgTime: number;
+  maxTime: number;
   fastestBattleHistory: BattleTurn[];
+  fastestBattleByTime: BattleTurn[];
 }

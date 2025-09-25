@@ -44,6 +44,12 @@ function getDefenderBonus(defenderSpecialty: string, floorSpecialty: string): nu
   return defenderSpecialty.toLowerCase() === floorSpecialty.toLowerCase() ? 1.2 : 1;
 }
 
+function calculateActionTime(targetsHit: number): number {
+  if (targetsHit === 1) return 10;
+  if (targetsHit === 2) return 12;
+  return 14; // 3 or more targets
+}
+
 function calculateDamage(
   attacker: BattleDigimon,
   defender: BattleDigimon,
@@ -154,7 +160,7 @@ function simulateBattle(
   playerTeam: TeamDigimon[],
   enemyTeam: TeamDigimon[] | any,
   floorSpecialty: string
-): { turns: number; history: BattleTurn[]; playerWon: boolean } {
+): { turns: number; history: BattleTurn[]; playerWon: boolean; totalTime: number } {
   // Convert teams to battle format
   const playerDigimons = createBattleDigimon(playerTeam, 'player');
   const enemyDigimons = Array.isArray(enemyTeam) && 'digimon' in (enemyTeam[0] || {})
@@ -165,6 +171,7 @@ function simulateBattle(
   const history: BattleTurn[] = [];
   let turnCount = 0;
   let round = 1;
+  let totalTime = 0;
 
   while (true) {
     // Check victory conditions
@@ -172,10 +179,10 @@ function simulateBattle(
     const aliveEnemyDigimons = enemyDigimons.filter(d => d.isAlive);
 
     if (alivePlayerDigimons.length === 0) {
-      return { turns: turnCount, history, playerWon: false };
+      return { turns: turnCount, history, playerWon: false, totalTime };
     }
     if (aliveEnemyDigimons.length === 0) {
-      return { turns: turnCount, history, playerWon: true };
+      return { turns: turnCount, history, playerWon: true, totalTime };
     }
 
     // Calculate turn order for this round
@@ -196,6 +203,9 @@ function simulateBattle(
       if (tech.target === 'Single') {
         const target = getRandomTarget(aliveOpponents);
         const damage = calculateDamage(attacker, target, tech, floorSpecialty);
+        const actionTime = calculateActionTime(1);
+        totalTime += actionTime;
+
         target.currentHp = Math.max(0, target.currentHp - damage);
         
         if (target.currentHp <= 0) {
@@ -210,10 +220,16 @@ function simulateBattle(
           target: target.name,
           damage,
           hpRemaining: target.currentHp,
-          result: target.currentHp <= 0 ? 'KO' : 'Hit'
+          result: target.currentHp <= 0 ? 'KO' : 'Hit',
+          timeSeconds: actionTime,
+          targetsHit: 1
         });
       } else {
         // Target all opponents
+        const targetsHit = aliveOpponents.length;
+        const actionTime = calculateActionTime(targetsHit);
+        totalTime += actionTime;
+
         for (const target of aliveOpponents) {
           const damage = calculateDamage(attacker, target, tech, floorSpecialty);
           target.currentHp = Math.max(0, target.currentHp - damage);
@@ -230,7 +246,9 @@ function simulateBattle(
             target: target.name,
             damage,
             hpRemaining: target.currentHp,
-            result: target.currentHp <= 0 ? 'KO' : 'Hit'
+            result: target.currentHp <= 0 ? 'KO' : 'Hit',
+            timeSeconds: actionTime,
+            targetsHit
           });
         }
       }
@@ -240,10 +258,10 @@ function simulateBattle(
       const remainingEnemyDigimons = enemyDigimons.filter(d => d.isAlive);
 
       if (remainingPlayerDigimons.length === 0) {
-        return { turns: turnCount, history, playerWon: false };
+        return { turns: turnCount, history, playerWon: false, totalTime };
       }
       if (remainingEnemyDigimons.length === 0) {
-        return { turns: turnCount, history, playerWon: true };
+        return { turns: turnCount, history, playerWon: true, totalTime };
       }
     }
 
@@ -259,9 +277,13 @@ export function runBattleSimulation(
 ): SimulationResult {
   let wins = 0;
   let totalTurns = 0;
+  let totalTime = 0;
   let minTurns = Infinity;
+  let minTime = Infinity;
   let maxTurns = 0;
+  let maxTime = 0;
   let fastestBattleHistory: BattleTurn[] = [];
+  let fastestBattleByTime: BattleTurn[] = [];
 
   for (let i = 0; i < simulationCount; i++) {
     const result = simulateBattle(playerTeam, enemyTeam, floorSpecialty);
@@ -271,14 +293,24 @@ export function runBattleSimulation(
     }
 
     totalTurns += result.turns;
+    totalTime += result.totalTime;
     
     if (result.turns < minTurns) {
       minTurns = result.turns;
       fastestBattleHistory = [...result.history];
     }
+
+    if (result.totalTime < minTime) {
+      minTime = result.totalTime;
+      fastestBattleByTime = [...result.history];
+    }
     
     if (result.turns > maxTurns) {
       maxTurns = result.turns;
+    }
+
+    if (result.totalTime > maxTime) {
+      maxTime = result.totalTime;
     }
   }
 
@@ -288,6 +320,10 @@ export function runBattleSimulation(
     minTurns: minTurns === Infinity ? 0 : minTurns,
     avgTurns: totalTurns / simulationCount,
     maxTurns,
-    fastestBattleHistory
+    minTime: minTime === Infinity ? 0 : minTime,
+    avgTime: totalTime / simulationCount,
+    maxTime,
+    fastestBattleHistory,
+    fastestBattleByTime
   };
 }
