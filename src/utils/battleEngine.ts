@@ -71,7 +71,7 @@ function calculateDamage(
   // Use integer arithmetic to avoid floating-point precision issues
   const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
   
-  return Math.max(0, finalDamage);
+  return finalDamage;
 }
 
 function createBattleDigimon(teamDigimon: TeamDigimon[], teamPrefix: string): BattleDigimon[] {
