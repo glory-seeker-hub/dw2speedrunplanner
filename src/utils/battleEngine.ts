@@ -1,5 +1,6 @@
 import { TeamDigimon, Tech, BattleDigimon, BattleTurn, SimulationResult, BattleSettings } from '@/types/digimon';
 import { TECHS } from '@/data/techs';
+import { DIGIMONS } from '@/data/digimons';
 
 // Specialty bonus matrix based on attacker tech specialty vs defender digimon specialty
 const SPECIALTY_BONUS_MATRIX: { [key: string]: { [key: string]: number } } = {
@@ -101,11 +102,14 @@ function createBattleDigimonFromEncounter(encounter: any): BattleDigimon[] {
       }
     );
 
+    // Look up the actual Digimon data to get correct type and specialty
+    const digimonData = DIGIMONS.find(d => d.name === digimon.name);
+    
     return {
       id: `enemy-${index}`,
       name: digimon.name,
-      type: 'Data' as const, // Default type for encounters
-      specialty: 'None' as const, // Default specialty for encounters
+      type: digimonData?.type || 'Data' as const, // Use actual type or fallback
+      specialty: digimonData?.specialty || 'None' as const, // Use actual specialty or fallback
       stats: {
         hp: digimon.hp,
         mp: digimon.mp,
