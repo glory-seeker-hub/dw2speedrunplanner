@@ -145,19 +145,44 @@ function getRandomTarget(targets: BattleDigimon[]): BattleDigimon {
   return aliveTargets[Math.floor(Math.random() * aliveTargets.length)];
 }
 
-function calculateTurnOrder(digimons: BattleDigimon[]): BattleDigimon[] {
+interface DigimonWithTech extends BattleDigimon {
+  assignedTech?: Tech;
+  counterUsed?: boolean;
+}
+
+function calculateTurnOrder(digimons: DigimonWithTech[]): DigimonWithTech[] {
   const aliveDigimons = digimons.filter(d => d.isAlive);
   
-  // Add random 0-9 to speed for turn order
-  const withInitiative = aliveDigimons.map(d => ({
+  // Separate counter and non-counter digimons
+  const counterDigimons: DigimonWithTech[] = [];
+  const normalDigimons: DigimonWithTech[] = [];
+  
+  for (const d of aliveDigimons) {
+    if (d.assignedTech?.isCounter) {
+      counterDigimons.push(d);
+    } else {
+      normalDigimons.push(d);
+    }
+  }
+  
+  // Add random 0-9 to speed for turn order (normal digimons)
+  const normalWithInitiative = normalDigimons.map(d => ({
     digimon: d,
     initiative: d.stats.spd + Math.floor(Math.random() * 10)
   }));
 
   // Sort by initiative (highest first)
-  withInitiative.sort((a, b) => b.initiative - a.initiative);
+  normalWithInitiative.sort((a, b) => b.initiative - a.initiative);
   
-  return withInitiative.map(w => w.digimon);
+  // Counter digimons go last
+  const counterWithInitiative = counterDigimons.map(d => ({
+    digimon: d,
+    initiative: d.stats.spd + Math.floor(Math.random() * 10)
+  }));
+  
+  counterWithInitiative.sort((a, b) => b.initiative - a.initiative);
+  
+  return [...normalWithInitiative.map(w => w.digimon), ...counterWithInitiative.map(w => w.digimon)];
 }
 
 function simulateBattle(
@@ -166,10 +191,10 @@ function simulateBattle(
   floorSpecialty: string
 ): { turns: number; history: BattleTurn[]; playerWon: boolean; totalTime: number } {
   // Convert teams to battle format
-  const playerDigimons = createBattleDigimon(playerTeam, 'player');
-  const enemyDigimons = Array.isArray(enemyTeam) && 'digimon' in (enemyTeam[0] || {})
+  const playerDigimons = createBattleDigimon(playerTeam, 'player') as DigimonWithTech[];
+  const enemyDigimons = (Array.isArray(enemyTeam) && 'digimon' in (enemyTeam[0] || {})
     ? createBattleDigimon(enemyTeam as TeamDigimon[], 'enemy')
-    : createBattleDigimonFromEncounter(enemyTeam);
+    : createBattleDigimonFromEncounter(enemyTeam)) as DigimonWithTech[];
 
   const allDigimons = [...playerDigimons, ...enemyDigimons];
   const history: BattleTurn[] = [];
@@ -189,27 +214,45 @@ function simulateBattle(
       return { turns: turnCount, history, playerWon: true, totalTime };
     }
 
+    // Assign techs to all digimons at the start of the round
+    for (const digimon of allDigimons) {
+      if (digimon.isAlive) {
+        digimon.assignedTech = getRandomTech(digimon);
+        digimon.counterUsed = false;
+      }
+    }
+
     // Calculate turn order for this round
     const turnOrder = calculateTurnOrder(allDigimons);
+    
+    // Track which digimons have acted this round
+    const actedThisRound = new Set<string>();
 
     // Execute turns
-    for (const attacker of turnOrder) {
-      if (!attacker.isAlive) continue;
+    let turnIndex = 0;
+    while (turnIndex < turnOrder.length) {
+      const attacker = turnOrder[turnIndex];
+      
+      if (!attacker.isAlive || actedThisRound.has(attacker.id)) {
+        turnIndex++;
+        continue;
+      }
 
+      actedThisRound.add(attacker.id);
       turnCount++;
-      const tech = getRandomTech(attacker);
+      
+      const tech = attacker.assignedTech!;
       const isPlayerDigimon = attacker.id.startsWith('player');
       const opponents = isPlayerDigimon ? enemyDigimons : playerDigimons;
       const aliveOpponents = opponents.filter(d => d.isAlive);
 
       if (aliveOpponents.length === 0) break;
 
-      if (tech.target === 'Single') {
-        const target = getRandomTarget(aliveOpponents);
+      // Execute attack
+      const executeAttack = (target: DigimonWithTech) => {
         const damage = calculateDamage(attacker, target, tech, floorSpecialty);
-        const actionTime = calculateActionTime(1);
-        totalTime += actionTime;
-
+        const actionTime = calculateActionTime(tech.target === 'All' ? aliveOpponents.length : 1);
+        
         target.currentHp = Math.max(0, target.currentHp - damage);
         
         if (target.currentHp <= 0) {
@@ -226,34 +269,26 @@ function simulateBattle(
           hpRemaining: target.currentHp,
           result: target.currentHp <= 0 ? 'KO' : 'Hit',
           timeSeconds: actionTime,
-          targetsHit: 1
+          targetsHit: tech.target === 'All' ? aliveOpponents.length : 1
         });
-      } else {
-        // Target all opponents
-        const targetsHit = aliveOpponents.length;
-        const actionTime = calculateActionTime(targetsHit);
+
         totalTime += actionTime;
 
-        for (const target of aliveOpponents) {
-          const damage = calculateDamage(attacker, target, tech, floorSpecialty);
-          target.currentHp = Math.max(0, target.currentHp - damage);
-          
-          if (target.currentHp <= 0) {
-            target.isAlive = false;
-          }
+        // Check for counter trigger
+        if (target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id)) {
+          target.counterUsed = true;
+          // Insert counter attacker right after current position
+          turnOrder.splice(turnIndex + 1, 0, target);
+        }
+      };
 
-          history.push({
-            turn: turnCount,
-            round,
-            digimon: attacker.name,
-            tech: tech.name,
-            target: target.name,
-            damage,
-            hpRemaining: target.currentHp,
-            result: target.currentHp <= 0 ? 'KO' : 'Hit',
-            timeSeconds: actionTime,
-            targetsHit
-          });
+      if (tech.target === 'Single') {
+        const target = getRandomTarget(aliveOpponents) as DigimonWithTech;
+        executeAttack(target);
+      } else {
+        // Target all opponents
+        for (const target of aliveOpponents) {
+          executeAttack(target as DigimonWithTech);
         }
       }
 
@@ -267,6 +302,8 @@ function simulateBattle(
       if (remainingEnemyDigimons.length === 0) {
         return { turns: turnCount, history, playerWon: true, totalTime };
       }
+
+      turnIndex++;
     }
 
     round++;
