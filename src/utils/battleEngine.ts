@@ -55,21 +55,40 @@ function calculateDamage(
   attacker: BattleDigimon,
   defender: BattleDigimon,
   tech: Tech,
-  floorSpecialty: string
+  floorSpecialty: string,
+  isCounterAttack: boolean = false
 ): number {
   const typeBonus = getTypeBonus(attacker.type, defender.type);
   const specialtyBonus = getSpecialtyBonus(tech.element, defender.specialty);
-  const attackPower = tech.ap;
+  
+  // Handle special effects that modify AP
+  let attackPower = tech.ap;
+  
+  // Beast King Fist: counter damage based on damage taken
+  if (isCounterAttack && tech.specialEffect?.type === 'counterDamageMultiplier' && attacker.damageTakenThisTurn) {
+    return Math.floor(attacker.damageTakenThisTurn * (tech.specialEffect.value || 1.5));
+  }
+  
+  // Counter AP multiplier effects
+  if (isCounterAttack && (tech.specialEffect?.type === 'counterApMultiplier' || tech.specialEffect?.type === 'counterApMultiplierAndTargetAll')) {
+    attackPower *= (tech.specialEffect.value || 1.5);
+  }
+  
+  // SubZero Ice Punch: consecutive use bonus
+  if (tech.specialEffect?.type === 'consecutiveApIncrease' && attacker.lastTechUsed === tech.name && attacker.consecutiveTechCount) {
+    const bonus = Math.min((attacker.consecutiveTechCount || 0) * (tech.specialEffect.value || 2.5), 25);
+    attackPower += bonus;
+  }
+  
   const tileBonus = getTileBonus(tech.element, floorSpecialty);
-  const attack = attacker.stats.atk;
-  const defense = defender.stats.def;
+  
+  // Apply debuffs to stats
+  const attack = attacker.stats.atk * (attacker.debuffs?.atk || 1);
+  const defense = defender.stats.def * (defender.debuffs?.def || 1);
   const defenderBonus = getDefenderBonus(defender.specialty, floorSpecialty);
 
-  // Damage formula: floor(floor(type bonus * specialty bonus * attack power * tech tile bonus) * attacker attack / floor(defender defense * defender tile bonus))
   const baseDamage = Math.floor(typeBonus * specialtyBonus * attackPower * tileBonus);
   const adjustedDefense = Math.floor(defense * defenderBonus);
-  
-  // Use integer arithmetic to avoid floating-point precision issues
   const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
   
   return finalDamage;
@@ -84,7 +103,11 @@ function createBattleDigimon(teamDigimon: TeamDigimon[], teamPrefix: string): Ba
     stats: { ...td.customStats },
     currentHp: td.customStats.hp,
     techs: td.techs,
-    isAlive: true
+    isAlive: true,
+    debuffs: {},
+    consecutiveTechCount: 0,
+    lastTechUsed: undefined,
+    damageTakenThisTurn: 0
   }));
 }
 
@@ -119,7 +142,11 @@ function createBattleDigimonFromEncounter(encounter: any): BattleDigimon[] {
       },
       currentHp: digimon.hp,
       techs,
-      isAlive: true
+      isAlive: true,
+      debuffs: {},
+      consecutiveTechCount: 0,
+      lastTechUsed: undefined,
+      damageTakenThisTurn: 0
     };
   });
 }
@@ -249,12 +276,32 @@ function simulateBattle(
       if (aliveOpponents.length === 0) break;
 
       // Execute attack
-      const executeAttack = (target: DigimonWithTech) => {
-        const damage = calculateDamage(attacker, target, tech, floorSpecialty);
+      const executeAttack = (target: DigimonWithTech, isCounterAttack = false) => {
+        const damage = calculateDamage(attacker, target, tech, floorSpecialty, isCounterAttack);
         const actionTime = calculateActionTime(tech.target === 'All' ? aliveOpponents.length : 1);
         
         target.currentHp = Math.max(0, target.currentHp - damage);
+        target.damageTakenThisTurn = damage;
         
+        // Twig Tap: heal attacker
+        if (tech.specialEffect?.type === 'healOnDamage') {
+          attacker.currentHp = Math.min(attacker.stats.hp, attacker.currentHp + damage);
+        }
+        
+        // Apply debuffs
+        if (tech.specialEffect?.type === 'debuffStat' && tech.specialEffect.stat) {
+          const stat = tech.specialEffect.stat;
+          const currentDebuff = target.debuffs?.[stat] || 1;
+          const maxStacks = tech.specialEffect.maxStacks || 2;
+          const stackCount = Math.round(Math.log2(1 / currentDebuff));
+          
+          if (stackCount < maxStacks) {
+            target.debuffs = target.debuffs || {};
+            target.debuffs[stat] = currentDebuff / Math.SQRT2;
+          }
+        }
+        
+        const wasAlive = target.isAlive;
         if (target.currentHp <= 0) {
           target.isAlive = false;
         }
@@ -274,21 +321,47 @@ function simulateBattle(
 
         totalTime += actionTime;
 
-        // Check for counter trigger
-        if (target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id)) {
+        // Check for counter trigger (unless Howling Crusher)
+        if (wasAlive && target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id) && tech.specialEffect?.type !== 'noTriggerCounter') {
           target.counterUsed = true;
-          // Insert counter attacker right after current position
           turnOrder.splice(turnIndex + 1, 0, target);
         }
+        
+        return target.currentHp <= 0;
       };
-
-      if (tech.target === 'Single') {
-        const target = getRandomTarget(aliveOpponents) as DigimonWithTech;
-        executeAttack(target);
+      
+      // Track consecutive tech usage
+      if (attacker.lastTechUsed === tech.name) {
+        attacker.consecutiveTechCount = (attacker.consecutiveTechCount || 0) + 1;
       } else {
-        // Target all opponents
+        attacker.consecutiveTechCount = 1;
+        attacker.lastTechUsed = tech.name;
+      }
+      
+      attacker.damageTakenThisTurn = 0;
+      
+      const isCounterAttack = actedThisRound.size > 0 && tech.isCounter;
+
+      // Determine actual targeting based on counter effects
+      let actualTarget = tech.target;
+      if (isCounterAttack && (tech.specialEffect?.type === 'counterTargetAll' || tech.specialEffect?.type === 'counterApMultiplierAndTargetAll')) {
+        actualTarget = 'All';
+      }
+      
+      if (actualTarget === 'Single') {
+        let target = getRandomTarget(aliveOpponents) as DigimonWithTech;
+        let killed = executeAttack(target, isCounterAttack);
+        
+        // Shadow Scythe: chain on kill
+        while (killed && tech.specialEffect?.type === 'chainOnKill') {
+          const remainingTargets = opponents.filter(d => d.isAlive);
+          if (remainingTargets.length === 0) break;
+          target = getRandomTarget(remainingTargets) as DigimonWithTech;
+          killed = executeAttack(target, isCounterAttack);
+        }
+      } else {
         for (const target of aliveOpponents) {
-          executeAttack(target as DigimonWithTech);
+          executeAttack(target as DigimonWithTech, isCounterAttack);
         }
       }
 

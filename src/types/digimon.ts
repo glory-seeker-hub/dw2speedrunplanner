@@ -14,6 +14,12 @@ export interface Tech {
   element: 'Fire' | 'Water' | 'Earth' | 'Air' | 'Nature' | 'Dark' | 'Machine' | 'None' | 'Wave' | 'Darkness' | 'Neutral';
   target: 'Single' | 'All';
   isCounter: boolean;
+  specialEffect?: {
+    type: 'counterDamageMultiplier' | 'debuffStat' | 'counterTargetAll' | 'counterApMultiplier' | 'noTriggerCounter' | 'chainOnKill' | 'consecutiveApIncrease' | 'healOnDamage' | 'counterApMultiplierAndTargetAll';
+    value?: number;
+    stat?: 'spd' | 'def' | 'atk';
+    maxStacks?: number;
+  };
 }
 
 export interface Digimon {
@@ -74,6 +80,14 @@ export interface BattleDigimon {
   currentHp: number;
   techs: Tech[];
   isAlive: boolean;
+  debuffs?: {
+    spd?: number;
+    def?: number;
+    atk?: number;
+  };
+  lastTechUsed?: string;
+  consecutiveTechCount?: number;
+  damageTakenThisTurn?: number;
 }
 
 export interface SimulationResult {

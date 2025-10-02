@@ -24,6 +24,10 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterDamageMultiplier',
+      value: 1.5
+    }
   },
   {
     id: 'big-bang-boom',
@@ -128,6 +132,11 @@ export const TECHS: Tech[] = [
     element: 'Water',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'spd',
+      maxStacks: 2
+    }
   },
   {
     id: 'crimson-claw',
@@ -184,6 +193,11 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'All',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'def',
+      maxStacks: 2
+    }
   },
   {
     id: 'electric-shock',
@@ -216,6 +230,9 @@ export const TECHS: Tech[] = [
     element: 'Machine',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterTargetAll'
+    }
   },
   {
     id: 'energy-blast',
@@ -256,6 +273,11 @@ export const TECHS: Tech[] = [
     element: 'Water',
     target: 'All',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'spd',
+      maxStacks: 2
+    }
   },
   {
     id: 'fire-blast',
@@ -432,6 +454,9 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'noTriggerCounter'
+    }
   },
   {
     id: 'hydro-blaster',
@@ -576,6 +601,9 @@ export const TECHS: Tech[] = [
     element: 'Fire',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterTargetAll'
+    }
   },
   {
     id: 'meteor-wing',
@@ -624,6 +652,10 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterApMultiplier',
+      value: 1.5
+    }
   },
   {
     id: 'nova-blast',
@@ -696,6 +728,11 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'atk',
+      maxStacks: 2
+    }
   },
   {
     id: 'pummel-peck',
@@ -776,6 +813,11 @@ export const TECHS: Tech[] = [
     element: 'None',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'def',
+      maxStacks: 2
+    }
   },
   {
     id: 'scissor-magic',
@@ -792,6 +834,9 @@ export const TECHS: Tech[] = [
     element: 'Dark',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'chainOnKill'
+    }
   },
   {
     id: 'slamming-tusk',
@@ -808,6 +853,10 @@ export const TECHS: Tech[] = [
     element: 'Machine',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterApMultiplier',
+      value: 1.5
+    }
   },
   {
     id: 'smiley-warhead',
@@ -816,6 +865,10 @@ export const TECHS: Tech[] = [
     element: 'Machine',
     target: 'Single',
     isCounter: true,
+    specialEffect: {
+      type: 'counterApMultiplierAndTargetAll',
+      value: 1.5
+    }
   },
   {
     id: 'solar-ray',
@@ -904,6 +957,10 @@ export const TECHS: Tech[] = [
     element: 'Water',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'consecutiveApIncrease',
+      value: 2.5
+    }
   },
   {
     id: 'super-shocker',
@@ -968,6 +1025,11 @@ export const TECHS: Tech[] = [
     element: 'Wave',
     target: 'All',
     isCounter: false,
+    specialEffect: {
+      type: 'debuffStat',
+      stat: 'atk',
+      maxStacks: 2
+    }
   },
   {
     id: 'tomahawk-crunch',
@@ -1032,6 +1094,9 @@ export const TECHS: Tech[] = [
     element: 'Nature',
     target: 'Single',
     isCounter: false,
+    specialEffect: {
+      type: 'healOnDamage'
+    }
   },
   {
     id: 'vee-head-butt',
