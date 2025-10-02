@@ -175,6 +175,7 @@ function getRandomTarget(targets: BattleDigimon[]): BattleDigimon {
 interface DigimonWithTech extends BattleDigimon {
   assignedTech?: Tech;
   counterUsed?: boolean;
+  isCountering?: boolean; // Track if this is a triggered counter attack
 }
 
 function calculateTurnOrder(digimons: DigimonWithTech[]): DigimonWithTech[] {
@@ -246,6 +247,7 @@ function simulateBattle(
       if (digimon.isAlive) {
         digimon.assignedTech = getRandomTech(digimon);
         digimon.counterUsed = false;
+        digimon.isCountering = false;
       }
     }
 
@@ -276,8 +278,8 @@ function simulateBattle(
       if (aliveOpponents.length === 0) break;
 
       // Execute attack
-      const executeAttack = (target: DigimonWithTech, isCounterAttack = false) => {
-        const damage = calculateDamage(attacker, target, tech, floorSpecialty, isCounterAttack);
+      const executeAttack = (target: DigimonWithTech) => {
+        const damage = calculateDamage(attacker, target, tech, floorSpecialty, attacker.isCountering || false);
         const actionTime = calculateActionTime(tech.target === 'All' ? aliveOpponents.length : 1);
         
         target.currentHp = Math.max(0, target.currentHp - damage);
@@ -324,6 +326,7 @@ function simulateBattle(
         // Check for counter trigger (unless Howling Crusher)
         if (wasAlive && target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id) && tech.specialEffect?.type !== 'noTriggerCounter') {
           target.counterUsed = true;
+          target.isCountering = true; // Mark as triggered counter
           turnOrder.splice(turnIndex + 1, 0, target);
         }
         
@@ -337,33 +340,32 @@ function simulateBattle(
         attacker.consecutiveTechCount = 1;
         attacker.lastTechUsed = tech.name;
       }
-      
-      attacker.damageTakenThisTurn = 0;
-      
-      const isCounterAttack = actedThisRound.size > 0 && tech.isCounter;
 
       // Determine actual targeting based on counter effects
       let actualTarget = tech.target;
-      if (isCounterAttack && (tech.specialEffect?.type === 'counterTargetAll' || tech.specialEffect?.type === 'counterApMultiplierAndTargetAll')) {
+      if (attacker.isCountering && (tech.specialEffect?.type === 'counterTargetAll' || tech.specialEffect?.type === 'counterApMultiplierAndTargetAll')) {
         actualTarget = 'All';
       }
       
       if (actualTarget === 'Single') {
         let target = getRandomTarget(aliveOpponents) as DigimonWithTech;
-        let killed = executeAttack(target, isCounterAttack);
+        let killed = executeAttack(target);
         
         // Shadow Scythe: chain on kill
         while (killed && tech.specialEffect?.type === 'chainOnKill') {
           const remainingTargets = opponents.filter(d => d.isAlive);
           if (remainingTargets.length === 0) break;
           target = getRandomTarget(remainingTargets) as DigimonWithTech;
-          killed = executeAttack(target, isCounterAttack);
+          killed = executeAttack(target);
         }
       } else {
         for (const target of aliveOpponents) {
-          executeAttack(target as DigimonWithTech, isCounterAttack);
+          executeAttack(target as DigimonWithTech);
         }
       }
+      
+      // Reset damage taken after attack is complete (for next turn)
+      attacker.damageTakenThisTurn = 0;
 
       // Check if battle ended after this attack
       const remainingPlayerDigimons = playerDigimons.filter(d => d.isAlive);
