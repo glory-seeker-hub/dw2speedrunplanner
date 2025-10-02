@@ -7,12 +7,10 @@ import { BattleSimulation } from '@/components/BattleSimulation';
 import { BattleResults } from '@/components/BattleResults';
 import { TeamDigimon, SimulationResult } from '@/types/digimon';
 import { Database, Zap, Trophy, Settings } from 'lucide-react';
-
 const Index = () => {
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
   const [activeTab, setActiveTab] = useState<string>('team-builder');
-
   const handleSaveTeam = (team: TeamDigimon[]) => {
     if (team.length > 0) {
       setSavedTeams([...savedTeams, team]);
@@ -20,14 +18,11 @@ const Index = () => {
       // Here you would typically save to localStorage or a database
     }
   };
-
   const handleSimulationComplete = (results: SimulationResult) => {
     setSimulationResults(results);
     setActiveTab('results');
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -44,10 +39,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
+              
             </div>
           </div>
         </div>
@@ -116,17 +108,11 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="battle-simulation" className="mt-6">
-              <BattleSimulation 
-                savedTeams={savedTeams} 
-                onSimulationComplete={handleSimulationComplete}
-              />
+              <BattleSimulation savedTeams={savedTeams} onSimulationComplete={handleSimulationComplete} />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
-              {simulationResults ? (
-                <BattleResults results={simulationResults} />
-              ) : (
-                <Card className="bg-gradient-card border-border">
+              {simulationResults ? <BattleResults results={simulationResults} /> : <Card className="bg-gradient-card border-border">
                   <CardHeader>
                     <CardTitle>Battle Results</CardTitle>
                   </CardHeader>
@@ -135,14 +121,11 @@ const Index = () => {
                       Results and statistics will appear here after running simulations.
                     </p>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </TabsContent>
           </Tabs>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
