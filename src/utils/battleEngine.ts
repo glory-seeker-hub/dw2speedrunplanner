@@ -323,8 +323,9 @@ function simulateBattle(
 
         totalTime += actionTime;
 
-        // Check for counter trigger (unless Howling Crusher)
-        if (wasAlive && target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id) && tech.specialEffect?.type !== 'noTriggerCounter') {
+        // Check for counter trigger (unless Howling Crusher or attacker is also countering)
+        // Counters cannot trigger other counters
+        if (wasAlive && target.isAlive && target.assignedTech?.isCounter && !target.counterUsed && !actedThisRound.has(target.id) && tech.specialEffect?.type !== 'noTriggerCounter' && !attacker.isCountering) {
           target.counterUsed = true;
           target.isCountering = true; // Mark as triggered counter
           turnOrder.splice(turnIndex + 1, 0, target);
