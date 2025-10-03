@@ -6,7 +6,8 @@ import { TeamBuilder } from '@/components/TeamBuilder';
 import { BattleSimulation } from '@/components/BattleSimulation';
 import { BattleResults } from '@/components/BattleResults';
 import { TeamDigimon, SimulationResult } from '@/types/digimon';
-import { Database, Zap, Trophy, Settings } from 'lucide-react';
+import { Database, Zap, Trophy } from 'lucide-react';
+import { InfoDialog } from '@/components/InfoDialog';
 const Index = () => {
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
@@ -39,7 +40,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              
+              <InfoDialog />
             </div>
           </div>
         </div>
