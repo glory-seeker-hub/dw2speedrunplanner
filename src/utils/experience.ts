@@ -5,7 +5,6 @@ import { CUMULATIVE_XP_BY_LEVEL } from '@/data/experience';
  * so missing data can never produce fabricated estimates.
  *
  * GAME RULE: a Digimon can gain at most ONE level per battle, regardless of accumulated XP.
- * Callers must therefore apply level-ups one battle at a time (see canLevelUp).
  */
 
 /** Cumulative XP required to reach `level`. `null` when unknown. */
@@ -31,4 +30,48 @@ export const getXpRemainingForNextLevel = (
 export const canLevelUp = (level: number, totalXp: number): boolean => {
   const remaining = getXpRemainingForNextLevel(level, totalXp);
   return remaining === 0;
+};
+
+export interface BattleXpResult {
+  previousLevel: number;
+  newLevel: number;
+  previousTotalXp: number;
+  newTotalXp: number;
+  leveledUp: boolean;
+  /** XP still missing for the level after `newLevel`. `null` when threshold unknown. */
+  xpToNextLevel: number | null;
+}
+
+/**
+ * Pure XP application for a single battle.
+ * Enforces the one-level-per-battle rule: newLevel is either currentLevel or +1.
+ * Never touches stats.
+ */
+export const applyBattleXp = (
+  currentLevel: number,
+  currentTotalXp: number,
+  gainedXp: number
+): BattleXpResult => {
+  if (!Number.isInteger(currentLevel) || currentLevel < 1) {
+    throw new Error(`applyBattleXp: invalid level ${currentLevel}`);
+  }
+  if (!Number.isFinite(currentTotalXp) || currentTotalXp < 0) {
+    throw new Error(`applyBattleXp: invalid totalXp ${currentTotalXp}`);
+  }
+  if (!Number.isFinite(gainedXp) || gainedXp < 0) {
+    throw new Error(`applyBattleXp: invalid gainedXp ${gainedXp}`);
+  }
+
+  const newTotalXp = currentTotalXp + gainedXp;
+  const leveledUp = canLevelUp(currentLevel, newTotalXp);
+  const newLevel = leveledUp ? currentLevel + 1 : currentLevel;
+
+  return {
+    previousLevel: currentLevel,
+    newLevel,
+    previousTotalXp: currentTotalXp,
+    newTotalXp,
+    leveledUp,
+    xpToNextLevel: getXpRemainingForNextLevel(newLevel, newTotalXp),
+  };
 };

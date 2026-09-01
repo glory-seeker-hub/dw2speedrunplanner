@@ -25,6 +25,7 @@ export interface RunBattleEvent {
   /** Snapshot of the digiline at the time this battle happened (up to 3 instance IDs). */
   digilineInstanceIds: string[];
   capturedEnemySlot?: number | null;
+  /** Reward SNAPSHOT taken when the event was created. Never a computed getter. */
   xpReward: number;
   bitsReward: number;
 }
@@ -50,32 +51,51 @@ export interface PersistedRunPlannerData {
   activeRunId: string | null;
 }
 
-/** Growth foundation — real DW2 growth data is not yet available in this project. */
-export type GrowthRate = 'low' | 'normal' | 'high' | string;
+/** Growth classification. Only these three categories are verified for DW2. */
+export type GrowthRate = 'low' | 'normal' | 'high';
 
 export interface DigimonGrowthProfile {
   speciesId: string;
+  /** Stage/rank drives which growth table row applies. */
+  stage?: string;
+  rank?: string;
   hpGrowth: GrowthRate;
   mpGrowth: GrowthRate;
   atkGrowth: GrowthRate;
   defGrowth: GrowthRate;
   spdGrowth: GrowthRate;
-  /** Optional extra parameters required by the real DW2 formula (stage/rank, DNA, etc.). */
-  stage?: string;
-  rank?: string;
 }
 
+/**
+ * Growth outcome for one stat on one level-up.
+ * `expected` is null when only min/max are verified — never assume a uniform distribution.
+ */
 export type StatGrowthEstimate =
-  | { available: true; min: number; expected: number; max: number }
+  | { available: true; min: number; max: number; expected: number | null }
   | { available: false; reason: string };
+
+/**
+ * Stat progression model. Keeps ACTUAL known stats separate from estimates so the
+ * Run Planner never re-rolls random growth on recalculation or page reload.
+ */
+export interface StatProgression {
+  /** Known/authoritative stats (starter record, capture record, or user-entered). */
+  currentStats: DigimonStats;
+  /** Deterministic estimate — null entries mean "not estimable with verified data". */
+  estimatedStats: Partial<Record<keyof DigimonStats, number | null>>;
+  /** Possible growth window per stat for the next level-up. */
+  growthRange: Record<keyof DigimonStats, StatGrowthEstimate>;
+}
 
 /** Starter definition — enough data to build the initial RosterDigimon. */
 export interface StarterDefinition {
   id: string;
+  /** In-game starter path label (Gold Hawk / Blue Falcon / Black Sword). */
+  label: string;
   speciesId: string;
   name: string;
   level: number;
   stats: DigimonStats;
   techs: string[];
-  totalXp?: number;
+  totalXp: number;
 }
