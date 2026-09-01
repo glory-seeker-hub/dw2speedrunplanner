@@ -22,8 +22,10 @@ export interface DigimonSpecies {
 /** Centralized alias table for naming differences between data files. */
 export const DIGIMON_NAME_ALIASES: Record<string, string> = {
   dokunemmon: 'dokunemon',
-  mudfrigimon: 'mudfrigimon',
+  // Encounter data uses the full name; the species list uses the abbreviated form.
+  skullmammothmon: 'smammothmon',
 };
+
 
 export const normalizeDigimonName = (name: string): string => {
   const key = (name ?? '')
