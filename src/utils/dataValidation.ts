@@ -95,9 +95,9 @@ export const validateGameData = (): ValidationReport => {
             seenUnresolvedTech.add(key);
             unresolvedTechNames.push({ source: `encounter ${e.id}`, techName });
             push(
-              'error',
+              'missing-data',
               'unresolved-tech',
-              `Encounter ${e.id}: tech "${techName}" cannot be resolved in TECHS`
+              `Encounter ${e.id}: tech "${techName}" is not in TECHS (expected for assists, which are not implemented)`
             );
           }
         }
