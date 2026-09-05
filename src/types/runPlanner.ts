@@ -68,10 +68,21 @@ export interface DigimonGrowthProfile {
 
 /**
  * Growth outcome for one stat on one level-up.
- * `expected` is null when only min/max are verified — never assume a uniform distribution.
+ * Each verified row has exactly four outcomes, each with probability 25%,
+ * so `expected` is the arithmetic mean of `rolls`.
  */
 export type StatGrowthEstimate =
-  | { available: true; min: number; max: number; expected: number | null }
+  | {
+      available: true;
+      min: number;
+      max: number;
+      expected: number;
+      /** The four equiprobable outcomes. */
+      rolls: number[];
+      /** 0.25 for every outcome. */
+      outcomeProbability: number;
+      bracket: string;
+    }
   | { available: false; reason: string };
 
 /**

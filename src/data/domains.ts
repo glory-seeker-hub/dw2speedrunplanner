@@ -1,34 +1,31 @@
 import { Domain, DomainEncounter, DomainPhase, DomainVariant } from '@/types/encounter';
-import { EXTERNAL_DOMAIN_GROUPS } from '@/data/externalDomainGroups';
-import { GroupMatch, matchGroup } from '@/utils/encounterMatching';
+import { DOMAIN_GROUPS, DomainGroup } from '@/data/domainGroups';
+import {
+  REWARDS_BY_ENCOUNTER_ID,
+  ResolvedReward,
+  getResolvedReward,
+} from '@/utils/rewardMatching';
 
 /**
  * DOMAIN / LOCATION MAPPINGS
  *
- * DOMAINS is derived from the verified external listings in externalDomainGroups.ts,
- * mapped to existing encounter IDs by unique signature match only. Groups that match
- * zero or multiple encounters are NOT mapped — they are reported instead.
+ * DOMAINS is derived from the fully resolved external group list in domainGroups.ts
+ * (456 strict CSV matches + 17 explicit contextual corrections = 473/473).
  *
- * Encounter stats are never duplicated here. XP/Bits resolved from unique matches are
- * exposed through ENCOUNTER_REWARDS / getEncounterRewards (Run Planner concern only —
- * the battle engine keeps reading encounter.digimons exactly as before).
+ * Encounter stats are NEVER duplicated here — domains only reference encounter IDs.
+ * XP/Bits come from the reward source records (see utils/rewardMatching.ts), which the
+ * battle engine never reads.
  */
-
-export const GROUP_MATCHES: GroupMatch[] = EXTERNAL_DOMAIN_GROUPS.map(matchGroup);
 
 export interface EncounterReward {
   xp: number;
   bits: number;
 }
 
-const buildDomains = (): { domains: Domain[]; rewards: Map<number, EncounterReward> } => {
+const buildDomains = (): Domain[] => {
   const domainMap = new Map<string, Domain>();
-  const rewards = new Map<number, EncounterReward>();
 
-  for (const match of GROUP_MATCHES) {
-    if (match.status !== 'mapped') continue;
-    const { group, encounterId } = match;
-
+  for (const group of DOMAIN_GROUPS) {
     let domain = domainMap.get(group.domainId);
     if (!domain) {
       domain = { id: group.domainId, name: group.domainName, variants: [] };
@@ -37,39 +34,45 @@ const buildDomains = (): { domains: Domain[]; rewards: Map<number, EncounterRewa
 
     let variant = domain.variants.find((v) => v.phase === group.phase);
     if (!variant) {
-      variant = { phase: group.phase, maxFloor: group.maxFloor, encounters: [] };
+      variant = { phase: group.phase, encounters: [] };
       domain.variants.push(variant);
-    } else if (variant.maxFloor === undefined && group.maxFloor !== undefined) {
-      variant.maxFloor = group.maxFloor;
     }
 
-    const existing = variant.encounters.find((e) => e.encounterId === encounterId);
+    const maxGroupFloor = group.floors.length > 0 ? Math.max(...group.floors) : undefined;
+    if (maxGroupFloor !== undefined) {
+      variant.maxFloor =
+        variant.maxFloor === undefined
+          ? maxGroupFloor
+          : Math.max(variant.maxFloor, maxGroupFloor);
+    }
+
+    const existing = variant.encounters.find((e) => e.encounterId === group.encounterId);
     if (existing) {
-      const floors = new Set([...(existing.floors ?? []), ...(group.floors ?? [])]);
+      const floors = new Set([...(existing.floors ?? []), ...group.floors]);
       existing.floors = floors.size > 0 ? [...floors].sort((a, b) => a - b) : undefined;
-      existing.isBoss = existing.isBoss || group.isBoss;
+      existing.isBoss = Boolean(existing.isBoss) || group.isBoss;
     } else {
-      const entry: DomainEncounter = { encounterId };
-      if (group.floors) entry.floors = [...group.floors];
-      if (group.isBoss !== undefined) entry.isBoss = group.isBoss;
+      const entry: DomainEncounter = { encounterId: group.encounterId };
+      if (group.floors.length > 0) entry.floors = [...group.floors];
+      entry.isBoss = group.isBoss;
       variant.encounters.push(entry);
-    }
-
-    if (typeof group.xp === 'number' && typeof group.bits === 'number') {
-      rewards.set(encounterId, { xp: group.xp, bits: group.bits });
     }
   }
 
-  return { domains: [...domainMap.values()], rewards };
+  return [...domainMap.values()];
 };
 
-const built = buildDomains();
+export const DOMAINS: Domain[] = buildDomains();
 
-export const DOMAINS: Domain[] = built.domains;
-export const ENCOUNTER_REWARDS: Map<number, EncounterReward> = built.rewards;
+/** Encounter rewards resolved from the reward source table by unique full-data match. */
+export const ENCOUNTER_REWARDS: Map<number, EncounterReward> = new Map(
+  [...REWARDS_BY_ENCOUNTER_ID.entries()].map(([id, r]) => [id, { xp: r.xp, bits: r.bits }])
+);
 
-export const getEncounterRewards = (encounterId: number): EncounterReward | undefined =>
-  ENCOUNTER_REWARDS.get(encounterId);
+export const getEncounterRewards = (encounterId: number): EncounterReward | undefined => {
+  const resolved: ResolvedReward | undefined = getResolvedReward(encounterId);
+  return resolved ? { xp: resolved.xp, bits: resolved.bits } : undefined;
+};
 
 export const getDomainById = (id: string): Domain | undefined =>
   DOMAINS.find((d) => d.id === id);
@@ -93,9 +96,8 @@ export const getLocationsForEncounter = (
   });
 
 export const getMappedEncounterIds = (): number[] => [
-  ...new Set(
-    getAllDomainVariants().flatMap(({ variant }) =>
-      variant.encounters.map((e) => e.encounterId)
-    )
-  ),
+  ...new Set(DOMAIN_GROUPS.map((g) => g.encounterId)),
 ];
+
+export const getGroupsForEncounter = (encounterId: number): DomainGroup[] =>
+  DOMAIN_GROUPS.filter((g) => g.encounterId === encounterId);

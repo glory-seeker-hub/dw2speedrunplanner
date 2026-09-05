@@ -19,11 +19,23 @@ export interface DigimonSpecies {
   specialty: Digimon['specialty'];
 }
 
-/** Centralized alias table for naming differences between data files. */
+/**
+ * Centralized alias table for naming differences between data files.
+ *
+ * GLOBAL-SAFE ONLY: every entry here must be the SAME Digimon everywhere (spelling,
+ * capitalization or abbreviation differences). Group-specific source discrepancies are
+ * handled as contextual corrections in data/domainGroups.ts and must NEVER be added here
+ * (in particular: MetalTyrannomon is NOT an alias of MasterTyrannomon — distinct Digimon).
+ */
 export const DIGIMON_NAME_ALIASES: Record<string, string> = {
   dokunemmon: 'dokunemon',
   // Encounter data uses the full name; the species list uses the abbreviated form.
   skullmammothmon: 'smammothmon',
+  // Source-workbook spellings.
+  lilymon: 'lillymon',
+  gryphomon: 'gryphonmon',
+  // Same special boss form, localized name difference.
+  cpiedmon: 'cpierrotmon',
 };
 
 
