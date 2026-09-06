@@ -110,3 +110,138 @@ test('all existing Phase 1.6a data self-checks still pass', () => {
   assert.equal(checks.length, 46);
   assert.deepEqual(checks.filter((check) => !check.passed), []);
 });
+
+// Synthetic multi-instance rosters stay in tests; no production starter/capture changes.
+const { addToDigiline, removeFromDigiline, moveDigilineMember } = load('src/utils/runDigiline.ts');
+function multiRun() {
+  const run = createRunPlan('gold-hawk', 'Synthetic roster');
+  const first = run.roster[0];
+  run.roster = [first, ...['reserve-a', 'reserve-b', 'reserve-c'].map((instanceId, index) => ({
+    ...first, instanceId, stats: {...first.stats, hp: first.stats.hp + index + 0.5},
+    techs: [...first.techs],
+  }))];
+  assert.deepEqual(validateRunPlan(run), []);
+  return run;
+}
+function freeze(value) {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    Object.values(value).forEach(freeze);
+  }
+  return value;
+}
+function fullRun() {
+  return addToDigiline(addToDigiline(multiRun(), 'reserve-a'), 'reserve-b');
+}
+test('reserve instances append in order up to exactly three, including same-species instances', () => {
+  const run = freeze(multiRun());
+  const second = addToDigiline(run, 'reserve-a');
+  const third = addToDigiline(second, 'reserve-b');
+  assert.deepEqual(run.digiline, [run.starterInstanceId]);
+  assert.deepEqual(second.digiline, [run.starterInstanceId, 'reserve-a']);
+  assert.deepEqual(third.digiline, [run.starterInstanceId, 'reserve-a', 'reserve-b']);
+  assert.equal(third.digiline.length, 3);
+  assert.deepEqual(validateRunPlan(third), []);
+});
+test('fourth member and already-active IDs are rejected without mutation', () => {
+  const run = freeze(fullRun());
+  const before = JSON.stringify(run);
+  assert.throws(() => addToDigiline(run, 'reserve-c'), /max 3/);
+  assert.throws(() => addToDigiline(multiRun(), 'reserve-a-does-not-exist'), /not in the roster/);
+  const single = multiRun();
+  assert.throws(() => addToDigiline(single, single.starterInstanceId), /duplicate/i);
+  assert.equal(JSON.stringify(run), before);
+});
+test('removal keeps roster data and remaining order; re-add appends at the end', () => {
+  const run = freeze(fullRun());
+  const removed = removeFromDigiline(run, 'reserve-a');
+  assert.deepEqual(removed.digiline, [run.starterInstanceId, 'reserve-b']);
+  assert.deepEqual(removed.roster, run.roster);
+  assert.equal(removed.roster.length, 4);
+  assert.deepEqual(addToDigiline(removed, 'reserve-a').digiline,
+    [run.starterInstanceId, 'reserve-b', 'reserve-a']);
+  assert.equal(removeFromDigiline(removed, 'reserve-a'), removed);
+});
+test('starter can become reserve and an empty Digiline remains valid and persisted', () => {
+  const run = multiRun();
+  const empty = removeFromDigiline(run, run.starterInstanceId);
+  assert.deepEqual(empty.digiline, []);
+  assert.equal(empty.starterInstanceId, run.starterInstanceId);
+  assert.deepEqual(empty.roster, run.roster);
+  assert.deepEqual(validateRunPlan(empty), []);
+  assert.equal(storage.saveRunPlannerData(envelope(empty)), true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0].digiline, []);
+  assert.deepEqual(addToDigiline(empty, run.starterInstanceId).digiline, run.digiline);
+});
+test('up and down swap adjacent slots without changing roster order or original input', () => {
+  const run = freeze(fullRun());
+  const up = moveDigilineMember(run, 'reserve-b', 'up');
+  assert.deepEqual(up.digiline, [run.starterInstanceId, 'reserve-b', 'reserve-a']);
+  const down = moveDigilineMember(up, 'reserve-b', 'down');
+  assert.deepEqual(down.digiline, run.digiline);
+  assert.deepEqual(down.roster, run.roster);
+});
+test('first/last moves are no-ops and cannot wrap into an empty slot', () => {
+  const run = fullRun();
+  assert.equal(moveDigilineMember(run, run.starterInstanceId, 'up'), run);
+  assert.equal(moveDigilineMember(run, 'reserve-b', 'down'), run);
+  const one = multiRun();
+  assert.equal(moveDigilineMember(one, one.starterInstanceId, 'up'), one);
+  assert.equal(moveDigilineMember(one, one.starterInstanceId, 'down'), one);
+});
+test('unknown instances, reserve moves and invalid directions are rejected', () => {
+  const run = multiRun();
+  assert.throws(() => addToDigiline(run, 'missing'), /not in the roster/);
+  assert.throws(() => removeFromDigiline(run, 'missing'), /not in the roster/);
+  assert.throws(() => moveDigilineMember(run, 'missing', 'up'), /not in the roster/);
+  assert.throws(() => moveDigilineMember(run, 'reserve-a', 'up'), /Only active/);
+  assert.throws(() => moveDigilineMember(run, run.starterInstanceId, 'sideways'), /direction/);
+});
+test('add, reorder and remove each survive save/load with exact slot order', () => {
+  let run = multiRun();
+  const original = run;
+  for (const mutate of [
+    (r) => addToDigiline(r, 'reserve-a'),
+    (r) => addToDigiline(r, 'reserve-b'),
+    (r) => moveDigilineMember(r, 'reserve-b', 'up'),
+    (r) => removeFromDigiline(r, r.starterInstanceId),
+  ]) {
+    const next = mutate(run);
+    assert.equal(storage.saveRunPlannerData(envelope(next)), true);
+    run = storage.loadRunPlannerData().runs[0];
+    assert.deepEqual(run, next);
+  }
+  assert.deepEqual(run.digiline, ['reserve-b', 'reserve-a']);
+  assert.deepEqual(run.roster, original.roster);
+});
+test('Digiline mutations preserve history snapshots, rewards, fractional stats and identity', () => {
+  const run = multiRun();
+  run.totalBits = 100;
+  run.battles = [{id:'history',order:0,domainId:'test',encounterId:182,
+    digilineInstanceIds:[run.starterInstanceId],xpReward:0,bitsReward:0}];
+  freeze(run);
+  const before = JSON.stringify(run);
+  const changed = moveDigilineMember(addToDigiline(run,'reserve-a'),'reserve-a','up');
+  const {digiline, ...other} = changed;
+  const {digiline: originalDigiline, ...originalOther} = run;
+  assert.deepEqual(other, originalOther);
+  assert.equal(JSON.stringify(run), before);
+  assert.deepEqual(changed.battles[0].digilineInstanceIds, [run.starterInstanceId]);
+  assert.notDeepEqual(digiline, originalDigiline);
+});
+test('failed save of a Digiline update retains the previously persisted run', () => {
+  const run = multiRun();
+  storage.saveRunPlannerData(envelope(run));
+  const before = values.get(storage.RUN_PLANNER_STORAGE_KEY);
+  global.localStorage.setItem = () => {throw Error('quota');};
+  assert.equal(storage.saveRunPlannerData(envelope(addToDigiline(run,'reserve-a'))),false);
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY), before);
+  assert.deepEqual(storage.loadRunPlannerData(), envelope(run));
+});
+test('static data coverage remains complete after Digiline management', () => {
+  const report = load('src/utils/dataValidation.ts').validateGameData();
+  assert.equal(report.rewards.uniqueMatches,184);
+  assert.equal(report.domains.resolvedGroups,473);
+  assert.equal(report.growth.canonicalProfiles,195);
+  assert.deepEqual(report.issues.filter((issue) => issue.severity === 'error'),[]);
+});

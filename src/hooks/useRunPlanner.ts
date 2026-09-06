@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { PersistedRunPlannerData } from '@/types/runPlanner';
+import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
+import { PersistedRunPlannerData, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
 import { loadRunPlannerData, saveRunPlannerData, resetRunPlannerData } from '@/utils/runPlannerStorage';
 
@@ -20,6 +21,27 @@ export const useRunPlanner = () => {
     setError(null);
     return true;
   };
+
+  const updateDigiline = (mutate: (run: RunPlan) => RunPlan): boolean => {
+    if (!activeRun) return false;
+    try {
+      const changed = mutate(activeRun);
+      if (changed === activeRun) return true;
+      const nextRun = { ...changed, updatedAt: new Date().toISOString() };
+      return persist({
+        ...data,
+        runs: data.runs.map((run) => run.id === activeRun.id ? nextRun : run),
+      });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not update the Digiline.');
+      return false;
+    }
+  };
+
+  const addMember = (id: string) => updateDigiline((run) => addToDigiline(run, id));
+  const removeMember = (id: string) => updateDigiline((run) => removeFromDigiline(run, id));
+  const moveMember = (id: string, direction: DigilineDirection) =>
+    updateDigiline((run) => moveDigilineMember(run, id, direction));
 
   const startRun = (): boolean => {
     if (activeRun) return false; // Replacement requires the confirmed reset flow.
@@ -55,5 +77,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember };
 };
