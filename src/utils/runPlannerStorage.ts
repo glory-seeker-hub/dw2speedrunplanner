@@ -1,3 +1,4 @@
+import { validateRunPlan } from '@/utils/runInvariants';
 import { DigimonStats } from '@/types/digimon';
 import {
   MAX_DIGILINE_SIZE,
@@ -88,7 +89,7 @@ const isRunPlan = (v: unknown): v is RunPlan => {
   if (v.starterInstanceId !== null && !rosterIds.has(v.starterInstanceId as string)) {
     return false;
   }
-  return true;
+  return validateRunPlan(v as unknown as RunPlan).length === 0;
 };
 
 export const isValidPersistedRunPlannerData = (
@@ -97,6 +98,7 @@ export const isValidPersistedRunPlannerData = (
   if (!isObject(value)) return false;
   if (value.schemaVersion !== RUN_PLANNER_SCHEMA_VERSION) return false;
   if (!Array.isArray(value.runs) || !value.runs.every(isRunPlan)) return false;
+  if (new Set(value.runs.map((run) => run.id)).size !== value.runs.length) return false;
   if (value.activeRunId !== null && !isNonEmptyString(value.activeRunId)) return false;
   if (
     value.activeRunId !== null &&
@@ -135,10 +137,11 @@ export const saveRunPlannerData = (data: PersistedRunPlannerData): boolean => {
   }
 };
 
-export const resetRunPlannerData = (): void => {
+export const resetRunPlannerData = (): boolean => {
   try {
     localStorage.removeItem(RUN_PLANNER_STORAGE_KEY);
+    return true;
   } catch {
-    /* storage unavailable — nothing to reset */
+    return false;
   }
 };
