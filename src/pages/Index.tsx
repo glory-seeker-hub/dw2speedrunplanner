@@ -8,7 +8,10 @@ import { BattleResults } from '@/components/BattleResults';
 import { TeamDigimon, SimulationResult } from '@/types/digimon';
 import { Database, Zap, Trophy } from 'lucide-react';
 import { InfoDialog } from '@/components/InfoDialog';
+import { RunPlanner } from '@/components/run-planner/RunPlanner';
+import { useRunPlanner } from '@/hooks/useRunPlanner';
 const Index = () => {
+  const planner = useRunPlanner();
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
   const [activeTab, setActiveTab] = useState<string>('team-builder');
@@ -89,7 +92,7 @@ const Index = () => {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
               <TabsTrigger value="team-builder" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 Team Builder
@@ -102,7 +105,12 @@ const Index = () => {
                 <Trophy className="h-4 w-4 mr-2" />
                 Results
               </TabsTrigger>
+              <TabsTrigger value="run-planner">Run Planner</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="run-planner" className="mt-6">
+              <RunPlanner planner={planner} />
+            </TabsContent>
 
             <TabsContent value="team-builder" className="mt-6">
               <TeamBuilder onSaveTeam={handleSaveTeam} />
