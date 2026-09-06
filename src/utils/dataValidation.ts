@@ -1,8 +1,35 @@
 import { encounters } from '@/data/encounters';
 import { DIGIMONS } from '@/data/digimons';
-import { DOMAINS, GROUP_MATCHES, ENCOUNTER_REWARDS, getMappedEncounterIds } from '@/data/domains';
+import { DOMAINS, ENCOUNTER_REWARDS, getMappedEncounterIds } from '@/data/domains';
+import {
+  CONTEXTUAL_CORRECTION_GROUPS,
+  DOMAIN_GROUPS,
+  STRICT_CSV_UNIQUE_GROUPS,
+} from '@/data/domainGroups';
 import { STARTERS, STARTER_BUILD_ISSUES } from '@/data/starters';
-import { GROWTH_PROFILES } from '@/data/growthProfiles';
+import {
+  DUPLICATE_GROWTH_PROFILE_SPECIES,
+  GROWTH_PROFILES,
+  GROWTH_PROFILE_SOURCE_COUNT,
+  INVALID_GROWTH_RATE_VALUES,
+  UNRESOLVED_GROWTH_PROFILES,
+} from '@/data/growthProfiles';
+import {
+  ATK_DEF_GROWTH_ROWS,
+  GROWTH_OUTCOMES_PER_ROW,
+  GROWTH_OUTCOME_PROBABILITY,
+  HP_MP_GROWTH_ROWS,
+  PLANNER_SCOPE_MAX_EL,
+  RANK_MINIMUM_EL,
+  SPD_GROWTH_ROWS,
+} from '@/data/statGrowthTables';
+import { ENCOUNTER_REWARD_SOURCE } from '@/data/encounterRewardSource';
+import {
+  AMBIGUOUS_REWARD_MATCHES,
+  EXPLICIT_ZERO_REWARD_RECORDS,
+  REWARDS_BY_ENCOUNTER_ID,
+  UNMATCHED_REWARD_MATCHES,
+} from '@/utils/rewardMatching';
 import {
   getHighestContinuousExperienceLevel,
   isExperienceTableCompleteThrough,
@@ -10,6 +37,8 @@ import {
 import { getDigimonByName } from '@/utils/digimonLookup';
 import { getTechByName } from '@/utils/techLookup';
 import { isBattleOnlySpecies } from '@/data/speciesClassification';
+import { rollsExpected } from '@/utils/statGrowth';
+import { runDataSelfChecks, SelfCheckResult } from '@/utils/dataSelfChecks';
 
 export interface ValidationIssue {
   severity: 'error' | 'missing-data';
@@ -17,27 +46,62 @@ export interface ValidationIssue {
   message: string;
 }
 
-/** Developer-facing report about domain/encounter mapping. */
-export interface EncounterMappingReport {
-  mapped: { domainId: string; phase: string; encounterId: number }[];
-  ambiguous: { domainId: string; phase: string; candidateIds: number[]; enemies: string }[];
-  unmatchedExternalGroups: { domainId: string; phase: string; enemies: string }[];
-  encountersWithoutLocation: number[];
-  encountersWithoutRewards: number[];
+export interface RewardReport {
+  sourceRecords: number;
+  uniqueMatches: number;
+  ambiguousMatches: { sourceRow: number; sourceLabel: string; candidateIds: number[] }[];
+  unmatchedRecords: { sourceRow: number; sourceLabel: string; signature: string }[];
+  encountersWithRewards: number;
+  explicitZeroRewardRecords: number;
+  domainReferencedEncountersMissingRewards: number[];
+}
+
+export interface DomainReport {
+  externalGroups: number;
+  strictCsvUnique: number;
+  contextualCorrections: number;
+  resolvedGroups: number;
+  unresolvedGroups: number;
+  ambiguousGroups: number;
+  distinctEncounterIds: number;
+}
+
+export interface GrowthReport {
+  sourceProfiles: number;
+  canonicalProfiles: number;
+  unresolvedSpecies: { sourceRow: number; name: string; reason: string }[];
+  duplicateSpecies: string[];
+  invalidRateValues: { name: string; stat: string; value: string }[];
+}
+
+export interface StatGrowthTableReport {
+  hpMpRows: number;
+  atkDefRows: number;
+  spdRows: number;
+  rowsWithoutFourOutcomes: number;
+  outcomeProbability: number;
+  expectedEqualsMean: boolean;
+  rankMinimumEL: Record<string, number>;
 }
 
 export interface ValidationReport {
   issues: ValidationIssue[];
-  mapping: EncounterMappingReport;
+  rewards: RewardReport;
+  domains: DomainReport;
+  growth: GrowthReport;
+  statGrowthTables: StatGrowthTableReport;
   speciesMissingGrowthProfiles: string[];
   battleOnlySpeciesWithoutProfiles: string[];
   unresolvedEncounterNames: string[];
   unresolvedTechNames: { source: string; techName: string }[];
-  experience: { highestContinuousLevel: number; completeThrough50: boolean };
+  encountersWithoutLocation: number[];
+  experience: {
+    highestContinuousLevel: number;
+    completeThroughPlannerScope: boolean;
+    plannerScopeMaxEL: number;
+  };
+  selfChecks: SelfCheckResult[];
 }
-
-const describeEnemies = (enemies: { name: string; level: number }[]): string =>
-  enemies.map((e) => `${e.name} Lv${e.level}`).join(' + ');
 
 /** Developer-facing game-data validation. Missing future metadata never blocks the app. */
 export const validateGameData = (): ValidationReport => {
@@ -105,7 +169,7 @@ export const validateGameData = (): ValidationReport => {
     }
   }
 
-  // Starter techs
+  // Starters
   for (const starter of STARTERS) {
     for (const techName of starter.techs) {
       if (!getTechByName(techName)) {
@@ -158,73 +222,105 @@ export const validateGameData = (): ValidationReport => {
     }
   }
 
-  // Mapping report
-  const mapping: EncounterMappingReport = {
-    mapped: [],
-    ambiguous: [],
-    unmatchedExternalGroups: [],
-    encountersWithoutLocation: [],
-    encountersWithoutRewards: [],
+  const unresolvedGroups = DOMAIN_GROUPS.filter(
+    (g) => !Number.isInteger(g.encounterId) || !seenEncounters.has(g.encounterId)
+  );
+  const domainsReport: DomainReport = {
+    externalGroups: DOMAIN_GROUPS.length,
+    strictCsvUnique: STRICT_CSV_UNIQUE_GROUPS,
+    contextualCorrections: CONTEXTUAL_CORRECTION_GROUPS,
+    resolvedGroups: DOMAIN_GROUPS.length - unresolvedGroups.length,
+    unresolvedGroups: unresolvedGroups.length,
+    ambiguousGroups: 0,
+    distinctEncounterIds: new Set(DOMAIN_GROUPS.map((g) => g.encounterId)).size,
   };
-  for (const match of GROUP_MATCHES) {
-    const base = { domainId: match.group.domainId, phase: match.group.phase };
-    if (match.status === 'mapped') {
-      mapping.mapped.push({ ...base, encounterId: match.encounterId });
-    } else if (match.status === 'ambiguous') {
-      mapping.ambiguous.push({
-        ...base,
-        candidateIds: match.candidateIds,
-        enemies: describeEnemies(match.group.enemies),
-      });
-      push(
-        'missing-data',
-        'ambiguous-encounter-mapping',
-        `Domain "${base.domainId}" (${base.phase}) group [${describeEnemies(
-          match.group.enemies
-        )}] matches encounters ${match.candidateIds.join(', ')} — not mapped`
-      );
-    } else {
-      mapping.unmatchedExternalGroups.push({
-        ...base,
-        enemies: describeEnemies(match.group.enemies),
-      });
-      push(
-        'missing-data',
-        'unmatched-external-group',
-        `Domain "${base.domainId}" (${base.phase}) group [${describeEnemies(
-          match.group.enemies
-        )}] matches no existing encounter`
-      );
-    }
+  if (domainsReport.externalGroups !== 473) {
+    push(
+      'error',
+      'domain-group-count',
+      `Expected 473 external domain groups, found ${domainsReport.externalGroups}`
+    );
+  }
+  if (unresolvedGroups.length > 0) {
+    push(
+      'error',
+      'unresolved-domain-groups',
+      `${unresolvedGroups.length} domain group(s) do not resolve to an existing encounter`
+    );
   }
 
-  const mappedIds = new Set(getMappedEncounterIds());
-  mapping.encountersWithoutLocation = encounters
-    .filter((e) => !mappedIds.has(e.id))
-    .map((e) => e.id);
-  mapping.encountersWithoutRewards = encounters
-    .filter((e) => !ENCOUNTER_REWARDS.has(e.id) && (e.xp === undefined || e.bits === undefined))
-    .map((e) => e.id);
+  // Rewards
+  const domainEncounterIds = getMappedEncounterIds();
+  const domainReferencedMissingRewards = domainEncounterIds
+    .filter((id) => !REWARDS_BY_ENCOUNTER_ID.has(id))
+    .sort((a, b) => a - b);
 
-  if (DOMAINS.length === 0) {
-    push('missing-data', 'missing-domains', 'No domain/location mappings populated yet');
+  const rewards: RewardReport = {
+    sourceRecords: ENCOUNTER_REWARD_SOURCE.length,
+    uniqueMatches: REWARDS_BY_ENCOUNTER_ID.size,
+    ambiguousMatches: AMBIGUOUS_REWARD_MATCHES.map((m) => ({
+      sourceRow: m.record.sourceRow,
+      sourceLabel: m.record.sourceLabel,
+      candidateIds: m.status === 'ambiguous' ? m.candidateIds : [],
+    })),
+    unmatchedRecords: UNMATCHED_REWARD_MATCHES.map((m) => ({
+      sourceRow: m.record.sourceRow,
+      sourceLabel: m.record.sourceLabel,
+      signature: m.status === 'unmatched' ? m.signature : '',
+    })),
+    encountersWithRewards: ENCOUNTER_REWARDS.size,
+    explicitZeroRewardRecords: EXPLICIT_ZERO_REWARD_RECORDS.length,
+    domainReferencedEncountersMissingRewards: domainReferencedMissingRewards,
+  };
+
+  if (rewards.sourceRecords !== 184) {
+    push(
+      'error',
+      'reward-source-count',
+      `Expected 184 reward source records, found ${rewards.sourceRecords}`
+    );
   }
-  if (mapping.encountersWithoutLocation.length > 0) {
+  if (rewards.explicitZeroRewardRecords !== 36) {
+    push(
+      'error',
+      'zero-reward-count',
+      `Expected 36 explicit zero-reward records, found ${rewards.explicitZeroRewardRecords}`
+    );
+  }
+  if (rewards.ambiguousMatches.length > 0) {
+    push(
+      'missing-data',
+      'ambiguous-reward-match',
+      `${rewards.ambiguousMatches.length} reward record(s) match multiple encounters and were not assigned`
+    );
+  }
+  if (rewards.unmatchedRecords.length > 0) {
+    push(
+      'missing-data',
+      'unmatched-reward-record',
+      `${rewards.unmatchedRecords.length} reward record(s) match no encounter by full battle data`
+    );
+  }
+  if (domainReferencedMissingRewards.length > 0) {
+    push(
+      'missing-data',
+      'domain-encounter-without-reward',
+      `${domainReferencedMissingRewards.length} domain-referenced encounter(s) have no reward metadata: ${domainReferencedMissingRewards.join(', ')}`
+    );
+  }
+
+  const encountersWithoutLocation = encounters
+    .filter((e) => !new Set(domainEncounterIds).has(e.id))
+    .map((e) => e.id);
+  if (encountersWithoutLocation.length > 0) {
     push(
       'missing-data',
       'encounters-without-location',
-      `${mapping.encountersWithoutLocation.length} encounter(s) have no domain/floor mapping`
-    );
-  }
-  if (mapping.encountersWithoutRewards.length > 0) {
-    push(
-      'missing-data',
-      'missing-rewards',
-      `${mapping.encountersWithoutRewards.length} encounter(s) still lack verified XP/Bits`
+      `${encountersWithoutLocation.length} encounter(s) have no domain/floor mapping (special/custom records)`
     );
   }
 
-  // Growth profiles — battle-only entities are not expected to have one.
+  // Growth profiles
   const profileIds = new Set(GROWTH_PROFILES.map((p) => p.speciesId));
   const speciesMissingGrowthProfiles = DIGIMONS.filter(
     (d) => !profileIds.has(d.id) && !isBattleOnlySpecies(d.id)
@@ -233,6 +329,41 @@ export const validateGameData = (): ValidationReport => {
     (d) => !profileIds.has(d.id) && isBattleOnlySpecies(d.id)
   ).map((d) => d.id);
 
+  const growth: GrowthReport = {
+    sourceProfiles: GROWTH_PROFILE_SOURCE_COUNT,
+    canonicalProfiles: GROWTH_PROFILES.length,
+    unresolvedSpecies: UNRESOLVED_GROWTH_PROFILES,
+    duplicateSpecies: DUPLICATE_GROWTH_PROFILE_SPECIES,
+    invalidRateValues: INVALID_GROWTH_RATE_VALUES,
+  };
+  if (growth.sourceProfiles !== 195) {
+    push(
+      'error',
+      'growth-source-count',
+      `Expected 195 growth source profiles, found ${growth.sourceProfiles}`
+    );
+  }
+  if (growth.unresolvedSpecies.length > 0) {
+    push(
+      'missing-data',
+      'unresolved-growth-species',
+      `${growth.unresolvedSpecies.length} growth source profile(s) do not resolve to a canonical species`
+    );
+  }
+  if (growth.duplicateSpecies.length > 0) {
+    push(
+      'error',
+      'duplicate-growth-profile',
+      `Duplicate growth profiles for: ${growth.duplicateSpecies.join(', ')}`
+    );
+  }
+  if (growth.invalidRateValues.length > 0) {
+    push(
+      'error',
+      'invalid-growth-rate',
+      `${growth.invalidRateValues.length} growth rate value(s) are not low/normal/high`
+    );
+  }
   if (speciesMissingGrowthProfiles.length > 0) {
     push(
       'missing-data',
@@ -242,25 +373,73 @@ export const validateGameData = (): ValidationReport => {
     );
   }
 
-  // Experience table
-  const highestContinuousLevel = getHighestContinuousExperienceLevel();
-  const completeThrough50 = isExperienceTableCompleteThrough(50);
-  if (!completeThrough50) {
+  // Stat growth tables
+  const allRows = [...HP_MP_GROWTH_ROWS, ...ATK_DEF_GROWTH_ROWS, ...SPD_GROWTH_ROWS];
+  const rowsWithoutFourOutcomes = allRows.filter(
+    (r) => r.rolls.length !== GROWTH_OUTCOMES_PER_ROW
+  ).length;
+  const expectedEqualsMean = allRows.every(
+    (r) =>
+      Math.abs(
+        rollsExpected(r.rolls) - r.rolls.reduce((s, v) => s + v, 0) / r.rolls.length
+      ) < 1e-9
+  );
+  const statGrowthTables: StatGrowthTableReport = {
+    hpMpRows: HP_MP_GROWTH_ROWS.length,
+    atkDefRows: ATK_DEF_GROWTH_ROWS.length,
+    spdRows: SPD_GROWTH_ROWS.length,
+    rowsWithoutFourOutcomes,
+    outcomeProbability: GROWTH_OUTCOME_PROBABILITY,
+    expectedEqualsMean,
+    rankMinimumEL: RANK_MINIMUM_EL,
+  };
+  if (rowsWithoutFourOutcomes > 0) {
     push(
-      'missing-data',
-      'missing-xp-table',
-      `Experience table is only continuous through level ${highestContinuousLevel}`
+      'error',
+      'growth-row-outcomes',
+      `${rowsWithoutFourOutcomes} growth row(s) do not have exactly four 25% outcomes`
     );
+  }
+  if (GROWTH_OUTCOME_PROBABILITY !== 0.25) {
+    push('error', 'growth-probability', 'Growth outcome probability must be 25%');
+  }
+  if (allRows.length === 0) {
+    push('error', 'missing-growth-tables', 'Stat-growth tables are empty');
+  }
+
+  // Experience — the planner only needs Lv50. Lv51+ is intentionally out of scope.
+  const highestContinuousLevel = getHighestContinuousExperienceLevel();
+  const completeThroughPlannerScope = isExperienceTableCompleteThrough(PLANNER_SCOPE_MAX_EL);
+  if (!completeThroughPlannerScope) {
+    push(
+      'error',
+      'incomplete-xp-table',
+      `Experience table is only continuous through level ${highestContinuousLevel} (planner requires ${PLANNER_SCOPE_MAX_EL})`
+    );
+  }
+
+  const selfChecks = runDataSelfChecks();
+  for (const failed of selfChecks.filter((c) => !c.passed)) {
+    push('error', 'self-check-failed', `${failed.name}: ${failed.detail ?? 'failed'}`);
   }
 
   return {
     issues,
-    mapping,
+    rewards,
+    domains: domainsReport,
+    growth,
+    statGrowthTables,
     speciesMissingGrowthProfiles,
     battleOnlySpeciesWithoutProfiles,
     unresolvedEncounterNames: [...unresolvedEncounterNames],
     unresolvedTechNames,
-    experience: { highestContinuousLevel, completeThrough50 },
+    encountersWithoutLocation,
+    experience: {
+      highestContinuousLevel,
+      completeThroughPlannerScope,
+      plannerScopeMaxEL: PLANNER_SCOPE_MAX_EL,
+    },
+    selfChecks,
   };
 };
 
@@ -275,13 +454,15 @@ export const logGameDataValidation = (): ValidationReport => {
     );
     errors.forEach((i) => console.warn(`${i.code}: ${i.message}`));
     missing.forEach((i) => console.info(`${i.code}: ${i.message}`));
-    console.info('mapping', {
-      mapped: report.mapping.mapped.length,
-      ambiguous: report.mapping.ambiguous.length,
-      unmatched: report.mapping.unmatchedExternalGroups.length,
-      withoutLocation: report.mapping.encountersWithoutLocation.length,
-      withoutRewards: report.mapping.encountersWithoutRewards.length,
-    });
+    console.info('rewards', report.rewards);
+    console.info('domains', report.domains);
+    console.info('growth', report.growth);
+    console.info('statGrowthTables', report.statGrowthTables);
+    console.info('experience', report.experience);
+    console.info(
+      'selfChecks',
+      `${report.selfChecks.filter((c) => c.passed).length}/${report.selfChecks.length} passed`
+    );
     console.groupEnd();
   }
   return report;
