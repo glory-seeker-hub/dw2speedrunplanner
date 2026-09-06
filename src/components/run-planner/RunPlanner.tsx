@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { STARTERS } from '@/data/starters';
+import { MAX_DIGILINE_SIZE } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
 import { useRunPlanner } from '@/hooks/useRunPlanner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -94,10 +95,39 @@ export const RunPlanner = ({ planner }: Props) => {
               <div><dt className="text-sm text-muted-foreground">Recorded battles</dt><dd className="text-xl font-semibold tabular-nums">{run.battles.length}</dd></div>
             </dl></CardContent>
           </Card>
-          <Card><CardHeader><CardTitle>Current Digiline</CardTitle><CardDescription>{run.digiline.length} / 3 active members</CardDescription></CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {run.digiline.map((id) => { const member = run.roster.find((entry) => entry.instanceId === id); return member && <Badge key={id}>{member.name} · EL {member.level} · Active</Badge>; })}
-              {run.digiline.length === 0 && <p className="text-sm text-muted-foreground">No active members.</p>}
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Digiline</CardTitle>
+              <CardDescription>{run.digiline.length} / {MAX_DIGILINE_SIZE} active members. Removing a member keeps it in your roster.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ol className="grid gap-4 lg:grid-cols-3" aria-label="Digiline slots">
+                {Array.from({ length: MAX_DIGILINE_SIZE }, (_, index) => {
+                  const id = run.digiline[index];
+                  const member = run.roster.find((entry) => entry.instanceId === id);
+                  return (
+                    <li key={index} className="space-y-3 rounded-lg border border-border bg-muted/10 p-4" aria-label={'Slot ' + (index + 1)}>
+                      <p className="text-sm text-muted-foreground">Slot {index + 1}</p>
+                      {member ? (
+                        <>
+                          <p className="font-semibold">{member.name} <span className="text-sm font-normal">EL {member.level}</span></p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" variant="outline" disabled={index === 0}
+                              aria-label={'Move ' + member.name + ' in slot ' + (index + 1) + ' up'}
+                              onClick={() => planner.moveMember(id, 'up')}>Move Up</Button>
+                            <Button size="sm" variant="outline" disabled={index === run.digiline.length - 1}
+                              aria-label={'Move ' + member.name + ' in slot ' + (index + 1) + ' down'}
+                              onClick={() => planner.moveMember(id, 'down')}>Move Down</Button>
+                            <Button size="sm" variant="outline" aria-label={'Remove ' + member.name + ' from slot ' + (index + 1)}
+                              onClick={() => planner.removeMember(id)}>Remove</Button>
+                          </div>
+                        </>
+                      ) : <p className="text-sm text-muted-foreground">Empty</p>}
+                    </li>
+                  );
+                })}
+              </ol>
+              {run.digiline.length === 0 && <p className="mt-4 text-sm text-muted-foreground">No active members. Add a reserve from your roster below.</p>}
             </CardContent>
           </Card>
           <section className="space-y-3" aria-label="Roster">
@@ -105,10 +135,20 @@ export const RunPlanner = ({ planner }: Props) => {
             <div className="grid gap-4 lg:grid-cols-3">
               {run.roster.map((member) => (
                 <Card key={member.instanceId}>
-                  <CardHeader><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle>{run.digiline.includes(member.instanceId) && <Badge variant="secondary">Active Digiline</Badge>}</div>
+                  <CardHeader><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
                     <CardDescription>EL {member.level} · Total XP {member.totalXp}</CardDescription>
                   </CardHeader>
-                  <CardContent><Stats stats={member.stats} /></CardContent>
+                  <CardContent className="space-y-4">
+                    <Stats stats={member.stats} />
+                    {!run.digiline.includes(member.instanceId) && (
+                      <div className="space-y-2">
+                        <Button size="sm" variant="outline" disabled={run.digiline.length >= MAX_DIGILINE_SIZE}
+                          aria-describedby={run.digiline.length >= MAX_DIGILINE_SIZE ? 'digiline-full-' + member.instanceId : undefined}
+                          onClick={() => planner.addMember(member.instanceId)}>Add to Digiline</Button>
+                        {run.digiline.length >= MAX_DIGILINE_SIZE && <p id={'digiline-full-' + member.instanceId} className="text-xs text-muted-foreground">Digiline full ({MAX_DIGILINE_SIZE}/{MAX_DIGILINE_SIZE}). Remove an active member first.</p>}
+                      </div>
+                    )}
+                  </CardContent>
                 </Card>
               ))}
             </div>
