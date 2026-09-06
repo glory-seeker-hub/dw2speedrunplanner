@@ -16,6 +16,22 @@ export interface AdapterResult {
   unresolvedInstanceIds: string[];
 }
 
+/**
+ * SIMULATOR BOUNDARY ROUNDING RULE (documented and explicit)
+ *
+ * Planner stats may be fractional because expected stat growth is the mean of four
+ * equiprobable outcomes. The Battle Simulator works on integers, so fractional planner
+ * stats are TRUNCATED DOWN (Math.floor) here — and only here. Progression math itself
+ * keeps full precision.
+ */
+export const toSimulatorStats = (stats: RosterDigimon['stats']): RosterDigimon['stats'] => ({
+  hp: Math.floor(stats.hp),
+  mp: Math.floor(stats.mp),
+  atk: Math.floor(stats.atk),
+  def: Math.floor(stats.def),
+  spd: Math.floor(stats.spd),
+});
+
 export const rosterDigimonToTeamDigimon = (
   entry: RosterDigimon
 ): TeamDigimon | null => {
@@ -27,7 +43,7 @@ export const rosterDigimonToTeamDigimon = (
 
   return {
     digimon: species,
-    customStats: { ...entry.stats },
+    customStats: toSimulatorStats(entry.stats),
     techs: resolved,
   };
 };
