@@ -23,6 +23,7 @@ import {
   RANK_MINIMUM_EL,
   SPD_GROWTH_ROWS,
 } from '@/data/statGrowthTables';
+import { PROJECT_ONLY_ENCOUNTERS_WITHOUT_SOURCE_REWARD } from '@/data/rewardMatchOverrides';
 import { ENCOUNTER_REWARD_SOURCE } from '@/data/encounterRewardSource';
 import {
   AMBIGUOUS_REWARD_MATCHES,
@@ -54,6 +55,8 @@ export interface RewardReport {
   encountersWithRewards: number;
   explicitZeroRewardRecords: number;
   domainReferencedEncountersMissingRewards: number[];
+  /** Informational: these project-only encounters intentionally have no source reward. */
+  projectOnlyEncountersWithoutRewards: number[];
 }
 
 export interface DomainReport {
@@ -271,6 +274,10 @@ export const validateGameData = (): ValidationReport => {
     encountersWithRewards: ENCOUNTER_REWARDS.size,
     explicitZeroRewardRecords: EXPLICIT_ZERO_REWARD_RECORDS.length,
     domainReferencedEncountersMissingRewards: domainReferencedMissingRewards,
+    projectOnlyEncountersWithoutRewards: encounters
+      .filter((e) => PROJECT_ONLY_ENCOUNTERS_WITHOUT_SOURCE_REWARD.includes(e.id) &&
+        !REWARDS_BY_ENCOUNTER_ID.has(e.id) && !domainEncounterIds.includes(e.id))
+      .map((e) => e.id).sort((a, b) => a - b),
   };
 
   if (rewards.sourceRecords !== 184) {
@@ -279,6 +286,10 @@ export const validateGameData = (): ValidationReport => {
       'reward-source-count',
       `Expected 184 reward source records, found ${rewards.sourceRecords}`
     );
+  }
+  if (rewards.uniqueMatches !== 184) {
+    push('error', 'reward-match-count',
+      `Expected 184 resolved encounter rewards, found ${rewards.uniqueMatches}`);
   }
   if (rewards.explicitZeroRewardRecords !== 36) {
     push(
