@@ -245,3 +245,100 @@ test('static data coverage remains complete after Digiline management', () => {
   assert.equal(report.growth.canonicalProfiles,195);
   assert.deepEqual(report.issues.filter((issue) => issue.severity === 'error'),[]);
 });
+
+const selection = load('src/utils/runBattleSelection.ts');
+const before = 'before-blood-knights';
+const after = 'after-blood-knights';
+test('phase Domain queries expose only existing variants', () => {
+  const { DOMAINS } = load('src/data/domains.ts');
+  for (const phase of [before, after]) {
+    assert.deepEqual(selection.getDomainsForPhase(phase), DOMAINS.filter(d => d.variants.some(v => v.phase === phase)));
+  }
+  assert.ok(selection.getDomainsForPhase(before).some(d => d.id === 'boot-domain'));
+  assert.ok(!selection.getDomainsForPhase(after).some(d => d.id === 'boot-domain'));
+  assert.deepEqual(selection.getEncountersForFloor('boot-domain', after, 1), []);
+  assert.deepEqual(selection.getFloorsForDomain('missing', before), []);
+});
+test('floors are derived from explicit sparse mappings', () => {
+  assert.deepEqual(selection.getFloorsForDomain('video-domain', before), [1, 2, 3, 5]);
+  assert.deepEqual(selection.getEncountersForFloor('video-domain', before, 4), []);
+  assert.deepEqual(selection.getFloorsForDomain('scsi-domain', before), [1, 2, 3, 4]);
+});
+test('floor queries isolate phase and preserve multi-floor encounter availability', () => {
+  const ids = (domain, phase, floor) => selection.getEncountersForFloor(domain, phase, floor).map(e => e.encounterId);
+  assert.deepEqual(ids('scsi-domain', before, 1), [32, 31]);
+  assert.deepEqual(ids('scsi-domain', after, 1), [35, 5, 65]);
+  assert.deepEqual(ids('video-domain', before, 2), [33, 34]);
+  assert.deepEqual(ids('video-domain', before, 3), [33, 34]);
+});
+test('boss metadata remains specific to the selected location with regular enemies on the same floor', () => {
+  const options = selection.getEncountersForFloor('scsi-domain', after, 6);
+  assert.deepEqual(options.map(e => [e.encounterId, e.isBoss]), [[69, false], [99, true]]);
+  assert.deepEqual(options.map(e => e.groupIds), [[24], [25]]);
+  assert.deepEqual(selection.getEncountersForFloor('disk-domain', after, 7).filter(e => e.isBoss).map(e => e.encounterId), [101, 102]);
+});
+test('preview retains exact canonical stats, techniques, levels, slots and repeated species', () => {
+  const { encounters } = load('src/data/encounters.ts');
+  const preview = selection.getBattlePreview(36);
+  assert.equal(preview.encounter, encounters.find(e => e.id === 36));
+  assert.deepEqual(preview.encounter.digimons.map(e => e.name), ['Penguinmon', 'Penguinmon']);
+  assert.deepEqual(preview.encounter.digimons.map(e => e.slot), [1, 2]);
+  assert.ok(preview.encounter.digimons.every(e => e.level === 3));
+  assert.equal(selection.getBattlePreview(-1), undefined);
+});
+test('every real floor option resolves canonical stats and authoritative rewards', () => {
+  const { DOMAIN_GROUPS } = load('src/data/domainGroups.ts');
+  const { getResolvedReward } = load('src/utils/rewardMatching.ts');
+  for (const group of DOMAIN_GROUPS) {
+    for (const floor of group.floors) {
+      const option = selection.getEncountersForFloor(group.domainId, group.phase, floor).find(e => e.encounterId === group.encounterId);
+      assert.ok(option);
+      assert.ok(option.preview);
+      assert.ok(option.preview.reward);
+      assert.equal(option.preview.reward, getResolvedReward(group.encounterId));
+      assert.ok(option.groupIds.includes(group.groupId));
+    }
+  }
+});
+test('known zero reward is distinct from unknown reward', () => {
+  const { REWARDS_BY_ENCOUNTER_ID } = load('src/utils/rewardMatching.ts');
+  const zeroId = [...REWARDS_BY_ENCOUNTER_ID].find(([,r]) => r.xp === 0 && r.bits === 0)[0];
+  const reward = selection.getBattlePreview(zeroId).reward;
+  assert.equal(reward.xp, 0);
+  assert.equal(reward.bits, 0);
+  assert.equal(selection.getBattlePreview(200).reward, undefined);
+});
+const selectedBattle = () => ({phase:before,domainId:'scsi-domain',floor:1,encounterId:32});
+test('phase changes reset downstream selection and retain only compatible Domains', () => {
+  assert.deepEqual(selection.battleSelectionReducer(freeze(selectedBattle()), {type:'phase',phase:after}),
+    {phase:after,domainId:'scsi-domain',floor:null,encounterId:null});
+  assert.deepEqual(selection.battleSelectionReducer({phase:before,domainId:'boot-domain',floor:1,encounterId:154}, {type:'phase',phase:after}),
+    {phase:after,domainId:'',floor:null,encounterId:null});
+});
+test('Domain and floor changes reset dependent selections', () => {
+  const changed = selection.battleSelectionReducer(freeze(selectedBattle()), {type:'domain',domainId:'video-domain'});
+  assert.deepEqual(changed, {phase:before,domainId:'video-domain',floor:null,encounterId:null});
+  assert.deepEqual(selection.battleSelectionReducer(selectedBattle(), {type:'floor',floor:2}),
+    {phase:before,domainId:'scsi-domain',floor:2,encounterId:null});
+});
+test('invalid Domain, floor and encounter choices cannot leave a stale preview', () => {
+  assert.equal(selection.battleSelectionReducer(selectedBattle(), {type:'domain',domainId:'missing'}).domainId, '');
+  assert.equal(selection.battleSelectionReducer(selectedBattle(), {type:'floor',floor:999}).floor, null);
+  assert.equal(selection.battleSelectionReducer(selectedBattle(), {type:'encounter',encounterId:99}).encounterId, null);
+  assert.equal(selection.battleSelectionReducer(selectedBattle(), {type:'encounter',encounterId:31}).encounterId, 31);
+});
+test('selection and preview leave the entire saved RunPlan and progression untouched', () => {
+  const run = freeze(fullRun());
+  storage.saveRunPlannerData(envelope(run));
+  const original = JSON.stringify(run);
+  const saved = values.get(storage.RUN_PLANNER_STORAGE_KEY);
+  global.localStorage.setItem = () => {throw Error('Selection must not write storage');};
+  let state = selection.initialBattleSelection;
+  for (const action of [{type:'domain',domainId:'scsi-domain'}, {type:'floor',floor:1}, {type:'encounter',encounterId:32}]) {
+    state = selection.battleSelectionReducer(state, action);
+  }
+  selection.getBattlePreview(state.encounterId);
+  assert.equal(JSON.stringify(run), original);
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY), saved);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0], run);
+});
