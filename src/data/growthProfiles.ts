@@ -50,6 +50,7 @@ for (const record of GROWTH_PROFILE_SOURCE as GrowthProfileSourceRecord[]) {
     }
   }
   if (!ratesOk) continue;
+  const safeRates = rates as Record<keyof typeof rates, DigimonGrowthProfile['hpGrowth']>;
   if (seen.has(species.id)) {
     duplicates.push(species.id);
     continue;
@@ -58,11 +59,11 @@ for (const record of GROWTH_PROFILE_SOURCE as GrowthProfileSourceRecord[]) {
   resolved.push({
     speciesId: species.id,
     rank: record.rank,
-    hpGrowth: rates.hpGrowth,
-    mpGrowth: rates.mpGrowth,
-    atkGrowth: rates.atkGrowth,
-    defGrowth: rates.defGrowth,
-    spdGrowth: rates.spdGrowth,
+    hpGrowth: safeRates.hpGrowth,
+    mpGrowth: safeRates.mpGrowth,
+    atkGrowth: safeRates.atkGrowth,
+    defGrowth: safeRates.defGrowth,
+    spdGrowth: safeRates.spdGrowth,
   });
 }
 
