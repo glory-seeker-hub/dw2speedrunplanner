@@ -10,7 +10,12 @@ import {
 } from '@/data/statGrowthTables';
 import { getGrowthProfile } from '@/data/growthProfiles';
 import { encounters } from '@/data/encounters';
-import { REWARDS_BY_ENCOUNTER_ID, matchRewardRecord } from '@/utils/rewardMatching';
+import {
+  REWARDS_BY_ENCOUNTER_ID, REWARD_MATCHES, AMBIGUOUS_REWARD_MATCHES,
+  UNMATCHED_REWARD_MATCHES, matchRewardRecord, getRewardMatchingSlots,
+} from '@/utils/rewardMatching';
+import { normalizeDigimonName } from '@/utils/digimonLookup';
+import { VERIFIED_REWARD_MATCH_OVERRIDES, PROJECT_ONLY_ENCOUNTERS_WITHOUT_SOURCE_REWARD } from '@/data/rewardMatchOverrides';
 import { applyBattleXp } from '@/utils/experience';
 import {
   bracketContains,
@@ -235,6 +240,76 @@ export const runDataSelfChecks = (): SelfCheckResult[] => {
     const ids = new Set(encounters.map((e) => e.id));
     const bad = DOMAIN_GROUPS.filter((g) => !ids.has(g.encounterId));
     return bad.length === 0 ? true : `${bad.length} group(s) reference missing encounters`;
+  });
+
+  // Phase 1.6a: preserve all earlier checks and audit the authoritative patch.
+  for (const [source, canonical] of [
+    ['Centaurmon', 'Centarumon'], ['Piedmon', 'Pierrotmon'],
+    ['VenomMyotismon', 'V-Myotismon'],
+  ]) {
+    check(results, `safe alias: ${source} -> ${canonical}`, () =>
+      normalizeDigimonName(source) === normalizeDigimonName(canonical)
+        ? true : 'safe alias does not resolve');
+  }
+  check(results, 'MetalTyrannomon remains distinct from Master Tyrannomon', () =>
+    normalizeDigimonName('MetalTyrannomon') !== normalizeDigimonName('Master Tyrannomon')
+      ? true : 'contextual discrepancy became a global alias');
+
+  for (const [row, expected] of Object.entries(VERIFIED_REWARD_MATCH_OVERRIDES)) {
+    check(results, `verified reward row ${row} -> encounter ${expected.encounterId}`, () => {
+      const source = ENCOUNTER_REWARD_SOURCE.find((r) => r.sourceRow === Number(row));
+      if (!source) return 'source record missing';
+      const match = matchRewardRecord(source);
+      if (match.status !== 'unique' || match.encounterId !== expected.encounterId)
+        return 'verified encounter did not resolve';
+      return source.xp === expected.xp && source.bits === expected.bits
+        ? true : 'source XP/Bits differ from authoritative evidence';
+    });
+  }
+  check(results, 'row 33 excludes only the exact Boot Domain artifact', () => {
+    const source = ENCOUNTER_REWARD_SOURCE.find((r) => r.sourceRow === 33)!;
+    const slots = getRewardMatchingSlots(source);
+    if (slots.length !== 2 || slots.some((s) => s.name === 'Boot Domain'))
+      return 'artifact was not excluded';
+    const otherRow = { ...source, sourceRow: -33 };
+    const otherZero = { ...source, slots: source.slots.map((s) =>
+      s.slot === 3 ? { ...s, name: 'GAIA1' } : s) };
+    return getRewardMatchingSlots(otherRow).length === source.slots.length &&
+      getRewardMatchingSlots(otherZero).length === source.slots.length
+      ? true : 'cleanup removed an unrelated entry';
+  });
+  check(results, 'row 52 does not map to encounter 189', () => {
+    const match = matchRewardRecord(ENCOUNTER_REWARD_SOURCE.find((r) => r.sourceRow === 52)!);
+    return match.status === 'unique' && match.encounterId !== 189 ? true : 'wrong MetalGreymon';
+  });
+  check(results, 'rows 164 and 171 remain distinct known zero rewards', () => {
+    const first = REWARDS_BY_ENCOUNTER_ID.get(165);
+    const second = REWARDS_BY_ENCOUNTER_ID.get(172);
+    return first?.sourceRow === 164 && second?.sourceRow === 171 &&
+      first.xp === 0 && first.bits === 0 && second.xp === 0 && second.bits === 0
+      ? true : 'Coliseum rewards were merged or lost';
+  });
+  check(results, 'all 184 reward source records resolve to distinct encounters', () =>
+    REWARD_MATCHES.length === 184 && REWARD_MATCHES.every((m) => m.status === 'unique') &&
+      REWARDS_BY_ENCOUNTER_ID.size === 184 ? true : 'incomplete or duplicate reward mapping');
+  check(results, 'no ambiguous reward matches remain', () =>
+    AMBIGUOUS_REWARD_MATCHES.length === 0 ? true : 'ambiguous rewards remain');
+  check(results, 'no unmatched reward records remain', () =>
+    UNMATCHED_REWARD_MATCHES.length === 0 ? true : 'unmatched rewards remain');
+  check(results, 'all Domain-referenced encounters have known rewards', () =>
+    DOMAIN_GROUPS.every((g) => REWARDS_BY_ENCOUNTER_ID.has(g.encounterId))
+      ? true : 'Domain reward metadata missing');
+  check(results, 'exactly the eight project-only encounters remain without rewards', () => {
+    const missing = encounters.filter((e) => !REWARDS_BY_ENCOUNTER_ID.has(e.id))
+      .map((e) => e.id).sort((a, b) => a - b);
+    return JSON.stringify(missing) === JSON.stringify(PROJECT_ONLY_ENCOUNTERS_WITHOUT_SOURCE_REWARD) &&
+      missing.every((id) => !DOMAIN_GROUPS.some((g) => g.encounterId === id))
+      ? true : 'unexpected missing rewards or project-only Domain references';
+  });
+  check(results, 'verified overrides reject changed composition', () => {
+    const source = ENCOUNTER_REWARD_SOURCE.find((r) => r.sourceRow === 52)!;
+    return matchRewardRecord({ ...source, slots: [{ ...source.slots[0], name: 'NotADigimonAtAll' }] }).status === 'unmatched'
+      ? true : 'override accepted incompatible source data';
   });
 
   return results;

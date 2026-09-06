@@ -28,6 +28,10 @@ export interface DigimonSpecies {
  * (in particular: MetalTyrannomon is NOT an alias of MasterTyrannomon — distinct Digimon).
  */
 export const DIGIMON_NAME_ALIASES: Record<string, string> = {
+  // Verified same-species spellings in DW2_Phase1_6_Reward_Matching_Patch.json.
+  centaurmon: 'centarumon',
+  piedmon: 'pierrotmon',
+  venommyotismon: 'vmyotismon',
   dokunemmon: 'dokunemon',
   // Encounter data uses the full name; the species list uses the abbreviated form.
   skullmammothmon: 'smammothmon',

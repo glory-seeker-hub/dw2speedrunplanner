@@ -3,6 +3,7 @@ import {
   ENCOUNTER_REWARD_SOURCE,
   EncounterRewardSourceRecord,
 } from '@/data/encounterRewardSource';
+import { VERIFIED_REWARD_MATCH_OVERRIDES } from '@/data/rewardMatchOverrides';
 import { normalizeDigimonName } from '@/utils/digimonLookup';
 
 /**
@@ -13,8 +14,9 @@ import { normalizeDigimonName } from '@/utils/digimonLookup';
  * sources: enemy count, normalized species names, multiplicity and levels.
  *
  * HARD RULES
- * - Never match on XP, Bits, source row or source label.
- * - Only a UNIQUE full-data match assigns a reward. Multiple candidates -> ambiguous.
+ * - Never infer identity from XP, Bits or source labels.
+ * - Verified Data-sheet overrides keyed by source row precede generic matching.
+ * - Otherwise only a unique composition + level match assigns a reward.
  * - 0 XP / 0 Bits is VALID KNOWN DATA, never treated as missing.
  */
 
@@ -45,11 +47,26 @@ export type RewardMatch =
     }
   | { status: 'unmatched'; record: EncounterRewardSourceRecord; signature: string };
 
+/** Only this exact source-table artifact is excluded; other Lv0 entries stay intact. */
+export const getRewardMatchingSlots = (record: EncounterRewardSourceRecord) =>
+  record.slots.filter((slot) => !(
+    record.sourceRow === 33 && slot.slot === 3 &&
+    slot.name === 'Boot Domain' && slot.level === 0
+  ));
+
 export const matchRewardRecord = (
   record: EncounterRewardSourceRecord
 ): RewardMatch => {
-  const signature = signatureOf(record.slots);
+  const signature = signatureOf(getRewardMatchingSlots(record));
   const candidates = encountersBySignature.get(signature) ?? [];
+  const verified = VERIFIED_REWARD_MATCH_OVERRIDES[record.sourceRow];
+  if (verified) {
+    // Candidate membership verifies both target existence and composition/levels.
+    // Fail closed if source or encounter data drifts away from the verified evidence.
+    return candidates.includes(verified.encounterId)
+      ? { status: 'unique', record, encounterId: verified.encounterId }
+      : { status: 'unmatched', record, signature };
+  }
   if (candidates.length === 1) {
     return { status: 'unique', record, encounterId: candidates[0] };
   }
