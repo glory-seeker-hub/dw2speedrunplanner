@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BattleSelector } from '@/components/run-planner/BattleSelector';
 import { STARTERS } from '@/data/starters';
 import { MAX_DIGILINE_SIZE } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
@@ -153,6 +154,7 @@ export const RunPlanner = ({ planner }: Props) => {
               ))}
             </div>
           </section>
+          <BattleSelector key={run.id} />
         </>
       )}
       <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
