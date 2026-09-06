@@ -116,10 +116,10 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
   let captureError: string | null = null;
   if (typeof input.capturedEnemySlot === 'number') {
     const result = tryCreateCapturedDigimon(encounterId, input.capturedEnemySlot);
-    if (result.ok) {
+    if (result.ok === true) {
       nextRoster.push(result.digimon);
       capturedInstanceId = result.digimon.instanceId;
-    } else {
+    } else if (result.ok === false) {
       captureError = result.reason;
     }
   }
