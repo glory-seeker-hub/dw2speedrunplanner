@@ -1,4 +1,5 @@
 import { DigimonStats } from '@/types/digimon';
+import { DomainPhase } from '@/types/encounter';
 
 export type RosterSource =
   | { type: 'starter' }
@@ -21,6 +22,9 @@ export interface RunBattleEvent {
   id: string;
   order: number;
   domainId: string;
+  /** Location snapshot; absent on events saved before Phase 2D. */
+  phase?: DomainPhase;
+  floor?: number;
   encounterId: number;
   /** Snapshot of the digiline at the time this battle happened (up to 3 instance IDs). */
   digilineInstanceIds: string[];

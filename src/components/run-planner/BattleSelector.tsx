@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { BattlePreview } from '@/components/run-planner/BattlePreview';
+import { BattleRecordControls, RecordBattleHandler } from '@/components/run-planner/BattleRecordControls';
 
 const phaseLabels: Record<DomainPhase, string> = {
   'before-blood-knights': 'Before Blood Knights',
   'after-blood-knights': 'After Blood Knights',
 };
 
-export const BattleSelector = () => {
+export const BattleSelector = ({ hasParticipants, onRecord }: { hasParticipants: boolean; onRecord: RecordBattleHandler }) => {
   const [selection, dispatch] = useReducer(battleSelectionReducer, initialBattleSelection);
   const { phase, domainId, floor, encounterId } = selection;
   const domains = getDomainsForPhase(phase);
@@ -71,6 +72,7 @@ export const BattleSelector = () => {
         </CardContent>
       </Card>
       {selected && domain && floor !== null && <BattlePreview encounterId={selected.encounterId} domainName={domain.name} phaseLabel={phaseLabels[phase]} floor={floor} isBoss={selected.isBoss} />}
+      {selected && <BattleRecordControls key={`${phase}/${domainId}/${floor}/${encounterId}`} selection={selection} hasParticipants={hasParticipants} onRecord={onRecord} />}
     </section>
   );
 };

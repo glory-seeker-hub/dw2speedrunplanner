@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
+import { BattleResolution } from '@/utils/runProgression';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
 import { PersistedRunPlannerData, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
@@ -7,6 +9,7 @@ import { loadRunPlannerData, saveRunPlannerData, resetRunPlannerData } from '@/u
 /** Own the persisted envelope above tab content. Save only explicit user changes. */
 export const useRunPlanner = () => {
   const [data, setData] = useState(loadRunPlannerData);
+  const currentData = useRef(data);
   const [error, setError] = useState<string | null>(null);
   const [starterId, setStarterId] = useState('');
   const [name, setName] = useState('');
@@ -18,6 +21,7 @@ export const useRunPlanner = () => {
       return false;
     }
     setData(next);
+    currentData.current = next;
     setError(null);
     return true;
   };
@@ -42,6 +46,20 @@ export const useRunPlanner = () => {
   const removeMember = (id: string) => updateDigiline((run) => removeFromDigiline(run, id));
   const moveMember = (id: string, direction: DigilineDirection) =>
     updateDigiline((run) => moveDigilineMember(run, id, direction));
+
+  const recordBattle = (request: RecordBattleRequest): BattleResolution | null => {
+    const current = currentData.current;
+    const run = current.runs.find(entry => entry.id === current.activeRunId);
+    if (!run) return null;
+    try {
+      const recorded = recordRunBattle(run, request);
+      return persist({ ...current, runs: current.runs.map(entry => entry.id === run.id ? recorded.run : entry) })
+        ? recorded.resolution : null;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not record this battle.');
+      return null;
+    }
+  };
 
   const startRun = (): boolean => {
     if (activeRun) return false; // Replacement requires the confirmed reset flow.
@@ -70,6 +88,7 @@ export const useRunPlanner = () => {
         return false;
       }
       setData(next);
+      currentData.current = next;
       setError(null);
     }
     setStarterId('');
@@ -77,5 +96,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle };
 };

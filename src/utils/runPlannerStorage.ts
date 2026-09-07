@@ -1,5 +1,6 @@
 import { validateRunPlan } from '@/utils/runInvariants';
 import { DigimonStats } from '@/types/digimon';
+import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
 import {
   MAX_DIGILINE_SIZE,
   PersistedRunPlannerData,
@@ -65,6 +66,8 @@ const isRunBattleEvent = (v: unknown): v is RunBattleEvent =>
   Number.isInteger(v.order) &&
   v.order >= 0 &&
   isNonEmptyString(v.domainId) &&
+  (v.phase === undefined || DOMAIN_PHASES.includes(v.phase as DomainPhase)) &&
+  (v.floor === undefined || (typeof v.floor === 'number' && Number.isInteger(v.floor) && v.floor > 0)) &&
   typeof v.encounterId === 'number' &&
   isStringArray(v.digilineInstanceIds) &&
   v.digilineInstanceIds.length <= MAX_DIGILINE_SIZE &&
