@@ -1,4 +1,4 @@
-import { RunBattleEvent, RunPlan } from '@/types/runPlanner';
+import { RunBattleCheckpoint, RunBattleEvent, RunPlan } from '@/types/runPlanner';
 import { BattleSelection, getEncountersForFloor } from '@/utils/runBattleSelection';
 import { BattleResolution, resolveBattle } from '@/utils/runProgression';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
@@ -41,6 +41,9 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
     if (!choice) throw new Error('Select a valid enemy slot to capture.');
     if (choice.unavailableReason) throw new Error(choice.unavailableReason);
   }
+  const checkpoint: RunBattleCheckpoint = structuredClone({
+    roster: run.roster, digiline: run.digiline, totalBits: run.totalBits,
+  });
   const resolution = resolveBattle({
     encounterId: option.encounterId, digilineInstanceIds: [...run.digiline],
     roster: run.roster, totalBits: run.totalBits, capturedEnemySlot: slot,
@@ -52,6 +55,7 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
     domainId: request.domainId, phase: request.phase, floor: request.floor!, encounterId: option.encounterId,
     digilineInstanceIds: [...resolution.participantIds], capturedEnemySlot: slot,
     xpReward: resolution.xpAwarded, bitsReward: resolution.bitsAwarded,
+    checkpoint,
   };
   if (run.battles.some(battle => battle.id === event.id)) throw new Error('Could not generate a unique battle ID. Try again.');
   const next: RunPlan = { ...run, roster: resolution.roster, totalBits: resolution.totalBits,

@@ -487,7 +487,7 @@ function plannerHost() {
   const slots = []; let cursor = 0;
   const react = {
     useState(initial) { const i=cursor++; if (!(i in slots)) slots[i]=typeof initial==='function'?initial():initial;
-      return [slots[i],value => {slots[i]=value;}]; },
+      return [slots[i],value => {slots[i]=typeof value==='function'?value(slots[i]):value;}]; },
     useRef(initial) { const i=cursor++; if (!(i in slots)) slots[i]={current:initial}; return slots[i]; },
   };
   const source = fs.readFileSync(path.join(root,'src/hooks/useRunPlanner.ts'),'utf8');
@@ -523,4 +523,176 @@ test('record action snapshots latest committed Digiline and consecutive calls do
   assert.deepEqual(run.battles[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
   assert.deepEqual(run.battles[1].digilineInstanceIds,run.battles[0].digilineInstanceIds);
   assert.equal(run.totalBits,run.battles[0].bitsReward*2);
+});
+
+const undo = load('src/utils/runBattleUndo.ts');
+const meaningfulRun = ({updatedAt, ...run}) => run;
+const restoredRun = (run) => {
+  const result = undo.undoLastBattle(run);
+  assert.equal(result.ok,true,result.reason);
+  return result.run;
+};
+test('new event checkpoint is the complete pre-battle state with no recursive history', () => {
+  const run = freeze(fullRun());
+  const recorded = recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+  assert.deepEqual(recorded.event.checkpoint,{roster:run.roster,digiline:run.digiline,totalBits:run.totalBits});
+  assert.deepEqual(Object.keys(recorded.event.checkpoint).sort(),['digiline','roster','totalBits']);
+  assert.notEqual(recorded.event.checkpoint.roster,run.roster);
+  assert.notEqual(recorded.event.checkpoint.digiline,run.digiline);
+  for (let i=0;i<run.roster.length;i++) {
+    assert.notEqual(recorded.event.checkpoint.roster[i],run.roster[i]);
+    for (const field of ['stats','techs','source']) {
+      assert.notEqual(recorded.event.checkpoint.roster[i][field],run.roster[i][field]);
+      assert.notEqual(recorded.event.checkpoint.roster[i][field],recorded.run.roster[i][field]);
+    }
+  }
+});
+test('normal battle undo restores all meaningful run state and does not mutate input', () => {
+  const before = multiRun();
+  const recorded = freeze(recording.recordRunBattle(before,normalBattle()).run);
+  const snapshot = JSON.stringify(recorded);
+  const restored = restoredRun(recorded);
+  assert.deepEqual(meaningfulRun(restored),meaningfulRun(before));
+  assert.equal(JSON.stringify(recorded),snapshot);
+  assert.ok(Number.isFinite(Date.parse(restored.updatedAt)));
+  restored.roster[0].stats.hp=999;
+  assert.equal(recorded.battles[0].checkpoint.roster[0].stats.hp,before.roster[0].stats.hp);
+});
+test('level-up undo restores exact fractional stats, level, XP and Bits', () => {
+  const before = recording.recordRunBattle(recording.recordRunBattle(multiRun(),normalBattle()).run,normalBattle()).run;
+  before.roster[0].totalXp=100000;
+  before.totalBits=123.5;
+  assert.ok(Object.values(before.roster[0].stats).some(v => !Number.isInteger(v)));
+  const recorded=recording.recordRunBattle(freeze(before),normalBattle()).run;
+  assert.equal(recorded.roster[0].level,before.roster[0].level+1);
+  assert.deepEqual(meaningfulRun(restoredRun(recorded)),meaningfulRun(before));
+});
+test('undo removes a capture promoted into Digiline and discards later membership and order changes', () => {
+  let before=multiRun();
+  before=addToDigiline(before,'reserve-a');
+  before=moveDigilineMember(before,'reserve-a','up');
+  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1});
+  const capturedId=recorded.resolution.capturedInstanceId;
+  let changed=addToDigiline(recorded.run,capturedId);
+  changed=moveDigilineMember(changed,capturedId,'up');
+  changed=removeFromDigiline(changed,before.starterInstanceId);
+  const restored=restoredRun(freeze(changed));
+  assert.deepEqual(meaningfulRun(restored),meaningfulRun(before));
+  assert.ok(!restored.roster.some(r => r.instanceId===capturedId));
+  assert.ok(!restored.digiline.includes(capturedId));
+  assert.deepEqual(restored.roster.map(r => r.instanceId),before.roster.map(r => r.instanceId));
+});
+test('repeated undo restores successive exact checkpoints and preserves earlier events', () => {
+  const states=[multiRun()];
+  for(let i=0;i<3;i++) states.push(recording.recordRunBattle(states[i],{...normalBattle(),capturedEnemySlot:1}).run);
+  let current=freeze(states[3]);
+  for(let i=2;i>=0;i--) {
+    const previousHistory=current.battles.slice(0,-1);
+    current=restoredRun(current);
+    assert.deepEqual(current.battles,previousHistory);
+    assert.deepEqual(meaningfulRun(current),meaningfulRun(states[i]));
+  }
+  assert.equal(undo.undoLastBattle(current).ok,false);
+});
+test('legacy saves remain loadable and repeated undo stops at their boundary', () => {
+  const legacy=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  delete legacy.battles[0].checkpoint;
+  assert.equal(storage.saveRunPlannerData(envelope(legacy)),true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],legacy);
+  assert.match(undo.undoLastBattle(legacy).reason,/predates Undo checkpoints/);
+  let current=recording.recordRunBattle(legacy,normalBattle()).run;
+  current=recording.recordRunBattle(current,normalBattle()).run;
+  current=restoredRun(restoredRun(current));
+  assert.deepEqual(meaningfulRun(current),meaningfulRun(legacy));
+  assert.match(undo.undoLastBattle(current).reason,/predates Undo checkpoints/);
+});
+test('empty history reports Undo unavailable', () => {
+  assert.deepEqual(undo.undoLastBattle(multiRun()),{ok:false,reason:'No battles recorded yet.'});
+});
+test('malformed checkpoint structures and references are rejected without altering input', () => {
+  const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const valid=run.battles[0].checkpoint;
+  const bad=[null,{}, {...valid,roster:null}, {...valid,totalBits:-1}, {...valid,totalBits:Infinity},
+    {...valid,digiline:['missing']}, {...valid,digiline:[valid.digiline[0],valid.digiline[0]]},
+    {...valid,digiline:valid.roster.map(r => r.instanceId)},
+    {...valid,roster:[valid.roster[0],valid.roster[0]]}, {...valid,battles:[]}, {...valid,checkpoint:valid}];
+  for (const change of [{stats:{hp:1}}, {techs:[1]}, {level:0}, {totalXp:NaN}, {source:null}, {instanceId:''}, {speciesId:''}, {name:null}]) {
+    bad.push({...valid,roster:[{...valid.roster[0],...change},...valid.roster.slice(1)]});
+  }
+  for(const checkpoint of bad) {
+    const invalid=freeze({...run,battles:[{...run.battles[0],checkpoint}]});
+    assert.equal(storage.isValidRunBattleCheckpoint(checkpoint),false);
+    assert.equal(storage.saveRunPlannerData(envelope(invalid)),false);
+    const result=undo.undoLastBattle(invalid);
+    assert.equal(result.ok,false);
+    assert.match(result.reason,/Invalid checkpoint/);
+    assert.equal(invalid.battles.length,1);
+  }
+});
+test('checkpoint missing a starter required by the run cannot be applied', () => {
+  const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  run.battles[0].checkpoint={roster:[],digiline:[],totalBits:0};
+  assert.equal(undo.undoLastBattle(run).ok,false);
+});
+test('record reload then undo restores exact saved pre-battle state', () => {
+  const before=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1}).run;
+  assert.equal(storage.saveRunPlannerData(envelope(recorded)),true);
+  const loaded=storage.loadRunPlannerData().runs[0];
+  assert.deepEqual(loaded,recorded);
+  const restored=restoredRun(loaded);
+  assert.deepEqual(meaningfulRun(restored),meaningfulRun(before));
+  assert.equal(storage.saveRunPlannerData(envelope(restored)),true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],restored);
+});
+test('recording after undo replaces the final order with a fresh event ID', () => {
+  let run=multiRun();
+  for(let i=0;i<3;i++) run=recording.recordRunBattle(run,normalBattle()).run;
+  const oldId=run.battles[2].id;
+  const next=recording.recordRunBattle(restoredRun(run),{...normalBattle(),encounterId:31}).run;
+  assert.deepEqual(next.battles.map(b => b.order),[0,1,2]);
+  assert.notEqual(next.battles[2].id,oldId);
+  assert.equal(new Set(next.battles.map(b => b.id)).size,3);
+  assert.deepEqual(next.battles.slice(0,2),run.battles.slice(0,2));
+});
+test('zero-reward fixture can be recorded and undone exactly', () => {
+  const {REWARDS_BY_ENCOUNTER_ID:rewards}=load('src/utils/rewardMatching.ts');
+  const saved=rewards.get(32);
+  try {
+    rewards.set(32,{...saved,xp:0,bits:0});
+    const before=multiRun();
+    assert.deepEqual(meaningfulRun(restoredRun(recording.recordRunBattle(before,normalBattle()).run)),meaningfulRun(before));
+  } finally {rewards.set(32,saved);}
+});
+test('failed Undo save leaves current run, history and feedback revision unchanged', () => {
+  const before=multiRun();
+  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1}).run;
+  storage.saveRunPlannerData(envelope(recorded));
+  const render=plannerHost(); const planner=render();
+  const raw=values.get(storage.RUN_PLANNER_STORAGE_KEY);
+  const save=global.localStorage.setItem;
+  global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.undoBattle(recorded.battles[0].id),false);
+  assert.deepEqual(render().activeRun,recorded);
+  assert.equal(render().undoRevision,0);
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
+  assert.match(render().error,/Could not save/);
+  global.localStorage.setItem=save;
+  assert.equal(render().undoBattle(recorded.battles[0].id),true);
+  assert.deepEqual(meaningfulRun(render().activeRun),meaningfulRun(before));
+  assert.equal(render().undoRevision,1);
+  assert.equal(render().error,null);
+});
+test('stale confirmation cannot undo a different battle or another saved run', () => {
+  const first=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const other=createRunPlan('blue-falcon','Other');
+  storage.saveRunPlannerData({schemaVersion:1,runs:[first,other],activeRunId:first.id});
+  const render=plannerHost(); const planner=render();
+  planner.recordBattle(normalBattle());
+  assert.equal(planner.undoBattle(first.battles[0].id),false);
+  const latest=render().activeRun;
+  assert.equal(planner.undoBattle(latest.battles[1].id),true);
+  assert.deepEqual(render().data.runs[1],other);
+  render().loadRun(other.id);
+  assert.equal(planner.undoBattle(first.battles[0].id),false);
 });
