@@ -342,3 +342,185 @@ test('selection and preview leave the entire saved RunPlan and progression untou
   assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY), saved);
   assert.deepEqual(storage.loadRunPlannerData().runs[0], run);
 });
+
+const recording = load('src/utils/runBattleRecording.ts');
+const xpHelpers = load('src/utils/experience.ts');
+const growthHelpers = load('src/utils/statGrowth.ts');
+const normalBattle = () => ({phase:before,domainId:'scsi-domain',floor:1,encounterId:32,capturedEnemySlot:null});
+test('recording rejects empty, duplicate and unknown participants without changing the run', () => {
+  const run = multiRun();
+  for (const digiline of [[], [run.starterInstanceId,run.starterInstanceId], ['missing']]) {
+    const invalid = freeze({...run,digiline});
+    assert.throws(() => recording.recordRunBattle(invalid,normalBattle()));
+    assert.equal(invalid.battles.length,0);
+    assert.equal(invalid.totalBits,0);
+  }
+});
+for (const count of [1,2,3]) test(`full encounter XP reaches each of ${count} participants, never reserves`, () => {
+  let run = multiRun();
+  for (const id of ['reserve-a','reserve-b'].slice(0,count-1)) run = addToDigiline(run,id);
+  freeze(run);
+  const reward = selection.getBattlePreview(32).reward;
+  const {run:next,resolution,event} = recording.recordRunBattle(run,normalBattle());
+  assert.equal(resolution.outcomes.length,count);
+  for (const member of run.roster) {
+    const updated = next.roster.find(r => r.instanceId === member.instanceId);
+    assert.equal(updated.totalXp,member.totalXp+(run.digiline.includes(member.instanceId)?reward.xp:0));
+    if (!run.digiline.includes(member.instanceId)) assert.deepEqual(updated,member);
+  }
+  assert.equal(next.totalBits,run.totalBits+reward.bits);
+  assert.equal(next.battles.length,1);
+  assert.equal(event.xpReward,reward.xp);
+  assert.equal(event.bitsReward,reward.bits);
+  assert.deepEqual(event.digilineInstanceIds,run.digiline);
+  assert.deepEqual(run.battles,[]);
+});
+test('recording reuses one-level XP and exact deterministic expected growth', () => {
+  const run = multiRun();
+  run.roster[0] = {...run.roster[0],totalXp:100000};
+  const expected = growthHelpers.applyExpectedLevelUpGrowth(run.roster[0].speciesId,1,run.roster[0].stats).stats;
+  const first = recording.recordRunBattle(freeze(run),normalBattle());
+  const again = recording.recordRunBattle(run,normalBattle());
+  assert.equal(first.run.roster[0].level,2);
+  assert.equal(first.run.roster[0].totalXp,100000+first.event.xpReward);
+  assert.equal(first.resolution.outcomes[0].xpToNextLevel,0);
+  assert.deepEqual(first.run.roster[0].stats,expected);
+  assert.deepEqual(again.run.roster,first.run.roster);
+  assert.ok(Object.values(expected).some(value => !Number.isInteger(value)));
+});
+test('no level-up leaves stats unchanged while recording XP and Bits', () => {
+  const run = multiRun();
+  run.roster[0] = {...run.roster[0],level:30,totalXp:xpHelpers.getRequiredTotalXpForLevel(30)};
+  const next = recording.recordRunBattle(freeze(run),normalBattle());
+  assert.equal(next.run.roster[0].level,30);
+  assert.deepEqual(next.run.roster[0].stats,run.roster[0].stats);
+});
+test('history is append-only with stable IDs, location and ordered participant snapshots', () => {
+  let run = fullRun();
+  run = moveDigilineMember(run,'reserve-b','up');
+  const first = recording.recordRunBattle(run,normalBattle());
+  const snapshot = structuredClone(first.event);
+  const changed = removeFromDigiline(first.run,'reserve-b');
+  const second = recording.recordRunBattle(changed,normalBattle());
+  assert.deepEqual(second.run.battles[0],snapshot);
+  assert.notEqual(second.event.id,first.event.id);
+  assert.deepEqual(second.run.battles.map(e => e.order),[0,1]);
+  assert.equal(second.event.phase,before);
+  assert.equal(second.event.floor,1);
+  assert.deepEqual(snapshot.digilineInstanceIds,[run.starterInstanceId,'reserve-b','reserve-a']);
+  assert.equal(second.run.totalBits,first.event.bitsReward*2);
+});
+test('capture uses exact slot data and cumulative XP, stays reserve and receives no battle XP', () => {
+  const run = multiRun();
+  const {run:next,resolution,event} = recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1});
+  const enemy = selection.getBattlePreview(32).encounter.digimons[0];
+  const captured = next.roster.find(r => r.instanceId === resolution.capturedInstanceId);
+  assert.equal(next.roster.length,run.roster.length+1);
+  assert.equal(captured.level,enemy.level);
+  assert.equal(captured.totalXp,xpHelpers.getRequiredTotalXpForLevel(enemy.level));
+  assert.deepEqual(captured.stats,Object.fromEntries(['hp','mp','atk','def','spd'].map(stat => [stat,enemy[stat]])));
+  assert.deepEqual(captured.techs,enemy.techs);
+  assert.deepEqual(captured.source,{type:'capture',encounterId:32,enemySlot:1});
+  assert.deepEqual(next.digiline,run.digiline);
+  assert.equal(event.capturedEnemySlot,1);
+  assert.ok(!event.digilineInstanceIds.includes(captured.instanceId));
+  assert.ok(addToDigiline(next,captured.instanceId).digiline.includes(captured.instanceId));
+});
+test('repeated captures of the same species create distinct instances', () => {
+  const first = recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:1});
+  const second = recording.recordRunBattle(first.run,{...normalBattle(),capturedEnemySlot:1});
+  assert.notEqual(first.resolution.capturedInstanceId,second.resolution.capturedInstanceId);
+  assert.equal(new Set(second.run.roster.map(r => r.instanceId)).size,second.run.roster.length);
+  assert.equal(second.run.roster.length,6);
+});
+test('capture choices preserve slots and boss capture is rejected in state logic', () => {
+  const normal = {...normalBattle(),phase:after,floor:2,encounterId:36};
+  assert.deepEqual(recording.getCaptureChoices(normal).map(e => [e.slot,e.name]),[[1,'Penguinmon'],[2,'Penguinmon']]);
+  const boss = {...normalBattle(),floor:4,encounterId:91};
+  assert.deepEqual(recording.getCaptureChoices(boss),[]);
+  assert.throws(() => recording.recordRunBattle(multiRun(),{...boss,capturedEnemySlot:1}),/Boss/);
+  assert.throws(() => recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:99}),/valid enemy slot/);
+  assert.equal(recording.recordRunBattle(multiRun(),boss).run.battles.length,1);
+});
+test('known zero rewards record, missing metadata and incompatible location reject', () => {
+  const {REWARDS_BY_ENCOUNTER_ID:rewards} = load('src/utils/rewardMatching.ts');
+  const saved = rewards.get(32);
+  try {
+    // No current Domain group references a 0/0 encounter. Exercise this future-safe
+    // branch with an in-memory reward fixture; never add fabricated Domain mappings.
+    const zero = [...rewards.values()].find(reward => reward.xp === 0 && reward.bits === 0);
+    rewards.set(32,zero);
+    const result = recording.recordRunBattle(multiRun(),normalBattle());
+    assert.equal(result.run.battles.length,1);
+    assert.equal(result.run.totalBits,0);
+    assert.equal(result.event.xpReward,0);
+    rewards.delete(32);
+    assert.throws(() => recording.recordRunBattle(multiRun(),normalBattle()),/Reward metadata/);
+  } finally { rewards.set(32,saved); }
+  assert.throws(() => recording.recordRunBattle(multiRun(),{...normalBattle(),floor:999}),/valid Domain/);
+});
+test('recorded progression, fractional stats, capture and history survive storage without replay', () => {
+  const first = recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:1});
+  const recorded = recording.recordRunBattle(first.run,normalBattle());
+  assert.ok(Object.values(recorded.run.roster[0].stats).some(value => !Number.isInteger(value)));
+  assert.equal(storage.saveRunPlannerData(envelope(recorded.run)),true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
+  const next = recording.recordRunBattle(storage.loadRunPlannerData().runs[0],normalBattle());
+  assert.equal(next.run.battles.length,3);
+});
+test('old history without location extensions loads, invalid new location fields reject', () => {
+  const recorded = recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const legacy = structuredClone(recorded);
+  delete legacy.battles[0].phase;
+  delete legacy.battles[0].floor;
+  assert.equal(storage.saveRunPlannerData(envelope(legacy)),true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],legacy);
+  for (const extension of [{phase:'unknown'},{floor:0},{floor:1.5}]) {
+    const invalid = {...recorded,battles:[{...recorded.battles[0],...extension}]};
+    assert.equal(storage.saveRunPlannerData(envelope(invalid)),false);
+  }
+});
+
+// Minimal hook host to exercise the real save-before-publish action and current-run ref.
+function plannerHost() {
+  const slots = []; let cursor = 0;
+  const react = {
+    useState(initial) { const i=cursor++; if (!(i in slots)) slots[i]=typeof initial==='function'?initial():initial;
+      return [slots[i],value => {slots[i]=value;}]; },
+    useRef(initial) { const i=cursor++; if (!(i in slots)) slots[i]={current:initial}; return slots[i]; },
+  };
+  const source = fs.readFileSync(path.join(root,'src/hooks/useRunPlanner.ts'),'utf8');
+  const js = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+  const mod={exports:{}};
+  new Function('require','module','exports',js)(id => id==='react'?react:load('src/'+id.slice(2)+'.ts'),mod,mod.exports);
+  return () => {cursor=0; return mod.exports.useRunPlanner();};
+}
+test('failed recording save preserves current and persisted run; retry applies once', () => {
+  const run = multiRun(); storage.saveRunPlannerData(envelope(run));
+  const render = plannerHost(); const planner = render();
+  const original = values.get(storage.RUN_PLANNER_STORAGE_KEY);
+  const setItem = global.localStorage.setItem;
+  global.localStorage.setItem = () => {throw Error('quota');};
+  assert.equal(planner.recordBattle({...normalBattle(),capturedEnemySlot:1}),null);
+  assert.deepEqual(render().activeRun,run);
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),original);
+  assert.match(render().error,/Could not save/);
+  global.localStorage.setItem=setItem;
+  assert.ok(render().recordBattle({...normalBattle(),capturedEnemySlot:1}));
+  assert.equal(render().activeRun.battles.length,1);
+  assert.equal(render().activeRun.roster.length,run.roster.length+1);
+  assert.equal(render().error,null);
+});
+test('record action snapshots latest committed Digiline and consecutive calls do not overwrite history', () => {
+  storage.saveRunPlannerData(envelope(multiRun()));
+  const render=plannerHost(); const planner=render();
+  planner.addMember('reserve-a');
+  planner.recordBattle(normalBattle());
+  planner.recordBattle(normalBattle());
+  const run=render().activeRun;
+  assert.equal(run.battles.length,2);
+  assert.deepEqual(run.battles[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
+  assert.deepEqual(run.battles[1].digilineInstanceIds,run.battles[0].digilineInstanceIds);
+  assert.equal(run.totalBits,run.battles[0].bitsReward*2);
+});

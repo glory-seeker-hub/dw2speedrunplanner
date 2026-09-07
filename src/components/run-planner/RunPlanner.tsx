@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BattleSelector } from '@/components/run-planner/BattleSelector';
+import { BattleHistory } from '@/components/run-planner/BattleHistory';
 import { STARTERS } from '@/data/starters';
 import { MAX_DIGILINE_SIZE } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
@@ -154,7 +155,8 @@ export const RunPlanner = ({ planner }: Props) => {
               ))}
             </div>
           </section>
-          <BattleSelector key={run.id} />
+          <BattleSelector key={run.id} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
+          <BattleHistory run={run} />
         </>
       )}
       <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
