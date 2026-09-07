@@ -18,6 +18,13 @@ export interface RosterDigimon {
   techs: string[];
 }
 
+/** Exact progression state before a battle; never includes history or UI state. */
+export interface RunBattleCheckpoint {
+  roster: RosterDigimon[];
+  digiline: string[];
+  totalBits: number;
+}
+
 export interface RunBattleEvent {
   id: string;
   order: number;
@@ -32,6 +39,8 @@ export interface RunBattleEvent {
   /** Reward SNAPSHOT taken when the event was created. Never a computed getter. */
   xpReward: number;
   bitsReward: number;
+  /** Missing on legacy events, which cannot be safely undone. */
+  checkpoint?: RunBattleCheckpoint;
 }
 
 export interface RunPlan {

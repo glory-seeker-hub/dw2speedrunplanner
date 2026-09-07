@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
 import { BattleResolution } from '@/utils/runProgression';
+import { undoLastBattle } from '@/utils/runBattleUndo';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
 import { PersistedRunPlannerData, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
@@ -13,6 +14,7 @@ export const useRunPlanner = () => {
   const [error, setError] = useState<string | null>(null);
   const [starterId, setStarterId] = useState('');
   const [name, setName] = useState('');
+  const [undoRevision, setUndoRevision] = useState(0);
   const activeRun = data.runs.find((run) => run.id === data.activeRunId) ?? null;
 
   const persist = (next: PersistedRunPlannerData): boolean => {
@@ -61,6 +63,21 @@ export const useRunPlanner = () => {
     }
   };
 
+  const undoBattle = (expectedEventId: string): boolean => {
+    const current = currentData.current;
+    const run = current.runs.find(entry => entry.id === current.activeRunId);
+    if (!run) return false;
+    if (run.battles[run.battles.length - 1]?.id !== expectedEventId) {
+      setError('The latest battle has changed. Review it before undoing.');
+      return false;
+    }
+    const result = undoLastBattle(run);
+    if (!result.ok) { setError(result.reason); return false; }
+    if (!persist({ ...current, runs: current.runs.map(entry => entry.id === run.id ? result.run : entry) })) return false;
+    setUndoRevision(value => value + 1);
+    return true;
+  };
+
   const startRun = (): boolean => {
     if (activeRun) return false; // Replacement requires the confirmed reset flow.
     try {
@@ -96,5 +113,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, undoBattle, undoRevision };
 };

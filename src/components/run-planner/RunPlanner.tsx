@@ -155,8 +155,8 @@ export const RunPlanner = ({ planner }: Props) => {
               ))}
             </div>
           </section>
-          <BattleSelector key={run.id} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
-          <BattleHistory run={run} />
+          <BattleSelector key={`${run.id}/${planner.undoRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
+          <BattleHistory key={run.id} run={run} onUndo={planner.undoBattle} error={error} />
         </>
       )}
       <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>

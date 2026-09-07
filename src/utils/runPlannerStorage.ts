@@ -6,6 +6,7 @@ import {
   PersistedRunPlannerData,
   RosterDigimon,
   RunBattleEvent,
+  RunBattleCheckpoint,
   RunPlan,
 } from '@/types/runPlanner';
 
@@ -59,6 +60,17 @@ const isRosterDigimon = (v: unknown): v is RosterDigimon =>
   isStats(v.stats) &&
   isStringArray(v.techs);
 
+/** Shared by storage and Undo: reject malformed or recursive checkpoint payloads. */
+export const isValidRunBattleCheckpoint = (v: unknown): v is RunBattleCheckpoint => {
+  if (!isObject(v) || Object.keys(v).some(key => !['roster', 'digiline', 'totalBits'].includes(key))) return false;
+  if (!Array.isArray(v.roster) || !v.roster.every(isRosterDigimon)) return false;
+  if (!isStringArray(v.digiline) || v.digiline.length > MAX_DIGILINE_SIZE) return false;
+  if (!isNonNegativeNumber(v.totalBits)) return false;
+  const ids = new Set(v.roster.map(member => member.instanceId));
+  return ids.size === v.roster.length && new Set(v.digiline).size === v.digiline.length &&
+    v.digiline.every(id => ids.has(id));
+};
+
 const isRunBattleEvent = (v: unknown): v is RunBattleEvent =>
   isObject(v) &&
   isNonEmptyString(v.id) &&
@@ -75,7 +87,8 @@ const isRunBattleEvent = (v: unknown): v is RunBattleEvent =>
     v.capturedEnemySlot === null ||
     (typeof v.capturedEnemySlot === 'number' && Number.isInteger(v.capturedEnemySlot))) &&
   isNonNegativeNumber(v.xpReward) &&
-  isNonNegativeNumber(v.bitsReward);
+  isNonNegativeNumber(v.bitsReward) &&
+  (v.checkpoint === undefined || isValidRunBattleCheckpoint(v.checkpoint));
 
 const isRunPlan = (v: unknown): v is RunPlan => {
   if (!isObject(v)) return false;
