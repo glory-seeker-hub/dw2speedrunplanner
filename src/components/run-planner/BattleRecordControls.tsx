@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getLevelCapChoices } from '@/utils/levelCap';
 import { BattleSelection } from '@/utils/runBattleSelection';
 import { getCaptureChoices, getRecordingEncounter, RecordBattleRequest } from '@/utils/runBattleRecording';
 import { BattleResolution } from '@/utils/runProgression';
@@ -14,21 +15,25 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
   onRecord: RecordBattleHandler;
 }) => {
   const [capture, setCapture] = useState('none');
+  const [selectedCap, setSelectedCap] = useState('');
   const [result, setResult] = useState<BattleResolution | null>(null);
   const option = getRecordingEncounter(selection);
   const choices = getCaptureChoices(selection);
+  const cap = choices.find(enemy => String(enemy.slot) === capture)?.levelCap;
+  const capRequired = cap?.resolved === null;
   const blocked = !hasParticipants ? 'Add at least one Digimon to the Digiline before recording a battle.'
+    : capRequired && !getLevelCapChoices(cap).includes(Number(selectedCap)) ? 'Select the exact Maximum EL before recording capture.'
     : !option?.preview?.reward ? 'Reward metadata is missing. This battle cannot be recorded.' : null;
   const record = () => {
-    const recorded = onRecord({ ...selection, capturedEnemySlot: capture === 'none' ? null : Number(capture) });
-    if (recorded) { setResult(recorded); setCapture('none'); }
+    const recorded = onRecord({ ...selection, capturedEnemySlot: capture === 'none' ? null : Number(capture), capturedMaxLevel: selectedCap === '' ? null : Number(selectedCap) });
+    if (recorded) { setResult(recorded); setCapture('none'); setSelectedCap(''); }
   };
   return (
     <div className="space-y-4 rounded-lg border p-4">
       {option?.isBoss ? <p className="text-sm text-muted-foreground">Boss encounter: capture is unavailable.</p> : (
         <div className="max-w-md space-y-2">
           <Label htmlFor="battle-capture">Capture</Label>
-          <Select value={capture} onValueChange={setCapture}>
+          <Select value={capture} onValueChange={value => { setCapture(value); setSelectedCap(''); }}>
             <SelectTrigger id="battle-capture"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No capture</SelectItem>
@@ -37,6 +42,14 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
               </SelectItem>)}
             </SelectContent>
           </Select>
+          {cap && (capRequired ? <>
+            <Label htmlFor="capture-max-el">Maximum EL</Label>
+            <Select value={selectedCap} onValueChange={setSelectedCap}>
+              <SelectTrigger id="capture-max-el"><SelectValue placeholder="Select..." /></SelectTrigger>
+              <SelectContent>{getLevelCapChoices(cap).map(value =>
+                <SelectItem key={value} value={String(value)}>{value}</SelectItem>)}</SelectContent>
+            </Select>
+          </> : <p className="text-sm">Maximum EL: {cap.resolved}</p>)}
         </div>
       )}
       <p className="text-sm text-muted-foreground">Recording keeps this encounter selected for the next battle and resets capture to No capture.</p>

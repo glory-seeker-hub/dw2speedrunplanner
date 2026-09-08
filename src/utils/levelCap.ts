@@ -25,3 +25,15 @@ export const resolveLevelCap = (cap: LevelCapState, chosen: number): LevelCapSta
   }
   return { ...cap, resolved: chosen };
 };
+
+/** Inclusive authoritative choices; never selects an individual cap implicitly. */
+export const getLevelCapChoices = (cap: LevelCapState): number[] =>
+  Array.from({ length: cap.max - cap.min + 1 }, (_, index) => cap.min + index);
+
+export const getAcquisitionLevelCap = (level: number, selected?: number | null): LevelCapState => {
+  const cap = getInitialLevelCap(level);
+  if (!cap) throw new Error('No authoritative acquisition cap for EL' + level);
+  if (cap.resolved !== null && selected == null) return cap;
+  if (selected == null) throw new Error('Select the exact Maximum EL before recording capture.');
+  return resolveLevelCap(cap, selected);
+};

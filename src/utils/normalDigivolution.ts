@@ -6,12 +6,7 @@ import { RosterDigimon } from '@/types/runPlanner';
 const ids = new Map<number, string | undefined>(METALKID_DIGIMON_SOURCE.map(r => [r.id, getDigimonByName(r.name)?.id]));
 export const EVOLUTION_RANGES = METALKID_EVOLUTION_SOURCE.map(r => {
   const from = ids.get(r.from), to = ids.get(r.to);
-  // Phase 2F-B project correction: Piddomon -> MagnaAngemon DP0–5,
-  // Giromon DP6+. Preserve the raw imported source for provenance.
-  return { id: r.id, from, to,
-    min: from === 'piddomon' && to === 'giromon' ? 6 : r.min,
-    max: from === 'piddomon' && to === 'magnaangemon' ? 5 : r.max as number | null,
-  };
+  return { id: r.id, from, to, min: r.min, max: r.max as number | null };
 });
 export type EvolutionLookup =
   | { status: 'unique'; targetSpeciesId: string }
