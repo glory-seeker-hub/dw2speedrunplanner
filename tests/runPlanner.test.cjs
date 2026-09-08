@@ -1259,3 +1259,174 @@ test('pure progression retains participant-level capResolutionRequired defense',
  assert.equal(r.outcomes[2].actualXpApplied,r.xpAwarded);assert.equal(r.totalBits,1030+r.bitsAwarded);assert.equal(r.roster.length,4);
  assert.deepEqual(run,previous);
 });
+
+// Phase 2G-A: pure DNA preview; no roster/history integration.
+const dnaData = load('src/data/dna.ts');
+const dnaSource = load('src/data/dnaSource.ts');
+const dnaTypes = load('src/types/dna.ts');
+const dnaEngine = load('src/utils/dnaDigivolution.ts');
+const dnaAudit = load('src/utils/dnaValidation.ts');
+const dnaExternal = load('src/data/dnaCrossValidationSource.ts');
+const dnaParent = (name, id, extra={}) => foundationMember(name,
+  {Champion:11,Ultimate:21,Mega:31,Rookie:1}[progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).rank],
+  {instanceId:id, ...extra});
+const dnaPreview = (a,b) => dnaEngine.previewDnaDigivolution(a,b);
+
+test('DNA v4 audit computes full family, matrix, mutation and independent combination counts',()=>{
+  const r=dnaAudit.getDnaValidationReport();
+  for(const [key,value] of Object.entries({familyRecords:182,familyNamesResolved:182,familyDuplicateSpecies:0,
+    matrixEntries:576,matrixResultsResolved:576,matrixUniqueResultLabels:137,matrixAsymmetries:0,matrixDuplicateCells:0,
+    MetalKidComparableCombinations:4322,MetalKidMatches:4322,MetalKidMismatches:0,MetalKidUnresolved:0,mutationCellCount:15,mutationInitializationUnresolved:0}))assert.equal(r[key],value,key);
+  for(const key of ['familyUnresolved','missingCells','asymmetricCells','MetalKidMismatchDetails','MetalKidUnresolvedIds'])assert.deepEqual(r[key],[]);
+  assert.deepEqual(r.mutationResultSpecies.sort(),['SandYanmamon','Vademon','Yanmamon']);
+  assert.deepEqual(r.mutationCells.sort(),dnaSource.DNA_DOCUMENTED_MUTATIONS.flatMap(m=>m.sourceCells).sort());
+  for(const [name,family] of dnaSource.DNA_FAMILY_SOURCE){assert.ok(dnaTypes.DNA_FAMILIES.includes(family));assert.equal(dnaData.getDnaFamily(speciesLookup.getDigimonByName(name).id),family);}
+});
+test('DNA normalization is contextual and preserves global aliases and distinct Tyrannomon species',()=>{
+  assert.equal(dnaData.resolveDnaMatrixLabel('M-Tyrannomon').id,'mastertyrannomon');
+  assert.equal(speciesLookup.getDigimonByName('M-Tyrannomon'),undefined);
+  assert.equal(speciesLookup.DIGIMON_NAME_ALIASES.mtyrannomon,undefined);
+  assert.equal(dnaData.resolveDnaMatrixLabel('MetalTyrannomon').id,'metaltyrannomon');
+  assert.equal(dnaData.resolveDnaMatrixLabel('Dokunemmon').id,'dokunemon');
+  for(const name of ['M-Garurumon','M-Seadramon','M-Kabuterimon'])assert.equal(dnaData.resolveDnaMatrixLabel(name).id,speciesLookup.getDigimonByName(name).id);
+  assert.equal(dnaData.resolveDnaMatrixLabel('M-Agumon'),undefined);
+  const labels=new Set(dnaSource.DNA_MATRIX_SOURCE.map(row=>row.resultLabel));assert.equal(labels.size,137);
+  for(const name of labels)assert.ok(dnaData.resolveDnaMatrixLabel(name));
+});
+for(const rank of dnaTypes.DNA_SELECTION_RANKS)for(const type of dnaTypes.DNA_TYPES)test(`DNA ${rank}/${type} has 64 exact symmetric cells`,()=>{
+  const rows=dnaSource.DNA_MATRIX_SOURCE.filter(r=>r.matrixSelectionRank===rank&&r.matrixSelectionType===type);assert.equal(rows.length,64);
+  for(const row of rows){const r=dnaData.getDnaMatrixResult(rank,type,row.familyA,row.familyB);const reverse=dnaData.getDnaMatrixResult(rank,type,row.familyB,row.familyA);
+    assert.equal(r.actualResultSpeciesId,dnaData.resolveDnaMatrixLabel(row.resultLabel).id);assert.equal(r.actualResultSpeciesId,reverse.actualResultSpeciesId);
+    assert.equal(r.isMutation,reverse.isMutation);assert.equal(r.sourceCell,row.sourceCell);
+    assert.equal(r.isMutation,r.actualResultRank!==rank||r.actualResultType!==type);
+  }
+});
+for(const [a,b,rank] of [['Greymon','Greymon','Rookie'],['Greymon','MetalGreymon','Rookie'],['Greymon','WarGreymon','Rookie'],
+  ['MetalGreymon','MetalGreymon','Champion'],['MetalGreymon','WarGreymon','Champion'],['WarGreymon','WarGreymon','Ultimate']])test(`DNA ${a} + ${b} selects ${rank} before either reaches MAX`,()=>{
+ const pa=freeze(dnaParent(a,'a')),pb=freeze(dnaParent(b,'b'));const old=structuredClone([pa,pb]);
+ const r=dnaPreview(pa,pb);assert.equal(r.status,'success');assert.equal(r.matrixSelectionRank,rank);assert.equal(r.actualResultRank,rank);
+ assert.equal(r.actualResultType,'Vaccine');assert.equal(r.matrixSelectionType,'Vaccine');assert.equal(r.isMutation,false);
+ assert.deepEqual(r,dnaPreview(pb,pa));assert.deepEqual(r,dnaPreview(pa,pb));assert.deepEqual([pa,pb],old);
+ assert.equal(r.startingLevel,{Rookie:1,Champion:11,Ultimate:21}[rank]);assert.equal(r.childTotalXp,{Rookie:0,Champion:483,Ultimate:5883}[rank]);
+ assert.notEqual(r.childTotalXp,pa.totalXp);assert.notEqual(r.childTotalXp,pb.totalXp);
+ assert.deepEqual(r.parents.map(p=>p.instanceId),['a','b']);assert.ok(r.parents.every(p=>p.family==='Dragon'));
+ assert.ok(!('techs' in r));assert.ok(!('instanceId' in r));assert.ok(!('source' in r));
+});
+for(const partner of ['Greymon','WarGreymon'])test(`DNA Rookie + ${partner} is rejected both ways`,()=>{
+ const a=dnaParent('Agumon','a'),b=dnaParent(partner,'b');assert.equal(dnaPreview(a,b).reason,'rookie-parent-ineligible');assert.deepEqual(dnaPreview(a,b),dnaPreview(b,a));
+});
+for(const name of ['ChaosLord','C-Pierrotmon','C-Seadramon','C-WarGreymon','Guardian-Data','Guardian-Vaccine','Guardian-Virus',
+ 'Left Hand','NeoCrimson','No Rookie Form','Overlord GAIA','Overlord GAIA (2)','Right Hand'])test(`DNA ${name} has no fabricated family`,()=>{
+ const a=dnaParent(name,'a'),b=dnaParent('Greymon','b');assert.equal(dnaData.getDnaFamily(a.speciesId),null);assert.equal(dnaPreview(a,b).reason,'missing-family');assert.deepEqual(dnaPreview(a,b),dnaPreview(b,a));
+});
+test('DNA rejects duplicate instance identity even with different species',()=>{
+ assert.equal(dnaPreview(dnaParent('Greymon','same'),dnaParent('MetalGreymon','same')).reason,'same-instance');
+});
+for(const [a,b,expected] of [['Vaccine','Virus','Vaccine'],['Virus','Data','Virus'],['Data','Vaccine','Data'],
+ ['Vaccine','Vaccine','Vaccine'],['Data','Data','Data'],['Virus','Virus','Virus']])test(`DNA dominance ${a}/${b} = ${expected}`,()=>{
+ assert.equal(dnaData.getDnaSelectionType(a,b),expected);assert.equal(dnaData.getDnaSelectionType(b,a),expected);
+});
+for(const [a,b,result] of [[0,0,1],[2,0,3],[4,7,8]])test(`DNA DP${a} + DP${b} = DP${result}`,()=>{
+ const pa=dnaParent('Greymon','a',{dp:a}),pb=dnaParent('Greymon','b',{dp:b});assert.equal(dnaPreview(pa,pb).childDp,result);assert.deepEqual(dnaPreview(pa,pb),dnaPreview(pb,pa));
+});
+for(const dp of [-1,0.5,NaN,Infinity,Number.MAX_SAFE_INTEGER])test(`DNA invalid DP ${dp} rejected`,()=>{
+ assert.equal(dnaPreview(dnaParent('Greymon','a',{dp}),dnaParent('Greymon','b')).reason,'invalid-dp');
+});
+for(const [a,b,cap] of [[11,11,13],[19,14,21],[20,15,23],[21,29,33],[49,49,58]])test(`DNA EL${a} + EL${b} gives exact cap ${cap}`,()=>{
+ const pa=dnaParent('Greymon','a',{level:a,levelCap:{min:99,max:99,resolved:99}}),pb=dnaParent('Greymon','b',{level:b});
+ const r=dnaPreview(pa,pb);assert.equal(r.childMaxLevel,cap);assert.deepEqual(r.childLevelCap,{min:cap,max:cap,resolved:cap});assert.deepEqual(r,dnaPreview(pb,pa));
+});
+const dnaStatsA={hp:123.75,mp:88.25,atk:101.75,def:73.5,spd:43.25};
+const dnaStatsB={hp:234.5,mp:155.75,atk:67.5,def:98.25,spd:66.75};
+for(const [name,expected] of [['Greymon',{hp:35,mp:24,atk:60,def:61,spd:33}],
+ ['MetalGreymon',{hp:121,mp:82,atk:71,def:71,spd:49}],['WarGreymon',{hp:161,mp:109,atk:77,def:78,spd:55}]])test(`DNA ${name} pair uses complete fractional stat expressions`,()=>{
+ const a=freeze(dnaParent(name,'a',{stats:{...dnaStatsA}})),b=freeze(dnaParent(name,'b',{stats:{...dnaStatsB}}));
+ const r=dnaPreview(a,b);assert.deepEqual(r.childStats,expected);assert.deepEqual(r,dnaPreview(b,a));
+ r.childStats.hp=999;assert.deepEqual(a.stats,dnaStatsA);assert.deepEqual(b.stats,dnaStatsB);assert.deepEqual(dnaPreview(a,b).childStats,expected);
+});
+test('DNA final flooring retains parent fractions and combines weighted terms before flooring',()=>{
+ const a=dnaParent('Greymon','a',{stats:{hp:9.5,mp:9.5,atk:1.5,def:1.5,spd:1.75}}),b=dnaParent('Greymon','b',{stats:{hp:0.5,mp:0.5,atk:1.5,def:1.5,spd:1.75}});
+ assert.deepEqual(dnaPreview(a,b).childStats,{hp:1,mp:1,atk:1,def:1,spd:1});
+});
+for(const [a,b,name,rank,type] of [['Cherrymon','MasterTyrannomon','Vademon','Ultimate','Virus'],
+ ['Gryphonmon','H-Kabuterimon','Yanmamon','Champion','Data'],['Baihumon','H-Kabuterimon','SandYanmamon','Champion','Data']])test(`DNA ${name} mutation initializes from actual canonical rank`,()=>{
+ const pa=freeze(dnaParent(a,'a',{dp:4,stats:{...dnaStatsA}})),pb=freeze(dnaParent(b,'b',{dp:7,stats:{...dnaStatsB}}));const old=structuredClone([pa,pb]);
+ const r=dnaPreview(pa,pb);assert.equal(r.status,'success');assert.equal(r.initializationStatus,'initialized');assert.equal(r.isMutation,true);
+ assert.equal(r.actualResultName,name);assert.equal(r.actualResultRank,rank);assert.equal(r.actualResultType,type);
+ assert.equal(r.matrixSelectionRank,name==='Vademon'?'Champion':'Ultimate');assert.equal(r.matrixSelectionType,name==='Vademon'?'Vaccine':'Data');
+ assert.equal(r.startingLevel,name==='Vademon'?21:11);assert.equal(r.childTotalXp,name==='Vademon'?5883:483);
+ const ultimateStats={hp:161,mp:109,atk:77,def:78,spd:55},championStats={hp:121,mp:82,atk:71,def:71,spd:49};
+ assert.deepEqual(r.childStats,name==='Vademon'?ultimateStats:championStats);
+ assert.notDeepEqual(r.childStats,name==='Vademon'?championStats:ultimateStats);assert.equal(r.childDp,8);
+ const cap=name==='Vademon'?25:37;assert.equal(r.childMaxLevel,cap);assert.deepEqual(r.childLevelCap,{min:cap,max:cap,resolved:cap});
+ assert.deepEqual(r,dnaPreview(pb,pa));assert.deepEqual(r,dnaPreview(pa,pb));assert.deepEqual([pa,pb],old);
+});
+test('DNA every documented mutation cell retains its actual metadata',()=>{
+ for(const group of dnaSource.DNA_DOCUMENTED_MUTATIONS)for(const cell of group.sourceCells){const row=dnaSource.DNA_MATRIX_SOURCE.find(r=>r.sourceCell===cell);
+  const r=dnaData.getDnaMatrixResult(row.matrixSelectionRank,row.matrixSelectionType,row.familyA,row.familyB);
+  assert.equal(r.isMutation,true);assert.equal(r.actualResultName,group.actualResultSpecies);assert.equal(r.actualResultRank,group.actualResultRank);assert.equal(r.actualResultType,group.actualResultType);
+ }
+});
+test('DNA missing authoritative XP fails explicitly for both ordinary and mutation results',()=>{
+ const xp=load('src/data/experience.ts').CUMULATIVE_XP_BY_LEVEL;const old=[xp[1],xp[11],xp[21]];
+ try{for(const l of [1,11,21])delete xp[l];assert.equal(dnaPreview(dnaParent('Greymon','a'),dnaParent('Greymon','b')).reason,'missing-xp-threshold');
+ assert.equal(dnaPreview(dnaParent('Cherrymon','a'),dnaParent('MasterTyrannomon','b')).reason,'missing-xp-threshold');
+ }finally{[1,11,21].forEach((l,i)=>{xp[l]=old[i];});}
+});
+for(const [extra,reason] of [[{speciesId:'unknown'},'invalid-species'],[{instanceId:''},'invalid-instance'],[{level:0},'invalid-level'],
+ [{level:11.5},'invalid-level'],[{stats:{...dnaStatsA,hp:NaN}},'invalid-stats'],[{stats:{...dnaStatsA,spd:-1}},'invalid-stats'],
+ [{level:Number.MAX_SAFE_INTEGER},'invalid-child-cap'],[{stats:{...dnaStatsA,hp:Number.MAX_VALUE}},'invalid-stats']])test(`DNA invalid input reports ${reason}`,()=>{
+ assert.equal(dnaPreview(dnaParent('Greymon','a',extra),dnaParent('Greymon','b')).reason,reason);
+});
+test('DNA missing matrix and unresolved result labels are explicit failures',()=>{
+ assert.equal(dnaData.getDnaMatrixResult('Mega','Vaccine','Dragon','Dragon').reason,'missing-matrix-result');
+ const row=dnaSource.DNA_MATRIX_SOURCE.find(r=>r.matrixSelectionRank==='Rookie'&&r.matrixSelectionType==='Vaccine'&&r.familyA==='Dragon'&&r.familyB==='Dragon');
+ const old=row.resultLabel;try{row.resultLabel='MissingSpecies';assert.equal(dnaPreview(dnaParent('Greymon','a'),dnaParent('Greymon','b')).reason,'unresolved-result-species');}finally{row.resultLabel=old;}
+});
+test('DNA external audit recomputes mismatches and unresolved IDs instead of trusting recorded counts',()=>{
+ const row=dnaExternal.DNA_METALKID_COMBINATIONS[0];const wrong=dnaExternal.DNA_METALKID_SPECIES.find(([id])=>id!==row[3])[0];
+ const r=dnaAudit.validateDnaCombinations([[...row.slice(0,3),wrong],[999,-1,row[2],row[3]]]);
+ assert.equal(r.comparable,1);assert.equal(r.matches,0);assert.equal(r.mismatches.length,1);assert.deepEqual(r.unresolved,[999]);
+});
+test('DNA previews match every independent combination with canonical parents and preserve reversal',()=>{
+ const byId=new Map(dnaExternal.DNA_METALKID_SPECIES);let ordinary=0,mutation=0;
+ for(const [id,a,b,result] of dnaExternal.DNA_METALKID_COMBINATIONS){
+  const pa=dnaParent(byId.get(a),'a'),pb=dnaParent(byId.get(b),'b');const r=dnaPreview(pa,pb);
+  assert.equal(r.actualResultSpeciesId,speciesLookup.getDigimonByName(byId.get(result)).id,`combination ${id}`);assert.deepEqual(r,dnaPreview(pb,pa));
+  assert.equal(r.status,'success');assert.ok(r.childStats);assert.equal(r.startingLevel,{Rookie:1,Champion:11,Ultimate:21}[r.actualResultRank]);
+  if(r.isMutation){mutation++;}else{ordinary++;}
+ }
+ assert.equal(ordinary,4312);assert.equal(mutation,10);
+});
+
+test('DNA all 576 cells have v4 initialization rules for their actual canonical ranks',()=>{
+ for(const row of dnaSource.DNA_MATRIX_SOURCE){
+  const result=dnaData.getDnaMatrixResult(row.matrixSelectionRank,row.matrixSelectionType,row.familyA,row.familyB);
+  const rule=dnaData.getDnaInitializationRule(result.actualResultRank);
+  assert.ok(rule,row.sourceCell);assert.equal(rule.statFormulaRank,result.actualResultRank);
+  assert.equal(rule.startingLevel,{Rookie:1,Champion:11,Ultimate:21}[result.actualResultRank]);
+  assert.notEqual(load('src/utils/experience.ts').getRequiredTotalXpForLevel(rule.startingLevel),null);
+ }
+ for(const mutation of dnaSource.DNA_DOCUMENTED_MUTATIONS){
+  const rule=dnaData.getDnaInitializationRule(mutation.actualResultRank);
+  assert.equal(rule.startingLevel,mutation.startingLevel);assert.equal(rule.statFormulaRank,mutation.statFormulaRank);
+ }
+});
+test('DNA mutation XP reads the actual-rank threshold independently of the matrix-rank threshold',()=>{
+ const xp=load('src/data/experience.ts').CUMULATIVE_XP_BY_LEVEL;const old11=xp[11],old21=xp[21];
+ try {
+  delete xp[11];
+  const v=dnaPreview(dnaParent('Cherrymon','a'),dnaParent('MasterTyrannomon','b'));
+  assert.equal(v.status,'success');assert.equal(v.childTotalXp,5883);
+  xp[11]=old11;delete xp[21];
+  for(const partner of ['Gryphonmon','Baihumon']){
+   const r=dnaPreview(dnaParent(partner,'a'),dnaParent('H-Kabuterimon','b'));
+   assert.equal(r.status,'success');assert.equal(r.childTotalXp,483);
+  }
+ } finally {xp[11]=old11;xp[21]=old21;}
+});
+test('DNA unsupported actual result rank fails instead of falling back to matrix initialization',()=>{
+ const metadata=progressionData.getSpeciesProgression('vademon');const old=metadata.rank;
+ try{metadata.rank='Mega';assert.equal(dnaPreview(dnaParent('Cherrymon','a'),dnaParent('MasterTyrannomon','b')).reason,'unsupported-result-rank');}
+ finally{metadata.rank=old;}
+});
