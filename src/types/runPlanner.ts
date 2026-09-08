@@ -5,6 +5,13 @@ export type RosterSource =
   | { type: 'starter' }
   | { type: 'capture'; encounterId: number; enemySlot: number };
 
+/** Individual cap uncertainty; fixed caps are resolved immediately. */
+export interface LevelCapState {
+  min: number;
+  max: number;
+  resolved: number | null;
+}
+
 /** A specific owned Digimon instance (not a species). */
 export interface RosterDigimon {
   /** Stable unique identity. Never use array index as identity. */
@@ -14,6 +21,8 @@ export interface RosterDigimon {
   source: RosterSource;
   level: number;
   totalXp: number;
+  dp: number;
+  levelCap: LevelCapState;
   stats: DigimonStats;
   techs: string[];
 }
@@ -59,7 +68,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 1;
+  schemaVersion: 2;
   runs: RunPlan[];
   activeRunId: string | null;
 }

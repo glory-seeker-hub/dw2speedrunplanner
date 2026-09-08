@@ -5,12 +5,15 @@ import { applyBattleXp } from '@/utils/experience';
 import { applyExpectedLevelUpGrowth, StatKey } from '@/utils/statGrowth';
 import { getResolvedReward } from '@/utils/rewardMatching';
 import { tryCreateCapturedDigimon } from '@/utils/capture';
+import { getLearnedTechniques } from '@/utils/normalDigivolution';
 
 /**
  * BATTLE RESOLUTION FOR THE RUN PLANNER (pure, deterministic)
  *
  * GAME RULES enforced here:
- * - Every participating Digiline Digimon receives the FULL encounter XP (never split).
+ * - Eligible Digiline participants receive FULL encounter XP (never split).
+ * - Capped, unresolved-at-minimum and unsupported-scope participants retain their state,
+ *   with distinct outcome flags. Teammates, Bits and captures still resolve.
  * - At most ONE level per Digimon per battle; excess XP is retained.
  * - XP-to-next may legally be 0 right after a level-up.
  * - A level-up applies the deterministic EXPECTED stat growth (no RNG, no rerolls).
@@ -22,6 +25,12 @@ import { tryCreateCapturedDigimon } from '@/utils/capture';
  */
 
 export interface ParticipantOutcome {
+  encounterXpReward: number;
+  actualXpApplied: number;
+  capped: boolean;
+  capResolutionRequired: boolean;
+  plannerScopeUnsupported: boolean;
+  learnedTechniques: string[];
   instanceId: string;
   previousLevel: number;
   newLevel: number;
@@ -76,8 +85,9 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
   const nextRoster = roster.map((entry) => {
     if (!participantIds.includes(entry.instanceId)) return entry;
 
-    // 2. Full encounter XP + 3. at most one level-up.
-    const xp = applyBattleXp(entry.level, entry.totalXp, xpAwarded);
+    // 2. Cap-aware XP + 3. at most one level-up.
+    const xp = applyBattleXp(entry.level, entry.totalXp, xpAwarded, entry.levelCap);
+    const learnedTechniques = xp.leveledUp ? getLearnedTechniques(entry, xp.newLevel) : [];
 
     // 4. Deterministic expected stat growth on level-up only.
     let newStats = entry.stats;
@@ -95,6 +105,9 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
     }
 
     outcomes.push({
+      encounterXpReward: xpAwarded, actualXpApplied: xp.actualXpApplied,
+      capped: xp.capped, capResolutionRequired: xp.capResolutionRequired,
+      plannerScopeUnsupported: xp.plannerScopeUnsupported, learnedTechniques,
       instanceId: entry.instanceId,
       previousLevel: xp.previousLevel,
       newLevel: xp.newLevel,
@@ -108,7 +121,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
       statsWithoutGrowthData: missing,
     });
 
-    return { ...entry, level: xp.newLevel, totalXp: xp.newTotalXp, stats: { ...newStats } };
+    return { ...entry, level: xp.newLevel, totalXp: xp.newTotalXp, stats: { ...newStats }, techs: [...entry.techs, ...learnedTechniques] };
   });
 
   // 6. Captured Digimon is added AFTER rewards and receives no XP from this battle.

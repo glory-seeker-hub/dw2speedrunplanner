@@ -4,6 +4,7 @@ import { BattleResolution, resolveBattle } from '@/utils/runProgression';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
 import { newInstanceId } from '@/utils/capture';
 import { validateRunPlan } from '@/utils/runInvariants';
+import { getInitialLevelCap } from '@/utils/levelCap';
 
 export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null };
 
@@ -16,7 +17,8 @@ export const getCaptureChoices = (selection: BattleSelection) => {
   const option = getRecordingEncounter(selection);
   return !option || option.isBoss ? [] : option.preview?.encounter.digimons.map((enemy) => ({
     slot: enemy.slot, name: enemy.name, level: enemy.level,
-    unavailableReason: getRequiredTotalXpForLevel(enemy.level) === null ? 'No verified XP threshold for this level' : null,
+    unavailableReason: !getInitialLevelCap(enemy.level) ? 'No authoritative acquisition cap for this level'
+      : getRequiredTotalXpForLevel(enemy.level) === null ? 'No verified XP threshold for this level' : null,
   })) ?? [];
 };
 

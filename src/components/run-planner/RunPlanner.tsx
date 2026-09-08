@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BattleSelector } from '@/components/run-planner/BattleSelector';
 import { BattleHistory } from '@/components/run-planner/BattleHistory';
+import { LevelCapDisplay } from '@/components/run-planner/LevelCapDisplay';
 import { STARTERS } from '@/data/starters';
 import { MAX_DIGILINE_SIZE } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
@@ -112,7 +113,8 @@ export const RunPlanner = ({ planner }: Props) => {
                       <p className="text-sm text-muted-foreground">Slot {index + 1}</p>
                       {member ? (
                         <>
-                          <p className="font-semibold">{member.name} <span className="text-sm font-normal">EL {member.level}</span></p>
+                          <p className="font-semibold">{member.name}</p>
+                          <LevelCapDisplay member={member} />
                           <div className="flex flex-wrap gap-2">
                             <Button size="sm" variant="outline" disabled={index === 0}
                               aria-label={'Move ' + member.name + ' in slot ' + (index + 1) + ' up'}
@@ -138,7 +140,8 @@ export const RunPlanner = ({ planner }: Props) => {
               {run.roster.map((member) => (
                 <Card key={member.instanceId}>
                   <CardHeader><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
-                    <CardDescription>EL {member.level} · Total XP {member.totalXp}</CardDescription>
+                    <LevelCapDisplay member={member} />
+                    <CardDescription>Total XP {member.totalXp}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Stats stats={member.stats} />

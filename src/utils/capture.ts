@@ -2,6 +2,7 @@ import { RosterDigimon, StarterDefinition } from '@/types/runPlanner';
 import { encounters } from '@/data/encounters';
 import { getDigimonByName } from '@/utils/digimonLookup';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
+import { getInitialLevelCap } from '@/utils/levelCap';
 
 const newInstanceId = (): string =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -41,6 +42,8 @@ export const tryCreateCapturedDigimon = (
   }
 
   const species = getDigimonByName(enemy.name);
+  const levelCap = getInitialLevelCap(enemy.level);
+  if (!levelCap) return { ok: false, reason: `No authoritative acquisition cap for EL${enemy.level}` };
 
   return {
     ok: true,
@@ -51,6 +54,8 @@ export const tryCreateCapturedDigimon = (
       source: { type: 'capture', encounterId, enemySlot },
       level: enemy.level,
       totalXp,
+      dp: 0,
+      levelCap,
       stats: {
         hp: enemy.hp,
         mp: enemy.mp,
@@ -73,15 +78,21 @@ export const createCapturedDigimon = (
 };
 
 /** Creates the initial roster Digimon from a starter definition. */
-export const createStarterDigimon = (starter: StarterDefinition): RosterDigimon => ({
-  instanceId: newInstanceId(),
-  speciesId: starter.speciesId,
-  name: starter.name,
-  source: { type: 'starter' },
-  level: starter.level,
-  totalXp: starter.totalXp ?? getRequiredTotalXpForLevel(starter.level) ?? 0,
-  stats: { ...starter.stats },
-  techs: [...starter.techs],
-});
+export const createStarterDigimon = (starter: StarterDefinition): RosterDigimon => {
+  const levelCap = getInitialLevelCap(starter.level);
+  if (!levelCap) throw new Error(`No authoritative acquisition cap for EL${starter.level}`);
+  return {
+    instanceId: newInstanceId(),
+    speciesId: starter.speciesId,
+    name: starter.name,
+    source: { type: 'starter' },
+    level: starter.level,
+    dp: 0,
+    levelCap,
+    totalXp: starter.totalXp ?? getRequiredTotalXpForLevel(starter.level) ?? 0,
+    stats: { ...starter.stats },
+    techs: [...starter.techs],
+  };
+};
 
 export { newInstanceId };

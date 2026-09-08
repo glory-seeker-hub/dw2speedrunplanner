@@ -1,4 +1,4 @@
-import { validateRunPlan } from '@/utils/runInvariants';
+import { validateRunPlan, validateRosterDigimonInvariants } from '@/utils/runInvariants';
 import { DigimonStats } from '@/types/digimon';
 import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/types/runPlanner';
 
 export const RUN_PLANNER_STORAGE_KEY = 'dw2-run-planner';
-export const RUN_PLANNER_SCHEMA_VERSION = 1 as const;
+export const RUN_PLANNER_SCHEMA_VERSION = 2 as const;
 
 export const emptyRunPlannerData = (): PersistedRunPlannerData => ({
   schemaVersion: RUN_PLANNER_SCHEMA_VERSION,
@@ -58,7 +58,8 @@ const isRosterDigimon = (v: unknown): v is RosterDigimon =>
   v.level >= 1 &&
   isNonNegativeNumber(v.totalXp) &&
   isStats(v.stats) &&
-  isStringArray(v.techs);
+  isStringArray(v.techs) &&
+  validateRosterDigimonInvariants(v as unknown as RosterDigimon).length === 0;
 
 /** Shared by storage and Undo: reject malformed or recursive checkpoint payloads. */
 export const isValidRunBattleCheckpoint = (v: unknown): v is RunBattleCheckpoint => {
