@@ -1,17 +1,10 @@
-import { validateRunPlan, validateRosterDigimonInvariants } from '@/utils/runInvariants';
-import { DigimonStats } from '@/types/digimon';
-import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
-import {
-  MAX_DIGILINE_SIZE,
-  PersistedRunPlannerData,
-  RosterDigimon,
-  RunBattleEvent,
-  RunBattleCheckpoint,
-  RunPlan,
-} from '@/types/runPlanner';
+import { validateRunPlan } from '@/utils/runInvariants';
+import { isRosterDigimon } from '@/utils/runActionCheckpoint';
+import { isValidRunEvent } from '@/utils/runEventValidation';
+import { MAX_DIGILINE_SIZE, PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 
 export const RUN_PLANNER_STORAGE_KEY = 'dw2-run-planner';
-export const RUN_PLANNER_SCHEMA_VERSION = 2 as const;
+export const RUN_PLANNER_SCHEMA_VERSION = 3 as const;
 
 export const emptyRunPlannerData = (): PersistedRunPlannerData => ({
   schemaVersion: RUN_PLANNER_SCHEMA_VERSION,
@@ -21,75 +14,9 @@ export const emptyRunPlannerData = (): PersistedRunPlannerData => ({
 
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
-
-const isNonEmptyString = (v: unknown): v is string =>
-  typeof v === 'string' && v.length > 0;
-
-const isNonNegativeNumber = (v: unknown): v is number =>
-  typeof v === 'number' && Number.isFinite(v) && v >= 0;
-
-const isStringArray = (v: unknown): v is string[] =>
-  Array.isArray(v) && v.every((item) => typeof item === 'string');
-
-const isStats = (v: unknown): v is DigimonStats =>
-  isObject(v) &&
-  (['hp', 'mp', 'atk', 'def', 'spd'] as const).every((k) =>
-    isNonNegativeNumber(v[k])
-  );
-
-const isRosterSource = (v: unknown): boolean => {
-  if (!isObject(v)) return false;
-  if (v.type === 'starter') return true;
-  return (
-    v.type === 'capture' &&
-    typeof v.encounterId === 'number' &&
-    typeof v.enemySlot === 'number'
-  );
-};
-
-const isRosterDigimon = (v: unknown): v is RosterDigimon =>
-  isObject(v) &&
-  isNonEmptyString(v.instanceId) &&
-  isNonEmptyString(v.speciesId) &&
-  isNonEmptyString(v.name) &&
-  isRosterSource(v.source) &&
-  typeof v.level === 'number' &&
-  Number.isInteger(v.level) &&
-  v.level >= 1 &&
-  isNonNegativeNumber(v.totalXp) &&
-  isStats(v.stats) &&
-  isStringArray(v.techs) &&
-  validateRosterDigimonInvariants(v as unknown as RosterDigimon).length === 0;
-
-/** Shared by storage and Undo: reject malformed or recursive checkpoint payloads. */
-export const isValidRunBattleCheckpoint = (v: unknown): v is RunBattleCheckpoint => {
-  if (!isObject(v) || Object.keys(v).some(key => !['roster', 'digiline', 'totalBits'].includes(key))) return false;
-  if (!Array.isArray(v.roster) || !v.roster.every(isRosterDigimon)) return false;
-  if (!isStringArray(v.digiline) || v.digiline.length > MAX_DIGILINE_SIZE) return false;
-  if (!isNonNegativeNumber(v.totalBits)) return false;
-  const ids = new Set(v.roster.map(member => member.instanceId));
-  return ids.size === v.roster.length && new Set(v.digiline).size === v.digiline.length &&
-    v.digiline.every(id => ids.has(id));
-};
-
-const isRunBattleEvent = (v: unknown): v is RunBattleEvent =>
-  isObject(v) &&
-  isNonEmptyString(v.id) &&
-  typeof v.order === 'number' &&
-  Number.isInteger(v.order) &&
-  v.order >= 0 &&
-  isNonEmptyString(v.domainId) &&
-  (v.phase === undefined || DOMAIN_PHASES.includes(v.phase as DomainPhase)) &&
-  (v.floor === undefined || (typeof v.floor === 'number' && Number.isInteger(v.floor) && v.floor > 0)) &&
-  typeof v.encounterId === 'number' &&
-  isStringArray(v.digilineInstanceIds) &&
-  v.digilineInstanceIds.length <= MAX_DIGILINE_SIZE &&
-  (v.capturedEnemySlot === undefined ||
-    v.capturedEnemySlot === null ||
-    (typeof v.capturedEnemySlot === 'number' && Number.isInteger(v.capturedEnemySlot))) &&
-  isNonNegativeNumber(v.xpReward) &&
-  isNonNegativeNumber(v.bitsReward) &&
-  (v.checkpoint === undefined || isValidRunBattleCheckpoint(v.checkpoint));
+const isNonEmptyString = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
+const isNonNegativeNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+const isStringArray = (v: unknown): v is string[] => Array.isArray(v) && v.every(item => typeof item === 'string');
 
 const isRunPlan = (v: unknown): v is RunPlan => {
   if (!isObject(v)) return false;
@@ -97,7 +24,7 @@ const isRunPlan = (v: unknown): v is RunPlan => {
   if (v.starterInstanceId !== null && !isNonEmptyString(v.starterInstanceId)) return false;
   if (!Array.isArray(v.roster) || !v.roster.every(isRosterDigimon)) return false;
   if (!isStringArray(v.digiline) || v.digiline.length > MAX_DIGILINE_SIZE) return false;
-  if (!Array.isArray(v.battles) || !v.battles.every(isRunBattleEvent)) return false;
+  if (!Array.isArray(v.history) || !v.history.every(isValidRunEvent)) return false;
   if (!isNonNegativeNumber(v.totalBits)) return false;
   if (!isNonEmptyString(v.createdAt) || !isNonEmptyString(v.updatedAt)) return false;
 
@@ -141,7 +68,7 @@ export const loadRunPlannerData = (): PersistedRunPlannerData => {
 
 export const saveRunPlannerData = (data: PersistedRunPlannerData): boolean => {
   try {
-    if (!isValidPersistedRunPlannerData({ ...data, schemaVersion: RUN_PLANNER_SCHEMA_VERSION })) {
+    if (!isValidPersistedRunPlannerData(data)) {
       return false;
     }
     localStorage.setItem(

@@ -7,7 +7,7 @@ import { getDigimonById } from '@/utils/digimonLookup';
 import { getTechByName } from '@/utils/techLookup';
 import { PLANNER_SCOPE_MAX_EL } from '@/data/statGrowthTables';
 
-/** Diagnostics are separate from fatal errors: planner labels and Piddomon DP6 are usable source facts. */
+/** Diagnostics use effective ranges, including the documented Phase 2F-B Piddomon correction. */
 export const getProgressionValidationReport = () => {
   const rules = Object.values(INITIAL_LEVEL_CAP_RULES);
   const assertions = SPECIES_PROGRESSION.filter(r => r.workbookDp0Evolution !== null);

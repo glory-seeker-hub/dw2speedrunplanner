@@ -1,4 +1,5 @@
-import { RunBattleCheckpoint, RunBattleEvent, RunPlan } from '@/types/runPlanner';
+import { createRunActionCheckpoint } from '@/utils/runActionCheckpoint';
+import { RunBattleEvent, RunPlan } from '@/types/runPlanner';
 import { BattleSelection, getEncountersForFloor } from '@/utils/runBattleSelection';
 import { BattleResolution, resolveBattle } from '@/utils/runProgression';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
@@ -43,9 +44,7 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
     if (!choice) throw new Error('Select a valid enemy slot to capture.');
     if (choice.unavailableReason) throw new Error(choice.unavailableReason);
   }
-  const checkpoint: RunBattleCheckpoint = structuredClone({
-    roster: run.roster, digiline: run.digiline, totalBits: run.totalBits,
-  });
+  const preActionCheckpoint = createRunActionCheckpoint(run);
   const resolution = resolveBattle({
     encounterId: option.encounterId, digilineInstanceIds: [...run.digiline],
     roster: run.roster, totalBits: run.totalBits, capturedEnemySlot: slot,
@@ -53,15 +52,16 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
   if (resolution.rewardUnknown) throw new Error('Reward metadata is missing. This battle cannot be recorded.');
   if (resolution.captureError) throw new Error(resolution.captureError);
   const event: RunBattleEvent = {
-    id: newInstanceId(), order: run.battles.length ? run.battles[run.battles.length - 1].order + 1 : 0,
+    type: 'battle',
+    id: newInstanceId(), order: run.history.length ? run.history[run.history.length - 1].order + 1 : 0,
     domainId: request.domainId, phase: request.phase, floor: request.floor!, encounterId: option.encounterId,
     digilineInstanceIds: [...resolution.participantIds], capturedEnemySlot: slot,
     xpReward: resolution.xpAwarded, bitsReward: resolution.bitsAwarded,
-    checkpoint,
+    preActionCheckpoint,
   };
-  if (run.battles.some(battle => battle.id === event.id)) throw new Error('Could not generate a unique battle ID. Try again.');
+  if (run.history.some(battle => battle.id === event.id)) throw new Error('Could not generate a unique battle ID. Try again.');
   const next: RunPlan = { ...run, roster: resolution.roster, totalBits: resolution.totalBits,
-    battles: [...run.battles, event], updatedAt: new Date().toISOString() };
+    history: [...run.history, event], updatedAt: new Date().toISOString() };
   const nextViolations = validateRunPlan(next);
   if (nextViolations.length) throw new Error(nextViolations.map(v => v.message).join(' '));
   return { run: next, resolution, event };

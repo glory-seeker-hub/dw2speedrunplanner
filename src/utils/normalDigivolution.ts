@@ -4,9 +4,15 @@ import { getDigimonById, getDigimonByName } from '@/utils/digimonLookup';
 import { RosterDigimon } from '@/types/runPlanner';
 
 const ids = new Map<number, string | undefined>(METALKID_DIGIMON_SOURCE.map(r => [r.id, getDigimonByName(r.name)?.id]));
-export const EVOLUTION_RANGES = METALKID_EVOLUTION_SOURCE.map(r => ({
-  id: r.id, from: ids.get(r.from), to: ids.get(r.to), min: r.min, max: r.max as number | null,
-}));
+export const EVOLUTION_RANGES = METALKID_EVOLUTION_SOURCE.map(r => {
+  const from = ids.get(r.from), to = ids.get(r.to);
+  // Phase 2F-B project correction: Piddomon -> MagnaAngemon DP0–5,
+  // Giromon DP6+. Preserve the raw imported source for provenance.
+  return { id: r.id, from, to,
+    min: from === 'piddomon' && to === 'giromon' ? 6 : r.min,
+    max: from === 'piddomon' && to === 'magnaangemon' ? 5 : r.max as number | null,
+  };
+});
 export type EvolutionLookup =
   | { status: 'unique'; targetSpeciesId: string }
   | { status: 'unavailable' }
@@ -24,12 +30,15 @@ export const lookupNormalEvolution = (speciesId: string, dp: number): EvolutionL
 };
 
 const thresholds = { Rookie: { level: 11, target: 'Champion' }, Champion: { level: 21, target: 'Ultimate' }, Ultimate: { level: 31, target: 'Mega' } };
+export const getNormalDigivolutionRule = (speciesId: string) => {
+  const metadata = getSpeciesProgression(speciesId);
+  return metadata && thresholds[metadata.rank as keyof typeof thresholds];
+};
 export type DigivolutionPreview = { canDigivolve: true; targetSpeciesId: string; digimon: RosterDigimon }
   | { canDigivolve: false; reason: string };
 
 export const previewNormalDigivolution = (entry: RosterDigimon): DigivolutionPreview => {
-  const metadata = getSpeciesProgression(entry.speciesId);
-  const rule = metadata && thresholds[metadata.rank as keyof typeof thresholds];
+  const rule = getNormalDigivolutionRule(entry.speciesId);
   if (!rule) return { canDigivolve: false, reason: 'No normal higher rank or missing progression metadata' };
   if (!Number.isInteger(entry.level) || entry.level < rule.level) return { canDigivolve: false, reason: `Requires EL${rule.level}` };
   const lookup = lookupNormalEvolution(entry.speciesId, entry.dp);

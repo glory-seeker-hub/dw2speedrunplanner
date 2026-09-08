@@ -47,6 +47,7 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
         {result.outcomes.filter(outcome => outcome.leveledUp).map(outcome => (
           <div key={outcome.instanceId} className="space-y-1">
             <p>{result.roster.find(member => member.instanceId === outcome.instanceId)?.name} · EL {outcome.previousLevel} → {outcome.newLevel} · +{result.xpAwarded} XP</p>
+            {outcome.learnedTechniques.length > 0 && <p>Learned technique: {outcome.learnedTechniques.join(', ')}</p>}
             <p className="text-muted-foreground">Expected growth: {(['hp', 'mp', 'atk', 'def', 'spd'] as const).map(stat => `${stat.toUpperCase()} ${outcome.previousStats[stat]} → ${outcome.newStats[stat]}`).join(' · ')}</p>
             {outcome.statsWithoutGrowthData.length > 0 && <p>Growth data unavailable; unchanged: {outcome.statsWithoutGrowthData.join(', ').toUpperCase()}</p>}
           </div>

@@ -38,7 +38,7 @@ beforeEach(() => {
     removeItem: (key) => values.delete(key),
   };
 });
-const envelope = (run) => ({ schemaVersion: 2, runs: [run], activeRunId: run.id });
+const envelope = (run) => ({ schemaVersion: 3, runs: [run], activeRunId: run.id });
 for (const starter of STARTERS) {
   test(starter.label + ' creates, persists, reloads, resets and recreates a valid run', () => {
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
@@ -57,7 +57,7 @@ for (const starter of STARTERS) {
     assert.equal(run.starterInstanceId, member.instanceId);
     assert.deepEqual(run.digiline, [member.instanceId]);
     assert.equal(run.totalBits, 0);
-    assert.deepEqual(run.battles, []);
+    assert.deepEqual(run.history, []);
     assert.equal(run.createdAt, run.updatedAt);
     assert.ok(Number.isFinite(Date.parse(run.createdAt)));
     assert.deepEqual(validateRunPlan(run), []);
@@ -91,11 +91,11 @@ test('storage rejects duplicate instances, duplicate run IDs and broken active r
     envelope({...run, digiline: [run.starterInstanceId, run.starterInstanceId]}),
   ]) assert.equal(storage.saveRunPlannerData(data), false);
 });
-test('saving a remaining run preserves the version-2 multi-run envelope', () => {
+test('saving a remaining run preserves the version-3 multi-run envelope', () => {
   const first = createRunPlan('gold-hawk', 'First');
   const second = createRunPlan('blue-falcon', 'Second');
-  assert.equal(storage.saveRunPlannerData({schemaVersion:2,runs:[first,second],activeRunId:first.id}),true);
-  const remaining = {schemaVersion:2,runs:[second],activeRunId:null};
+  assert.equal(storage.saveRunPlannerData({schemaVersion: 3,runs:[first,second],activeRunId:first.id}),true);
+  const remaining = {schemaVersion: 3,runs:[second],activeRunId:null};
   assert.equal(storage.saveRunPlannerData(remaining), true);
   assert.deepEqual(storage.loadRunPlannerData(), remaining);
 });
@@ -220,7 +220,8 @@ test('add, reorder and remove each survive save/load with exact slot order', () 
 test('Digiline mutations preserve history snapshots, rewards, fractional stats and identity', () => {
   const run = multiRun();
   run.totalBits = 100;
-  run.battles = [{id:'history',order:0,domainId:'test',encounterId:182,
+  run.history = [{type:'battle',id:'history',order:0,domainId:'test',phase:'before-blood-knights',floor:1,encounterId:182,
+    preActionCheckpoint:load('src/utils/runActionCheckpoint.ts').createRunActionCheckpoint(run),
     digilineInstanceIds:[run.starterInstanceId],xpReward:0,bitsReward:0}];
   freeze(run);
   const before = JSON.stringify(run);
@@ -229,7 +230,7 @@ test('Digiline mutations preserve history snapshots, rewards, fractional stats a
   const {digiline: originalDigiline, ...originalOther} = run;
   assert.deepEqual(other, originalOther);
   assert.equal(JSON.stringify(run), before);
-  assert.deepEqual(changed.battles[0].digilineInstanceIds, [run.starterInstanceId]);
+  assert.deepEqual(changed.history[0].digilineInstanceIds, [run.starterInstanceId]);
   assert.notDeepEqual(digiline, originalDigiline);
 });
 test('failed save of a Digiline update retains the previously persisted run', () => {
@@ -355,7 +356,7 @@ test('recording rejects empty, duplicate and unknown participants without changi
   for (const digiline of [[], [run.starterInstanceId,run.starterInstanceId], ['missing']]) {
     const invalid = freeze({...run,digiline});
     assert.throws(() => recording.recordRunBattle(invalid,normalBattle()));
-    assert.equal(invalid.battles.length,0);
+    assert.equal(invalid.history.length,0);
     assert.equal(invalid.totalBits,0);
   }
 });
@@ -372,11 +373,11 @@ for (const count of [1,2,3]) test(`full encounter XP reaches each of ${count} pa
     if (!run.digiline.includes(member.instanceId)) assert.deepEqual(updated,member);
   }
   assert.equal(next.totalBits,run.totalBits+reward.bits);
-  assert.equal(next.battles.length,1);
+  assert.equal(next.history.length,1);
   assert.equal(event.xpReward,reward.xp);
   assert.equal(event.bitsReward,reward.bits);
   assert.deepEqual(event.digilineInstanceIds,run.digiline);
-  assert.deepEqual(run.battles,[]);
+  assert.deepEqual(run.history,[]);
 });
 test('recording reuses one-level XP and exact deterministic expected growth', () => {
   const run = multiRun();
@@ -405,9 +406,9 @@ test('history is append-only with stable IDs, location and ordered participant s
   const snapshot = structuredClone(first.event);
   const changed = removeFromDigiline(first.run,'reserve-b');
   const second = recording.recordRunBattle(changed,normalBattle());
-  assert.deepEqual(second.run.battles[0],snapshot);
+  assert.deepEqual(second.run.history[0],snapshot);
   assert.notEqual(second.event.id,first.event.id);
-  assert.deepEqual(second.run.battles.map(e => e.order),[0,1]);
+  assert.deepEqual(second.run.history.map(e => e.order),[0,1]);
   assert.equal(second.event.phase,before);
   assert.equal(second.event.floor,1);
   assert.deepEqual(snapshot.digilineInstanceIds,[run.starterInstanceId,'reserve-b','reserve-a']);
@@ -443,7 +444,7 @@ test('capture choices preserve slots and boss capture is rejected in state logic
   assert.deepEqual(recording.getCaptureChoices(boss),[]);
   assert.throws(() => recording.recordRunBattle(multiRun(),{...boss,capturedEnemySlot:1}),/Boss/);
   assert.throws(() => recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:99}),/valid enemy slot/);
-  assert.equal(recording.recordRunBattle(multiRun(),boss).run.battles.length,1);
+  assert.equal(recording.recordRunBattle(multiRun(),boss).run.history.length,1);
 });
 test('known zero rewards record, missing metadata and incompatible location reject', () => {
   const {REWARDS_BY_ENCOUNTER_ID:rewards} = load('src/utils/rewardMatching.ts');
@@ -454,7 +455,7 @@ test('known zero rewards record, missing metadata and incompatible location reje
     const zero = [...rewards.values()].find(reward => reward.xp === 0 && reward.bits === 0);
     rewards.set(32,zero);
     const result = recording.recordRunBattle(multiRun(),normalBattle());
-    assert.equal(result.run.battles.length,1);
+    assert.equal(result.run.history.length,1);
     assert.equal(result.run.totalBits,0);
     assert.equal(result.event.xpReward,0);
     rewards.delete(32);
@@ -470,17 +471,17 @@ test('recorded progression, fractional stats, capture and history survive storag
   assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
   assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
   const next = recording.recordRunBattle(storage.loadRunPlannerData().runs[0],normalBattle());
-  assert.equal(next.run.battles.length,3);
+  assert.equal(next.run.history.length,3);
 });
-test('old history without location extensions loads, invalid new location fields reject', () => {
+test('schema v3 requires battle location and rejects invalid location fields', () => {
   const recorded = recording.recordRunBattle(multiRun(),normalBattle()).run;
   const legacy = structuredClone(recorded);
-  delete legacy.battles[0].phase;
-  delete legacy.battles[0].floor;
-  assert.equal(storage.saveRunPlannerData(envelope(legacy)),true);
-  assert.deepEqual(storage.loadRunPlannerData().runs[0],legacy);
+  delete legacy.history[0].phase;
+  delete legacy.history[0].floor;
+  assert.equal(storage.saveRunPlannerData(envelope(legacy)),false);
+  assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
   for (const extension of [{phase:'unknown'},{floor:0},{floor:1.5}]) {
-    const invalid = {...recorded,battles:[{...recorded.battles[0],...extension}]};
+    const invalid = {...recorded,history:[{...recorded.history[0],...extension}]};
     assert.equal(storage.saveRunPlannerData(envelope(invalid)),false);
   }
 });
@@ -511,7 +512,7 @@ test('failed recording save preserves current and persisted run; retry applies o
   assert.match(render().error,/Could not save/);
   global.localStorage.setItem=setItem;
   assert.ok(render().recordBattle({...normalBattle(),capturedEnemySlot:1}));
-  assert.equal(render().activeRun.battles.length,1);
+  assert.equal(render().activeRun.history.length,1);
   assert.equal(render().activeRun.roster.length,run.roster.length+1);
   assert.equal(render().error,null);
 });
@@ -522,31 +523,31 @@ test('record action snapshots latest committed Digiline and consecutive calls do
   planner.recordBattle(normalBattle());
   planner.recordBattle(normalBattle());
   const run=render().activeRun;
-  assert.equal(run.battles.length,2);
-  assert.deepEqual(run.battles[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
-  assert.deepEqual(run.battles[1].digilineInstanceIds,run.battles[0].digilineInstanceIds);
-  assert.equal(run.totalBits,run.battles[0].bitsReward*2);
+  assert.equal(run.history.length,2);
+  assert.deepEqual(run.history[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
+  assert.deepEqual(run.history[1].digilineInstanceIds,run.history[0].digilineInstanceIds);
+  assert.equal(run.totalBits,run.history[0].bitsReward*2);
 });
 
-const undo = load('src/utils/runBattleUndo.ts');
+const undo = load('src/utils/runActionUndo.ts');
 const meaningfulRun = ({updatedAt, ...run}) => run;
 const restoredRun = (run) => {
-  const result = undo.undoLastBattle(run);
+  const result = undo.undoLastAction(run);
   assert.equal(result.ok,true,result.reason);
   return result.run;
 };
-test('new event checkpoint is the complete pre-battle state with no recursive history', () => {
+test('new event preActionCheckpoint is the complete pre-battle state with no recursive history', () => {
   const run = freeze(fullRun());
   const recorded = recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
-  assert.deepEqual(recorded.event.checkpoint,{roster:run.roster,digiline:run.digiline,totalBits:run.totalBits});
-  assert.deepEqual(Object.keys(recorded.event.checkpoint).sort(),['digiline','roster','totalBits']);
-  assert.notEqual(recorded.event.checkpoint.roster,run.roster);
-  assert.notEqual(recorded.event.checkpoint.digiline,run.digiline);
+  assert.deepEqual(recorded.event.preActionCheckpoint,{roster:run.roster,digiline:run.digiline,totalBits:run.totalBits});
+  assert.deepEqual(Object.keys(recorded.event.preActionCheckpoint).sort(),['digiline','roster','totalBits']);
+  assert.notEqual(recorded.event.preActionCheckpoint.roster,run.roster);
+  assert.notEqual(recorded.event.preActionCheckpoint.digiline,run.digiline);
   for (let i=0;i<run.roster.length;i++) {
-    assert.notEqual(recorded.event.checkpoint.roster[i],run.roster[i]);
+    assert.notEqual(recorded.event.preActionCheckpoint.roster[i],run.roster[i]);
     for (const field of ['stats','techs','source']) {
-      assert.notEqual(recorded.event.checkpoint.roster[i][field],run.roster[i][field]);
-      assert.notEqual(recorded.event.checkpoint.roster[i][field],recorded.run.roster[i][field]);
+      assert.notEqual(recorded.event.preActionCheckpoint.roster[i][field],run.roster[i][field]);
+      assert.notEqual(recorded.event.preActionCheckpoint.roster[i][field],recorded.run.roster[i][field]);
     }
   }
 });
@@ -559,7 +560,7 @@ test('normal battle undo restores all meaningful run state and does not mutate i
   assert.equal(JSON.stringify(recorded),snapshot);
   assert.ok(Number.isFinite(Date.parse(restored.updatedAt)));
   restored.roster[0].stats.hp=999;
-  assert.equal(recorded.battles[0].checkpoint.roster[0].stats.hp,before.roster[0].stats.hp);
+  assert.equal(recorded.history[0].preActionCheckpoint.roster[0].stats.hp,before.roster[0].stats.hp);
 });
 test('level-up undo restores exact fractional stats, level, XP and Bits', () => {
   const before = recording.recordRunBattle(recording.recordRunBattle(multiRun(),normalBattle()).run,normalBattle()).run;
@@ -590,52 +591,50 @@ test('repeated undo restores successive exact checkpoints and preserves earlier 
   for(let i=0;i<3;i++) states.push(recording.recordRunBattle(states[i],{...normalBattle(),capturedEnemySlot:1}).run);
   let current=freeze(states[3]);
   for(let i=2;i>=0;i--) {
-    const previousHistory=current.battles.slice(0,-1);
+    const previousHistory=current.history.slice(0,-1);
     current=restoredRun(current);
-    assert.deepEqual(current.battles,previousHistory);
+    assert.deepEqual(current.history,previousHistory);
     assert.deepEqual(meaningfulRun(current),meaningfulRun(states[i]));
   }
-  assert.equal(undo.undoLastBattle(current).ok,false);
+  assert.equal(undo.undoLastAction(current).ok,false);
 });
-test('legacy saves remain loadable and repeated undo stops at their boundary', () => {
+test('schema v3 rejects events missing mandatory checkpoints without overwriting development saves', () => {
   const legacy=recording.recordRunBattle(multiRun(),normalBattle()).run;
-  delete legacy.battles[0].checkpoint;
-  assert.equal(storage.saveRunPlannerData(envelope(legacy)),true);
-  assert.deepEqual(storage.loadRunPlannerData().runs[0],legacy);
-  assert.match(undo.undoLastBattle(legacy).reason,/predates Undo checkpoints/);
-  let current=recording.recordRunBattle(legacy,normalBattle()).run;
-  current=recording.recordRunBattle(current,normalBattle()).run;
-  current=restoredRun(restoredRun(current));
-  assert.deepEqual(meaningfulRun(current),meaningfulRun(legacy));
-  assert.match(undo.undoLastBattle(current).reason,/predates Undo checkpoints/);
+  delete legacy.history[0].preActionCheckpoint;
+  const raw=JSON.stringify(envelope(legacy));values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
+  assert.equal(storage.saveRunPlannerData(envelope(legacy)),false);
+  assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
+  assert.match(undo.undoLastAction(legacy).reason,/Invalid checkpoint/);
 });
+
 test('empty history reports Undo unavailable', () => {
-  assert.deepEqual(undo.undoLastBattle(multiRun()),{ok:false,reason:'No battles recorded yet.'});
+  assert.deepEqual(undo.undoLastAction(multiRun()),{ok:false,reason:'No actions recorded yet.'});
 });
-test('malformed checkpoint structures and references are rejected without altering input', () => {
+test('malformed preActionCheckpoint structures and references are rejected without altering input', () => {
   const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
-  const valid=run.battles[0].checkpoint;
+  const valid=run.history[0].preActionCheckpoint;
   const bad=[null,{}, {...valid,roster:null}, {...valid,totalBits:-1}, {...valid,totalBits:Infinity},
     {...valid,digiline:['missing']}, {...valid,digiline:[valid.digiline[0],valid.digiline[0]]},
     {...valid,digiline:valid.roster.map(r => r.instanceId)},
-    {...valid,roster:[valid.roster[0],valid.roster[0]]}, {...valid,battles:[]}, {...valid,checkpoint:valid}];
+    {...valid,roster:[valid.roster[0],valid.roster[0]]}, {...valid,history:[]}, {...valid,preActionCheckpoint:valid}];
   for (const change of [{stats:{hp:1}}, {techs:[1]}, {level:0}, {totalXp:NaN}, {source:null}, {instanceId:''}, {speciesId:''}, {name:null}]) {
     bad.push({...valid,roster:[{...valid.roster[0],...change},...valid.roster.slice(1)]});
   }
-  for(const checkpoint of bad) {
-    const invalid=freeze({...run,battles:[{...run.battles[0],checkpoint}]});
-    assert.equal(storage.isValidRunBattleCheckpoint(checkpoint),false);
+  for(const preActionCheckpoint of bad) {
+    const invalid=freeze({...run,history:[{...run.history[0],preActionCheckpoint}]});
+    assert.equal(load('src/utils/runActionCheckpoint.ts').isValidRunActionCheckpoint(preActionCheckpoint),false);
     assert.equal(storage.saveRunPlannerData(envelope(invalid)),false);
-    const result=undo.undoLastBattle(invalid);
+    const result=undo.undoLastAction(invalid);
     assert.equal(result.ok,false);
     assert.match(result.reason,/Invalid checkpoint/);
-    assert.equal(invalid.battles.length,1);
+    assert.equal(invalid.history.length,1);
   }
 });
-test('checkpoint missing a starter required by the run cannot be applied', () => {
+test('preActionCheckpoint missing a starter required by the run cannot be applied', () => {
   const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
-  run.battles[0].checkpoint={roster:[],digiline:[],totalBits:0};
-  assert.equal(undo.undoLastBattle(run).ok,false);
+  run.history[0].preActionCheckpoint={roster:[],digiline:[],totalBits:0};
+  assert.equal(undo.undoLastAction(run).ok,false);
 });
 test('record reload then undo restores exact saved pre-battle state', () => {
   const before=recording.recordRunBattle(multiRun(),normalBattle()).run;
@@ -651,12 +650,12 @@ test('record reload then undo restores exact saved pre-battle state', () => {
 test('recording after undo replaces the final order with a fresh event ID', () => {
   let run=multiRun();
   for(let i=0;i<3;i++) run=recording.recordRunBattle(run,normalBattle()).run;
-  const oldId=run.battles[2].id;
+  const oldId=run.history[2].id;
   const next=recording.recordRunBattle(restoredRun(run),{...normalBattle(),encounterId:31}).run;
-  assert.deepEqual(next.battles.map(b => b.order),[0,1,2]);
-  assert.notEqual(next.battles[2].id,oldId);
-  assert.equal(new Set(next.battles.map(b => b.id)).size,3);
-  assert.deepEqual(next.battles.slice(0,2),run.battles.slice(0,2));
+  assert.deepEqual(next.history.map(b => b.order),[0,1,2]);
+  assert.notEqual(next.history[2].id,oldId);
+  assert.equal(new Set(next.history.map(b => b.id)).size,3);
+  assert.deepEqual(next.history.slice(0,2),run.history.slice(0,2));
 });
 test('zero-reward fixture can be recorded and undone exactly', () => {
   const {REWARDS_BY_ENCOUNTER_ID:rewards}=load('src/utils/rewardMatching.ts');
@@ -675,29 +674,29 @@ test('failed Undo save leaves current run, history and feedback revision unchang
   const raw=values.get(storage.RUN_PLANNER_STORAGE_KEY);
   const save=global.localStorage.setItem;
   global.localStorage.setItem=()=>{throw Error('quota');};
-  assert.equal(planner.undoBattle(recorded.battles[0].id),false);
+  assert.equal(planner.undoAction(recorded.history[0].id,recorded.id),false);
   assert.deepEqual(render().activeRun,recorded);
-  assert.equal(render().undoRevision,0);
+  assert.equal(render().feedbackRevision,0);
   assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
   assert.match(render().error,/Could not save/);
   global.localStorage.setItem=save;
-  assert.equal(render().undoBattle(recorded.battles[0].id),true);
+  assert.equal(render().undoAction(recorded.history[0].id,recorded.id),true);
   assert.deepEqual(meaningfulRun(render().activeRun),meaningfulRun(before));
-  assert.equal(render().undoRevision,1);
+  assert.equal(render().feedbackRevision,1);
   assert.equal(render().error,null);
 });
 test('stale confirmation cannot undo a different battle or another saved run', () => {
   const first=recording.recordRunBattle(multiRun(),normalBattle()).run;
   const other=createRunPlan('blue-falcon','Other');
-  storage.saveRunPlannerData({schemaVersion:2,runs:[first,other],activeRunId:first.id});
+  storage.saveRunPlannerData({schemaVersion: 3,runs:[first,other],activeRunId:first.id});
   const render=plannerHost(); const planner=render();
   planner.recordBattle(normalBattle());
-  assert.equal(planner.undoBattle(first.battles[0].id),false);
+  assert.equal(planner.undoAction(first.history[0].id,first.id),false);
   const latest=render().activeRun;
-  assert.equal(planner.undoBattle(latest.battles[1].id),true);
+  assert.equal(planner.undoAction(latest.history[1].id,latest.id),true);
   assert.deepEqual(render().data.runs[1],other);
   render().loadRun(other.id);
-  assert.equal(planner.undoBattle(first.battles[0].id),false);
+  assert.equal(planner.undoAction(first.history[0].id,first.id),false);
 });
 
 // Phase 2F-A: synthetic progression instances deliberately carry explicit cap metadata.
@@ -724,7 +723,7 @@ test('Phase 2F authoritative data audit preserves all counts and known diagnosti
   assert.deepEqual(r.unresolvedEndpoints,[]); assert.equal(r.workbookDp0AssertionsChecked,137);
   assert.deepEqual(r.dp0AssertionMismatches,[]); assert.equal(r.workbookNullMetalKidPresent.length,5);
   assert.equal(r.noOwnTechnique,13); assert.equal(r.unresolvedPlannerTechniqueLabels.length,45);
-  assert.equal(r.evolutionRangeAmbiguities.length,1); assert.equal(r.evolutionRangeAmbiguities[0].known,true);
+  assert.deepEqual(r.evolutionRangeAmbiguities,[]);
   assert.deepEqual(r.plannerXpSupportedRange,{min:1,max:50});
 });
 for (const [el,min,max] of [[1,13,13],[2,13,13],[5,14,14],[6,17,17],[10,19,19],[17,22,22],[18,26,26],[21,27,27],[27,30,30],[28,30,32],[29,31,33],[30,32,34],[35,37,39],[40,42,44],[45,47,49],[49,51,53]]) {
@@ -781,13 +780,14 @@ test('EL50 scope is separate from individual cap and tables stop at 50',()=>{
 for(const [dp,name] of [[0,'D-Tyrannomon'],[1,'D-Tyrannomon'],[2,'D-Tyrannomon'],[3,'Darkrizamon'],[4,'Darkrizamon'],[5,'Darkrizamon'],[6,'Tuskmon'],[999,'Tuskmon']]){
  test(`generic Betamon DP${dp} range selects ${name}`,()=>assert.deepEqual(evolution.lookupNormalEvolution('betamon',dp),{status:'unique',targetSpeciesId:speciesLookup.getDigimonByName(name).id}));
 }
-test('Piddomon DP6 remains ambiguous; adjacent DP and invalid/unavailable cases are explicit',()=>{
- const r=evolution.lookupNormalEvolution('piddomon',6);assert.equal(r.status,'ambiguous');assert.equal(r.candidateSpeciesIds.length,2);assert.equal('targetSpeciesId' in r,false);
+test('Piddomon DP6 uses corrected Giromon route; adjacent DP and invalid/unavailable cases are explicit',()=>{
+ for(const dp of [0,1,5])assert.deepEqual(evolution.lookupNormalEvolution('piddomon',dp),{status:'unique',targetSpeciesId:'magnaangemon'});
+ for(const dp of [6,7,999])assert.deepEqual(evolution.lookupNormalEvolution('piddomon',dp),{status:'unique',targetSpeciesId:'giromon'});
  for(const dp of [5,7])assert.equal(evolution.lookupNormalEvolution('piddomon',dp).status,'unique');
  for(const dp of [-1,1.2,NaN])assert.equal(evolution.lookupNormalEvolution('betamon',dp).status,'invalid');
  assert.equal(evolution.lookupNormalEvolution('unknown',0).status,'invalid');
  assert.equal(evolution.lookupNormalEvolution(speciesLookup.getDigimonByName('No Rookie Form').id,0).status,'unavailable');
- assert.equal(evolution.previewNormalDigivolution(foundationMember('Piddomon',21,{dp:6})).canDigivolve,false);
+ assert.equal(evolution.previewNormalDigivolution(foundationMember('Piddomon',21,{dp:6})).canDigivolve,true);
 });
 for(const [name,minimum] of [['Agumon',11],['Greymon',21],['MetalGreymon',31]]){
  test(`${name} normal evolution threshold EL${minimum}`,()=>{
@@ -823,7 +823,7 @@ test('all 45 unresolved labels remain learnable strings when rank has an unlock;
  const late=evolution.applyNormalDigivolution(foundationMember('Agumon',13,{techs:[]}));assert.deepEqual(late.techs,[]);
  assert.deepEqual(evolution.getLearnedTechniques(late,14),[]);
 });
-test('mixed capped, unresolved and eligible participants still record Bits and capture; Undo restores v2 metadata',()=>{
+test('mixed capped, unresolved and eligible participants still record Bits and capture; Undo restores DP/cap metadata',()=>{
  const run=multiRun();run.roster=run.roster.slice(0,3);run.digiline=run.roster.map(r=>r.instanceId);
  run.roster[0]={...run.roster[0],level:13,totalXp:1000000};
  run.roster[1]={...run.roster[1],level:30,totalXp:1000000,dp:7,levelCap:caps.getInitialLevelCap(28)};
@@ -831,15 +831,15 @@ test('mixed capped, unresolved and eligible participants still record Bits and c
  assert.equal(r.resolution.outcomes[0].capped,true);assert.equal(r.resolution.outcomes[1].capResolutionRequired,true);
  for(const i of [0,1]){assert.deepEqual(r.run.roster[i],previous.roster[i]);assert.deepEqual(r.resolution.outcomes[i].learnedTechniques,[]);}
  assert.equal(r.resolution.outcomes[2].actualXpApplied,r.event.xpReward);assert.equal(r.run.totalBits,r.event.bitsReward);assert.equal(r.run.roster.length,4);
- assert.deepEqual(r.event.checkpoint.roster,previous.roster);assert.equal(storage.saveRunPlannerData(envelope(r.run)),true);
- const loaded=storage.loadRunPlannerData().runs[0];const restored=undo.undoLastBattle(loaded);assert.equal(restored.ok,true);assert.deepEqual(restored.run.roster,previous.roster);
+ assert.deepEqual(r.event.preActionCheckpoint.roster,previous.roster);assert.equal(storage.saveRunPlannerData(envelope(r.run)),true);
+ const loaded=storage.loadRunPlannerData().runs[0];const restored=undo.undoLastAction(loaded);assert.equal(restored.ok,true);assert.deepEqual(restored.run.roster,previous.roster);
 });
-test('schema v2 rejects old schema and invalid DP/caps in live and checkpoint rosters',()=>{
+test('schema v3 rejects old schema and invalid DP/caps in live and preActionCheckpoint rosters',()=>{
  const r=recording.recordRunBattle(multiRun(),normalBattle()).run;
  const raw=JSON.stringify({...envelope(r),schemaVersion:1});values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
  assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
  for(const bad of [{dp:-1},{dp:0.5},{levelCap:{min:13,max:13,resolved:null}},{levelCap:{min:30,max:32,resolved:33}},{levelCap:undefined},{dp:undefined}]){
-  for(const checkpoint of [false,true]){const copy=structuredClone(r);Object.assign(checkpoint?copy.battles[0].checkpoint.roster[0]:copy.roster[0],bad);assert.equal(storage.isValidPersistedRunPlannerData(envelope(copy)),false);}
+  for(const preActionCheckpoint of [false,true]){const copy=structuredClone(r);Object.assign(preActionCheckpoint?copy.history[0].preActionCheckpoint.roster[0]:copy.roster[0],bad);assert.equal(storage.isValidPersistedRunPlannerData(envelope(copy)),false);}
  }
 });
 
@@ -873,7 +873,7 @@ for(const c of displayCases) test(`Roster and Current Digiline render persisted 
   const {RunPlanner}=load('src/components/run-planner/RunPlanner.tsx');
   const run=createRunPlan('black-sword','Display test');
   run.roster[0]={...run.roster[0],level:c.level,levelCap:{...c.cap},totalXp:1224};
-  const html=renderToStaticMarkup(React.createElement(RunPlanner,{planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',undoRevision:0}}));
+  const html=renderToStaticMarkup(React.createElement(RunPlanner,{planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}));
   const digiline=html.slice(html.indexOf('aria-label="Digiline slots"'),html.indexOf('aria-label="Roster"'));
   const roster=html.slice(html.indexOf('aria-label="Roster"'));
   for(const section of [digiline,roster]){
@@ -884,4 +884,278 @@ for(const c of displayCases) test(`Roster and Current Digiline render persisted 
   }
   assert.ok(roster.includes('Total XP 1224'));assert.ok(roster.includes('Active Digiline'));
   for(const stat of ['HP','MP','ATK','DEF','SPD'])assert.ok(roster.includes('>'+stat+'<'));
+});
+
+// Phase 2F-B: retain the original regression cases above under the clean v3 contract.
+const { recordRunDigivolution } = load('src/utils/runDigivolutionRecording.ts');
+const checkpointHelpers = load('src/utils/runActionCheckpoint.ts');
+const evolutionRun = (name='Agumon', level=11, extra={}) => {
+  const run=createRunPlan('gold-hawk','Evolution fixture');
+  run.roster=[foundationMember(name,level,{instanceId:run.starterInstanceId,
+    stats:{hp:34.5,mp:37.25,atk:10.5,def:12.25,spd:11.75},techs:['Pepper Breath'],...extra})];
+  return run;
+};
+const renderPlanner = run => require('react-dom/server').renderToStaticMarkup(require('react').createElement(
+  load('src/components/run-planner/RunPlanner.tsx').RunPlanner,
+  {planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}
+));
+
+test('schema v3 is explicit and rejects schema v2 without migration or writes',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,3);
+  assert.equal(storage.emptyRunPlannerData().schemaVersion,3);
+  const old={...envelope(evolutionRun()),schemaVersion:2};
+  const raw=JSON.stringify(old);values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
+  assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
+  assert.equal(storage.saveRunPlannerData(old),false);
+  assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
+});
+
+test('v3 battle event retains all location, capture, reward and ordered participant fields',()=>{
+  const run=fullRun();const request={...normalBattle(),capturedEnemySlot:1};
+  const {event,resolution}=recording.recordRunBattle(run,request);
+  assert.equal(event.type,'battle');assert.equal(event.order,0);
+  for(const key of ['domainId','phase','floor','encounterId','capturedEnemySlot'])assert.equal(event[key],request[key]);
+  assert.deepEqual(event.digilineInstanceIds,run.digiline);
+  assert.equal(event.xpReward,resolution.xpAwarded);assert.equal(event.bitsReward,resolution.bitsAwarded);
+  assert.deepEqual(event.preActionCheckpoint,checkpointHelpers.createRunActionCheckpoint(run));
+});
+
+test('Digivolution records one audited action and preserves every unrelated field exactly',()=>{
+  const run=freeze(evolutionRun());const before=JSON.stringify(run);
+  const {run:next,event}=recordRunDigivolution(run,run.starterInstanceId);
+  const member=next.roster[0];
+  assert.equal(JSON.stringify(run),before);assert.equal(next.history.length,1);
+  assert.equal(member.speciesId,'greymon');assert.equal(member.name,'Greymon');
+  assert.equal(progressionData.getSpeciesProgression(member.speciesId).rank,'Champion');
+  for(const key of ['instanceId','level','totalXp','dp','levelCap','techs','source'])assert.deepEqual(member[key],run.roster[0][key]);
+  assert.deepEqual(member.stats,{hp:64.5,mp:67.25,atk:10.5,def:12.25,spd:11.75});
+  assert.deepEqual(next.digiline,run.digiline);assert.equal(next.totalBits,run.totalBits);
+  assert.equal(next.starterInstanceId,run.starterInstanceId);
+  assert.deepEqual(event,{type:'digivolve',id:event.id,order:0,instanceId:member.instanceId,
+    fromSpeciesId:'agumon',toSpeciesId:'greymon',fromRank:'Rookie',toRank:'Champion',level:11,dp:0,
+    levelCap:run.roster[0].levelCap,hpBonus:30,mpBonus:30,preActionCheckpoint:checkpointHelpers.createRunActionCheckpoint(run)});
+  assert.equal(storage.saveRunPlannerData(envelope(next)),true);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],next);
+  assert.deepEqual(storage.loadRunPlannerData().runs[0],next);
+});
+
+test('Digivolution checkpoints and audit caps are deep copied without recursive history',()=>{
+  const run=evolutionRun();const {event,run:next}=recordRunDigivolution(freeze(run),run.starterInstanceId);
+  const cp=event.preActionCheckpoint;
+  assert.deepEqual(Object.keys(cp).sort(),['digiline','roster','totalBits']);
+  assert.notEqual(cp.roster,run.roster);assert.notEqual(cp.digiline,run.digiline);
+  for(const key of ['source','stats','levelCap','techs']){
+    assert.notEqual(cp.roster[0][key],run.roster[0][key]);assert.notEqual(cp.roster[0][key],next.roster[0][key]);
+  }
+  assert.notEqual(event.levelCap,cp.roster[0].levelCap);assert.notEqual(event.levelCap,next.roster[0].levelCap);
+  event.levelCap.resolved=52;cp.roster[0].stats.hp=0;
+  assert.equal(run.roster[0].stats.hp,34.5);assert.equal(next.roster[0].stats.hp,64.5);
+  assert.equal(next.roster[0].levelCap.resolved,53);
+});
+
+test('Digivolution changes only the selected duplicate-species reserve instance',()=>{
+  const run=evolutionRun();run.roster.push({...structuredClone(run.roster[0]),instanceId:'reserve'});
+  const next=recordRunDigivolution(freeze(run),'reserve').run;
+  assert.deepEqual(next.roster[0],run.roster[0]);assert.equal(next.roster[1].speciesId,'greymon');
+  assert.deepEqual(next.digiline,run.digiline);assert.equal(next.history[0].instanceId,'reserve');
+});
+
+for(const [name,level,cap] of [
+  ['Agumon',13,{min:13,max:13,resolved:13}],
+  ['Greymon',30,{min:30,max:32,resolved:null}],
+  ['MetalGreymon',31,{min:30,max:32,resolved:null}],
+])test(`Digivolution permits ${name} EL${level} at MAX or an unresolved cap`,()=>{
+  const run=evolutionRun(name,level,{levelCap:cap});
+  const next=recordRunDigivolution(run,run.starterInstanceId).run;
+  assert.notEqual(next.roster[0].speciesId,run.roster[0].speciesId);
+  assert.deepEqual(next.roster[0].levelCap,cap);assert.equal(next.roster[0].level,level);
+});
+
+test('Digivolution rejects low EL, terminal ranks, invalid state and unknown instances without mutation',()=>{
+  for(const run of [evolutionRun('Agumon',10),evolutionRun('WarGreymon',32),evolutionRun('Agumon',11,{dp:-1})]){
+    const before=JSON.stringify(run);assert.throws(()=>recordRunDigivolution(freeze(run),run.starterInstanceId));
+    assert.equal(JSON.stringify(run),before);
+  }
+  assert.throws(()=>recordRunDigivolution(evolutionRun(),'missing'),/not in the roster/);
+});
+
+test('mixed history uses one chronology, battle-only counts and original battle names',()=>{
+  const initial=evolutionRun('Agumon',10);
+  const first=recording.recordRunBattle(initial,normalBattle()).run;
+  const evolved=recordRunDigivolution(first,first.starterInstanceId).run;
+  const final=recording.recordRunBattle(evolved,normalBattle()).run;
+  assert.deepEqual(final.history.map(e=>[e.type,e.order]),[['battle',0],['digivolve',1],['battle',2]]);
+  const html=renderPlanner(final);
+  assert.match(html,/Recorded battles<\/dt><dd[^>]*>2<\/dd>/);
+  assert.ok(html.indexOf('Action 1')<html.indexOf('Action 2') && html.indexOf('Action 2')<html.indexOf('Action 3'));
+  const history=html.slice(html.indexOf('aria-label="Run History"'));
+  assert.match(history,/Participants: Agumon/);assert.match(history,/Participants: Greymon/);
+  assert.match(history,/Agumon → Greymon/);assert.match(history,/Rookie → Champion/);
+  assert.match(history,/HP \+30 · MP \+30/);assert.match(html,/Gold Hawk/);
+  assert.ok(!html.includes('Undo Last Battle'));assert.ok(html.includes('Undo Last Action'));
+});
+
+test('mixed Undo restores exact checkpoints, techniques, species, fractional stats and earlier events',()=>{
+  const initial=evolutionRun('Agumon',10);
+  const first=recording.recordRunBattle(initial,normalBattle()).run;
+  const evolved=recordRunDigivolution(first,first.starterInstanceId).run;
+  assert.deepEqual(meaningfulRun(restoredRun(freeze(evolved))),meaningfulRun(first));
+  const final=recording.recordRunBattle(evolved,{...normalBattle(),capturedEnemySlot:1}).run;
+  assert.equal(final.roster[0].level,12);assert.ok(final.roster[0].techs.length>evolved.roster[0].techs.length);
+  const once=restoredRun(freeze(final));assert.deepEqual(meaningfulRun(once),meaningfulRun(evolved));
+  const twice=restoredRun(once);assert.deepEqual(meaningfulRun(twice),meaningfulRun(first));
+  assert.equal(progressionData.getSpeciesProgression(twice.roster[0].speciesId).rank,'Rookie');
+  assert.deepEqual(meaningfulRun(restoredRun(twice)),meaningfulRun(initial));
+});
+
+test('Undo Digivolution discards subsequent Digiline edits and replacement orders stay contiguous',()=>{
+  const initial=evolutionRun();initial.roster.push({...structuredClone(initial.roster[0]),instanceId:'reserve'});
+  const evolved=recordRunDigivolution(initial,initial.starterInstanceId).run;
+  let changed=addToDigiline(evolved,'reserve');changed=moveDigilineMember(changed,'reserve','up');
+  changed=removeFromDigiline(changed,initial.starterInstanceId);
+  const restored=restoredRun(changed);assert.deepEqual(meaningfulRun(restored),meaningfulRun(initial));
+  const replacement=recordRunDigivolution(restored,initial.starterInstanceId).run;
+  assert.equal(replacement.history[0].order,0);assert.notEqual(replacement.history[0].id,evolved.history[0].id);
+  const battled=recording.recordRunBattle(replacement,normalBattle()).run;
+  const undone=restoredRun(battled);
+  const another=recording.recordRunBattle(undone,normalBattle()).run;
+  assert.deepEqual(another.history.map(e=>e.order),[0,1]);assert.deepEqual(another.history[0],replacement.history[0]);
+});
+
+test('v3 rejects malformed discriminants, audit fields, checkpoint references, IDs and order',()=>{
+  const initial=evolutionRun();const valid=recordRunDigivolution(initial,initial.starterInstanceId).run;
+  const event=valid.history[0];
+  const bad=[{type:'dna'},{type:'battle'},{id:''},{id:7},{order:-1},{order:0.5},{order:1},{order:NaN},
+    {instanceId:'missing'},{fromSpeciesId:'betamon'},{toSpeciesId:'devimon'},
+    {fromRank:'Champion'},{toRank:'Mega'},{level:12},{dp:1},{hpBonus:31},{mpBonus:0},
+    {levelCap:{min:13,max:13,resolved:13}},{preActionCheckpoint:null},
+    {preActionCheckpoint:{...event.preActionCheckpoint,history:[]}}];
+  for(const key of Object.keys(event))bad.push({[key]:undefined});
+  for(const change of bad){
+    const invalid=freeze({...valid,history:[{...event,...change}]});
+    assert.equal(storage.isValidPersistedRunPlannerData(envelope(invalid)),false,JSON.stringify(change));
+    assert.ok(validateRunPlan(invalid).length>0,JSON.stringify(change));
+  }
+  const mixed=recording.recordRunBattle(valid,normalBattle()).run;
+  mixed.history[1].id=mixed.history[0].id;
+  assert.equal(storage.saveRunPlannerData(envelope(mixed)),false);
+});
+
+test('Digivolution save failure is atomic; retry succeeds once and stale preview is rejected',()=>{
+  const initial=evolutionRun();storage.saveRunPlannerData(envelope(initial));
+  const render=plannerHost(), planner=render();const reviewed=structuredClone(initial.roster[0]);
+  const raw=values.get(storage.RUN_PLANNER_STORAGE_KEY),save=global.localStorage.setItem;
+  global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.digivolve(initial.id,reviewed),false);
+  assert.deepEqual(render().activeRun,initial);assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
+  assert.equal(render().feedbackRevision,0);assert.match(render().error,/Could not save/);
+  global.localStorage.setItem=save;
+  assert.equal(planner.digivolve(initial.id,reviewed),true);
+  assert.equal(render().activeRun.history.length,1);assert.equal(render().feedbackRevision,1);
+  assert.equal(planner.digivolve(initial.id,reviewed),false);
+  assert.equal(render().activeRun.history.length,1);assert.match(render().error,/changed/);
+});
+
+test('changed stats or switched runs invalidate previews; immediate Digiline edits retain new history',()=>{
+  const initial=evolutionRun(),other=evolutionRun();
+  storage.saveRunPlannerData({schemaVersion:3,runs:[initial,other],activeRunId:initial.id});
+  const render=plannerHost(),planner=render();
+  planner.recordBattle(normalBattle());
+  assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
+  planner.loadRun(other.id);
+  assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
+  assert.equal(render().activeRun.id,other.id);
+  assert.equal(planner.digivolve(other.id,other.roster[0]),true);
+  planner.removeMember(other.starterInstanceId);
+  assert.equal(render().activeRun.history.length,1);assert.equal(render().activeRun.roster[0].speciesId,'greymon');
+});
+
+test('failed Digivolution Undo save preserves state and retry restores it',()=>{
+  const before=evolutionRun(),evolved=recordRunDigivolution(before,before.starterInstanceId).run;
+  storage.saveRunPlannerData(envelope(evolved));const render=plannerHost(),planner=render();
+  const save=global.localStorage.setItem;global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.undoAction(evolved.history[0].id,evolved.id),false);assert.deepEqual(render().activeRun,evolved);
+  global.localStorage.setItem=save;
+  assert.equal(planner.undoAction(evolved.history[0].id,evolved.id),true);
+  assert.deepEqual(meaningfulRun(render().activeRun),meaningfulRun(before));
+});
+
+test('own technique is learned by the following threshold battle, never by early or late Digivolution',()=>{
+  for(const [name,level] of [['Agumon',11],['Greymon',21],['MetalGreymon',31]]){
+    const initial=evolutionRun(name,level,{techs:[]});
+    const evolved=recordRunDigivolution(initial,initial.starterInstanceId).run;
+    const tech=progressionData.getSpeciesProgression(evolved.roster[0].speciesId).ownTechnique;
+    assert.deepEqual(evolved.roster[0].techs,[]);
+    const battle=recording.recordRunBattle(evolved,normalBattle());
+    assert.deepEqual(battle.resolution.outcomes[0].learnedTechniques,[tech]);assert.deepEqual(battle.run.roster[0].techs,[tech]);
+    const late=evolutionRun(name,level+2,{techs:[]});const lateEvolved=recordRunDigivolution(late,late.starterInstanceId).run;
+    assert.deepEqual(lateEvolved.roster[0].techs,[]);
+    assert.deepEqual(recording.recordRunBattle(lateEvolved,normalBattle()).resolution.outcomes[0].learnedTechniques,[]);
+  }
+});
+
+for(const [name,level,dp,text] of [
+  ['Agumon',10,0,'Available at EL11'],['Agumon',11,0,'Digivolve'],
+  ['WarGreymon',32,0,'No further normal Digivolution'],['Piddomon',21,6,'Next: Giromon'],
+])test(`roster displays rank, DP and next evolution for ${name} EL${level} DP${dp}`,()=>{
+  const html=renderPlanner(evolutionRun(name,level,{dp}));
+  const roster=html.slice(html.indexOf('aria-label="Roster"'),html.indexOf('aria-label="Battle Selector"'));
+  assert.ok(roster.includes(`${progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).rank} · DP ${dp}`));
+  assert.ok(roster.includes(text));assert.ok(roster.includes('Active Digiline'));assert.ok(roster.includes('Total XP'));
+  if(name==='Agumon')assert.ok(roster.includes('Next: Greymon'));
+});
+
+// Drive actual component handlers with local hook state; no DOM dependency or fabricated data files.
+function componentHost(file,exportName){
+  const slots=[];let cursor=0;const realReact=require('react');
+  const react={...realReact,useState(initial){const i=cursor++;if(!(i in slots))slots[i]=typeof initial==='function'?initial():initial;
+    return [slots[i],value=>{slots[i]=typeof value==='function'?value(slots[i]):value;}];}};
+  const mod={exports:{}};const js=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{
+    compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+  new Function('require','module','exports',js)(id=>{
+    if(id==='react')return react;if(!id.startsWith('@/'))return require(id);
+    const base='src/'+id.slice(2);return load(base+(fs.existsSync(path.join(root,base+'.ts'))?'.ts':'.tsx'));
+  },mod,mod.exports);
+  return props=>{cursor=0;return mod.exports[exportName](props);};
+}
+function elements(node){
+  if(Array.isArray(node))return node.flatMap(elements);
+  return node&&typeof node==='object'&&node.props?[node,...elements(node.props.children)]:[];
+}
+function elementText(node){
+  if(Array.isArray(node))return node.map(elementText).join('');
+  if(node&&typeof node==='object')return elementText(node.props?.children);
+  return typeof node==='string'||typeof node==='number'?String(node):'';
+}
+
+test('Digivolve preview is read-only, displays exact changes and cancellation does not submit',()=>{
+  const member=freeze(evolutionRun().roster[0]);let calls=0;
+  const render=componentHost('src/components/run-planner/DigivolutionControls.tsx','DigivolutionControls');
+  const props={runId:'test',member,error:null,onDigivolve:()=>{calls++;return false;}};
+  let tree=render(props);elements(tree).find(e=>e.props.children==='Digivolve').props.onClick();
+  tree=render(props);assert.equal(calls,0);const text=elementText(tree);
+  for(const expected of ['CurrentAgumonRookieEL 11 · DP 0','ResultGreymonChampionEL 11 · DP 0',
+    'HP: 34.5 → 64.5','MP: 37.25 → 67.25','Max EL: unchanged','Known techniques: preserved','EL12 / EL22 / EL32'])assert.ok(text.includes(expected),text);
+  let prevented=false;elements(tree).find(e=>e.props.children==='Confirm Digivolution').props.onClick({preventDefault(){prevented=true;}});
+  assert.equal(calls,1);assert.equal(prevented,true);assert.equal(elements(render(props)).find(e=>e.props.open===true).props.open,true);
+  elements(tree).find(e=>e.props.open===true).props.onOpenChange(false);
+  assert.ok(!elements(render(props)).some(e=>e.props.open===true));assert.equal(calls,1);
+});
+
+test('generic ambiguous data remains visible without offering a Digivolve action',()=>{
+  const extra={id:-1,from:'agumon',to:'devimon',min:0,max:null};evolution.EVOLUTION_RANGES.push(extra);
+  try{const html=renderPlanner(evolutionRun());assert.ok(html.includes('Evolution data ambiguous'));assert.ok(!html.includes('aria-label="Digivolve Agumon"'));}
+  finally{evolution.EVOLUTION_RANGES.splice(evolution.EVOLUTION_RANGES.indexOf(extra),1);}
+});
+
+for(const name of ['Greymon','Piddomon'])test(`battle feedback displays learned planner technique for ${name}`,()=>{
+  const run=evolutionRun(name,11,{techs:[]});
+  const result=recording.recordRunBattle(run,normalBattle()).resolution;
+  const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');
+  const props={selection:normalBattle(),hasParticipants:true,onRecord:()=>result};
+  const tree=render(props);elements(tree).find(e=>e.props.children==='Record Battle').props.onClick();
+  const html=require('react-dom/server').renderToStaticMarkup(render(props));
+  const tech=progressionData.getSpeciesProgression(run.roster[0].speciesId).ownTechnique;
+  assert.ok(html.includes('Learned technique: '+tech));
+  if(name==='Piddomon'){assert.equal(tech,'Mega Heal');assert.equal(techLookup.getTechByName(tech),undefined);}
 });
