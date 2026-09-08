@@ -135,7 +135,19 @@ export const validateRunPlan = (run: RunPlan): InvariantViolation[] => {
         (run.starterInstanceId !== null && !event.preActionCheckpoint.roster.some(member => member.instanceId === run.starterInstanceId))) {
       violations.push({ code: 'checkpoint-unknown-instance', message: 'Checkpoint roster must preserve the starter and reference existing instances.' });
     }
-    if (event.type === 'battle') violations.push(...validateBattleEvent(event, event.preActionCheckpoint.roster));
+    if (event.type === 'battle') {
+      violations.push(...validateBattleEvent(event, event.preActionCheckpoint.roster));
+      if (event.capturedInstanceId !== null) {
+        const captured = run.roster.find(member => member.instanceId === event.capturedInstanceId);
+        const cap = event.capturedLevelCap!;
+        if (!captured || captured.source.type !== 'capture' ||
+            captured.source.encounterId !== event.encounterId || captured.source.enemySlot !== event.capturedEnemySlot ||
+            captured.levelCap.min !== cap.min || captured.levelCap.max !== cap.max || captured.levelCap.resolved !== cap.resolved ||
+            run.history.slice(0, index).some(previous => previous.type === 'battle' && previous.capturedInstanceId === event.capturedInstanceId)) {
+          violations.push({ code: 'capture-audit-mismatch', message: 'Capture audit must match the newly acquired roster instance and its exact cap.' });
+        }
+      }
+    }
     else if (!instanceIds.has(event.instanceId)) violations.push({ code: 'digivolve-unknown-instance', message: 'Digivolution references an unknown roster instance.' });
   });
 

@@ -7,7 +7,7 @@ import { getDigimonById } from '@/utils/digimonLookup';
 import { getTechByName } from '@/utils/techLookup';
 import { PLANNER_SCOPE_MAX_EL } from '@/data/statGrowthTables';
 
-/** Diagnostics use effective ranges, including the documented Phase 2F-B Piddomon correction. */
+/** Diagnostics use the authoritative static evolution ranges. */
 export const getProgressionValidationReport = () => {
   const rules = Object.values(INITIAL_LEVEL_CAP_RULES);
   const assertions = SPECIES_PROGRESSION.filter(r => r.workbookDp0Evolution !== null);
@@ -20,7 +20,6 @@ export const getProgressionValidationReport = () => {
     return a.from && a.from === b.from && a.to !== b.to && min <= max ? [{
       speciesId: a.from, min, max: Number.isFinite(max) ? max : null,
       candidateSpeciesIds: [a.to, b.to], sourceRowIds: [a.id, b.id],
-      known: a.from === 'piddomon' && min === 6 && max === 6,
     }] : [];
   }));
   return {

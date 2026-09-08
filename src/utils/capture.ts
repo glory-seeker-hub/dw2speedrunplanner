@@ -2,7 +2,7 @@ import { RosterDigimon, StarterDefinition } from '@/types/runPlanner';
 import { encounters } from '@/data/encounters';
 import { getDigimonByName } from '@/utils/digimonLookup';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
-import { getInitialLevelCap } from '@/utils/levelCap';
+import { getAcquisitionLevelCap } from '@/utils/levelCap';
 
 const newInstanceId = (): string =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -23,7 +23,8 @@ export type CaptureResult =
  */
 export const tryCreateCapturedDigimon = (
   encounterId: number,
-  enemySlot: number
+  enemySlot: number,
+  selectedMaxLevel?: number | null
 ): CaptureResult => {
   const encounter = encounters.find((e) => e.id === encounterId);
   if (!encounter) return { ok: false, reason: `Unknown encounter ${encounterId}` };
@@ -42,8 +43,9 @@ export const tryCreateCapturedDigimon = (
   }
 
   const species = getDigimonByName(enemy.name);
-  const levelCap = getInitialLevelCap(enemy.level);
-  if (!levelCap) return { ok: false, reason: `No authoritative acquisition cap for EL${enemy.level}` };
+  let levelCap;
+  try { levelCap = getAcquisitionLevelCap(enemy.level, selectedMaxLevel); }
+  catch (error) { return { ok: false, reason: (error as Error).message }; }
 
   return {
     ok: true,
@@ -71,15 +73,16 @@ export const tryCreateCapturedDigimon = (
 /** Convenience wrapper: `null` when the capture cannot be created safely. */
 export const createCapturedDigimon = (
   encounterId: number,
-  enemySlot: number
+  enemySlot: number,
+  selectedMaxLevel?: number | null
 ): RosterDigimon | null => {
-  const result = tryCreateCapturedDigimon(encounterId, enemySlot);
+  const result = tryCreateCapturedDigimon(encounterId, enemySlot, selectedMaxLevel);
   return result.ok ? result.digimon : null;
 };
 
 /** Creates the initial roster Digimon from a starter definition. */
 export const createStarterDigimon = (starter: StarterDefinition): RosterDigimon => {
-  const levelCap = getInitialLevelCap(starter.level);
+  const levelCap = getAcquisitionLevelCap(starter.level);
   if (!levelCap) throw new Error(`No authoritative acquisition cap for EL${starter.level}`);
   return {
     instanceId: newInstanceId(),

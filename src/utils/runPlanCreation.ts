@@ -3,6 +3,8 @@ import { RunPlan } from '@/types/runPlanner';
 import { createStarterDigimon, newInstanceId } from '@/utils/capture';
 import { validateRunPlan } from '@/utils/runInvariants';
 
+export const INITIAL_RUN_BITS = 1030;
+
 /** Build a fresh plan from authoritative starter data, never species baseStats. */
 export const createRunPlan = (starterId: string, name: string): RunPlan => {
   const starter = getStarterById(starterId);
@@ -16,8 +18,8 @@ export const createRunPlan = (starterId: string, name: string): RunPlan => {
     roster: [member],
     digiline: [member.instanceId],
     history: [],
-    // Planner balance starts at zero; no battle rewards have been earned.
-    totalBits: 0,
+    // Initial balance is independent of battle history.
+    totalBits: INITIAL_RUN_BITS,
     createdAt: now,
     updatedAt: now,
   };

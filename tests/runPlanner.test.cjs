@@ -56,7 +56,8 @@ for (const starter of STARTERS) {
     assert.deepEqual(member.source, { type: 'starter' });
     assert.equal(run.starterInstanceId, member.instanceId);
     assert.deepEqual(run.digiline, [member.instanceId]);
-    assert.equal(run.totalBits, 0);
+    assert.equal(run.totalBits, 1030);
+    assert.equal(run.history.filter(event=>event.type==='battle').length,0);
     assert.deepEqual(run.history, []);
     assert.equal(run.createdAt, run.updatedAt);
     assert.ok(Number.isFinite(Date.parse(run.createdAt)));
@@ -69,6 +70,7 @@ for (const starter of STARTERS) {
     assert.equal(values.get('unrelated'), 'keep');
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
     const next = createRunPlan(starter.id, '');
+    assert.equal(next.totalBits,1030);
     assert.notEqual(next.id, run.id);
     assert.notEqual(next.starterInstanceId, member.instanceId);
     assert.equal(storage.saveRunPlannerData(envelope(next)), true);
@@ -222,6 +224,7 @@ test('Digiline mutations preserve history snapshots, rewards, fractional stats a
   run.totalBits = 100;
   run.history = [{type:'battle',id:'history',order:0,domainId:'test',phase:'before-blood-knights',floor:1,encounterId:182,
     preActionCheckpoint:load('src/utils/runActionCheckpoint.ts').createRunActionCheckpoint(run),
+    capturedEnemySlot:null,capturedInstanceId:null,capturedLevelCap:null,
     digilineInstanceIds:[run.starterInstanceId],xpReward:0,bitsReward:0}];
   freeze(run);
   const before = JSON.stringify(run);
@@ -357,7 +360,7 @@ test('recording rejects empty, duplicate and unknown participants without changi
     const invalid = freeze({...run,digiline});
     assert.throws(() => recording.recordRunBattle(invalid,normalBattle()));
     assert.equal(invalid.history.length,0);
-    assert.equal(invalid.totalBits,0);
+    assert.equal(invalid.totalBits,1030);
   }
 });
 for (const count of [1,2,3]) test(`full encounter XP reaches each of ${count} participants, never reserves`, () => {
@@ -412,7 +415,7 @@ test('history is append-only with stable IDs, location and ordered participant s
   assert.equal(second.event.phase,before);
   assert.equal(second.event.floor,1);
   assert.deepEqual(snapshot.digilineInstanceIds,[run.starterInstanceId,'reserve-b','reserve-a']);
-  assert.equal(second.run.totalBits,first.event.bitsReward*2);
+  assert.equal(second.run.totalBits,1030+first.event.bitsReward*2);
 });
 test('capture uses exact slot data and cumulative XP, stays reserve and receives no battle XP', () => {
   const run = multiRun();
@@ -456,7 +459,7 @@ test('known zero rewards record, missing metadata and incompatible location reje
     rewards.set(32,zero);
     const result = recording.recordRunBattle(multiRun(),normalBattle());
     assert.equal(result.run.history.length,1);
-    assert.equal(result.run.totalBits,0);
+    assert.equal(result.run.totalBits,1030);
     assert.equal(result.event.xpReward,0);
     rewards.delete(32);
     assert.throws(() => recording.recordRunBattle(multiRun(),normalBattle()),/Reward metadata/);
@@ -526,7 +529,7 @@ test('record action snapshots latest committed Digiline and consecutive calls do
   assert.equal(run.history.length,2);
   assert.deepEqual(run.history[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
   assert.deepEqual(run.history[1].digilineInstanceIds,run.history[0].digilineInstanceIds);
-  assert.equal(run.totalBits,run.history[0].bitsReward*2);
+  assert.equal(run.totalBits,1030+run.history[0].bitsReward*2);
 });
 
 const undo = load('src/utils/runActionUndo.ts');
@@ -745,15 +748,15 @@ test('starter and exact capture slots initialize DP0 and acquisition caps',()=>{
   const es=load('src/data/encounters.ts').encounters;
   for(const level of [3,35]){
     const enc=es.find(e=>e.digimons.some(d=>d.level===level));assert.ok(enc);
-    const enemy=enc.digimons.find(d=>d.level===level);const result=captureFoundation.tryCreateCapturedDigimon(enc.id,enemy.slot);
-    assert.equal(result.ok,true);assert.equal(result.digimon.dp,0);assert.deepEqual(result.digimon.levelCap,caps.getInitialLevelCap(level));
+    const enemy=enc.digimons.find(d=>d.level===level);const result=captureFoundation.tryCreateCapturedDigimon(enc.id,enemy.slot,level===35?38:undefined);
+    assert.equal(result.ok,true);assert.equal(result.digimon.dp,0);assert.deepEqual(result.digimon.levelCap,level===35?{min:37,max:39,resolved:38}:caps.getInitialLevelCap(level));
   }
   // No EL28 encounter exists in the static dataset; exercise capture with an isolated synthetic slot.
   const fixture={id:999928,digimons:[{...es[0].digimons[0],slot:1,level:28}]};
   es.push(fixture);
-  try { const result=captureFoundation.tryCreateCapturedDigimon(fixture.id,1);
+  try { const result=captureFoundation.tryCreateCapturedDigimon(fixture.id,1,31);
     assert.equal(result.ok,true);assert.equal(result.digimon.dp,0);
-    assert.deepEqual(result.digimon.levelCap,{min:30,max:32,resolved:null});
+    assert.deepEqual(result.digimon.levelCap,{min:30,max:32,resolved:31});
   } finally { es.splice(es.indexOf(fixture),1); }
 });
 test('resolved cap blocks later XP and preserves excess XP from reaching cap',()=>{
@@ -823,16 +826,13 @@ test('all 45 unresolved labels remain learnable strings when rank has an unlock;
  const late=evolution.applyNormalDigivolution(foundationMember('Agumon',13,{techs:[]}));assert.deepEqual(late.techs,[]);
  assert.deepEqual(evolution.getLearnedTechniques(late,14),[]);
 });
-test('mixed capped, unresolved and eligible participants still record Bits and capture; Undo restores DP/cap metadata',()=>{
+test('mixed capped, unresolved and eligible participants reject recording atomically',()=>{
  const run=multiRun();run.roster=run.roster.slice(0,3);run.digiline=run.roster.map(r=>r.instanceId);
  run.roster[0]={...run.roster[0],level:13,totalXp:1000000};
  run.roster[1]={...run.roster[1],level:30,totalXp:1000000,dp:7,levelCap:caps.getInitialLevelCap(28)};
- const previous=structuredClone(run);const r=recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1});
- assert.equal(r.resolution.outcomes[0].capped,true);assert.equal(r.resolution.outcomes[1].capResolutionRequired,true);
- for(const i of [0,1]){assert.deepEqual(r.run.roster[i],previous.roster[i]);assert.deepEqual(r.resolution.outcomes[i].learnedTechniques,[]);}
- assert.equal(r.resolution.outcomes[2].actualXpApplied,r.event.xpReward);assert.equal(r.run.totalBits,r.event.bitsReward);assert.equal(r.run.roster.length,4);
- assert.deepEqual(r.event.preActionCheckpoint.roster,previous.roster);assert.equal(storage.saveRunPlannerData(envelope(r.run)),true);
- const loaded=storage.loadRunPlannerData().runs[0];const restored=undo.undoLastAction(loaded);assert.equal(restored.ok,true);assert.deepEqual(restored.run.roster,previous.roster);
+ const previous=structuredClone(run);
+ assert.throws(()=>recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);
+ assert.deepEqual(run,previous);
 });
 test('schema v3 rejects old schema and invalid DP/caps in live and preActionCheckpoint rosters',()=>{
  const r=recording.recordRunBattle(multiRun(),normalBattle()).run;
@@ -1158,4 +1158,104 @@ for(const name of ['Greymon','Piddomon'])test(`battle feedback displays learned 
   const tech=progressionData.getSpeciesProgression(run.roster[0].speciesId).ownTechnique;
   assert.ok(html.includes('Learned technique: '+tech));
   if(name==='Piddomon'){assert.equal(tech,'Mega Heal');assert.equal(techLookup.getTechByName(tech),undefined);}
+});
+
+// Phase 2F-C: isolated authoritative-slot fixtures are restored after every test.
+function withCaptureLevel(level, action) {
+  const enemy=load('src/data/encounters.ts').encounters.find(e=>e.id===32).digimons[0];
+  const old=enemy.level;enemy.level=level;
+  try{return action(enemy);}finally{enemy.level=old;}
+}
+for(const [level,choices] of [[28,[30,31,32]],[29,[31,32,33]],[35,[37,38,39]],[49,[51,52,53]]]) {
+  test(`EL${level} exposes authoritative inclusive choices and commits exact acquisition metadata`,()=>withCaptureLevel(level,enemy=>{
+    const choice=recording.getCaptureChoices(normalBattle()).find(c=>c.slot===enemy.slot);
+    assert.deepEqual(caps.getLevelCapChoices(choice.levelCap),choices);
+    const run=createRunPlan('gold-hawk','Capture');
+    const r=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[1]});
+    const captured=r.run.roster.find(m=>m.instanceId===r.event.capturedInstanceId);
+    assert.ok(captured);assert.equal(captured.dp,0);assert.equal(captured.level,level);
+    assert.equal(captured.totalXp,load('src/utils/experience.ts').getRequiredTotalXpForLevel(level));
+    assert.deepEqual(captured.stats,{hp:enemy.hp,mp:enemy.mp,atk:enemy.atk,def:enemy.def,spd:enemy.spd});
+    assert.deepEqual(captured.techs,enemy.techs);
+    assert.deepEqual(captured.levelCap,{min:choices[0],max:choices[2],resolved:choices[1]});
+    assert.deepEqual(r.event.capturedLevelCap,captured.levelCap);assert.notEqual(r.event.capturedLevelCap,captured.levelCap);
+    assert.equal(storage.saveRunPlannerData(envelope(r.run)),true);
+    assert.deepEqual(storage.loadRunPlannerData(),envelope(r.run));
+    const restored=undo.undoLastAction(r.run);assert.equal(restored.ok,true);assert.deepEqual(restored.run.roster,run.roster);
+    const again=recording.recordRunBattle(restored.run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[2]});
+    assert.equal(again.event.capturedLevelCap.resolved,choices[2]);assert.notEqual(again.event.capturedInstanceId,r.event.capturedInstanceId);
+  }));
+}
+for(const value of [undefined,null,29,33,30.5,NaN,Infinity,38])test(`random capture rejects invalid choice ${value}`,()=>withCaptureLevel(28,enemy=>{
+  const run=freeze(createRunPlan('gold-hawk','Run'));const previous=structuredClone(run);
+  assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:value}));
+  assert.equal(captureFoundation.tryCreateCapturedDigimon(32,enemy.slot,value).ok,false);assert.deepEqual(run,previous);
+}));
+test('stale cap without capture rejects; no-capture and fixed audit are explicit',()=>{
+ const run=createRunPlan('gold-hawk','Run');
+ assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),capturedMaxLevel:31}),/requires a capture/);
+ const plain=recording.recordRunBattle(run,normalBattle());assert.equal(plain.event.capturedInstanceId,null);assert.equal(plain.event.capturedLevelCap,null);
+ const fixed=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+ assert.deepEqual(fixed.event.capturedLevelCap,fixed.run.roster.at(-1).levelCap);assert.notEqual(fixed.event.capturedLevelCap.resolved,null);
+});
+for(const level of [28,29,30,31])test(`unresolved active EL${level} recording boundary is atomic`,()=>{
+ const run=multiRun();run.roster[0]={...run.roster[0],level,totalXp:1000000,levelCap:{min:30,max:32,resolved:null}};
+ run.digiline=run.roster.slice(0,2).map(m=>m.instanceId);const previous=structuredClone(run);
+ if(level>=30){assert.throws(()=>recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);assert.deepEqual(run,previous);}
+ else assert.equal(recording.recordRunBattle(run,normalBattle()).run.history.length,1);
+});
+test('unresolved reserve is permitted; resolved MAX grants teammates XP, Bits and capture',()=>{
+ const run=multiRun();run.roster[1]={...run.roster[1],level:30,totalXp:1000000,levelCap:{min:30,max:32,resolved:null}};
+ assert.equal(recording.recordRunBattle(run,normalBattle()).run.history.length,1);
+ run.roster[0]={...run.roster[0],level:30,totalXp:1000000,levelCap:{min:30,max:32,resolved:30}};
+ run.digiline=[run.roster[0].instanceId,run.roster[2].instanceId];
+ const r=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+ assert.equal(r.resolution.outcomes[0].actualXpApplied,0);assert.equal(r.resolution.outcomes[1].actualXpApplied,r.event.xpReward);
+ assert.equal(r.run.totalBits,1030+r.event.bitsReward);assert.ok(r.event.capturedInstanceId);assert.equal(r.run.history.length,1);
+});
+test('first 280 Bits battle and Undo use the initial balance checkpoint',()=>{
+ const rewards=load('src/utils/rewardMatching.ts').REWARDS_BY_ENCOUNTER_ID;const old=rewards.get(32);
+ try {rewards.set(32,{...old,bits:280});const r=recording.recordRunBattle(createRunPlan('gold-hawk','Run'),normalBattle());
+ assert.equal(r.run.totalBits,1310);assert.equal(undo.undoLastAction(r.run).run.totalBits,1030);
+ }finally{rewards.set(32,old);}
+});
+for(const mutation of [e=>{e.capturedInstanceId=null},e=>{e.capturedInstanceId='unknown'},e=>{e.capturedLevelCap=null},e=>{e.capturedLevelCap.resolved=null},e=>{e.capturedLevelCap.min--},e=>{e.capturedLevelCap.resolved=32},e=>{e.capturedEnemySlot=null},e=>{e.capturedEnemySlot=99}])test('capture audit tampering is rejected on save and reload',()=>withCaptureLevel(28,()=>{
+ const r=recording.recordRunBattle(createRunPlan('gold-hawk','Run'),{...normalBattle(),capturedEnemySlot:1,capturedMaxLevel:31}).run;
+ mutation(r.history[0]);assert.ok(validateRunPlan(r).length);assert.equal(storage.saveRunPlannerData(envelope(r)),false);
+ values.set(storage.RUN_PLANNER_STORAGE_KEY,JSON.stringify(envelope(r)));assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
+}));
+test('Piddomon authoritative static ranges need no runtime exception',()=>{
+ const source=load('src/data/evolutionSource.ts');const id=source.METALKID_DIGIMON_SOURCE.find(d=>d.name==='Piddomon').id;
+ const rows=source.METALKID_EVOLUTION_SOURCE.filter(r=>r.from===id);
+ assert.deepEqual(rows.map(r=>[r.min,r.max]),[[0,5],[6,null]]);
+ assert.deepEqual(rows.map(r=>source.METALKID_DIGIMON_SOURCE.find(d=>d.id===r.to).name),['MagnaAngemon','Giromon']);
+ for(const file of ['normalDigivolution.ts','progressionValidation.ts'])assert.ok(!fs.readFileSync(path.join(root,'src/utils',file),'utf8').toLowerCase().includes('piddomon'));
+ assert.deepEqual(load('src/utils/progressionValidation.ts').getProgressionValidationReport().evolutionRangeAmbiguities,[]);
+});
+test('capture UI starts blank, resets on slot/no-capture/success and disables missing choice',()=>withCaptureLevel(28,()=>{
+ const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');let submitted;
+ const props={selection:normalBattle(),hasParticipants:true,onRecord:request=>{submitted=request;return recording.recordRunBattle(createRunPlan('gold-hawk','Run'),request).resolution;}};
+ const selects=()=>elements(render(props)).filter(e=>typeof e.props.onValueChange==='function');
+ const button=()=>elements(render(props)).find(e=>e.props.children==='Record Battle');
+ selects()[0].props.onValueChange('1');assert.equal(selects()[1].props.value,'');assert.equal(button().props.disabled,true);
+ selects()[1].props.onValueChange('31');assert.equal(button().props.disabled,false);
+ selects()[0].props.onValueChange('2');selects()[0].props.onValueChange('1');assert.equal(selects()[1].props.value,'');
+ selects()[1].props.onValueChange('32');selects()[0].props.onValueChange('none');selects()[0].props.onValueChange('1');assert.equal(selects()[1].props.value,'');
+ selects()[1].props.onValueChange('31');button().props.onClick();assert.equal(submitted.capturedMaxLevel,31);assert.equal(selects()[0].props.value,'none');
+ selects()[0].props.onValueChange('1');assert.equal(selects()[1].props.value,'');
+ // Parent keys the actual controls on every encounter-location field, forcing fresh hook state.
+ const parent=fs.readFileSync(path.join(root,'src/components/run-planner/BattleSelector.tsx'),'utf8');
+ assert.ok(parent.includes('key={`${phase}/${domainId}/${floor}/${encounterId}`}'));
+}));
+
+test('pure progression retains participant-level capResolutionRequired defense',()=>{
+ const run=multiRun();run.roster=run.roster.slice(0,3);run.digiline=run.roster.map(m=>m.instanceId);
+ run.roster[0]={...run.roster[0],level:13,totalXp:1000000};
+ run.roster[1]={...run.roster[1],level:30,totalXp:1000000,dp:7,levelCap:caps.getInitialLevelCap(28)};
+ const previous=structuredClone(run);
+ const r=battleFoundation.resolveBattle({encounterId:32,roster:freeze(run.roster),digilineInstanceIds:run.digiline,totalBits:run.totalBits,capturedEnemySlot:1});
+ assert.equal(r.outcomes[0].capped,true);assert.equal(r.outcomes[1].capResolutionRequired,true);
+ for(const i of [0,1]){assert.deepEqual(r.roster[i],previous.roster[i]);assert.deepEqual(r.outcomes[i].learnedTechniques,[]);}
+ assert.equal(r.outcomes[2].actualXpApplied,r.xpAwarded);assert.equal(r.totalBits,1030+r.bitsAwarded);assert.equal(r.roster.length,4);
+ assert.deepEqual(run,previous);
 });

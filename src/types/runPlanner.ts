@@ -48,7 +48,9 @@ export interface RunBattleEvent extends RunEventBase {
   encounterId: number;
   /** Snapshot of the digiline at the time this battle happened (up to 3 instance IDs). */
   digilineInstanceIds: string[];
-  capturedEnemySlot?: number | null;
+  capturedEnemySlot: number | null;
+  capturedInstanceId: string | null;
+  capturedLevelCap: LevelCapState | null;
   /** Reward SNAPSHOT taken when the event was created. Never a computed getter. */
   xpReward: number;
   bitsReward: number;

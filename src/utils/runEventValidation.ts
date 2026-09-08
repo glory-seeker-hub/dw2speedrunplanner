@@ -4,6 +4,8 @@ import { isValidRunActionCheckpoint } from '@/utils/runActionCheckpoint';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 import { previewNormalDigivolution } from '@/utils/normalDigivolution';
 import { isValidLevelCap } from '@/utils/levelCap';
+import { getInitialLevelCap } from '@/utils/levelCap';
+import { encounters } from '@/data/encounters';
 
 const nonEmptyString = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const integer = (v: unknown, min: number): v is number => typeof v === 'number' && Number.isInteger(v) && v >= min;
@@ -16,6 +18,16 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
   if (!nonEmptyString(v.id) || !integer(v.order, 0) || !isValidRunActionCheckpoint(v.preActionCheckpoint)) return false;
   const checkpoint = v.preActionCheckpoint;
   if (v.type === 'battle') {
+    if (v.capturedEnemySlot == null) {
+      if (v.capturedInstanceId !== null || v.capturedLevelCap !== null) return false;
+    } else {
+      const enemy = encounters.find(e => e.id === v.encounterId)?.digimons.find(e => e.slot === v.capturedEnemySlot);
+      const cap = enemy && getInitialLevelCap(enemy.level);
+      if (!cap || !nonEmptyString(v.capturedInstanceId) ||
+          checkpoint.roster.some(member => member.instanceId === v.capturedInstanceId) ||
+          !isValidLevelCap(v.capturedLevelCap) || v.capturedLevelCap.resolved === null ||
+          v.capturedLevelCap.min !== cap.min || v.capturedLevelCap.max !== cap.max) return false;
+    }
     return nonEmptyString(v.domainId) && DOMAIN_PHASES.includes(v.phase as DomainPhase) &&
       integer(v.floor, 1) && integer(v.encounterId, 0) &&
       Array.isArray(v.digilineInstanceIds) && v.digilineInstanceIds.length > 0 &&

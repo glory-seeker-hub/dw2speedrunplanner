@@ -778,6 +778,7 @@ export const METALKID_DIGIMON_SOURCE = [
     "name": "C-Seadramon"
   }
 ] as const;
+// Verified imported-source boundary correction: Piddomon DP0–5 -> MagnaAngemon; DP6+ -> Giromon.
 export const METALKID_EVOLUTION_SOURCE = [
   {
     "id": 1,
@@ -2100,7 +2101,7 @@ export const METALKID_EVOLUTION_SOURCE = [
     "from": 81,
     "to": 120,
     "min": 0,
-    "max": 6
+    "max": 5
   },
   {
     "id": 190,
