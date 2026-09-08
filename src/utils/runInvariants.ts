@@ -1,3 +1,5 @@
+import { isValidRunEvent } from '@/utils/runEventValidation';
+import { isRosterDigimon } from '@/utils/runActionCheckpoint';
 import {
   MAX_DIGILINE_SIZE,
   RosterDigimon,
@@ -94,6 +96,7 @@ export const validateRunPlan = (run: RunPlan): InvariantViolation[] => {
 
   const instanceIds = new Set<string>();
   for (const entry of run.roster) {
+    if (!isRosterDigimon(entry)) violations.push({ code: 'invalid-roster-entry', message: 'Invalid roster instance fields.' });
     if (instanceIds.has(entry.instanceId)) {
       violations.push({
         code: 'roster-duplicate-instance',
@@ -113,32 +116,31 @@ export const validateRunPlan = (run: RunPlan): InvariantViolation[] => {
     });
   }
 
-  if (run.totalBits < 0) {
+  if (!Number.isFinite(run.totalBits) || run.totalBits < 0) {
     violations.push({ code: 'negative-bits', message: 'totalBits cannot be negative.' });
   }
 
-  // Battle order must be deterministic: strictly increasing, no duplicates.
-  const orders = run.battles.map((b) => b.order);
-  const sorted = [...orders].sort((a, b) => a - b);
-  if (orders.some((o, i) => o !== sorted[i]) || new Set(orders).size !== orders.length) {
-    violations.push({
-      code: 'battle-order-not-deterministic',
-      message: 'Battle events must have unique, ascending order values.',
-    });
-  }
-
-  for (const event of run.battles) {
-    violations.push(...validateBattleEvent(event, run.roster));
-  }
+  // One contiguous chronological sequence for every recorded action.
+  const eventIds = new Set<string>();
+  run.history.forEach((event, index) => {
+    if (!isValidRunEvent(event)) {
+      violations.push({ code: 'invalid-run-event', message: 'Invalid action fields or checkpoint.' });
+      return;
+    }
+    if (event.order !== index || eventIds.has(event.id)) {
+      violations.push({ code: 'history-order-not-deterministic', message: 'Run actions require unique IDs and contiguous order values starting at zero.' });
+    }
+    eventIds.add(event.id);
+    if (event.preActionCheckpoint.roster.some(member => !instanceIds.has(member.instanceId)) ||
+        (run.starterInstanceId !== null && !event.preActionCheckpoint.roster.some(member => member.instanceId === run.starterInstanceId))) {
+      violations.push({ code: 'checkpoint-unknown-instance', message: 'Checkpoint roster must preserve the starter and reference existing instances.' });
+    }
+    if (event.type === 'battle') violations.push(...validateBattleEvent(event, event.preActionCheckpoint.roster));
+    else if (!instanceIds.has(event.instanceId)) violations.push({ code: 'digivolve-unknown-instance', message: 'Digivolution references an unknown roster instance.' });
+  });
 
   return violations;
 };
 
 export const isValidRunPlan = (run: RunPlan): boolean =>
   validateRunPlan(run).length === 0;
-
-/** Reorders battles and reassigns `order` deterministically (0-based). */
-export const normalizeBattleOrder = (battles: RunBattleEvent[]): RunBattleEvent[] =>
-  [...battles]
-    .sort((a, b) => a.order - b.order)
-    .map((b, index) => ({ ...b, order: index }));

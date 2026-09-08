@@ -15,7 +15,7 @@ export const createRunPlan = (starterId: string, name: string): RunPlan => {
     starterInstanceId: member.instanceId,
     roster: [member],
     digiline: [member.instanceId],
-    battles: [],
+    history: [],
     // Planner balance starts at zero; no battle rewards have been earned.
     totalBits: 0,
     createdAt: now,

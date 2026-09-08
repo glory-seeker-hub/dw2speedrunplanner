@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
+import { recordRunDigivolution } from '@/utils/runDigivolutionRecording';
 import { BattleResolution } from '@/utils/runProgression';
-import { undoLastBattle } from '@/utils/runBattleUndo';
+import { undoLastAction } from '@/utils/runActionUndo';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
-import { PersistedRunPlannerData, RunPlan } from '@/types/runPlanner';
+import { PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
 import { loadRunPlannerData, saveRunPlannerData, resetRunPlannerData } from '@/utils/runPlannerStorage';
 
@@ -14,7 +15,7 @@ export const useRunPlanner = () => {
   const [error, setError] = useState<string | null>(null);
   const [starterId, setStarterId] = useState('');
   const [name, setName] = useState('');
-  const [undoRevision, setUndoRevision] = useState(0);
+  const [feedbackRevision, setFeedbackRevision] = useState(0);
   const activeRun = data.runs.find((run) => run.id === data.activeRunId) ?? null;
 
   const persist = (next: PersistedRunPlannerData): boolean => {
@@ -29,14 +30,16 @@ export const useRunPlanner = () => {
   };
 
   const updateDigiline = (mutate: (run: RunPlan) => RunPlan): boolean => {
-    if (!activeRun) return false;
+    const current = currentData.current;
+    const run = current.runs.find(entry => entry.id === current.activeRunId);
+    if (!run) return false;
     try {
-      const changed = mutate(activeRun);
-      if (changed === activeRun) return true;
+      const changed = mutate(run);
+      if (changed === run) return true;
       const nextRun = { ...changed, updatedAt: new Date().toISOString() };
       return persist({
-        ...data,
-        runs: data.runs.map((run) => run.id === activeRun.id ? nextRun : run),
+        ...current,
+        runs: current.runs.map((entry) => entry.id === run.id ? nextRun : entry),
       });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not update the Digiline.');
@@ -63,18 +66,37 @@ export const useRunPlanner = () => {
     }
   };
 
-  const undoBattle = (expectedEventId: string): boolean => {
+  const digivolve = (expectedRunId: string, expectedMember: RosterDigimon): boolean => {
+    const current = currentData.current;
+    const run = current.runs.find(entry => entry.id === current.activeRunId);
+    const member = run?.roster.find(entry => entry.instanceId === expectedMember.instanceId);
+    if (!run || run.id !== expectedRunId || !member || JSON.stringify(member) !== JSON.stringify(expectedMember)) {
+      setError('This Digimon or the active run has changed. Close the preview and review Digivolution again.');
+      return false;
+    }
+    try {
+      const recorded = recordRunDigivolution(run, member.instanceId);
+      if (!persist({ ...current, runs: current.runs.map(entry => entry.id === run.id ? recorded.run : entry) })) return false;
+      setFeedbackRevision(value => value + 1);
+      return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not Digivolve this Digimon.');
+      return false;
+    }
+  };
+
+  const undoAction = (expectedEventId: string, expectedRunId: string): boolean => {
     const current = currentData.current;
     const run = current.runs.find(entry => entry.id === current.activeRunId);
     if (!run) return false;
-    if (run.battles[run.battles.length - 1]?.id !== expectedEventId) {
-      setError('The latest battle has changed. Review it before undoing.');
+    if (run.id !== expectedRunId || run.history[run.history.length - 1]?.id !== expectedEventId) {
+      setError('The latest action or active run has changed. Review it before undoing.');
       return false;
     }
-    const result = undoLastBattle(run);
-    if (!result.ok) { setError(result.reason); return false; }
+    const result = undoLastAction(run);
+    if (result.ok === false) { setError(result.reason); return false; }
     if (!persist({ ...current, runs: current.runs.map(entry => entry.id === run.id ? result.run : entry) })) return false;
-    setUndoRevision(value => value + 1);
+    setFeedbackRevision(value => value + 1);
     return true;
   };
 
@@ -113,5 +135,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, undoBattle, undoRevision };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, undoAction, feedbackRevision };
 };

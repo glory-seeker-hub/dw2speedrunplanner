@@ -1,6 +1,8 @@
+import { DigivolutionControls } from '@/components/run-planner/DigivolutionControls';
+import { getSpeciesProgression } from '@/data/speciesProgression';
 import { useState } from 'react';
 import { BattleSelector } from '@/components/run-planner/BattleSelector';
-import { BattleHistory } from '@/components/run-planner/BattleHistory';
+import { RunHistory } from '@/components/run-planner/RunHistory';
 import { LevelCapDisplay } from '@/components/run-planner/LevelCapDisplay';
 import { STARTERS } from '@/data/starters';
 import { MAX_DIGILINE_SIZE } from '@/types/runPlanner';
@@ -36,7 +38,8 @@ export const RunPlanner = ({ planner }: Props) => {
   const [confirmReset, setConfirmReset] = useState(false);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
   const starterMember = run?.roster.find((member) => member.instanceId === run.starterInstanceId);
-  const starter = STARTERS.find((option) => option.speciesId === starterMember?.speciesId);
+  const originalStarter = run?.history[0]?.preActionCheckpoint.roster.find(member => member.instanceId === run.starterInstanceId) ?? starterMember;
+  const starter = STARTERS.find((option) => option.speciesId === originalStarter?.speciesId);
 
   return (
     <section className="space-y-6" aria-label="Run Planner">
@@ -95,7 +98,7 @@ export const RunPlanner = ({ planner }: Props) => {
             <CardHeader><CardTitle>{run.name}</CardTitle><CardDescription>{starter?.label ?? 'Starter'} / {starterMember?.name ?? 'No starter recorded'}</CardDescription></CardHeader>
             <CardContent><dl className="flex flex-wrap gap-8">
               <div><dt className="text-sm text-muted-foreground">Total Bits</dt><dd className="text-xl font-semibold tabular-nums">{run.totalBits}</dd></div>
-              <div><dt className="text-sm text-muted-foreground">Recorded battles</dt><dd className="text-xl font-semibold tabular-nums">{run.battles.length}</dd></div>
+              <div><dt className="text-sm text-muted-foreground">Recorded battles</dt><dd className="text-xl font-semibold tabular-nums">{run.history.filter(event => event.type === 'battle').length}</dd></div>
             </dl></CardContent>
           </Card>
           <Card>
@@ -140,11 +143,14 @@ export const RunPlanner = ({ planner }: Props) => {
               {run.roster.map((member) => (
                 <Card key={member.instanceId}>
                   <CardHeader><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
+                    <p className="text-sm text-muted-foreground">{getSpeciesProgression(member.speciesId)?.rank ?? 'Unknown rank'} · DP {member.dp}</p>
                     <LevelCapDisplay member={member} />
                     <CardDescription>Total XP {member.totalXp}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Stats stats={member.stats} />
+                    <p className="text-sm"><span className="text-muted-foreground">Known techniques: </span>{member.techs.join(', ') || 'None'}</p>
+                    <DigivolutionControls runId={run.id} member={member} onDigivolve={planner.digivolve} error={error} />
                     {!run.digiline.includes(member.instanceId) && (
                       <div className="space-y-2">
                         <Button size="sm" variant="outline" disabled={run.digiline.length >= MAX_DIGILINE_SIZE}
@@ -158,8 +164,8 @@ export const RunPlanner = ({ planner }: Props) => {
               ))}
             </div>
           </section>
-          <BattleSelector key={`${run.id}/${planner.undoRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
-          <BattleHistory key={run.id} run={run} onUndo={planner.undoBattle} error={error} />
+          <BattleSelector key={`${run.id}/${planner.feedbackRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
+          <RunHistory key={run.id} run={run} onUndo={planner.undoAction} error={error} />
         </>
       )}
       <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>

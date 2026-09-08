@@ -27,20 +27,24 @@ export interface RosterDigimon {
   techs: string[];
 }
 
-/** Exact progression state before a battle; never includes history or UI state. */
-export interface RunBattleCheckpoint {
+/** Exact progression state before an action; never includes history or UI state. */
+export interface RunActionCheckpoint {
   roster: RosterDigimon[];
   digiline: string[];
   totalBits: number;
 }
 
-export interface RunBattleEvent {
+interface RunEventBase {
   id: string;
   order: number;
+  preActionCheckpoint: RunActionCheckpoint;
+}
+
+export interface RunBattleEvent extends RunEventBase {
+  type: 'battle';
   domainId: string;
-  /** Location snapshot; absent on events saved before Phase 2D. */
-  phase?: DomainPhase;
-  floor?: number;
+  phase: DomainPhase;
+  floor: number;
   encounterId: number;
   /** Snapshot of the digiline at the time this battle happened (up to 3 instance IDs). */
   digilineInstanceIds: string[];
@@ -48,9 +52,23 @@ export interface RunBattleEvent {
   /** Reward SNAPSHOT taken when the event was created. Never a computed getter. */
   xpReward: number;
   bitsReward: number;
-  /** Missing on legacy events, which cannot be safely undone. */
-  checkpoint?: RunBattleCheckpoint;
 }
+
+export interface RunDigivolveEvent extends RunEventBase {
+  type: 'digivolve';
+  instanceId: string;
+  fromSpeciesId: string;
+  toSpeciesId: string;
+  fromRank: string;
+  toRank: string;
+  level: number;
+  dp: number;
+  levelCap: LevelCapState;
+  hpBonus: 30;
+  mpBonus: 30;
+}
+
+export type RunEvent = RunBattleEvent | RunDigivolveEvent;
 
 export interface RunPlan {
   id: string;
@@ -59,7 +77,7 @@ export interface RunPlan {
   roster: RosterDigimon[];
   /** Current active party: RosterDigimon instance IDs, max 3. */
   digiline: string[];
-  battles: RunBattleEvent[];
+  history: RunEvent[];
   totalBits: number;
   createdAt: string;
   updatedAt: string;
@@ -68,7 +86,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 2;
+  schemaVersion: 3;
   runs: RunPlan[];
   activeRunId: string | null;
 }
