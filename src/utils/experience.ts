@@ -1,4 +1,7 @@
 import { CUMULATIVE_XP_BY_LEVEL } from '@/data/experience';
+import { LevelCapState } from '@/types/runPlanner';
+import { isValidLevelCap } from '@/utils/levelCap';
+import { PLANNER_SCOPE_MAX_EL } from '@/data/statGrowthTables';
 
 /**
  * XP helpers. All return `null`/`false` when the required threshold is not yet known,
@@ -33,12 +36,16 @@ export const canLevelUp = (level: number, totalXp: number): boolean => {
 };
 
 export interface BattleXpResult {
+  actualXpApplied: number;
+  capped: boolean;
+  capResolutionRequired: boolean;
+  plannerScopeUnsupported: boolean;
   previousLevel: number;
   newLevel: number;
   previousTotalXp: number;
   newTotalXp: number;
   leveledUp: boolean;
-  /** XP still missing for the level after `newLevel`. `null` when threshold unknown. */
+  /** XP still missing for the next level; null when blocked or outside known thresholds. */
   xpToNextLevel: number | null;
 }
 
@@ -46,11 +53,13 @@ export interface BattleXpResult {
  * Pure XP application for a single battle.
  * Enforces the one-level-per-battle rule: newLevel is either currentLevel or +1.
  * Never touches stats.
+ * The optional cap preserves the standalone XP-table API; roster progression always supplies it.
  */
 export const applyBattleXp = (
   currentLevel: number,
   currentTotalXp: number,
-  gainedXp: number
+  gainedXp: number,
+  levelCap?: LevelCapState
 ): BattleXpResult => {
   if (!Number.isInteger(currentLevel) || currentLevel < 1) {
     throw new Error(`applyBattleXp: invalid level ${currentLevel}`);
@@ -62,11 +71,21 @@ export const applyBattleXp = (
     throw new Error(`applyBattleXp: invalid gainedXp ${gainedXp}`);
   }
 
+  if (levelCap !== undefined && !isValidLevelCap(levelCap)) throw new Error('Invalid level cap');
+  const capped = levelCap?.resolved != null && currentLevel >= levelCap.resolved;
+  const capResolutionRequired = levelCap?.resolved === null && currentLevel >= levelCap.min;
+  const plannerScopeUnsupported = !capped && !capResolutionRequired && currentLevel >= PLANNER_SCOPE_MAX_EL;
+  if (capped || capResolutionRequired || plannerScopeUnsupported) return {
+    previousLevel: currentLevel, newLevel: currentLevel, previousTotalXp: currentTotalXp,
+    newTotalXp: currentTotalXp, leveledUp: false, xpToNextLevel: null,
+    actualXpApplied: 0, capped, capResolutionRequired, plannerScopeUnsupported,
+  };
   const newTotalXp = currentTotalXp + gainedXp;
   const leveledUp = canLevelUp(currentLevel, newTotalXp);
   const newLevel = leveledUp ? currentLevel + 1 : currentLevel;
 
   return {
+    actualXpApplied: gainedXp, capped: false, capResolutionRequired: false, plannerScopeUnsupported: false,
     previousLevel: currentLevel,
     newLevel,
     previousTotalXp: currentTotalXp,
