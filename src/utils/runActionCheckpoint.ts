@@ -1,3 +1,4 @@
+import { getTradeDefinition } from '@/data/trades';
 import { MAX_TECHNIQUES } from '@/types/techniqueCapacity';
 import { isValidTechniqueState } from '@/utils/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
@@ -25,6 +26,8 @@ const isStats = (v: unknown): v is DigimonStats =>
 const isRosterSource = (v: unknown): boolean => {
   if (!isObject(v)) return false;
   if (v.type === 'starter') return true;
+  if (v.type === 'trade') return Object.keys(v).length === 3 && isNonEmptyString(v.tradeId) &&
+    !!getTradeDefinition(v.tradeId) && isNonEmptyString(v.givenInstanceId) && !!v.givenInstanceId.trim();
   if (v.type === 'dna') return Object.keys(v).length === 2 && Array.isArray(v.parentInstanceIds) &&
     v.parentInstanceIds.length === 2 && v.parentInstanceIds.every(isNonEmptyString) &&
     v.parentInstanceIds[0] < v.parentInstanceIds[1];

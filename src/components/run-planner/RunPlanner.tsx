@@ -1,3 +1,4 @@
+import { TradeControls } from '@/components/run-planner/TradeControls';
 import { DnaControls } from '@/components/run-planner/DnaControls';
 import { DigivolutionControls } from '@/components/run-planner/DigivolutionControls';
 import { getSpeciesProgression } from '@/data/speciesProgression';
@@ -139,6 +140,7 @@ export const RunPlanner = ({ planner }: Props) => {
           </Card>
           <section className="space-y-3" aria-label="Roster">
             <h3 className="text-xl font-semibold">Roster</h3>
+            <TradeControls key={`trade/${run.id}/${planner.feedbackRevision}`} run={run} onTrade={planner.trade} error={error} />
             <DnaControls key={`${run.id}/${planner.feedbackRevision}`} run={run} onDna={planner.dna} error={error} />
             <div className="grid gap-4 lg:grid-cols-3">
               {run.roster.map((member) => (

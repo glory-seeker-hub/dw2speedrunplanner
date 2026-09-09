@@ -28,6 +28,11 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
       {run.history.length === 0 ? <p className="text-sm text-muted-foreground">No actions recorded yet.</p> : (
         <ol className="space-y-4" aria-label="Run History">
           {run.history.map((event, index) => {
+            if (event.type === 'trade') return <li key={event.id} className="space-y-1 rounded-lg border p-4 text-sm">
+              <p className="font-semibold">Action {index + 1} · Trade</p>
+              <p>{event.givenName} → {event.receivedName}</p>
+              <p>EL{event.receivedLevel} · DP{event.receivedDp} · Max EL{event.receivedMaxLevel}</p>
+            </li>;
             if (event.type === 'dna') return <li key={event.id} className="space-y-1 rounded-lg border p-4 text-sm">
               <p className="font-semibold">Action {index + 1} · DNA Digivolution{event.isMutation ? ' · Mutation' : ''}</p>
               <p>{event.parentAName} + {event.parentBName} → {event.childName}</p>
@@ -65,7 +70,7 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Undo the last recorded action?</AlertDialogTitle>
-          <AlertDialogDescription>{run.history.find(event => event.id === confirmEventId)?.type === 'dna' ? 'Undo this DNA and restore both parents? ' : run.history.find(event => event.id === confirmEventId)?.type === 'digivolve' ? 'Undo this Digivolution? ' : 'Undo this battle? '}Undo restores the run to the state immediately before the last recorded action. Species, XP, levels, stats, techniques, Bits and captures will be restored. Digiline changes made after that action will also be discarded. There is no redo.</AlertDialogDescription>
+          <AlertDialogDescription>{run.history.find(event => event.id === confirmEventId)?.type === 'trade' ? 'Undo this trade and restore the given Digimon? ' : run.history.find(event => event.id === confirmEventId)?.type === 'dna' ? 'Undo this DNA and restore both parents? ' : run.history.find(event => event.id === confirmEventId)?.type === 'digivolve' ? 'Undo this Digivolution? ' : 'Undo this battle? '}Undo restores the run to the state immediately before the last recorded action. Species, XP, levels, stats, techniques, Bits and captures will be restored. Digiline changes made after that action will also be discarded. There is no redo.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={event => {
           if (confirmEventId && onUndo(confirmEventId, run.id)) setUndoneAt(run.history.at(-2)?.id ?? 'empty');

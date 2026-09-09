@@ -1,3 +1,4 @@
+import { recordTradeAction } from '@/utils/runTradeRecording';
 import { recordDnaAction } from '@/utils/runDnaRecording';
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
@@ -111,6 +112,22 @@ export const useRunPlanner = () => {
     }
   };
 
+  const trade = (expectedRunId: string, tradeId: string, expectedGiven: RosterDigimon): boolean => {
+    const current = currentData.current;
+    const run = current.runs.find(r => r.id === current.activeRunId);
+    const given = run?.roster.find(p => p.instanceId === expectedGiven.instanceId);
+    if (!run || run.id !== expectedRunId || !given || JSON.stringify(given) !== JSON.stringify(expectedGiven)) {
+      setError('The given Digimon or active run has changed. Review the trade again.'); return false;
+    }
+    try {
+      const result = recordTradeAction(run, tradeId, given.instanceId);
+      if (!persist({ ...current, runs: current.runs.map(r => r.id === run.id ? result.run : r) })) return false;
+      setFeedbackRevision(v => v + 1); return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not record trade.'); return false;
+    }
+  };
+
   const undoAction = (expectedEventId: string, expectedRunId: string): boolean => {
     const current = currentData.current;
     const run = current.runs.find(entry => entry.id === current.activeRunId);
@@ -161,5 +178,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, undoAction, feedbackRevision };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
 };
