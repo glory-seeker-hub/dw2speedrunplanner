@@ -38,7 +38,23 @@ beforeEach(() => {
     removeItem: (key) => values.delete(key),
   };
 });
-const envelope = (run) => ({ schemaVersion: 5, runs: [run], activeRunId: run.id });
+function resolveKeepingAll(input) {
+  const api=load('src/utils/runProgression.ts');
+  try { return api.resolveBattle(input); } catch(error) {
+    if (!(error instanceof load('src/utils/techniqueCapacity.ts').BattleTechniqueSelectionRequired)) throw error;
+    assert.ok(error.choices.every(c=>c.choice.candidates.length<=12));
+    return api.resolveBattle({...input,techniqueSelections:error.choices.map(c=>({instanceId:c.instanceId,keptKeys:c.choice.candidates.map(p=>p.key)}))});
+  }
+}
+function recordKeepingAll(run,request) {
+  const api=load('src/utils/runBattleRecording.ts');
+  try { return api.recordRunBattle(run,request); } catch(error) {
+    if (!(error instanceof load('src/utils/techniqueCapacity.ts').BattleTechniqueSelectionRequired)) throw error;
+    assert.ok(error.choices.every(c=>c.choice.candidates.length<=12));
+    return api.recordRunBattle(run,{...request,techniqueSelections:error.choices.map(c=>({instanceId:c.instanceId,keptKeys:c.choice.candidates.map(p=>p.key)}))});
+  }
+}
+const envelope = (run) => ({ schemaVersion: 6, runs: [run], activeRunId: run.id });
 for (const starter of STARTERS) {
   test(starter.label + ' creates, persists, reloads, resets and recreates a valid run', () => {
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
@@ -93,11 +109,11 @@ test('storage rejects duplicate instances, duplicate run IDs and broken active r
     envelope({...run, digiline: [run.starterInstanceId, run.starterInstanceId]}),
   ]) assert.equal(storage.saveRunPlannerData(data), false);
 });
-test('saving a remaining run preserves the version-5 multi-run envelope', () => {
+test('saving a remaining run preserves the version-6 multi-run envelope', () => {
   const first = createRunPlan('gold-hawk', 'First');
   const second = createRunPlan('blue-falcon', 'Second');
-  assert.equal(storage.saveRunPlannerData({schemaVersion: 5,runs:[first,second],activeRunId:first.id}),true);
-  const remaining = {schemaVersion: 5,runs:[second],activeRunId:null};
+  assert.equal(storage.saveRunPlannerData({schemaVersion: 6,runs:[first,second],activeRunId:first.id}),true);
+  const remaining = {schemaVersion: 6,runs:[second],activeRunId:null};
   assert.equal(storage.saveRunPlannerData(remaining), true);
   assert.deepEqual(storage.loadRunPlannerData(), remaining);
 });
@@ -358,7 +374,7 @@ test('recording rejects empty, duplicate and unknown participants without changi
   const run = multiRun();
   for (const digiline of [[], [run.starterInstanceId,run.starterInstanceId], ['missing']]) {
     const invalid = freeze({...run,digiline});
-    assert.throws(() => recording.recordRunBattle(invalid,normalBattle()));
+    assert.throws(() => recordKeepingAll(invalid,normalBattle()));
     assert.equal(invalid.history.length,0);
     assert.equal(invalid.totalBits,1030);
   }
@@ -368,7 +384,7 @@ for (const count of [1,2,3]) test(`full encounter XP reaches each of ${count} pa
   for (const id of ['reserve-a','reserve-b'].slice(0,count-1)) run = addToDigiline(run,id);
   freeze(run);
   const reward = selection.getBattlePreview(32).reward;
-  const {run:next,resolution,event} = recording.recordRunBattle(run,normalBattle());
+  const {run:next,resolution,event} = recordKeepingAll(run,normalBattle());
   assert.equal(resolution.outcomes.length,count);
   for (const member of run.roster) {
     const updated = next.roster.find(r => r.instanceId === member.instanceId);
@@ -386,8 +402,8 @@ test('recording reuses one-level XP and exact deterministic expected growth', ()
   const run = multiRun();
   run.roster[0] = {...run.roster[0],totalXp:100000};
   const expected = growthHelpers.applyExpectedLevelUpGrowth(run.roster[0].speciesId,1,run.roster[0].stats).stats;
-  const first = recording.recordRunBattle(freeze(run),normalBattle());
-  const again = recording.recordRunBattle(run,normalBattle());
+  const first = recordKeepingAll(freeze(run),normalBattle());
+  const again = recordKeepingAll(run,normalBattle());
   assert.equal(first.run.roster[0].level,2);
   assert.equal(first.run.roster[0].totalXp,100000+first.event.xpReward);
   assert.equal(first.resolution.outcomes[0].xpToNextLevel,0);
@@ -398,17 +414,17 @@ test('recording reuses one-level XP and exact deterministic expected growth', ()
 test('no level-up leaves stats unchanged while recording XP and Bits', () => {
   const run = multiRun();
   run.roster[0] = {...run.roster[0],level:30,levelCap:{min:50,max:50,resolved:50},totalXp:xpHelpers.getRequiredTotalXpForLevel(30)};
-  const next = recording.recordRunBattle(freeze(run),normalBattle());
+  const next = recordKeepingAll(freeze(run),normalBattle());
   assert.equal(next.run.roster[0].level,30);
   assert.deepEqual(next.run.roster[0].stats,run.roster[0].stats);
 });
 test('history is append-only with stable IDs, location and ordered participant snapshots', () => {
   let run = fullRun();
   run = moveDigilineMember(run,'reserve-b','up');
-  const first = recording.recordRunBattle(run,normalBattle());
+  const first = recordKeepingAll(run,normalBattle());
   const snapshot = structuredClone(first.event);
   const changed = removeFromDigiline(first.run,'reserve-b');
-  const second = recording.recordRunBattle(changed,normalBattle());
+  const second = recordKeepingAll(changed,normalBattle());
   assert.deepEqual(second.run.history[0],snapshot);
   assert.notEqual(second.event.id,first.event.id);
   assert.deepEqual(second.run.history.map(e => e.order),[0,1]);
@@ -419,7 +435,7 @@ test('history is append-only with stable IDs, location and ordered participant s
 });
 test('capture uses exact slot data and cumulative XP, stays reserve and receives no battle XP', () => {
   const run = multiRun();
-  const {run:next,resolution,event} = recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1});
+  const {run:next,resolution,event} = recordKeepingAll(freeze(run),{...normalBattle(),capturedEnemySlot:1});
   const enemy = selection.getBattlePreview(32).encounter.digimons[0];
   const captured = next.roster.find(r => r.instanceId === resolution.capturedInstanceId);
   assert.equal(next.roster.length,run.roster.length+1);
@@ -434,8 +450,8 @@ test('capture uses exact slot data and cumulative XP, stays reserve and receives
   assert.ok(addToDigiline(next,captured.instanceId).digiline.includes(captured.instanceId));
 });
 test('repeated captures of the same species create distinct instances', () => {
-  const first = recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:1});
-  const second = recording.recordRunBattle(first.run,{...normalBattle(),capturedEnemySlot:1});
+  const first = recordKeepingAll(multiRun(),{...normalBattle(),capturedEnemySlot:1});
+  const second = recordKeepingAll(first.run,{...normalBattle(),capturedEnemySlot:1});
   assert.notEqual(first.resolution.capturedInstanceId,second.resolution.capturedInstanceId);
   assert.equal(new Set(second.run.roster.map(r => r.instanceId)).size,second.run.roster.length);
   assert.equal(second.run.roster.length,6);
@@ -445,9 +461,9 @@ test('capture choices preserve slots and boss capture is rejected in state logic
   assert.deepEqual(recording.getCaptureChoices(normal).map(e => [e.slot,e.name]),[[1,'Penguinmon'],[2,'Penguinmon']]);
   const boss = {...normalBattle(),floor:4,encounterId:91};
   assert.deepEqual(recording.getCaptureChoices(boss),[]);
-  assert.throws(() => recording.recordRunBattle(multiRun(),{...boss,capturedEnemySlot:1}),/Boss/);
-  assert.throws(() => recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:99}),/valid enemy slot/);
-  assert.equal(recording.recordRunBattle(multiRun(),boss).run.history.length,1);
+  assert.throws(() => recordKeepingAll(multiRun(),{...boss,capturedEnemySlot:1}),/Boss/);
+  assert.throws(() => recordKeepingAll(multiRun(),{...normalBattle(),capturedEnemySlot:99}),/valid enemy slot/);
+  assert.equal(recordKeepingAll(multiRun(),boss).run.history.length,1);
 });
 test('known zero rewards record, missing metadata and incompatible location reject', () => {
   const {REWARDS_BY_ENCOUNTER_ID:rewards} = load('src/utils/rewardMatching.ts');
@@ -457,27 +473,27 @@ test('known zero rewards record, missing metadata and incompatible location reje
     // branch with an in-memory reward fixture; never add fabricated Domain mappings.
     const zero = [...rewards.values()].find(reward => reward.xp === 0 && reward.bits === 0);
     rewards.set(32,zero);
-    const result = recording.recordRunBattle(multiRun(),normalBattle());
+    const result = recordKeepingAll(multiRun(),normalBattle());
     assert.equal(result.run.history.length,1);
     assert.equal(result.run.totalBits,1030);
     assert.equal(result.event.xpReward,0);
     rewards.delete(32);
-    assert.throws(() => recording.recordRunBattle(multiRun(),normalBattle()),/Reward metadata/);
+    assert.throws(() => recordKeepingAll(multiRun(),normalBattle()),/Reward metadata/);
   } finally { rewards.set(32,saved); }
-  assert.throws(() => recording.recordRunBattle(multiRun(),{...normalBattle(),floor:999}),/valid Domain/);
+  assert.throws(() => recordKeepingAll(multiRun(),{...normalBattle(),floor:999}),/valid Domain/);
 });
 test('recorded progression, fractional stats, capture and history survive storage without replay', () => {
-  const first = recording.recordRunBattle(multiRun(),{...normalBattle(),capturedEnemySlot:1});
-  const recorded = recording.recordRunBattle(first.run,normalBattle());
+  const first = recordKeepingAll(multiRun(),{...normalBattle(),capturedEnemySlot:1});
+  const recorded = recordKeepingAll(first.run,normalBattle());
   assert.ok(Object.values(recorded.run.roster[0].stats).some(value => !Number.isInteger(value)));
   assert.equal(storage.saveRunPlannerData(envelope(recorded.run)),true);
   assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
   assert.deepEqual(storage.loadRunPlannerData().runs[0],recorded.run);
-  const next = recording.recordRunBattle(storage.loadRunPlannerData().runs[0],normalBattle());
+  const next = recordKeepingAll(storage.loadRunPlannerData().runs[0],normalBattle());
   assert.equal(next.run.history.length,3);
 });
 test('schema v3 requires battle location and rejects invalid location fields', () => {
-  const recorded = recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const recorded = recordKeepingAll(multiRun(),normalBattle()).run;
   const legacy = structuredClone(recorded);
   delete legacy.history[0].phase;
   delete legacy.history[0].floor;
@@ -541,7 +557,7 @@ const restoredRun = (run) => {
 };
 test('new event preActionCheckpoint is the complete pre-battle state with no recursive history', () => {
   const run = freeze(fullRun());
-  const recorded = recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+  const recorded = recordKeepingAll(run,{...normalBattle(),capturedEnemySlot:1});
   assert.deepEqual(recorded.event.preActionCheckpoint,{roster:run.roster,digiline:run.digiline,totalBits:run.totalBits});
   assert.deepEqual(Object.keys(recorded.event.preActionCheckpoint).sort(),['digiline','roster','totalBits']);
   assert.notEqual(recorded.event.preActionCheckpoint.roster,run.roster);
@@ -556,7 +572,7 @@ test('new event preActionCheckpoint is the complete pre-battle state with no rec
 });
 test('normal battle undo restores all meaningful run state and does not mutate input', () => {
   const before = multiRun();
-  const recorded = freeze(recording.recordRunBattle(before,normalBattle()).run);
+  const recorded = freeze(recordKeepingAll(before,normalBattle()).run);
   const snapshot = JSON.stringify(recorded);
   const restored = restoredRun(recorded);
   assert.deepEqual(meaningfulRun(restored),meaningfulRun(before));
@@ -566,11 +582,11 @@ test('normal battle undo restores all meaningful run state and does not mutate i
   assert.equal(recorded.history[0].preActionCheckpoint.roster[0].stats.hp,before.roster[0].stats.hp);
 });
 test('level-up undo restores exact fractional stats, level, XP and Bits', () => {
-  const before = recording.recordRunBattle(recording.recordRunBattle(multiRun(),normalBattle()).run,normalBattle()).run;
+  const before = recordKeepingAll(recordKeepingAll(multiRun(),normalBattle()).run,normalBattle()).run;
   before.roster[0].totalXp=100000;
   before.totalBits=123.5;
   assert.ok(Object.values(before.roster[0].stats).some(v => !Number.isInteger(v)));
-  const recorded=recording.recordRunBattle(freeze(before),normalBattle()).run;
+  const recorded=recordKeepingAll(freeze(before),normalBattle()).run;
   assert.equal(recorded.roster[0].level,before.roster[0].level+1);
   assert.deepEqual(meaningfulRun(restoredRun(recorded)),meaningfulRun(before));
 });
@@ -578,7 +594,7 @@ test('undo removes a capture promoted into Digiline and discards later membershi
   let before=multiRun();
   before=addToDigiline(before,'reserve-a');
   before=moveDigilineMember(before,'reserve-a','up');
-  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1});
+  const recorded=recordKeepingAll(before,{...normalBattle(),capturedEnemySlot:1});
   const capturedId=recorded.resolution.capturedInstanceId;
   let changed=addToDigiline(recorded.run,capturedId);
   changed=moveDigilineMember(changed,capturedId,'up');
@@ -591,7 +607,7 @@ test('undo removes a capture promoted into Digiline and discards later membershi
 });
 test('repeated undo restores successive exact checkpoints and preserves earlier events', () => {
   const states=[multiRun()];
-  for(let i=0;i<3;i++) states.push(recording.recordRunBattle(states[i],{...normalBattle(),capturedEnemySlot:1}).run);
+  for(let i=0;i<3;i++) states.push(recordKeepingAll(states[i],{...normalBattle(),capturedEnemySlot:1}).run);
   let current=freeze(states[3]);
   for(let i=2;i>=0;i--) {
     const previousHistory=current.history.slice(0,-1);
@@ -602,7 +618,7 @@ test('repeated undo restores successive exact checkpoints and preserves earlier 
   assert.equal(undo.undoLastAction(current).ok,false);
 });
 test('schema v3 rejects events missing mandatory checkpoints without overwriting development saves', () => {
-  const legacy=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const legacy=recordKeepingAll(multiRun(),normalBattle()).run;
   delete legacy.history[0].preActionCheckpoint;
   const raw=JSON.stringify(envelope(legacy));values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
   assert.equal(storage.saveRunPlannerData(envelope(legacy)),false);
@@ -615,7 +631,7 @@ test('empty history reports Undo unavailable', () => {
   assert.deepEqual(undo.undoLastAction(multiRun()),{ok:false,reason:'No actions recorded yet.'});
 });
 test('malformed preActionCheckpoint structures and references are rejected without altering input', () => {
-  const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const run=recordKeepingAll(multiRun(),normalBattle()).run;
   const valid=run.history[0].preActionCheckpoint;
   const bad=[null,{}, {...valid,roster:null}, {...valid,totalBits:-1}, {...valid,totalBits:Infinity},
     {...valid,digiline:['missing']}, {...valid,digiline:[valid.digiline[0],valid.digiline[0]]},
@@ -635,13 +651,13 @@ test('malformed preActionCheckpoint structures and references are rejected witho
   }
 });
 test('preActionCheckpoint missing a starter required by the run cannot be applied', () => {
-  const run=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const run=recordKeepingAll(multiRun(),normalBattle()).run;
   run.history[0].preActionCheckpoint={roster:[],digiline:[],totalBits:0};
   assert.equal(undo.undoLastAction(run).ok,false);
 });
 test('record reload then undo restores exact saved pre-battle state', () => {
-  const before=recording.recordRunBattle(multiRun(),normalBattle()).run;
-  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1}).run;
+  const before=recordKeepingAll(multiRun(),normalBattle()).run;
+  const recorded=recordKeepingAll(before,{...normalBattle(),capturedEnemySlot:1}).run;
   assert.equal(storage.saveRunPlannerData(envelope(recorded)),true);
   const loaded=storage.loadRunPlannerData().runs[0];
   assert.deepEqual(loaded,recorded);
@@ -652,9 +668,9 @@ test('record reload then undo restores exact saved pre-battle state', () => {
 });
 test('recording after undo replaces the final order with a fresh event ID', () => {
   let run=multiRun();
-  for(let i=0;i<3;i++) run=recording.recordRunBattle(run,normalBattle()).run;
+  for(let i=0;i<3;i++) run=recordKeepingAll(run,normalBattle()).run;
   const oldId=run.history[2].id;
-  const next=recording.recordRunBattle(restoredRun(run),{...normalBattle(),encounterId:31}).run;
+  const next=recordKeepingAll(restoredRun(run),{...normalBattle(),encounterId:31}).run;
   assert.deepEqual(next.history.map(b => b.order),[0,1,2]);
   assert.notEqual(next.history[2].id,oldId);
   assert.equal(new Set(next.history.map(b => b.id)).size,3);
@@ -666,12 +682,12 @@ test('zero-reward fixture can be recorded and undone exactly', () => {
   try {
     rewards.set(32,{...saved,xp:0,bits:0});
     const before=multiRun();
-    assert.deepEqual(meaningfulRun(restoredRun(recording.recordRunBattle(before,normalBattle()).run)),meaningfulRun(before));
+    assert.deepEqual(meaningfulRun(restoredRun(recordKeepingAll(before,normalBattle()).run)),meaningfulRun(before));
   } finally {rewards.set(32,saved);}
 });
 test('failed Undo save leaves current run, history and feedback revision unchanged', () => {
   const before=multiRun();
-  const recorded=recording.recordRunBattle(before,{...normalBattle(),capturedEnemySlot:1}).run;
+  const recorded=recordKeepingAll(before,{...normalBattle(),capturedEnemySlot:1}).run;
   storage.saveRunPlannerData(envelope(recorded));
   const render=plannerHost(); const planner=render();
   const raw=values.get(storage.RUN_PLANNER_STORAGE_KEY);
@@ -689,9 +705,9 @@ test('failed Undo save leaves current run, history and feedback revision unchang
   assert.equal(render().error,null);
 });
 test('stale confirmation cannot undo a different battle or another saved run', () => {
-  const first=recording.recordRunBattle(multiRun(),normalBattle()).run;
+  const first=recordKeepingAll(multiRun(),normalBattle()).run;
   const other=createRunPlan('blue-falcon','Other');
-  storage.saveRunPlannerData({schemaVersion: 5,runs:[first,other],activeRunId:first.id});
+  storage.saveRunPlannerData({schemaVersion: 6,runs:[first,other],activeRunId:first.id});
   const render=plannerHost(); const planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.undoAction(first.history[0].id,first.id),false);
@@ -812,7 +828,7 @@ test('normal Digivolution preserves identity and progression, adds fractional HP
 for(const [name,level] of [['Greymon',11],['MetalGreymon',21],['WarGreymon',31],['Piddomon',11]]){
  test(`${name} learns exact own technique only on ${level} -> ${level+1}`,()=>{
  const m=foundationMember(name,level,{techs:[]});const tech=progressionData.getSpeciesProgression(m.speciesId).ownTechnique;
- const r=battleFoundation.resolveBattle({encounterId:32,roster:[freeze(m)],digilineInstanceIds:[m.instanceId],totalBits:0});
+ const r=resolveKeepingAll({encounterId:32,roster:[freeze(m)],digilineInstanceIds:[m.instanceId],totalBits:0});
  assert.deepEqual(r.outcomes[0].learnedTechniques,[tech]);assert.deepEqual(r.roster[0].techs,[tech]);
  assert.deepEqual(evolution.getLearnedTechniques({...m,techs:[tech]},level+1),[]);
  assert.deepEqual(evolution.getLearnedTechniques({...m,level:level+2},level+3),[]);
@@ -834,11 +850,11 @@ test('mixed capped, unresolved and eligible participants reject recording atomic
  run.roster[0]={...run.roster[0],level:13,totalXp:1000000};
  run.roster[1]={...run.roster[1],level:30,totalXp:1000000,dp:7,levelCap:caps.getInitialLevelCap(28)};
  const previous=structuredClone(run);
- assert.throws(()=>recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);
+ assert.throws(()=>recordKeepingAll(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);
  assert.deepEqual(run,previous);
 });
 test('schema v3 rejects old schema and invalid DP/caps in live and preActionCheckpoint rosters',()=>{
- const r=recording.recordRunBattle(multiRun(),normalBattle()).run;
+ const r=recordKeepingAll(multiRun(),normalBattle()).run;
  const raw=JSON.stringify({...envelope(r),schemaVersion:1});values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
  assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
  for(const bad of [{dp:-1},{dp:0.5},{levelCap:{min:13,max:13,resolved:null}},{levelCap:{min:30,max:32,resolved:33}},{levelCap:undefined},{dp:undefined}]){
@@ -903,10 +919,10 @@ const renderPlanner = run => require('react-dom/server').renderToStaticMarkup(re
   {planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}
 ));
 
-test('schema v5 is explicit and rejects schema v4 without migration or writes',()=>{
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
-  assert.equal(storage.emptyRunPlannerData().schemaVersion,5);
-  const old={...envelope(evolutionRun()),schemaVersion:4};
+test('schema v6 is explicit and rejects schema v5 without migration or writes',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
+  assert.equal(storage.emptyRunPlannerData().schemaVersion,6);
+  const old={...envelope(evolutionRun()),schemaVersion:5};
   const raw=JSON.stringify(old);values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
   assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
   assert.equal(storage.saveRunPlannerData(old),false);
@@ -915,7 +931,7 @@ test('schema v5 is explicit and rejects schema v4 without migration or writes',(
 
 test('v3 battle event retains all location, capture, reward and ordered participant fields',()=>{
   const run=fullRun();const request={...normalBattle(),capturedEnemySlot:1};
-  const {event,resolution}=recording.recordRunBattle(run,request);
+  const {event,resolution}=recordKeepingAll(run,request);
   assert.equal(event.type,'battle');assert.equal(event.order,0);
   for(const key of ['domainId','phase','floor','encounterId','capturedEnemySlot'])assert.equal(event[key],request[key]);
   assert.deepEqual(event.digilineInstanceIds,run.digiline);
@@ -935,7 +951,7 @@ test('Digivolution records one audited action and preserves every unrelated fiel
   assert.deepEqual(next.digiline,run.digiline);assert.equal(next.totalBits,run.totalBits);
   assert.equal(next.starterInstanceId,run.starterInstanceId);
   assert.deepEqual(event,{type:'digivolve',id:event.id,order:0,instanceId:member.instanceId,
-    fromSpeciesId:'agumon',toSpeciesId:'greymon',fromRank:'Rookie',toRank:'Champion',level:11,dp:0,
+    fromName:'Agumon',toName:'Greymon',fromSpeciesId:'agumon',toSpeciesId:'greymon',fromRank:'Rookie',toRank:'Champion',level:11,dp:0,
     levelCap:run.roster[0].levelCap,hpBonus:30,mpBonus:30,preActionCheckpoint:checkpointHelpers.createRunActionCheckpoint(run)});
   assert.equal(storage.saveRunPlannerData(envelope(next)),true);
   assert.deepEqual(storage.loadRunPlannerData().runs[0],next);
@@ -984,9 +1000,9 @@ test('Digivolution rejects low EL, terminal ranks, invalid state and unknown ins
 
 test('mixed history uses one chronology, battle-only counts and original battle names',()=>{
   const initial=evolutionRun('Agumon',10);
-  const first=recording.recordRunBattle(initial,normalBattle()).run;
+  const first=recordKeepingAll(initial,normalBattle()).run;
   const evolved=recordRunDigivolution(first,first.starterInstanceId).run;
-  const final=recording.recordRunBattle(evolved,normalBattle()).run;
+  const final=recordKeepingAll(evolved,normalBattle()).run;
   assert.deepEqual(final.history.map(e=>[e.type,e.order]),[['battle',0],['digivolve',1],['battle',2]]);
   const html=renderPlanner(final);
   assert.match(html,/Recorded battles<\/dt><dd[^>]*>2<\/dd>/);
@@ -1000,10 +1016,10 @@ test('mixed history uses one chronology, battle-only counts and original battle 
 
 test('mixed Undo restores exact checkpoints, techniques, species, fractional stats and earlier events',()=>{
   const initial=evolutionRun('Agumon',10);
-  const first=recording.recordRunBattle(initial,normalBattle()).run;
+  const first=recordKeepingAll(initial,normalBattle()).run;
   const evolved=recordRunDigivolution(first,first.starterInstanceId).run;
   assert.deepEqual(meaningfulRun(restoredRun(freeze(evolved))),meaningfulRun(first));
-  const final=recording.recordRunBattle(evolved,{...normalBattle(),capturedEnemySlot:1}).run;
+  const final=recordKeepingAll(evolved,{...normalBattle(),capturedEnemySlot:1}).run;
   assert.equal(final.roster[0].level,12);assert.ok(final.roster[0].techs.length>evolved.roster[0].techs.length);
   const once=restoredRun(freeze(final));assert.deepEqual(meaningfulRun(once),meaningfulRun(evolved));
   const twice=restoredRun(once);assert.deepEqual(meaningfulRun(twice),meaningfulRun(first));
@@ -1019,9 +1035,9 @@ test('Undo Digivolution discards subsequent Digiline edits and replacement order
   const restored=restoredRun(changed);assert.deepEqual(meaningfulRun(restored),meaningfulRun(initial));
   const replacement=recordRunDigivolution(restored,initial.starterInstanceId).run;
   assert.equal(replacement.history[0].order,0);assert.notEqual(replacement.history[0].id,evolved.history[0].id);
-  const battled=recording.recordRunBattle(replacement,normalBattle()).run;
+  const battled=recordKeepingAll(replacement,normalBattle()).run;
   const undone=restoredRun(battled);
-  const another=recording.recordRunBattle(undone,normalBattle()).run;
+  const another=recordKeepingAll(undone,normalBattle()).run;
   assert.deepEqual(another.history.map(e=>e.order),[0,1]);assert.deepEqual(another.history[0],replacement.history[0]);
 });
 
@@ -1039,7 +1055,7 @@ test('v3 rejects malformed discriminants, audit fields, checkpoint references, I
     assert.equal(storage.isValidPersistedRunPlannerData(envelope(invalid)),false,JSON.stringify(change));
     assert.ok(validateRunPlan(invalid).length>0,JSON.stringify(change));
   }
-  const mixed=recording.recordRunBattle(valid,normalBattle()).run;
+  const mixed=recordKeepingAll(valid,normalBattle()).run;
   mixed.history[1].id=mixed.history[0].id;
   assert.equal(storage.saveRunPlannerData(envelope(mixed)),false);
 });
@@ -1061,7 +1077,7 @@ test('Digivolution save failure is atomic; retry succeeds once and stale preview
 
 test('changed stats or switched runs invalidate previews; immediate Digiline edits retain new history',()=>{
   const initial=evolutionRun(),other=evolutionRun();
-  storage.saveRunPlannerData({schemaVersion: 5,runs:[initial,other],activeRunId:initial.id});
+  storage.saveRunPlannerData({schemaVersion: 6,runs:[initial,other],activeRunId:initial.id});
   const render=plannerHost(),planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
@@ -1085,15 +1101,15 @@ test('failed Digivolution Undo save preserves state and retry restores it',()=>{
 
 test('own technique is learned by the following threshold battle, never by early or late Digivolution',()=>{
   for(const [name,level] of [['Agumon',11],['Greymon',21],['MetalGreymon',31]]){
-    const initial=evolutionRun(name,level,{techs:[]});
+    const initial=evolutionRun(name,level,{techs:['Pepper Breath']});
     const evolved=recordRunDigivolution(initial,initial.starterInstanceId).run;
     const tech=progressionData.getSpeciesProgression(evolved.roster[0].speciesId).ownTechnique;
-    assert.deepEqual(evolved.roster[0].techs,[]);
-    const battle=recording.recordRunBattle(evolved,normalBattle());
-    assert.deepEqual(battle.resolution.outcomes[0].learnedTechniques,[tech]);assert.deepEqual(battle.run.roster[0].techs,[tech]);
-    const late=evolutionRun(name,level+2,{techs:[]});const lateEvolved=recordRunDigivolution(late,late.starterInstanceId).run;
-    assert.deepEqual(lateEvolved.roster[0].techs,[]);
-    assert.deepEqual(recording.recordRunBattle(lateEvolved,normalBattle()).resolution.outcomes[0].learnedTechniques,[]);
+    assert.deepEqual(evolved.roster[0].techs,['Pepper Breath']);
+    const battle=recordKeepingAll(evolved,normalBattle());
+    assert.deepEqual(battle.resolution.outcomes[0].learnedTechniques,[tech]);assert.deepEqual(battle.run.roster[0].techs,['Pepper Breath',tech]);
+    const late=evolutionRun(name,level+2,{techs:['Pepper Breath']});const lateEvolved=recordRunDigivolution(late,late.starterInstanceId).run;
+    assert.deepEqual(lateEvolved.roster[0].techs,['Pepper Breath']);
+    assert.deepEqual(recordKeepingAll(lateEvolved,normalBattle()).resolution.outcomes[0].learnedTechniques,[]);
   }
 });
 
@@ -1152,8 +1168,8 @@ test('generic ambiguous data remains visible without offering a Digivolve action
 });
 
 for(const name of ['Greymon','Piddomon'])test(`battle feedback displays learned planner technique for ${name}`,()=>{
-  const run=evolutionRun(name,11,{techs:[]});
-  const result=recording.recordRunBattle(run,normalBattle()).resolution;
+  const run=evolutionRun(name,11,{techs:['Pepper Breath']});
+  const result=recordKeepingAll(run,normalBattle()).resolution;
   const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');
   const props={selection:normalBattle(),hasParticipants:true,onRecord:()=>result};
   const tree=render(props);elements(tree).find(e=>e.props.children==='Record Battle').props.onClick();
@@ -1174,7 +1190,7 @@ for(const [level,choices] of [[28,[30,31,32]],[29,[31,32,33]],[35,[37,38,39]],[4
     const choice=recording.getCaptureChoices(normalBattle()).find(c=>c.slot===enemy.slot);
     assert.deepEqual(caps.getLevelCapChoices(choice.levelCap),choices);
     const run=createRunPlan('gold-hawk','Capture');
-    const r=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[1]});
+    const r=recordKeepingAll(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[1]});
     const captured=r.run.roster.find(m=>m.instanceId===r.event.capturedInstanceId);
     assert.ok(captured);assert.equal(captured.dp,0);assert.equal(captured.level,level);
     assert.equal(captured.totalXp,load('src/utils/experience.ts').getRequiredTotalXpForLevel(level));
@@ -1185,45 +1201,45 @@ for(const [level,choices] of [[28,[30,31,32]],[29,[31,32,33]],[35,[37,38,39]],[4
     assert.equal(storage.saveRunPlannerData(envelope(r.run)),true);
     assert.deepEqual(storage.loadRunPlannerData(),envelope(r.run));
     const restored=undo.undoLastAction(r.run);assert.equal(restored.ok,true);assert.deepEqual(restored.run.roster,run.roster);
-    const again=recording.recordRunBattle(restored.run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[2]});
+    const again=recordKeepingAll(restored.run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:choices[2]});
     assert.equal(again.event.capturedLevelCap.resolved,choices[2]);assert.notEqual(again.event.capturedInstanceId,r.event.capturedInstanceId);
   }));
 }
 for(const value of [undefined,null,29,33,30.5,NaN,Infinity,38])test(`random capture rejects invalid choice ${value}`,()=>withCaptureLevel(28,enemy=>{
   const run=freeze(createRunPlan('gold-hawk','Run'));const previous=structuredClone(run);
-  assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:value}));
+  assert.throws(()=>recordKeepingAll(run,{...normalBattle(),capturedEnemySlot:enemy.slot,capturedMaxLevel:value}));
   assert.equal(captureFoundation.tryCreateCapturedDigimon(32,enemy.slot,value).ok,false);assert.deepEqual(run,previous);
 }));
 test('stale cap without capture rejects; no-capture and fixed audit are explicit',()=>{
  const run=createRunPlan('gold-hawk','Run');
- assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),capturedMaxLevel:31}),/requires a capture/);
- const plain=recording.recordRunBattle(run,normalBattle());assert.equal(plain.event.capturedInstanceId,null);assert.equal(plain.event.capturedLevelCap,null);
- const fixed=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+ assert.throws(()=>recordKeepingAll(run,{...normalBattle(),capturedMaxLevel:31}),/requires a capture/);
+ const plain=recordKeepingAll(run,normalBattle());assert.equal(plain.event.capturedInstanceId,null);assert.equal(plain.event.capturedLevelCap,null);
+ const fixed=recordKeepingAll(run,{...normalBattle(),capturedEnemySlot:1});
  assert.deepEqual(fixed.event.capturedLevelCap,fixed.run.roster.at(-1).levelCap);assert.notEqual(fixed.event.capturedLevelCap.resolved,null);
 });
 for(const level of [28,29,30,31])test(`unresolved active EL${level} recording boundary is atomic`,()=>{
  const run=multiRun();run.roster[0]={...run.roster[0],level,totalXp:1000000,levelCap:{min:30,max:32,resolved:null}};
  run.digiline=run.roster.slice(0,2).map(m=>m.instanceId);const previous=structuredClone(run);
- if(level>=30){assert.throws(()=>recording.recordRunBattle(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);assert.deepEqual(run,previous);}
- else assert.equal(recording.recordRunBattle(run,normalBattle()).run.history.length,1);
+ if(level>=30){assert.throws(()=>recordKeepingAll(freeze(run),{...normalBattle(),capturedEnemySlot:1}),/Maximum EL is unresolved/);assert.deepEqual(run,previous);}
+ else assert.equal(recordKeepingAll(run,normalBattle()).run.history.length,1);
 });
 test('unresolved reserve is permitted; resolved MAX grants teammates XP, Bits and capture',()=>{
  const run=multiRun();run.roster[1]={...run.roster[1],level:30,totalXp:1000000,levelCap:{min:30,max:32,resolved:null}};
- assert.equal(recording.recordRunBattle(run,normalBattle()).run.history.length,1);
+ assert.equal(recordKeepingAll(run,normalBattle()).run.history.length,1);
  run.roster[0]={...run.roster[0],level:30,totalXp:1000000,levelCap:{min:30,max:32,resolved:30}};
  run.digiline=[run.roster[0].instanceId,run.roster[2].instanceId];
- const r=recording.recordRunBattle(run,{...normalBattle(),capturedEnemySlot:1});
+ const r=recordKeepingAll(run,{...normalBattle(),capturedEnemySlot:1});
  assert.equal(r.resolution.outcomes[0].actualXpApplied,0);assert.equal(r.resolution.outcomes[1].actualXpApplied,r.event.xpReward);
  assert.equal(r.run.totalBits,1030+r.event.bitsReward);assert.ok(r.event.capturedInstanceId);assert.equal(r.run.history.length,1);
 });
 test('first 280 Bits battle and Undo use the initial balance checkpoint',()=>{
  const rewards=load('src/utils/rewardMatching.ts').REWARDS_BY_ENCOUNTER_ID;const old=rewards.get(32);
- try {rewards.set(32,{...old,bits:280});const r=recording.recordRunBattle(createRunPlan('gold-hawk','Run'),normalBattle());
+ try {rewards.set(32,{...old,bits:280});const r=recordKeepingAll(createRunPlan('gold-hawk','Run'),normalBattle());
  assert.equal(r.run.totalBits,1310);assert.equal(undo.undoLastAction(r.run).run.totalBits,1030);
  }finally{rewards.set(32,old);}
 });
 for(const mutation of [e=>{e.capturedInstanceId=null},e=>{e.capturedInstanceId='unknown'},e=>{e.capturedLevelCap=null},e=>{e.capturedLevelCap.resolved=null},e=>{e.capturedLevelCap.min--},e=>{e.capturedLevelCap.resolved=32},e=>{e.capturedEnemySlot=null},e=>{e.capturedEnemySlot=99}])test('capture audit tampering is rejected on save and reload',()=>withCaptureLevel(28,()=>{
- const r=recording.recordRunBattle(createRunPlan('gold-hawk','Run'),{...normalBattle(),capturedEnemySlot:1,capturedMaxLevel:31}).run;
+ const r=recordKeepingAll(createRunPlan('gold-hawk','Run'),{...normalBattle(),capturedEnemySlot:1,capturedMaxLevel:31}).run;
  mutation(r.history[0]);assert.ok(validateRunPlan(r).length);assert.equal(storage.saveRunPlannerData(envelope(r)),false);
  values.set(storage.RUN_PLANNER_STORAGE_KEY,JSON.stringify(envelope(r)));assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
 }));
@@ -1237,7 +1253,7 @@ test('Piddomon authoritative static ranges need no runtime exception',()=>{
 });
 test('capture UI starts blank, resets on slot/no-capture/success and disables missing choice',()=>withCaptureLevel(28,()=>{
  const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');let submitted;
- const props={selection:normalBattle(),hasParticipants:true,onRecord:request=>{submitted=request;return recording.recordRunBattle(createRunPlan('gold-hawk','Run'),request).resolution;}};
+ const props={selection:normalBattle(),hasParticipants:true,onRecord:request=>{submitted=request;return recordKeepingAll(createRunPlan('gold-hawk','Run'),request).resolution;}};
  const selects=()=>elements(render(props)).filter(e=>typeof e.props.onValueChange==='function');
  const button=()=>elements(render(props)).find(e=>e.props.children==='Record Battle');
  selects()[0].props.onValueChange('1');assert.equal(selects()[1].props.value,'');assert.equal(button().props.disabled,true);
@@ -1465,7 +1481,7 @@ test('all 45 simulator-unresolved labels retain planner ranks independently',()=
 for(const starter of STARTERS) test(`starter pool preserves ${starter.name} current techniques`,()=>{
   const member=captureFoundation.createStarterDigimon(starter);
   assert.deepEqual(member.techs,starter.techs);
-  assert.ok(inheritance.isValidTechniqueState(member));
+  assert.ok(member.techs.length>=1);assert.ok(inheritance.isValidTechniqueState(member));
   assert.ok(member.techniquePool.every(p=>p.unlock.status==='available' && p.sources[0].type==='starter'));
 });
 test('every recordable capture preserves source techniques and resolves intrinsic ranks',()=>{
@@ -1477,7 +1493,7 @@ test('every recordable capture preserves source techniques and resolves intrinsi
     const result=captureFoundation.tryCreateCapturedDigimon(e.id,d.slot,c.min);
     assert.equal(result.ok,true,`${e.id}/${d.slot}: ${result.reason}`);
     assert.deepEqual(result.digimon.techs,d.techs);
-    assert.ok(inheritance.isValidTechniqueState(result.digimon));
+    assert.ok(result.digimon.techs.length>=1);assert.ok(inheritance.isValidTechniqueState(result.digimon));
     assert.ok(result.digimon.techniquePool.every(p=>p.unlock.status==='available'));
     count++;
   }
@@ -1503,9 +1519,9 @@ for(const [name,level] of [['Agumon',1],['Greymon',11],['MetalGreymon',21],['Vad
     const own=progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).ownTechnique;
     for(const raw of rankedNames){
       const p=potential(child,raw);const threshold=techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[p.rank];
-      assert.deepEqual(p.unlock,(level>=threshold || (level===1 && p.key===techniqueMetadata.normalizeTechniqueName(own))) ? {status:'available'} : {status:'pending',level:threshold});
+      assert.deepEqual(p.unlock,p.key===techniqueMetadata.normalizeTechniqueName(own) ? {status:'available'} : {status:'pending',level:Math.max(threshold,level+1)});
     }
-    assert.deepEqual(potential(child,own).unlock,level===1 ? {status:'available'} : {status:'pending',level:level+1});
+    assert.deepEqual(potential(child,own).unlock,{status:'available'});
     assert.equal(child.techniquePool.filter(p=>p.name==='Party Time').length,1);
     assert.deepEqual(potential(child,'Party Time').sources,[{type:'inherited',parentInstanceId:'a'},{type:'inherited',parentInstanceId:'b'}]);
   });
@@ -1570,15 +1586,15 @@ test('pure DNA rejects mismatched actual rank and malformed parent metadata',()=
   assert.throws(()=>inheritance.calculateDnaTechniqueState({speciesId:species.id,actualRank:'Champion',startingLevel:21},techParent('a',[]),techParent('b',[])),/actual DNA/);
   assert.throws(()=>childTech('Agumon',1,{...techParent('a',['Party Time']),techs:[]},techParent('b',[])),/parent technique/);
 });
-test('schema v5 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
+test('schema v6 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
   const undo=load('src/utils/runActionUndo.ts');const checkpoint=load('src/utils/runActionCheckpoint.ts');
   const run=evolutionRun();run.roster[0]={...run.roster[0],...childTech('Agumon',1)};
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
   assert.equal(storage.saveRunPlannerData(envelope(run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(run));
   assert.deepEqual(checkpoint.createRunActionCheckpoint(run).roster,run.roster);
   const evolved=recordRunDigivolution(freeze(run),run.starterInstanceId).run;
   assert.deepEqual(undo.undoLastAction(evolved).run.roster,run.roster);
-  const battle=recording.recordRunBattle(evolved,normalBattle());
+  const battle=recordKeepingAll(evolved,normalBattle());
   assert.ok(battle.resolution.outcomes[0].learnedTechniques.includes('Party Time'));
   assert.deepEqual(undo.undoLastAction(battle.run).run.roster,evolved.roster);
   assert.equal(storage.saveRunPlannerData(envelope(battle.run)),true);
@@ -1595,7 +1611,7 @@ for(const [label,change] of [
   ['incorrect unlock level',s=>{s.techs=[];s.techniquePool[0].unlock={status:'pending',level:12};}],
   ['missing provenance',s=>s.techniquePool[0].sources=[]],
   ['missing pool',s=>delete s.techniquePool],
-])test(`schema v5 rejects ${label} in roster and checkpoints`,()=>{
+])test(`schema v6 rejects ${label} in roster and checkpoints`,()=>{
   const run=createRunPlan('gold-hawk','Validation');change(run.roster[0]);
   assert.equal(inheritance.isValidTechniqueState(run.roster[0]),false);
   assert.ok(validateRunPlan(run).length>0);
@@ -1658,10 +1674,10 @@ for(const [name,level] of [['Vademon',21],['Yanmamon',11],['SandYanmamon',11]]){
     parent=withoutPossession(parent,'Venom Infusion',{status:'pending',level:32});
     const child=childTech(name,level,parent,techParent('b',[]));
     assert.equal(child.techniquePool.length,2);
-    assert.equal(potential(child,'Spiral Twister').unlock.status,'available');
+    assert.deepEqual(potential(child,'Spiral Twister').unlock,{status:'pending',level:level+1});
     for(const label of ['Party Time','Ninja Flower','Venom Infusion'])assert.equal(potential(child,label),undefined);
     const own=progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).ownTechnique;
-    assert.deepEqual(potential(child,own).unlock,{status:'pending',level:level+1});
+    assert.deepEqual(potential(child,own).unlock,{status:'available'});
     assert.deepEqual(potential(child,own).sources,[{type:'own-species',speciesId:speciesLookup.getDigimonByName(name).id}]);
     assert.deepEqual(child,childTech(name,level,techParent('b',[]),parent));
   });
@@ -1672,7 +1688,7 @@ for(const [label,level] of [['Party Time',12],['Ninja Flower',22],['Venom Infusi
     assert.deepEqual(potential(first,label).unlock,{status:'pending',level});
     const before={...foundationMember('Agumon',level-1),...first,instanceId:'second-generation'};
     assert.equal(potential(childTech('Biyomon',1,before,techParent('other',[])),label),undefined);
-    const battle=battleFoundation.resolveBattle({encounterId:1,digilineInstanceIds:[before.instanceId],roster:[freeze(before)],totalBits:1030});
+    const battle=resolveKeepingAll({encounterId:1,digilineInstanceIds:[before.instanceId],roster:[freeze(before)],totalBits:1030});
     const learned=battle.roster[0];
     assert.equal(learned.level,level);assert.ok(learned.techs.includes(label));
     assert.deepEqual(potential(learned,label).unlock,{status:'available'});
@@ -1702,13 +1718,13 @@ test('discarded former own techniques remain discarded through evolution and bat
   assert.equal(progressionData.getSpeciesProgression(evolved.speciesId).ownTechnique,own);
   assert.deepEqual(potential(evolved,own),potential(member,own));
   assert.deepEqual(evolution.getLearnedTechniques(evolved,12),[]);
-  const battle=battleFoundation.resolveBattle({encounterId:1,digilineInstanceIds:[evolved.instanceId],roster:[evolved],totalBits:1030});
+  const battle=resolveKeepingAll({encounterId:1,digilineInstanceIds:[evolved.instanceId],roster:[evolved],totalBits:1030});
   assert.equal(battle.roster[0].level,12);
   assert.deepEqual(battle.outcomes[0].learnedTechniques,[]);
   assert.deepEqual(potential(battle.roster[0],own).unlock,{status:'discarded'});
   assert.equal(potential(childTech('Biyomon',1,battle.roster[0],techParent('b',[])),own),undefined);
 });
-test('schema v5 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
+test('schema v6 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
   const run=evolutionRun();
   run.roster[0]={...run.roster[0],...inheritance.createAvailableTechniqueState(['Pepper Breath','Party Time'],{type:'starter',speciesId:run.roster[0].speciesId})};
   run.roster[0]=withoutPossession(run.roster[0],'Party Time',{status:'discarded'});
@@ -1722,7 +1738,7 @@ test('schema v5 saves, loads and checkpoints discarded provenance exactly; Undo 
   const evolved=recordRunDigivolution(run,run.starterInstanceId).run;
   const undo=load('src/utils/runActionUndo.ts');
   assert.deepEqual(undo.undoLastAction(evolved).run.roster[0].techniquePool,original);
-  const battle=recording.recordRunBattle(evolved,normalBattle()).run;
+  const battle=recordKeepingAll(evolved,normalBattle()).run;
   assert.deepEqual(undo.undoLastAction(battle).run.roster,evolved.roster);
   assert.equal(storage.saveRunPlannerData(envelope(battle)),true);
   assert.deepEqual(storage.loadRunPlannerData(),envelope(battle));
@@ -1756,33 +1772,33 @@ const preflight=(run,reviewTechniques=false)=>{
 };
 const keepSelection=(review,keep)=>review.map(c=>({instanceId:c.instanceId,keptKeys:keep(c)}));
 test('capacity is one authoritative 12-technique constant',()=>assert.equal(capacityTypes.MAX_TECHNIQUES,12));
-for(const count of [12,13,24])test(`${count} candidates preserve all metadata and require choice only above capacity`,()=>{
+for(const count of [12,13,24])test(`${count} candidates preserve all metadata and require learning review at every capacity`,()=>{
   const state=freeze(availableState(rookieNames.slice(0,count)));const before=JSON.stringify(state);
   const choice=capacity.buildTechniqueChoice(state);
-  assert.equal(choice.candidates.length,count);assert.equal(choice.selectionRequired,count>12);
+  assert.equal(choice.candidates.length,count);assert.equal(choice.selectionRequired,true);
   const result=capacity.resolveTechniqueChoice(choice);
-  assert.equal(result.status,count>12?'selection-required':'resolved');
-  if(count<=12)assert.deepEqual(result.techs,state.techs);
-  else {assert.equal(result.choice.candidates.length,count);assert.equal('techs' in result,false);}
+  assert.equal(result.status,'selection-required');
+  {assert.equal(result.choice.candidates.length,count);assert.equal('techs' in result,false);}
   assert.equal(JSON.stringify(state),before);
   assert.deepEqual(capacity.resolveTechniqueChoice(choice),result);
 });
-test('committed over-cap rosters and checkpoints are rejected by schema v5',()=>{
+test('committed over-cap rosters and checkpoints are rejected by schema v6',()=>{
   const run=capacityRun('Greymon',11,13);
   assert.ok(validateRunPlan(run).some(v=>v.code==='roster-technique-capacity'));
   assert.equal(storage.saveRunPlannerData(envelope(run)),false);
   const checkpoints=load('src/utils/runActionCheckpoint.ts');
   assert.equal(checkpoints.isValidRunActionCheckpoint(checkpoints.createRunActionCheckpoint(run)),false);
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
 });
 test('canonical aliases occupy one candidate slot',()=>{
   const state=availableState(['Blaze Blaster','Blaze Buster','FLer Cannon','Flower Cannon']);
   const choice=capacity.buildTechniqueChoice(state);
-  assert.equal(choice.candidates.length,2);assert.equal(capacity.resolveTechniqueChoice(choice).techs.length,2);
+  assert.equal(choice.candidates.length,2);assert.equal(capacity.resolveTechniqueChoice(choice,choice.candidates.map(p=>p.key)).techs.length,2);
 });
-for(const keptCount of [0,1,2])test(`optional choice may retain ${keptCount} of 2 candidates without imposing a minimum`,()=>{
+for(const keptCount of [0,1,2])test(`learning choice enforces minimum one when retaining ${keptCount} of 2 candidates`,()=>{
   const state=availableState(rookieNames.slice(0,2)),choice=capacity.buildTechniqueChoice(state,[rookieNames[1]]);
   const selected=choice.candidates.slice(0,keptCount).map(p=>p.key);
+  if(keptCount===0){assert.throws(()=>capacity.resolveTechniqueChoice(choice,selected),/within capacity/);return;}
   const result=capacity.resolveTechniqueChoice(freeze(choice),selected);
   assert.equal(result.status,'resolved');assert.equal(result.techs.length,keptCount);
   assert.equal(result.discarded.length,2-keptCount);assert.ok(inheritance.isValidTechniqueState(result));
@@ -1799,7 +1815,7 @@ test('no arbitrary deletion API is offered when nothing became learnable',()=>{
   assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:[{instanceId:run.starterInstanceId,keptKeys:[]}]}),/participant technique/);
 });
 test('11 possessed plus one own technique defaults to all 12 and audits learning',()=>{
-  const run=capacityRun('Greymon',11,11),result=recording.recordRunBattle(run,normalBattle());
+  const run=capacityRun('Greymon',11,11),result=recordKeepingAll(run,normalBattle());
   assert.equal(result.run.roster[0].techs.length,12);
   const own=progressionData.getSpeciesProgression(run.roster[0].speciesId).ownTechnique;
   assert.deepEqual(result.event.techniqueChoices,[{instanceId:run.starterInstanceId,learned:[own],discarded:[]}]);
@@ -1834,7 +1850,7 @@ test('multiple participant preflight and selections are atomic, including partia
 });
 test('voluntary non-overflow review discards old techniques and prevents subsequent DNA inheritance',()=>{
   const run=capacityRun('Greymon',11,2),review=preflight(run,true);
-  assert.equal(review[0].choice.selectionRequired,false);
+  assert.equal(review[0].choice.selectionRequired,true);
   const old=review[0].choice.candidates[0];
   const choices=keepSelection(review,c=>c.choice.candidates.filter(p=>p.key!==old.key).map(p=>p.key));
   const recorded=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:choices});
@@ -1844,16 +1860,17 @@ test('voluntary non-overflow review discards old techniques and prevents subsequ
   assert.ok(potential(child,retained));
   const later=inheritance.advanceTechniqueState(parent,12,13);assert.deepEqual(potential(later,old.name).unlock,{status:'discarded'});
 });
-test('future DNA composition requires choice for 24 immediate candidates and resolves exactly 12',()=>{
+test('DNA composition defers 24 inherited candidates until EL12 and resolves exactly 12',()=>{
   const a=foundationMember('MetalGreymon',49,{instanceId:'a',techs:rookieNames.slice(0,12)});
   const b=foundationMember('MetalGreymon',49,{instanceId:'b',techs:rookieNames.slice(12,24)});
   const p=dnaPreview(a,b);assert.equal(p.status,'success');
   const state=inheritance.calculateDnaTechniqueState({speciesId:p.actualResultSpeciesId,actualRank:p.actualResultRank,startingLevel:p.startingLevel},a,b);
-  assert.equal(state.techs.length,24);
-  const choice=capacity.buildTechniqueChoice(state);assert.equal(capacity.resolveTechniqueChoice(choice).status,'selection-required');
-  const selected=choice.candidates.filter((p,i)=>i%2===0).map(p=>p.key);
+  assert.equal(state.techs.length,1);
+  const advanced=inheritance.advanceTechniqueState(state,11,12);assert.equal(advanced.learnedTechniques.length,24);
+  const choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);assert.equal(capacity.resolveTechniqueChoice(choice).status,'selection-required');
+  const selected=choice.candidates.filter((p,i)=>i%2===1).map(p=>p.key);
   const final=capacity.resolveTechniqueChoice(choice,selected);
-  assert.equal(final.techs.length,12);assert.equal(final.discarded.length,12);
+  assert.equal(final.techs.length,12);assert.equal(final.discarded.length,13);
   assert.ok(inheritance.isValidTechniqueState(final));
 });
 test('deferred DNA EL2 overflow exposes 25 candidates before any recorded level-up',()=>{
@@ -1874,11 +1891,11 @@ test('choice candidates exclude other pending, missed and discarded potentials',
   potential(state,'Party Time').unlock={status:'missed',level:12};potential(state,'Venom Infusion').unlock={status:'discarded'};
   const advanced=inheritance.advanceTechniqueState(state,1,2),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
   assert.deepEqual(choice.candidates.map(p=>p.name).sort(),['Pepper Breath','Spiral Twister']);
-  const result=capacity.resolveTechniqueChoice(choice,[]);
+  const result=capacity.resolveTechniqueChoice(choice,[choice.candidates[0].key]);
   assert.equal(potential(result,'Party Time').unlock.status,'missed');assert.equal(potential(result,'Venom Infusion').unlock.status,'discarded');
 });
 for(const mutation of [e=>e.techniqueChoices=[],e=>e.techniqueChoices[0].learned.push('Invented'),e=>e.techniqueChoices[0].discarded.push('Invented'),e=>e.techniqueChoices[0].instanceId='missing'])test('battle choice audit tampering is rejected',()=>{
-  const result=recording.recordRunBattle(capacityRun('Greymon',11,11),normalBattle());mutation(result.event);
+  const result=recordKeepingAll(capacityRun('Greymon',11,11),normalBattle());mutation(result.event);
   assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
 });
 test('hook leaves run/storage untouched until choices resolve; failed save and stale choice are atomic',()=>{
@@ -1921,5 +1938,427 @@ test('optional review is exposed in battle UI and defaults all candidates select
   assert.equal(choices.props.selections[0].keptKeys.length,3);assert.equal(hook().activeRun.history.length,0);
   choices.props.onChange(choices.props.selections.map(s=>({...s,keptKeys:[]})));
   elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls').props.onConfirm();
-  assert.deepEqual(hook().activeRun.roster[0].techs,[]);
+  assert.deepEqual(hook().activeRun.roster[0].techs,run.roster[0].techs);assert.equal(hook().activeRun.history.length,0);
+});
+
+// Phase 2G-D: live identity lifecycle, DNA transactions, capacity and UI.
+const dnaRecording=load('src/utils/runDnaRecording.ts');
+const dnaComposition=load('src/utils/dnaProposal.ts');
+const lifecycle=load('src/utils/runInstanceLifecycle.ts');
+const liveUndo=load('src/utils/runActionUndo.ts');
+const liveRun=(a='Greymon',b='Greymon',level=49)=>{
+  const run=evolutionRun(a,level);
+  run.roster[0].instanceId='a';run.starterInstanceId='a';run.digiline=['a'];
+  run.roster.push(foundationMember(b,level,{instanceId:'b'}));return run;
+};
+const liveDna=(run,a='a',b='b',kept,prefix='child')=>{
+  const ids=[prefix,prefix+'-event'];return dnaRecording.recordDnaAction(run,a,b,kept,()=>ids.shift());
+};
+test('schema v6 initializes canonical starter provenance and rejects v5',()=>{
+  const run=createRunPlan('blue-falcon','Starter');assert.equal(run.starterDefinitionId,'blue-falcon');
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
+  assert.equal(storage.saveRunPlannerData({...envelope(run),schemaVersion:5}),false);
+  assert.equal(storage.saveRunPlannerData(envelope({...run,starterDefinitionId:'invented'})),false);
+});
+test('ordinary live DNA consumes both parents and constructs every child field from pure engines',()=>{
+  const run=freeze(liveRun()),before=JSON.stringify(run),proposal=dnaComposition.proposeDnaChild(run.roster[0],run.roster[1]);
+  assert.equal(proposal.status,'ready');assert.equal('instanceId' in proposal.child,false);
+  const result=liveDna(run);assert.equal(JSON.stringify(run),before);
+  assert.deepEqual(result.child,{instanceId:'child',...proposal.child});
+  assert.deepEqual(result.run.roster,[result.child]);assert.deepEqual(result.run.digiline,['child']);
+  assert.equal(result.run.totalBits,run.totalBits);assert.equal(result.run.history.length,1);
+  assert.equal(result.run.history.filter(e=>e.type==='battle').length,0);
+  assert.deepEqual(result.child.source,{type:'dna',parentInstanceIds:['a','b']});
+  assert.ok(result.child.techs.length<=12);assert.deepEqual(validateRunPlan(result.run),[]);
+  assert.equal(storage.saveRunPlannerData(envelope(result.run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(result.run));
+  assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);
+});
+for(const [active,expected] of [[['a','x','y'],['child','x','y']],[['x','a','b'],['x','child']],[['a','x','b'],['child','x']],[['x','y'],['x','y']]]){
+  test(`live DNA preserves roster and Digiline order for ${active.join('/')}`,()=>{
+    const run=liveRun(),x=foundationMember('Patamon',1,{instanceId:'x'}),y=foundationMember('Patamon',1,{instanceId:'y'});
+    run.roster=[run.roster[0],x,run.roster[1],y];run.digiline=active;
+    const forward=liveDna(freeze(run)),reverse=liveDna(run,'b','a');
+    assert.deepEqual(forward.run.roster.map(p=>p.instanceId),['child','x','y']);assert.deepEqual(forward.run.digiline,expected);
+    assert.deepEqual(forward.child,reverse.child);assert.deepEqual(forward.event,reverse.event);
+    assert.deepEqual(forward.run.roster,reverse.run.roster);assert.deepEqual(reverse.run.digiline,expected);
+  });
+}
+for(const collision of ['a','b','known-event','child'])test(`fresh DNA identity rejects collision ${collision}`,()=>{
+  const run=liveRun();run.roster.push(foundationMember('Greymon',49,{instanceId:'known-event'}));
+  const ids=collision==='child'?['child','child']:[collision];
+  assert.throws(()=>dnaRecording.recordDnaAction(freeze(run),'a','b',undefined,()=>ids.shift()),/fresh DNA ID/);
+});
+for(const [a,b,pattern] of [['a','a',/same-instance/],['a','missing',/current roster/]])test(`DNA rejects parent selection ${a}/${b}`,()=>assert.throws(()=>liveDna(liveRun(),a,b),pattern));
+test('Rookie is rejected while non-max Champion parents are accepted',()=>{
+  assert.throws(()=>liveDna(liveRun('Agumon','Greymon',11)),/rookie-parent/);
+  const run=liveRun('Greymon','Greymon',11);assert.ok(run.roster.every(p=>p.level<p.levelCap.resolved));
+  assert.equal(liveDna(run).child.level,1);
+});
+for(const [a,b,name,level] of [['Cherrymon','MasterTyrannomon','Vademon',21],['Gryphonmon','H-Kabuterimon','Yanmamon',11],['Baihumon','H-Kabuterimon','SandYanmamon',11]]){
+  test(`live ${name} mutation preserves actual mechanics, technique timing, history and Undo`,()=>{
+    const run=liveRun(a,b);run.roster[0].stats={...dnaStatsA};run.roster[1].stats={...dnaStatsB};run.roster[0].dp=4;run.roster[1].dp=7;
+    for(const parent of run.roster)Object.assign(parent,availableState(['Pepper Breath','Party Time','Ninja Flower','Venom Infusion']));
+    const preview=dnaPreview(...run.roster),result=liveDna(freeze(run));
+    assert.equal(result.child.name,name);assert.equal(result.child.level,level);assert.equal(result.child.dp,8);
+    assert.deepEqual(result.child.stats,preview.childStats);assert.equal(result.child.totalXp,preview.childTotalXp);
+    assert.equal(result.event.isMutation,true);assert.equal(result.event.actualResultRank,preview.actualResultRank);
+    assert.equal(result.event.matrixSelectionRank,preview.matrixSelectionRank);
+    const own=progressionData.getSpeciesProgression(result.child.speciesId).ownTechnique;
+    assert.deepEqual(potential(result.child,own).unlock,{status:'available'});
+    const html=require('react-dom/server').renderToStaticMarkup(require('react').createElement(load('src/components/run-planner/RunHistory.tsx').RunHistory,{run:result.run,onUndo:()=>false,error:null}));
+    assert.ok(html.includes('Mutation'));assert.ok(html.includes(name));assert.ok(html.includes('Matrix:'));
+    assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);
+  });
+}
+test('live DNA excludes unavailable parent potentials and always knows its own technique',()=>{
+  const run=liveRun('MetalGreymon','MetalGreymon');
+  for(const parent of run.roster){Object.assign(parent,availableState(['Party Time','Ninja Flower','Venom Infusion','Fire Blast II']));
+    Object.assign(parent,withoutPossession(parent,'Party Time',{status:'missed',level:12}));
+    Object.assign(parent,withoutPossession(parent,'Ninja Flower',{status:'discarded'}));
+    Object.assign(parent,withoutPossession(parent,'Venom Infusion',{status:'pending',level:32}));}
+  const result=liveDna(run);assert.deepEqual(result.child.techs,[progressionData.getSpeciesProgression(result.child.speciesId).ownTechnique]);
+  for(const label of ['Party Time','Ninja Flower','Venom Infusion'])assert.equal(potential(result.child,label),undefined);
+  assert.equal(result.child.techniquePool.length,2);assert.deepEqual(validateRunPlan(result.run),[]);
+});
+test('24 parent techniques are pending at DNA birth and cannot be selected prematurely',()=>{
+  const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(rookieNames.slice(0,12)));Object.assign(run.roster[1],availableState(rookieNames.slice(12,24)));
+  const proposal=dnaComposition.proposeDnaChild(...run.roster);assert.equal(proposal.status,'ready');assert.equal(proposal.choice.candidates.length,1);assert.equal(proposal.choice.selectionRequired,false);
+  for(const selected of [[],rookieNames.slice(0,13).map(techniqueMetadata.normalizeTechniqueName),['unknown']])assert.throws(()=>liveDna(run,'a','b',selected),/unique candidate/);
+  const result=liveDna(run);assert.equal(result.child.techs.length,1);assert.equal(result.child.techniquePool.filter(p=>p.unlock.status==='pending').length,24);assert.deepEqual(validateRunPlan(result.run),[]);
+});
+test('later DNA learning discard is audited and cannot propagate through another DNA',()=>{
+  const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(['Pepper Breath','Spiral Twister']));
+  let next=liveDna(run).run,review;
+  for(let i=0;i<100;i++){try{next=recording.recordRunBattle(next,normalBattle()).run;}catch(e){if(e instanceof capacity.BattleTechniqueSelectionRequired){review=e.choices;break;}throw e;}}
+  assert.ok(review);const selections=keepSelection(review,c=>c.choice.candidates.filter(p=>p.name!=='Spiral Twister').map(p=>p.key));
+  const result=recording.recordRunBattle(next,{...normalBattle(),techniqueSelections:selections});
+  assert.equal(potential(result.run.roster[0],'Spiral Twister').unlock.status,'discarded');assert.deepEqual(result.event.techniqueChoices[0].discarded,['Spiral Twister']);
+  const descendant=dnaComposition.proposeDnaChild(result.run.roster[0],foundationMember('Greymon',49,{instanceId:'other'}));assert.equal(potential(descendant.child,'Spiral Twister'),undefined);
+});
+test('live deferred DNA overflow uses existing atomic battle choices at EL2',()=>{
+  const run=liveRun('AeroVeedramon','Airdramon'),names=rookieNames.filter(n=>n!=='Spiral Twister');
+  Object.assign(run.roster[0],availableState(names.slice(0,12)));Object.assign(run.roster[1],availableState(names.slice(12,24)));
+  const dna=liveDna(run);assert.equal(dna.child.techs.length,1);
+  // Preserve a real chronological chain while accumulating XP to EL2.
+  let next=dna.run,review;
+  for(let i=0;i<20;i++){try{next=recording.recordRunBattle(next,normalBattle()).run;}catch(e){if(e instanceof capacity.BattleTechniqueSelectionRequired){review=e.choices;break;}throw e;}}
+  assert.ok(review);assert.equal(review[0].choice.candidates.length,25);assert.equal(next.roster[0].level,1);
+  const battle=recording.recordRunBattle(next,{...normalBattle(),techniqueSelections:keepSelection(review,c=>c.choice.candidates.slice(-12).map(p=>p.key))});
+  assert.equal(battle.run.roster[0].level,2);assert.equal(battle.run.roster[0].techs.length,12);
+  assert.deepEqual(liveUndo.undoLastAction(battle.run).run.roster,next.roster);
+});
+test('starter consumption retains original definition in header and restores exactly with Undo',()=>{
+  const run=liveRun(),result=liveDna(run);
+  assert.equal(result.run.starterInstanceId,'a');assert.equal(result.run.starterDefinitionId,'gold-hawk');
+  assert.equal(result.run.roster.some(p=>p.instanceId==='a'||p.instanceId==='b'),false);
+  const html=renderPlanner(result.run);assert.ok(html.includes('Gold Hawk'));assert.ok(html.includes('Agumon'));assert.ok(!html.includes('No starter recorded'));
+  assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);
+});
+test('Battle/DNA and DNA/Battle repeated Undo preserve exact chronological states',()=>{
+  const run=liveRun();const battle=recording.recordRunBattle(run,normalBattle()).run;const dna=liveDna(battle);
+  assert.deepEqual(liveUndo.undoLastAction(dna.run).run.roster,battle.roster);
+  const second=recording.recordRunBattle(dna.run,normalBattle()).run;
+  const undone=liveUndo.undoLastAction(second).run;assert.deepEqual(undone.roster,dna.run.roster);
+  assert.deepEqual(liveUndo.undoLastAction(undone).run.roster,battle.roster);
+});
+test('multiple DNA generations preserve historical names, consumed identities, and repeated Undo',()=>{
+  const run=liveRun('WarGreymon','WarGreymon');run.roster.push(foundationMember('WarGreymon',49,{instanceId:'c'}));
+  const first=liveDna(run),event=structuredClone(first.event);const second=liveDna(first.run,'child','c',undefined,'grandchild');
+  assert.deepEqual(second.run.history[0],event);assert.deepEqual(validateRunPlan(second.run),[]);
+  assert.deepEqual(second.run.roster.map(p=>p.instanceId),['grandchild']);
+  assert.deepEqual(liveUndo.undoLastAction(second.run).run.roster,first.run.roster);
+  assert.deepEqual(liveUndo.undoLastAction(liveUndo.undoLastAction(second.run).run).run.roster,run.roster);
+  assert.ok(lifecycle.getHistoricalInstanceIds(second.run).has('a'));
+  assert.throws(()=>dnaRecording.recordDnaAction(first.run,'child','c',undefined,()=> 'a'),/fresh DNA ID/);
+});
+for(const [field,value] of [['childDp',99],['childMaxLevel',99],['childStartingLevel',12],['childName','Fake'],['actualResultRank','Mega'],['actualResultType','Data'],['matrixSelectionRank','Ultimate'],['isMutation',true],['parentAName','Fake'],['parentASpeciesId','patamon'],['childInstanceId','a']]){
+  test(`persisted DNA event rejects tampered ${field}`,()=>{const result=liveDna(liveRun());result.event[field]=value;assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);});
+}
+for(const parents of [['a','a'],['b','a'],['a'],['','b']])test('DNA source rejects invalid parents '+JSON.stringify(parents),()=>{
+  const result=liveDna(liveRun());result.child.source.parentInstanceIds=parents;
+  assert.equal(load('src/utils/runActionCheckpoint.ts').isRosterDigimon(result.child),false);
+  assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+});
+test('lifecycle rejects consumed IDs reappearing, provenance swaps, and missing historical starter',()=>{
+  const run=liveRun(),result=liveDna(run);
+  for(const change of [r=>r.roster.push(run.roster[0]),r=>r.digiline=['a'],r=>r.roster.push(structuredClone(r.roster[0])),r=>r.roster[0].source={type:'dna',parentInstanceIds:['a','z']},r=>r.starterInstanceId='unknown']){
+    const bad=structuredClone(result.run);change(bad);assert.equal(storage.saveRunPlannerData(envelope(bad)),false);
+  }
+});
+for(const field of ['level','totalXp','dp','stats','techs','techniquePool','speciesId','levelCap'])for(const parentIndex of [0,1])test(`hook rejects stale ${field} on parent ${parentIndex}`,()=>{
+  const run=liveRun();storage.saveRunPlannerData(envelope(run));const render=plannerHost(),planner=render();const reviewed=structuredClone(run.roster);
+  if(field==='stats')reviewed[parentIndex].stats.hp++;
+  else if(field==='techs')reviewed[parentIndex].techs=[];
+  else if(field==='techniquePool')reviewed[parentIndex].techniquePool=[];
+  else if(field==='speciesId')reviewed[parentIndex].speciesId='patamon';
+  else if(field==='levelCap')reviewed[parentIndex].levelCap.resolved--;
+  else reviewed[parentIndex][field]++;
+  assert.equal(planner.dna(run.id,...reviewed),false);assert.deepEqual(render().activeRun,run);
+});
+test('DNA hook persists before publishing, rejects repeated confirmation, and permits unrelated Digiline changes',()=>{
+  const run=liveRun();storage.saveRunPlannerData(envelope(run));const render=plannerHost(),planner=render();const parents=structuredClone(run.roster);
+  const save=global.localStorage.setItem;global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.dna(run.id,...parents),false);assert.deepEqual(render().activeRun,run);
+  global.localStorage.setItem=save;planner.addMember('b');assert.equal(planner.dna(run.id,...parents),true);
+  assert.equal(render().activeRun.roster.length,1);assert.equal(render().activeRun.digiline.length,1);
+  assert.equal(planner.dna(run.id,...parents),false);assert.equal(render().activeRun.history.length,1);
+});
+test('DNA UI previews without allocating identities, requires confirmation, then clears state',()=>{
+  const run=liveRun();storage.saveRunPlannerData(envelope(run));const hook=plannerHost(),planner=hook();
+  const render=componentHost('src/components/run-planner/DnaControls.tsx','DnaControls');const props={run,onDna:planner.dna,error:null};
+  let tree=render(props);elements(tree).find(e=>e.props['aria-label']==='DNA Parent A').props.onChange({target:{value:'a'}});
+  tree=render(props);elements(tree).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:'b'}});
+  tree=render(props);assert.ok(elementText(tree).includes('Result:'));assert.equal(hook().activeRun.history.length,0);
+  assert.ok(elements(tree).filter(e=>e.type==='option').some(e=>elementText(e).includes('Reserve')));
+  elements(tree).find(e=>e.props.children==='DNA Digivolve').props.onClick();tree=render(props);assert.ok(elementText(tree).includes('Both parent Digimon will be consumed'));
+  elements(tree).find(e=>e.props.children==='Confirm DNA').props.onClick({preventDefault:()=>assert.fail('unexpected failure')});
+  assert.equal(hook().activeRun.history.length,1);tree=render({...props,run:hook().activeRun});
+  assert.equal(elements(tree).find(e=>e.props['aria-label']==='DNA Parent A').props.value,'');assert.ok(!elementText(tree).includes('Result:'));
+});
+test('DNA UI hides pointless birth review and resets preview on parent change',()=>{
+  const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(rookieNames.slice(0,12)));Object.assign(run.roster[1],availableState(rookieNames.slice(12,24)));
+  const render=componentHost('src/components/run-planner/DnaControls.tsx','DnaControls');const props={run,onDna:()=>false,error:null};
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent A').props.onChange({target:{value:'a'}});
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:'b'}});
+  const tree=render(props);assert.equal(elements(tree).find(e=>e.props.children==='DNA Digivolve').props.disabled,false);
+  assert.ok(!elementText(tree).includes('Review techniques before DNA'));assert.ok(!elements(tree).some(e=>e.type?.name==='TechniqueChoiceControls'));
+  assert.ok(elementText(tree).includes('Pepper Breath — EL12'));
+  elements(tree).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:'a'}});assert.ok(elementText(render(props)).includes('same-instance'));
+});
+test('capture/evolution/DNA lifecycle preserves consumed history through two generations and rejects capture ID reuse',()=>{
+  const {encounters}=load('src/data/encounters.ts'),{DOMAIN_GROUPS}=load('src/data/domainGroups.ts');
+  const capData=load('src/utils/levelCap.ts'),rewardData=load('src/utils/rewardMatching.ts');
+  const requests=DOMAIN_GROUPS.filter(g=>!g.isBoss).map(g=>({domainId:g.domainId,phase:g.phase,floor:g.floors[0],encounterId:g.encounterId}));
+  const captures=encounters.flatMap(e=>e.digimons.map(d=>({d,request:requests.find(r=>r.encounterId===e.id),cap:capData.getInitialLevelCap(d.level),rank:progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(d.name)?.id)?.rank})))
+    .filter(x=>x.request&&x.cap);
+  const rookie=captures.filter(x=>x.rank==='Rookie'&&x.cap.max>=11).sort((a,b)=>b.d.level-a.d.level)[0];assert.ok(rookie);
+  const champion=captures.find(x=>x.rank==='Champion');assert.ok(champion);
+  const bigBattle=requests.filter(r=>recording.getRecordingEncounter(r)?.preview?.reward).sort((a,b)=>rewardData.getResolvedReward(b.encounterId).xp-rewardData.getResolvedReward(a.encounterId).xp)[0];
+  const original=liveRun('WarGreymon','WarGreymon');original.roster.pop();
+  let run=recording.recordRunBattle(original,{...rookie.request,capturedEnemySlot:rookie.d.slot,capturedMaxLevel:rookie.cap.max}).run;
+  const capturedId=run.history[0].capturedInstanceId;run=addToDigiline(run,capturedId);
+  while(run.roster.find(p=>p.instanceId===capturedId).level<11)run=recordKeepingAll(run,bigBattle).run;
+  run=recordRunDigivolution(run,capturedId).run;
+  const first=liveDna(run,'a',capturedId,undefined,'generation-2');run=first.run;
+  const originalDna=structuredClone(first.event);
+  while(run.roster.find(p=>p.instanceId==='generation-2').level<11)run=recordKeepingAll(run,bigBattle).run;
+  if(progressionData.getSpeciesProgression(run.roster[0].speciesId).rank==='Rookie')run=recordRunDigivolution(run,'generation-2').run;
+  assert.deepEqual(run.history.find(e=>e.id===originalDna.id),originalDna);
+  run=recordKeepingAll(run,{...champion.request,capturedEnemySlot:champion.d.slot,capturedMaxLevel:champion.cap.max}).run;
+  const d=run.history.at(-1).capturedInstanceId;
+  const second=liveDna(run,'generation-2',d,undefined,'generation-3');
+  assert.deepEqual(second.run.roster.map(p=>p.instanceId),['generation-3']);assert.deepEqual(validateRunPlan(second.run),[]);
+  assert.equal(storage.saveRunPlannerData(envelope(second.run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(second.run));
+  const bad=structuredClone(second.run);const captureEvent=bad.history.find(e=>e.type==='battle'&&e.capturedInstanceId===d);captureEvent.capturedInstanceId='a';
+  assert.equal(storage.saveRunPlannerData(envelope(bad)),false);
+  let undone=second.run;while(undone.history.length){const result=liveUndo.undoLastAction(undone);assert.equal(result.ok,true,result.reason);undone=result.run;}
+  assert.deepEqual(undone.roster,original.roster);assert.deepEqual(undone.digiline,original.digiline);assert.equal(undone.totalBits,original.totalBits);
+});
+
+// Phase 2G-D amendment: birth own technique and mandatory learning-event decisions.
+const rankNames=rank=>[...new Set(progressionData.SPECIES_PROGRESSION.filter(s=>s.rank===rank&&s.ownTechnique).map(s=>techniqueMetadata.getTechniqueIdentity(s.ownTechnique).name))];
+const ownName=member=>techniqueMetadata.getTechniqueIdentity(progressionData.getSpeciesProgression(member.speciesId).ownTechnique).name;
+const shimaRun=()=>{
+  const run=liveRun('MetalTyrannomon','Mammothmon',24);
+  run.roster[1]={...foundationMember('Mammothmon',25,{instanceId:'b',techs:['Tusk Crusher']}),dp:0};
+  Object.assign(run.roster[0],availableState(['Fire Blast II']),{dp:0});return run;
+};
+test('ShimaUnimon birth knows Anti-Freeze; EL12 neither offers nor relearns it',()=>{
+  const parents=shimaRun(),result=liveDna(parents),child=result.child;
+  assert.equal(child.name,'ShimaUnimon');assert.equal(child.level,11);assert.equal(child.dp,1);
+  assert.deepEqual(child.techs,['Anti-Freeze']);assert.deepEqual(potential(child,'Anti-Freeze').unlock,{status:'available'});
+  for(const name of ['Fire Blast II','Tusk Crusher'])assert.deepEqual(potential(child,name).unlock,{status:'pending',level:22});
+  assert.ok(renderPlanner(result.run).includes('Anti-Freeze'));
+  let run=result.run;
+  while(run.roster[0].level===11){const recorded=recording.recordRunBattle(run,normalBattle());assert.deepEqual(recorded.event.techniqueChoices,[]);assert.deepEqual(recorded.resolution.outcomes[0].learnedTechniques,[]);run=recorded.run;}
+  assert.equal(run.roster[0].level,12);assert.deepEqual(run.roster[0].techs,['Anti-Freeze']);
+  for(const name of ['Fire Blast II','Tusk Crusher'])assert.deepEqual(potential(run.roster[0],name).unlock,{status:'pending',level:22});
+  assert.equal(run.roster[0].techniquePool.filter(p=>p.name==='Anti-Freeze').length,1);
+  assert.deepEqual(validateRunPlan(run),[]);
+});
+for(const [name,level] of [['Agumon',1],['ShimaUnimon',11],['Vademon',21],['Yanmamon',11],['SandYanmamon',11]])test(`${name} own-plus-two-inherited identity merges and is immediately available`,()=>{
+  const species=speciesLookup.getDigimonByName(name),own=progressionData.getSpeciesProgression(species.id).ownTechnique;
+  const state=childTech(name,level,techParent('a',[own]),techParent('b',[own]));
+  assert.deepEqual(state.techs,[techniqueMetadata.getTechniqueIdentity(own).name]);assert.equal(state.techniquePool.length,1);
+  assert.equal(state.techniquePool[0].unlock.status,'available');assert.equal(state.techniquePool[0].sources.length,3);
+  assert.deepEqual(inheritance.advanceTechniqueState(state,level,level+1).learnedTechniques,[]);
+});
+for(const [rank,threshold] of Object.entries(techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS))test(`${rank} EL${threshold} requires a below-cap learning choice with complete current union`,()=>{
+  const name=rankNames(rank).find(n=>n!=='Pepper Breath');
+  const state=childTech('Agumon',1,techParent('a',[name,'Venom Infusion']),techParent('b',[]));
+  const member={...foundationMember('Agumon',threshold-1),...state};
+  const run=evolutionRun('Agumon',threshold-1);run.roster[0]={...member,instanceId:run.starterInstanceId};
+  const review=preflight(run);assert.equal(review.length,1);assert.equal(review[0].choice.selectionRequired,true);
+  assert.ok(review[0].choice.candidates.some(p=>p.name==='Pepper Breath'));assert.ok(review[0].choice.candidates.some(p=>p.name===name));
+  assert.ok(review[0].choice.candidates.every(p=>p.name==='Pepper Breath'||techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[p.rank]===threshold));
+  const selected=[techniqueMetadata.normalizeTechniqueName(name)];
+  const result=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:[{instanceId:run.starterInstanceId,keptKeys:selected}]});
+  assert.deepEqual(result.run.roster[0].techs,[name]);assert.equal(potential(result.run.roster[0],'Pepper Breath').unlock.status,'discarded');
+  assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);
+});
+test('authoritative 12 Champion plus 3 Champion/5 Rookie parent example resolves EL2 then normal EL12 union',()=>{
+  const champions=rankNames('Champion').filter(n=>n!=='Mega Flame').slice(0,15);
+  const rookies=rookieNames.filter(n=>n!=='Pepper Breath').slice(0,5);
+  const parents=liveRun('Greymon','Greymon');Object.assign(parents.roster[0],availableState(champions.slice(0,12)));Object.assign(parents.roster[1],availableState([...champions.slice(12),...rookies]));
+  const born=liveDna(parents);assert.equal(born.child.level,1);const own=ownName(born.child);
+  assert.deepEqual(born.child.techs,[own]);assert.equal(born.child.techniquePool.filter(p=>p.unlock.status==='pending').length,20);
+  const ready=evolutionRun(born.child.name,1);Object.assign(ready.roster[0],{techs:born.child.techs,techniquePool:born.child.techniquePool});
+  const review=preflight(ready);assert.deepEqual(new Set(review[0].choice.candidates.map(p=>p.name)),new Set([own,...rookies]));
+  assert.equal(review[0].choice.newlyUnlockedKeys.length,5);
+  const selected=rookies.slice(0,2).map(techniqueMetadata.normalizeTechniqueName);
+  const learned=recording.recordRunBattle(ready,{...normalBattle(),techniqueSelections:[{instanceId:ready.starterInstanceId,keptKeys:selected}]}).run.roster[0];
+  assert.equal(potential(learned,own).unlock.status,'discarded');assert.deepEqual(new Set(learned.techs),new Set(rookies.slice(0,2)));
+  const level11=evolutionRun(born.child.name,11);Object.assign(level11.roster[0],{techs:learned.techs,techniquePool:learned.techniquePool});
+  const evolved=recordRunDigivolution(level11,level11.starterInstanceId).run;assert.deepEqual(evolved.roster[0].techs,learned.techs);
+  const currentOwn=ownName(evolved.roster[0]),review12=preflight(evolved);
+  assert.deepEqual(new Set(review12[0].choice.candidates.map(p=>p.name)),new Set([...learned.techs,currentOwn,...champions]));
+  assert.equal(review12[0].choice.newlyUnlockedKeys.length,16);
+  const kept=[techniqueMetadata.normalizeTechniqueName(currentOwn)];
+  const final=recording.recordRunBattle(evolved,{...normalBattle(),techniqueSelections:[{instanceId:evolved.starterInstanceId,keptKeys:kept}]}).run.roster[0];
+  assert.deepEqual(final.techs,[currentOwn]);assert.ok(final.techniquePool.filter(p=>p.key!==kept[0]&&review12[0].choice.candidates.some(q=>q.key===p.key)).every(p=>p.unlock.status==='discarded'));
+  const descendant=childTech('Biyomon',1,final,techParent('other',[]));
+  assert.ok(potential(descendant,currentOwn));for(const rejected of [...champions,...rookies,own])if(rejected!==currentOwn&&rejected!=='Spiral Twister')assert.equal(potential(descendant,rejected),undefined);
+});
+test('DNA birth choice cannot remove mandatory own technique, including bypassed UI and persisted audit',()=>{
+  const run=shimaRun(),proposal=dnaComposition.proposeDnaChild(...run.roster);
+  assert.throws(()=>liveDna(run,'a','b',[]),/within capacity/);
+  const overflow=liveRun('MetalGreymon','MetalGreymon');Object.assign(overflow.roster[0],availableState(rookieNames.slice(0,12)));Object.assign(overflow.roster[1],availableState(rookieNames.slice(12,24)));
+  const p=dnaComposition.proposeDnaChild(...overflow.roster),withoutOwn=p.choice.candidates.filter(c=>!p.choice.mandatoryKeys.includes(c.key)).slice(0,12).map(c=>c.key);
+  assert.throws(()=>liveDna(overflow,'a','b',withoutOwn),/within capacity|mandatory at birth/);
+  const result=liveDna(run);result.event.techniqueChoice.kept=[];assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+  const Controls=load('src/components/run-planner/TechniqueChoiceControls.tsx').TechniqueChoiceControls;
+  const tree=Controls({context:'dna',choices:[{instanceId:'proposal',name:'ShimaUnimon',newLevel:11,currentlyPossessed:[],choice:proposal.choice}],selections:[{instanceId:'proposal',keptKeys:proposal.choice.mandatoryKeys}],onChange:()=>{},onConfirm:()=>{},onCancel:()=>{}});
+  assert.equal(elements(tree).find(e=>e.type==='input').props.disabled,true);
+});
+test('schema v6 rejects zero possessed techniques in both current roster and checkpoints',()=>{
+  const run=createRunPlan('gold-hawk','Minimum');Object.assign(run.roster[0],availableState([]));
+  assert.ok(validateRunPlan(run).length);assert.equal(storage.saveRunPlannerData(envelope(run)),false);
+  assert.equal(load('src/utils/runActionCheckpoint.ts').isValidRunActionCheckpoint({roster:run.roster,digiline:run.digiline,totalBits:run.totalBits}),false);
+});
+test('two below-cap learning decisions remain atomic through failed save and Undo',()=>{
+  const run=capacityRun('Greymon',11,1);run.roster.push({...capacityRun('MetalGreymon',21,1).roster[0],instanceId:'second'});run.digiline.push('second');
+  storage.saveRunPlannerData(envelope(run));const host=plannerHost(),planner=host();const review=planner.recordBattle(normalBattle());
+  assert.equal(review.status,'selection-required');assert.equal(review.choices.length,2);assert.ok(review.choices.every(c=>c.choice.candidates.length===2));
+  const selections=keepSelection(review.choices,c=>c.choice.newlyUnlockedKeys);
+  assert.equal(planner.recordBattle({...normalBattle(),expectedRunState:review.expectedRunState,techniqueSelections:selections.slice(0,1)}).status,'selection-required');assert.deepEqual(host().activeRun,run);
+  const write=global.localStorage.setItem;global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.recordBattle({...normalBattle(),expectedRunState:review.expectedRunState,techniqueSelections:selections}),null);assert.deepEqual(host().activeRun,run);
+  global.localStorage.setItem=write;assert.ok(planner.recordBattle({...normalBattle(),expectedRunState:review.expectedRunState,techniqueSelections:selections}));
+  const final=host().activeRun;assert.equal(final.history.length,1);assert.deepEqual(liveUndo.undoLastAction(final).run.roster,run.roster);
+});
+test('missing authoritative DNA own technique is explicit and never fabricated',()=>{
+  const run=shimaRun(),species=progressionData.getSpeciesProgression('shimaunimon'),saved=species.ownTechnique;
+  try{species.ownTechnique=null;assert.throws(()=>liveDna(run),/no authoritative own technique/);}finally{species.ownTechnique=saved;}
+});
+
+test('Record Battle opens an under-cap Rookie EL2 selector and permits one retained technique but not zero',()=>{
+  const state=childTech('Agumon',1,techParent('a',['Spiral Twister','Electric Shock']),techParent('b',[]));
+  const run=evolutionRun('Agumon',1);Object.assign(run.roster[0],state);storage.saveRunPlannerData(envelope(run));
+  const host=plannerHost(),planner=host(),render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');
+  const props={selection:normalBattle(),hasParticipants:true,onRecord:planner.recordBattle};
+  elements(render(props)).find(e=>e.props.children==='Record Battle').props.onClick();
+  let child=elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls');assert.ok(child);assert.equal(host().activeRun.history.length,0);
+  assert.deepEqual(new Set(child.props.choices[0].choice.candidates.map(p=>p.name)),new Set(['Pepper Breath','Spiral Twister','Electric Shock']));
+  child.props.onChange([{instanceId:run.starterInstanceId,keptKeys:[]}]);child=elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls');
+  assert.equal(elements(child.type(child.props)).find(e=>e.props.children==='Confirm choices and record battle').props.disabled,true);
+  child.props.onChange([{instanceId:run.starterInstanceId,keptKeys:[techniqueMetadata.normalizeTechniqueName('Spiral Twister')]}]);
+  child=elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls');assert.equal(elements(child.type(child.props)).find(e=>e.props.children==='Confirm choices and record battle').props.disabled,false);child.props.onConfirm();
+  assert.deepEqual(host().activeRun.roster[0].techs,['Spiral Twister']);assert.equal(host().activeRun.history.length,1);
+  assert.deepEqual(host().activeRun.history[0].techniqueChoices[0].learned,['Spiral Twister']);
+});
+test('ShimaUnimon DNA controls preview immediate Anti-Freeze and confirm a roster knowing it',()=>{
+  const run=shimaRun();storage.saveRunPlannerData(envelope(run));const host=plannerHost(),planner=host();
+  const render=componentHost('src/components/run-planner/DnaControls.tsx','DnaControls'),props={run,onDna:planner.dna,error:null};
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent A').props.onChange({target:{value:'a'}});
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:'b'}});
+  const text=elementText(render(props));assert.match(text,/Available techniques selected: Anti-Freeze/);assert.match(text,/Fire Blast II — EL22/);assert.ok(!text.includes('Anti-Freeze — EL12'));
+  elements(render(props)).find(e=>e.props.children==='DNA Digivolve').props.onClick();
+  elements(render(props)).find(e=>e.props.children==='Confirm DNA').props.onClick({preventDefault:()=>assert.fail('DNA should succeed')});
+  assert.deepEqual(host().activeRun.roster[0].techs,['Anti-Freeze']);assert.match(renderPlanner(host().activeRun),/Known techniques:.*Anti-Freeze/);
+});
+
+for(const reversed of [false,true])test(`DNA parent details and confirmation follow selector order (${reversed?'Nanimon first':'D-Tyrannomon first'})`,()=>{
+  const run=liveRun('D-Tyrannomon','Nanimon',24);
+  // Deliberately oppose canonical ID order to the initial selector order.
+  run.roster[0].instanceId='z-parent';run.roster[1].instanceId='a-parent';run.starterInstanceId='z-parent';run.digiline=['z-parent'];
+  const [a,b]=reversed?[run.roster[1],run.roster[0]]:run.roster;
+  const render=componentHost('src/components/run-planner/DnaControls.tsx','DnaControls');const props={run,onDna:()=>false,error:null};
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent A').props.onChange({target:{value:a.instanceId}});
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:b.instanceId}});
+  const tree=render(props),paragraphs=elements(tree).filter(e=>e.type==='p').map(elementText);
+  assert.ok(paragraphs.includes(`Parent A · ${a.name}`));assert.ok(paragraphs.includes(`Parent B · ${b.name}`));
+  assert.ok(paragraphs.indexOf(`Parent A · ${a.name}`)<paragraphs.indexOf(`Parent B · ${b.name}`));
+  assert.ok(elementText(tree).includes('Result: Tsukaimon'));
+  for(const [index,p] of [a,b].entries()){
+    const detail=elements(tree).find(e=>e.type==='div'&&Array.isArray(e.props.children)&&elementText(e.props.children[0])===`Parent ${index===0?'A':'B'} · ${p.name}`);
+    const metadata=dnaPreview(a,b).parents.find(m=>m.instanceId===p.instanceId);
+    assert.ok(elementText(detail).includes(`${metadata.rank} · ${metadata.type} · ${metadata.family}`));
+  }
+  elements(tree).find(e=>e.props.children==='DNA Digivolve').props.onClick();
+  assert.ok(elementText(render(props)).includes(`DNA Digivolve ${a.name} + ${b.name} into Tsukaimon?`));
+});
+test('D-Tyrannomon/Nanimon selector reversal preserves complete mechanics, child technique state and canonical audits',()=>{
+  const run=liveRun('D-Tyrannomon','Nanimon',24);
+  run.roster[0].instanceId='z-parent';run.roster[1].instanceId='a-parent';run.starterInstanceId='z-parent';run.digiline=['z-parent'];
+  const [a,b]=run.roster,forward=dnaComposition.proposeDnaChild(a,b),reverse=dnaComposition.proposeDnaChild(b,a);
+  assert.equal(forward.status,'ready');assert.equal(forward.mechanical.actualResultName,'Tsukaimon');
+  assert.deepEqual(forward.mechanical,reverse.mechanical);assert.deepEqual(forward.child,reverse.child);
+  const recorded=liveDna(run,a.instanceId,b.instanceId),reversed=liveDna(run,b.instanceId,a.instanceId);
+  assert.deepEqual(recorded.child,reversed.child);assert.deepEqual(recorded.event,reversed.event);
+  assert.deepEqual(recorded.child.source.parentInstanceIds,['a-parent','z-parent']);
+  assert.equal(recorded.event.parentAName,'Nanimon');assert.equal(recorded.event.parentBName,'D-Tyrannomon');
+  assert.deepEqual(validateRunPlan(recorded.run),[]);assert.deepEqual(validateRunPlan(reversed.run),[]);
+});
+
+// Planner abstraction: inherited techniques are grouped, never available at DNA birth.
+for(const [a,b,name,level] of [['MetalGreymon','MetalGreymon',null,11],['WarGreymon','WarGreymon',null,21],['Cherrymon','MasterTyrannomon','Vademon',21],['Gryphonmon','H-Kabuterimon','Yanmamon',11],['Baihumon','H-Kabuterimon','SandYanmamon',11]])test(`${a} + ${b} groups lower-rank inheritance at the actual birth level plus one`,()=>{
+  const run=liveRun(a,b),names=['Pepper Breath','Spiral Twister','Party Time','Mega Heal','Ninja Flower','Fire Blast II','Venom Infusion'];
+  Object.assign(run.roster[0],availableState(names));Object.assign(run.roster[1],availableState(['Tusk Crusher']));
+  const result=liveDna(run),own=ownName(result.child);if(name)assert.equal(result.child.name,name);assert.equal(result.child.level,level);
+  assert.deepEqual(result.child.techs,[own]);
+  for(const label of [...names,'Tusk Crusher'])if(label!==own)assert.deepEqual(potential(result.child,label).unlock,{status:'pending',level:Math.max(techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[techniqueMetadata.getTechniqueRank(label)],level+1)});
+  const advanced=inheritance.advanceTechniqueState(result.child,level,level+1),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
+  const expected=[...names,'Tusk Crusher'].filter(label=>label!==own&&techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[techniqueMetadata.getTechniqueRank(label)]<=level+1);
+  assert.deepEqual(new Set(advanced.learnedTechniques),new Set(expected));assert.ok(!advanced.learnedTechniques.includes(own));
+  assert.deepEqual(new Set(choice.candidates.map(p=>p.name)),new Set([own,...expected]));assert.equal(choice.selectionRequired,true);
+  const selected=capacity.resolveTechniqueChoice(choice,[techniqueMetadata.normalizeTechniqueName(expected[0])]);
+  assert.equal(potential(selected,own).unlock.status,'discarded');assert.deepEqual(selected.techs,[expected[0]]);assert.equal(potential(selected,'Venom Infusion').unlock.level,32);
+  assert.equal(storage.saveRunPlannerData(envelope(result.run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(result.run));
+  assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);
+  const render=componentHost('src/components/run-planner/DnaControls.tsx','DnaControls'),props={run,onDna:()=>false,error:null};
+  elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent A').props.onChange({target:{value:'a'}});elements(render(props)).find(e=>e.props['aria-label']==='DNA Parent B').props.onChange({target:{value:'b'}});
+  const text=elementText(render(props));assert.ok(text.includes(`Pepper Breath — EL${level+1}`));assert.ok(text.includes(`Available techniques selected: ${own}`));assert.ok(!text.includes('Review techniques before DNA'));
+});
+for(const [a,b,level] of [['MetalGreymon','MetalGreymon',12],['WarGreymon','WarGreymon',22]])test(`live EL${level} deferred 24-inherited overflow blocks battle atomically and preserves Undo`,()=>{
+  const run=liveRun(a,b);Object.assign(run.roster[0],availableState(rookieNames.slice(0,12)));Object.assign(run.roster[1],availableState(rookieNames.slice(12,24)));
+  let next=liveDna(run).run;const original=structuredClone(next);let review;
+  const {DOMAIN_GROUPS}=load('src/data/domainGroups.ts'),rewards=load('src/utils/rewardMatching.ts');
+  const request=DOMAIN_GROUPS.map(g=>({domainId:g.domainId,phase:g.phase,floor:g.floors[0],encounterId:g.encounterId})).filter(r=>recording.getRecordingEncounter(r)?.preview?.reward).sort((a,b)=>rewards.getResolvedReward(b.encounterId).xp-rewards.getResolvedReward(a.encounterId).xp)[0];
+  for(let i=0;i<100;i++){try{next=recording.recordRunBattle(next,request).run;}catch(e){if(e instanceof capacity.BattleTechniqueSelectionRequired){review=e.choices;break;}throw e;}}
+  assert.ok(review);assert.equal(review[0].newLevel,level);assert.equal(review[0].choice.candidates.length,25);assert.equal(next.roster[0].level,level-1);assert.equal(next.roster[0].techs.length,1);
+  const snapshot=JSON.stringify(next),keys=review[0].choice.candidates.map(p=>p.key);
+  for(const keptKeys of [[],keys.slice(0,13)])assert.throws(()=>recording.recordRunBattle(next,{...request,techniqueSelections:[{instanceId:next.roster[0].instanceId,keptKeys}]}),/within capacity/);
+  assert.equal(JSON.stringify(next),snapshot);
+  const recorded=recording.recordRunBattle(next,{...request,techniqueSelections:[{instanceId:next.roster[0].instanceId,keptKeys:keys.slice(0,12)}]});assert.equal(recorded.run.roster[0].techs.length,12);
+  assert.deepEqual(liveUndo.undoLastAction(recorded.run).run.roster,next.roster);assert.deepEqual(validateRunPlan(recorded.run),[]);
+  let undone=recorded.run;while(undone.history.length>original.history.length)undone=liveUndo.undoLastAction(undone).run;assert.deepEqual(undone.roster,original.roster);
+});
+test('all 576 production DNA matrix cells have one birth candidate and zero birth selection requirements',()=>{
+  let count=0,required=0;const a=techParent('a',rookieNames.slice(0,12)),b=techParent('b',rookieNames.slice(12,24));
+  for(const row of dnaSource.DNA_MATRIX_SOURCE){
+    const result=dnaData.getDnaMatrixResult(row.matrixSelectionRank,row.matrixSelectionType,row.familyA,row.familyB);
+    const species=progressionData.getSpeciesProgression(result.actualResultSpeciesId),level={Rookie:1,Champion:11,Ultimate:21}[species.rank];assert.ok(level);assert.ok(species.ownTechnique);
+    const state=inheritance.calculateDnaTechniqueState({speciesId:species.speciesId??result.actualResultSpeciesId,actualRank:species.rank,startingLevel:level},a,b);
+    assert.deepEqual(state.techs,[techniqueMetadata.getTechniqueIdentity(species.ownTechnique).name]);assert.ok(inheritance.isValidTechniqueState(state));
+    const choice=capacity.buildTechniqueChoice(state,state.techs,{kind:'dna',mandatoryKeys:[techniqueMetadata.normalizeTechniqueName(species.ownTechnique)]});
+    if(choice.selectionRequired)required++;assert.equal(choice.candidates.length,1);count++;
+  }
+  assert.equal(count,576);assert.equal(required,0);
+});
+test('effective pending validator accepts inherited milestones, rejects staggered levels and audits DNA creation timing',()=>{
+  const state=childTech('Vademon',21,techParent('a',['Pepper Breath']),techParent('b',[]));assert.ok(inheritance.isValidTechniqueState(state));
+  for(const level of [3,4,13,23,33,1]){const bad=structuredClone(state);potential(bad,'Pepper Breath').unlock.level=level;assert.equal(inheritance.isValidTechniqueState(bad),false);}
+  const normal=inheritance.registerOwnTechnique(availableState(['Pepper Breath']),'greymon',11);potential(normal,progressionData.getSpeciesProgression('greymon').ownTechnique).unlock.level=22;assert.equal(inheritance.isValidTechniqueState(normal),false);
+  const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(['Pepper Breath']));const recorded=liveDna(run);potential(recorded.child,'Pepper Breath').unlock.level=2;
+  assert.equal(storage.saveRunPlannerData(envelope(recorded.run)),false);
 });

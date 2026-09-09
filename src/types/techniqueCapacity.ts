@@ -8,6 +8,8 @@ export interface TechniqueChoice {
   candidates: TechniquePotential[];
   newlyUnlockedKeys: string[];
   selectionRequired: boolean;
+  kind: 'learning' | 'dna';
+  mandatoryKeys: string[];
 }
 
 export interface TechniqueSelection {

@@ -17,6 +17,7 @@ export const recordRunDigivolution = (run: RunPlan, instanceId: string): { run: 
     type: 'digivolve', id: newInstanceId(),
     order: run.history.length ? run.history[run.history.length - 1].order + 1 : 0,
     preActionCheckpoint, instanceId,
+    fromName: before.name, toName: evolved.name,
     fromSpeciesId: before.speciesId, toSpeciesId: evolved.speciesId,
     fromRank: getSpeciesProgression(before.speciesId)!.rank,
     toRank: getSpeciesProgression(evolved.speciesId)!.rank,

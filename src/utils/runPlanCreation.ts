@@ -15,6 +15,7 @@ export const createRunPlan = (starterId: string, name: string): RunPlan => {
     id: newInstanceId(),
     name: name.trim() || starter.label + ' Run',
     starterInstanceId: member.instanceId,
+    starterDefinitionId: starter.id,
     roster: [member],
     digiline: [member.instanceId],
     history: [],
