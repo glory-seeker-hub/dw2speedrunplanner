@@ -7,6 +7,7 @@ import { DomainPhase } from '@/types/encounter';
 
 export type RosterSource =
   | { type: 'starter' }
+  | { type: 'trade'; tradeId: string; givenInstanceId: string }
   | { type: 'dna'; parentInstanceIds: [string, string] }
   | { type: 'capture'; encounterId: number; enemySlot: number };
 
@@ -101,7 +102,21 @@ export interface RunDnaEvent extends RunEventBase {
   techniqueChoice: { kept: string[]; discarded: string[] };
 }
 
-export type RunEvent = RunBattleEvent | RunDigivolveEvent | RunDnaEvent;
+export interface RunTradeEvent extends RunEventBase {
+  type: 'trade';
+  tradeId: string;
+  givenInstanceId: string;
+  givenSpeciesId: string;
+  givenName: string;
+  receivedInstanceId: string;
+  receivedSpeciesId: string;
+  receivedName: string;
+  receivedLevel: number;
+  receivedDp: 0;
+  receivedMaxLevel: number;
+}
+
+export type RunEvent = RunBattleEvent | RunDigivolveEvent | RunDnaEvent | RunTradeEvent;
 
 export interface RunPlan {
   id: string;
@@ -121,7 +136,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 6;
+  schemaVersion: 7;
   runs: RunPlan[];
   activeRunId: string | null;
 }

@@ -1,3 +1,4 @@
+import { createTradeReceivedProposal } from '@/utils/tradeProposal';
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
 import { getStarterById } from '@/data/starters';
 import { proposeDnaChild, replaceDnaParents } from '@/utils/dnaProposal';
@@ -6,7 +7,7 @@ import { normalizeTechniqueName } from '@/data/techniqueMetadata';
 export const getHistoricalInstanceIds = (run: RunPlan): Set<string> => new Set([
   ...run.roster.map(p => p.instanceId),
   ...run.history.flatMap(e => [...e.preActionCheckpoint.roster.map(p => p.instanceId),
-    ...(e.type === 'dna' ? [e.childInstanceId] : e.type === 'battle' && e.capturedInstanceId ? [e.capturedInstanceId] : [])]),
+    ...(e.type === 'trade' ? [e.receivedInstanceId] : e.type === 'dna' ? [e.childInstanceId] : e.type === 'battle' && e.capturedInstanceId ? [e.capturedInstanceId] : [])]),
 ]);
 
 const equal = (a: unknown, b: unknown): boolean => {
@@ -29,6 +30,7 @@ export const validateInstanceLifecycle = (run: RunPlan) => {
   const seen = new Set(live);
   const sources = new Map(initial.map(p => [p.instanceId, p.source]));
   if (initial.some(p => p.source?.type === 'dna')) fail('dna-source-without-event', 'DNA source requires a chronological creation event.');
+  if (initial.some(p => p.source?.type === 'trade')) fail('trade-source-without-event', 'Trade source requires a chronological creation event.');
   const matches = (roster: RosterDigimon[]) => roster.length === live.size && roster.every(p => live.has(p.instanceId));
   const checkSources = (roster: RosterDigimon[]) => {
     if (roster.some(p => !equal(p.source, sources.get(p.instanceId)))) fail('instance-source-mismatch', 'Individual provenance must match its introduction.');
@@ -54,6 +56,18 @@ export const validateInstanceLifecycle = (run: RunPlan) => {
       if (!live.has(event.instanceId) || after.roster.find(p => p.instanceId === event.instanceId)?.speciesId !== event.toSpeciesId) {
         fail('digivolve-unknown-instance', 'Evolution subject must persist with its evolved species immediately after the action.');
       }
+    } else if (event.type === 'trade') {
+      if (!live.has(event.givenInstanceId)) fail('trade-missing-given', 'Given individual must exist at trade time.');
+      live.delete(event.givenInstanceId);
+      introduce(event.receivedInstanceId);
+      const given = before.roster.find(p => p.instanceId === event.givenInstanceId)!;
+      const expected = { ...createTradeReceivedProposal(event.tradeId, given), instanceId: event.receivedInstanceId };
+      sources.set(event.receivedInstanceId, expected.source);
+      // Audit receipt species/state at creation; later normal evolution may change species, preserving provenance.
+      const expectedRoster = before.roster.map(p => p.instanceId === event.givenInstanceId ? expected : p);
+      if (!equal(after.roster, expectedRoster)) fail('trade-received-audit-mismatch', 'Trade must replace only the given individual with the exact authoritative received state.');
+      if (after.totalBits !== before.totalBits) fail('trade-bits-changed', 'Trading does not change Bits.');
+      // Digiline may be edited between actions; local membership remains strict in every snapshot.
     } else if (event.type === 'dna') {
       const parents = [event.parentAInstanceId, event.parentBInstanceId];
       if (!parents.every(id => live.has(id))) fail('dna-missing-parent', 'DNA parents must exist at consumption time.');

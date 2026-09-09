@@ -54,7 +54,7 @@ function recordKeepingAll(run,request) {
     return api.recordRunBattle(run,{...request,techniqueSelections:error.choices.map(c=>({instanceId:c.instanceId,keptKeys:c.choice.candidates.map(p=>p.key)}))});
   }
 }
-const envelope = (run) => ({ schemaVersion: 6, runs: [run], activeRunId: run.id });
+const envelope = (run) => ({ schemaVersion: 7, runs: [run], activeRunId: run.id });
 for (const starter of STARTERS) {
   test(starter.label + ' creates, persists, reloads, resets and recreates a valid run', () => {
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
@@ -112,8 +112,8 @@ test('storage rejects duplicate instances, duplicate run IDs and broken active r
 test('saving a remaining run preserves the version-6 multi-run envelope', () => {
   const first = createRunPlan('gold-hawk', 'First');
   const second = createRunPlan('blue-falcon', 'Second');
-  assert.equal(storage.saveRunPlannerData({schemaVersion: 6,runs:[first,second],activeRunId:first.id}),true);
-  const remaining = {schemaVersion: 6,runs:[second],activeRunId:null};
+  assert.equal(storage.saveRunPlannerData({schemaVersion: 7,runs:[first,second],activeRunId:first.id}),true);
+  const remaining = {schemaVersion: 7,runs:[second],activeRunId:null};
   assert.equal(storage.saveRunPlannerData(remaining), true);
   assert.deepEqual(storage.loadRunPlannerData(), remaining);
 });
@@ -707,7 +707,7 @@ test('failed Undo save leaves current run, history and feedback revision unchang
 test('stale confirmation cannot undo a different battle or another saved run', () => {
   const first=recordKeepingAll(multiRun(),normalBattle()).run;
   const other=createRunPlan('blue-falcon','Other');
-  storage.saveRunPlannerData({schemaVersion: 6,runs:[first,other],activeRunId:first.id});
+  storage.saveRunPlannerData({schemaVersion: 7,runs:[first,other],activeRunId:first.id});
   const render=plannerHost(); const planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.undoAction(first.history[0].id,first.id),false);
@@ -919,9 +919,9 @@ const renderPlanner = run => require('react-dom/server').renderToStaticMarkup(re
   {planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}
 ));
 
-test('schema v6 is explicit and rejects schema v5 without migration or writes',()=>{
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
-  assert.equal(storage.emptyRunPlannerData().schemaVersion,6);
+test('schema v7 is explicit and rejects schema v5 without migration or writes',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);
+  assert.equal(storage.emptyRunPlannerData().schemaVersion,7);
   const old={...envelope(evolutionRun()),schemaVersion:5};
   const raw=JSON.stringify(old);values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
   assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
@@ -1077,7 +1077,7 @@ test('Digivolution save failure is atomic; retry succeeds once and stale preview
 
 test('changed stats or switched runs invalidate previews; immediate Digiline edits retain new history',()=>{
   const initial=evolutionRun(),other=evolutionRun();
-  storage.saveRunPlannerData({schemaVersion: 6,runs:[initial,other],activeRunId:initial.id});
+  storage.saveRunPlannerData({schemaVersion: 7,runs:[initial,other],activeRunId:initial.id});
   const render=plannerHost(),planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
@@ -1586,10 +1586,10 @@ test('pure DNA rejects mismatched actual rank and malformed parent metadata',()=
   assert.throws(()=>inheritance.calculateDnaTechniqueState({speciesId:species.id,actualRank:'Champion',startingLevel:21},techParent('a',[]),techParent('b',[])),/actual DNA/);
   assert.throws(()=>childTech('Agumon',1,{...techParent('a',['Party Time']),techs:[]},techParent('b',[])),/parent technique/);
 });
-test('schema v6 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
+test('schema v7 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
   const undo=load('src/utils/runActionUndo.ts');const checkpoint=load('src/utils/runActionCheckpoint.ts');
   const run=evolutionRun();run.roster[0]={...run.roster[0],...childTech('Agumon',1)};
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);
   assert.equal(storage.saveRunPlannerData(envelope(run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(run));
   assert.deepEqual(checkpoint.createRunActionCheckpoint(run).roster,run.roster);
   const evolved=recordRunDigivolution(freeze(run),run.starterInstanceId).run;
@@ -1611,7 +1611,7 @@ for(const [label,change] of [
   ['incorrect unlock level',s=>{s.techs=[];s.techniquePool[0].unlock={status:'pending',level:12};}],
   ['missing provenance',s=>s.techniquePool[0].sources=[]],
   ['missing pool',s=>delete s.techniquePool],
-])test(`schema v6 rejects ${label} in roster and checkpoints`,()=>{
+])test(`schema v7 rejects ${label} in roster and checkpoints`,()=>{
   const run=createRunPlan('gold-hawk','Validation');change(run.roster[0]);
   assert.equal(inheritance.isValidTechniqueState(run.roster[0]),false);
   assert.ok(validateRunPlan(run).length>0);
@@ -1724,7 +1724,7 @@ test('discarded former own techniques remain discarded through evolution and bat
   assert.deepEqual(potential(battle.roster[0],own).unlock,{status:'discarded'});
   assert.equal(potential(childTech('Biyomon',1,battle.roster[0],techParent('b',[])),own),undefined);
 });
-test('schema v6 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
+test('schema v7 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
   const run=evolutionRun();
   run.roster[0]={...run.roster[0],...inheritance.createAvailableTechniqueState(['Pepper Breath','Party Time'],{type:'starter',speciesId:run.roster[0].speciesId})};
   run.roster[0]=withoutPossession(run.roster[0],'Party Time',{status:'discarded'});
@@ -1782,13 +1782,13 @@ for(const count of [12,13,24])test(`${count} candidates preserve all metadata an
   assert.equal(JSON.stringify(state),before);
   assert.deepEqual(capacity.resolveTechniqueChoice(choice),result);
 });
-test('committed over-cap rosters and checkpoints are rejected by schema v6',()=>{
+test('committed over-cap rosters and checkpoints are rejected by schema v7',()=>{
   const run=capacityRun('Greymon',11,13);
   assert.ok(validateRunPlan(run).some(v=>v.code==='roster-technique-capacity'));
   assert.equal(storage.saveRunPlannerData(envelope(run)),false);
   const checkpoints=load('src/utils/runActionCheckpoint.ts');
   assert.equal(checkpoints.isValidRunActionCheckpoint(checkpoints.createRunActionCheckpoint(run)),false);
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);
 });
 test('canonical aliases occupy one candidate slot',()=>{
   const state=availableState(['Blaze Blaster','Blaze Buster','FLer Cannon','Flower Cannon']);
@@ -1954,9 +1954,9 @@ const liveRun=(a='Greymon',b='Greymon',level=49)=>{
 const liveDna=(run,a='a',b='b',kept,prefix='child')=>{
   const ids=[prefix,prefix+'-event'];return dnaRecording.recordDnaAction(run,a,b,kept,()=>ids.shift());
 };
-test('schema v6 initializes canonical starter provenance and rejects v5',()=>{
+test('schema v7 initializes canonical starter provenance and rejects v5',()=>{
   const run=createRunPlan('blue-falcon','Starter');assert.equal(run.starterDefinitionId,'blue-falcon');
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,6);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);
   assert.equal(storage.saveRunPlannerData({...envelope(run),schemaVersion:5}),false);
   assert.equal(storage.saveRunPlannerData(envelope({...run,starterDefinitionId:'invented'})),false);
 });
@@ -2230,7 +2230,7 @@ test('DNA birth choice cannot remove mandatory own technique, including bypassed
   const tree=Controls({context:'dna',choices:[{instanceId:'proposal',name:'ShimaUnimon',newLevel:11,currentlyPossessed:[],choice:proposal.choice}],selections:[{instanceId:'proposal',keptKeys:proposal.choice.mandatoryKeys}],onChange:()=>{},onConfirm:()=>{},onCancel:()=>{}});
   assert.equal(elements(tree).find(e=>e.type==='input').props.disabled,true);
 });
-test('schema v6 rejects zero possessed techniques in both current roster and checkpoints',()=>{
+test('schema v7 rejects zero possessed techniques in both current roster and checkpoints',()=>{
   const run=createRunPlan('gold-hawk','Minimum');Object.assign(run.roster[0],availableState([]));
   assert.ok(validateRunPlan(run).length);assert.equal(storage.saveRunPlannerData(envelope(run)),false);
   assert.equal(load('src/utils/runActionCheckpoint.ts').isValidRunActionCheckpoint({roster:run.roster,digiline:run.digiline,totalBits:run.totalBits}),false);
@@ -2361,4 +2361,216 @@ test('effective pending validator accepts inherited milestones, rejects staggere
   const normal=inheritance.registerOwnTechnique(availableState(['Pepper Breath']),'greymon',11);potential(normal,progressionData.getSpeciesProgression('greymon').ownTechnique).unlock.level=22;assert.equal(inheritance.isValidTechniqueState(normal),false);
   const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(['Pepper Breath']));const recorded=liveDna(run);potential(recorded.child,'Pepper Breath').unlock.level=2;
   assert.equal(storage.saveRunPlannerData(envelope(recorded.run)),false);
+});
+
+// Phase 2G-E: authoritative trade receipts, fresh identities and chronological consumption.
+const tradeData=load('src/data/trades.ts'),tradeProposal=load('src/utils/tradeProposal.ts'),tradeRecording=load('src/utils/runTradeRecording.ts');
+const tradeFixture=(index=0)=>{
+  const definition=tradeData.TRADE_DEFINITIONS[index];
+  const run=evolutionRun(speciesLookup.getDigimonById(definition.giveSpeciesId).name,11,{dp:7});
+  run.roster[0].instanceId='given';run.starterInstanceId='given';run.digiline=['given'];return run;
+};
+const tradeAction=(run,index=0,givenId='given',prefix='received')=>{
+  const ids=[prefix,prefix+'-event'];return tradeRecording.recordTradeAction(run,tradeData.TRADE_DEFINITIONS[index].id,givenId,()=>ids.shift());
+};
+const tradeExpected=[
+  ['ToyAgumon','SnowAgumon',3,14,[41,42,38,40,19],['Hail Storm','Rock Fist']],
+  ['Crabmon','Wizardmon',11,19,[102,79,49,52,31],['Thunder Ball','Necro Magic']],
+  ['Numemon','Megadramon',21,27,[188,210,85,73,52],['Darkside Attack','Wing Blade']],
+  ['Garurumon','MagnaAngemon',21,27,[195,183,76,81,49],['HP Recovery','Magical Tail']],
+  ['N-Drimogemon','MetalMamemon',21,27,[214,176,80,79,51],['Energetic Bomb','Fire Blast II']],
+  ['D-Tyrannomon','Myotismon',21,27,[161,203,96,77,50],['Grisly Wing','Full Recovery']],
+  ['Angewomon','Magnadramon',31,35,[285,281,99,112,62],['Fire Tornado','Sad Water Blast']],
+  ['M-Seadramon','M-Garurumon',31,35,[298,267,110,113,83],['Freeze Breath','Venom Infusion']],
+  ['SkullGreymon','Machinedramon',31,33,[249,280,125,102,82],['Giga Cannon','Giga Scissor Claw']],
+];
+test('schema v7 rejects old v6 development saves and exactly nine canonical trades resolve',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);const run=tradeFixture();assert.equal(storage.saveRunPlannerData({...envelope(run),schemaVersion:6}),false);
+  assert.equal(tradeData.TRADE_DEFINITIONS.length,9);assert.deepEqual(tradeData.TRADE_DEFINITIONS.map(t=>t.receiveEncounterId),[191,192,193,194,195,196,197,198,199]);
+  assert.equal(new Set(tradeData.TRADE_DEFINITIONS.map(t=>t.id)).size,9);
+  tradeData.TRADE_DEFINITIONS.forEach((t,i)=>{assert.equal(speciesLookup.getDigimonById(t.giveSpeciesId).name,tradeExpected[i][0]);assert.equal(tradeData.getTradeReceipt(t.id).record.name,tradeExpected[i][1]);});
+});
+for(const [index,[give,receive,level,cap,stats,techs]] of tradeExpected.entries())test(`trade ${give} -> ${receive} copies exact receipt, XP, DP0, fixed cap and available techniques`,()=>{
+  const run=freeze(tradeFixture(index)),before=JSON.stringify(run),definition=tradeData.TRADE_DEFINITIONS[index];
+  const preview=tradeProposal.previewTrade(definition.id);assert.equal('instanceId' in preview.received,false);assert.equal(JSON.stringify(run),before);
+  const result=tradeAction(run,index),member=result.received;assert.equal(member.instanceId,'received');assert.equal(member.name,receive);assert.equal(member.speciesId,speciesLookup.getDigimonByName(receive).id);
+  assert.equal(member.level,level);assert.equal(member.dp,0);assert.deepEqual(Object.values(member.stats),stats);assert.deepEqual(member.techs,techs);
+  assert.deepEqual(member.levelCap,{min:cap,max:cap,resolved:cap});assert.equal(member.totalXp,load('src/utils/experience.ts').getRequiredTotalXpForLevel(level));
+  assert.deepEqual(member.source,{type:'trade',tradeId:definition.id,givenInstanceId:'given'});
+  assert.ok(member.techniquePool.every(p=>p.unlock.status==='available'));assert.equal(member.techniquePool.length,techs.length);
+  for(const p of member.techniquePool){assert.deepEqual(p.sources,[{type:'trade',tradeId:definition.id}]);assert.equal(p.rank,techniqueMetadata.getTechniqueRank(p.name));}
+  assert.deepEqual(result.run.roster,[member]);assert.deepEqual(result.run.digiline,['received']);assert.equal(JSON.stringify(run),before);assert.equal(result.run.totalBits,run.totalBits);
+  assert.equal(result.event.order,0);assert.equal(result.event.receivedDp,0);assert.equal(result.run.history.filter(e=>e.type==='battle').length,0);
+  assert.deepEqual(validateRunPlan(result.run),[]);assert.equal(storage.saveRunPlannerData(envelope(result.run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(result.run));
+  assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,run.roster);assert.deepEqual(liveUndo.undoLastAction(result.run).run.digiline,run.digiline);
+  const html=renderPlanner(result.run);assert.ok(html.includes(`${give} → ${receive}`));assert.ok(html.includes('Gold Hawk'));assert.ok(html.includes('Agumon'));assert.equal(result.run.starterInstanceId,'given');assert.equal(result.run.starterDefinitionId,run.starterDefinitionId);
+});
+for(const field of ['name','level','hp','mp','atk','def','spd','techs'])test(`trade source drift in ${field} fails explicitly`,()=>{
+  const record=load('src/data/encounters.ts').encounters.find(e=>e.id===191).digimons[0],old=record[field];
+  try{record[field]=field==='name'?'Agumon':field==='techs'?['Pepper Breath']:old+1;assert.throws(()=>tradeProposal.previewTrade('trade-191'),/has drifted/);}finally{record[field]=old;}
+});
+test('trade receipt rejects extra/missing encounter or ambiguous received slots',()=>{
+  const rows=load('src/data/encounters.ts').encounters,index=rows.findIndex(e=>e.id===191),record=rows[index];
+  try{rows.splice(index,1);assert.throws(()=>tradeProposal.previewTrade('trade-191'),/has drifted/);}finally{rows.splice(index,0,record);}
+  try{record.digimons.push(structuredClone(record.digimons[0]));assert.throws(()=>tradeProposal.previewTrade('trade-191'),/has drifted/);}finally{record.digimons.pop();}
+});
+test('missing trade XP threshold fails before identity generation',()=>{
+  const xp=load('src/data/experience.ts').CUMULATIVE_XP_BY_LEVEL,old=xp[3];const run=tradeFixture();let ids=0;
+  try{delete xp[3];assert.throws(()=>tradeRecording.recordTradeAction(run,'trade-191','given',()=>{ids++;return 'never';}),/XP threshold/);assert.equal(ids,0);}finally{xp[3]=old;}
+});
+for(const active of [['x','given','y'],['given','x','y'],['x','y','given'],['x','y']])test(`trade preserves exact roster and Digiline positions: ${active.join('/')}`,()=>{
+  const run=tradeFixture();const x=foundationMember('Greymon',11,{instanceId:'x'}),y=foundationMember('Greymon',11,{instanceId:'y'});run.roster=[x,run.roster[0],y];run.digiline=active;
+  const result=tradeAction(freeze(run));assert.deepEqual(result.run.roster.map(p=>p.instanceId),['x','received','y']);assert.deepEqual(result.run.digiline,active.map(id=>id==='given'?'received':id));
+  assert.deepEqual(result.run.roster[0],x);assert.deepEqual(result.run.roster[2],y);
+});
+for(const id of ['given','other','received','', '   '])test(`trade fresh identity rejects collision or empty ID ${JSON.stringify(id)}`,()=>{
+  const run=tradeFixture();run.roster.push(foundationMember('Greymon',11,{instanceId:'other'}));const ids=id==='received'?['received','received']:[id];
+  assert.throws(()=>tradeRecording.recordTradeAction(run,'trade-191','given',()=>ids.shift()),/fresh Trade ID/);
+});
+test('wrong/missing species and unknown trade reject; eligibility ignores DP, EL, cap and active status',()=>{
+  const run=tradeFixture();assert.throws(()=>tradeAction(run,1),/required Give species/);assert.throws(()=>tradeAction(run,0,'missing'),/current roster/);assert.throws(()=>tradeProposal.previewTrade('fake'),/Unknown trade/);
+  run.roster[0].level=3;run.roster[0].dp=99;run.digiline=[];assert.equal(tradeAction(run).received.name,'SnowAgumon');
+});
+for(const field of ['tradeId','givenInstanceId','givenSpeciesId','givenName','receivedInstanceId','receivedSpeciesId','receivedName','receivedLevel','receivedDp','receivedMaxLevel'])test(`trade event rejects tampered ${field}`,()=>{
+  const result=tradeAction(tradeFixture());result.event[field]=typeof result.event[field]==='number'?result.event[field]+1:'fake';assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+});
+for(const field of ['speciesId','name','level','totalXp','dp','levelCap','stats','techs','techniquePool','source'])test(`trade immediate receipt rejects tampered ${field}`,()=>{
+  const result=tradeAction(tradeFixture()),p=result.received;
+  if(field==='stats')p.stats.hp++;else if(field==='levelCap')p.levelCap={min:15,max:15,resolved:15};else if(field==='techs')p.techs=[];else if(field==='techniquePool')p.techniquePool=[];else if(field==='source')p.source.givenInstanceId='missing';else if(typeof p[field]==='number')p[field]++;else p[field]='fake';
+  assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+});
+for(const field of ['instanceId','speciesId','level','totalXp','dp','levelCap','stats','techs','techniquePool'])test(`trade hook rejects stale given ${field} without publishing`,()=>{
+  const run=tradeFixture();storage.saveRunPlannerData(envelope(run));const host=plannerHost(),planner=host(),reviewed=structuredClone(run.roster[0]);
+  if(field==='levelCap')reviewed.levelCap.resolved--;else if(field==='stats')reviewed.stats.hp++;else if(field==='techs')reviewed.techs=[];else if(field==='techniquePool')reviewed.techniquePool=[];else if(typeof reviewed[field]==='number')reviewed[field]++;else reviewed[field]='missing';
+  assert.equal(planner.trade(run.id,'trade-191',reviewed),false);assert.deepEqual(host().activeRun,run);
+});
+test('trade hook saves before publishing, rejects wrong run/repeated confirmation and tolerates Digiline edits',()=>{
+  const run=tradeFixture();storage.saveRunPlannerData(envelope(run));const host=plannerHost(),planner=host(),reviewed=structuredClone(run.roster[0]);
+  const raw=values.get(storage.RUN_PLANNER_STORAGE_KEY),write=global.localStorage.setItem;
+  assert.equal(planner.trade('wrong','trade-191',reviewed),false);
+  global.localStorage.setItem=()=>{throw Error('quota');};assert.equal(planner.trade(run.id,'trade-191',reviewed),false);assert.deepEqual(host().activeRun,run);assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),raw);
+  global.localStorage.setItem=write;planner.removeMember('given');assert.equal(planner.trade(run.id,'trade-191',reviewed),true);assert.deepEqual(host().activeRun.digiline,[]);assert.equal(planner.trade(run.id,'trade-191',reviewed),false);assert.equal(host().activeRun.history.length,1);
+});
+test('trade source validators reject missing definitions, blank historical IDs and unsupported initial provenance',()=>{
+  for(const source of [{type:'trade',tradeId:'fake',givenInstanceId:'given'},{type:'trade',tradeId:'trade-191',givenInstanceId:' '},{type:'trade',tradeId:'trade-191',givenInstanceId:'given',extra:true}]){
+    const result=tradeAction(tradeFixture());result.received.source=source;assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+  }
+  const result=tradeAction(tradeFixture());result.received.techniquePool[0].sources=[{type:'trade',tradeId:'fake'}];assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+  const forged=tradeFixture();forged.roster.push(tradeProposal.createTradeReceivedProposal('trade-191',forged.roster[0]));assert.ok(validateRunPlan(forged).length);
+});
+
+const tradeCaptureRequest=(speciesName)=>{
+  const {encounters}=load('src/data/encounters.ts'),{DOMAIN_GROUPS}=load('src/data/domainGroups.ts');
+  for(const group of DOMAIN_GROUPS.filter(g=>!g.isBoss)){
+    const encounter=encounters.find(e=>e.id===group.encounterId),record=encounter?.digimons.find(d=>d.name===speciesName);
+    if(!record)continue;const cap=caps.getInitialLevelCap(record.level);if(!cap)continue;
+    const request={domainId:group.domainId,phase:group.phase,floor:group.floors[0],encounterId:group.encounterId,capturedEnemySlot:record.slot,capturedMaxLevel:cap.min};
+    if(recording.getRecordingEncounter(request)?.preview?.reward)return request;
+  }
+  throw Error('No recordable capture fixture for '+speciesName);
+};
+const strongestTradeTestBattle=()=>load('src/data/domainGroups.ts').DOMAIN_GROUPS.map(g=>({domainId:g.domainId,phase:g.phase,floor:g.floors[0],encounterId:g.encounterId}))
+  .filter(r=>recording.getRecordingEncounter(r)?.preview?.reward).sort((a,b)=>load('src/utils/rewardMatching.ts').getResolvedReward(b.encounterId).xp-load('src/utils/rewardMatching.ts').getResolvedReward(a.encounterId).xp)[0];
+
+test('capture/trade/DNA across two generations preserves all historical identities, repeat trades and exact repeated Undo',()=>{
+  const initial=evolutionRun('WarGreymon',49);initial.roster[0].instanceId='A';initial.starterInstanceId='A';initial.digiline=['A'];
+  const capture=recordKeepingAll(initial,tradeCaptureRequest('Numemon')).run,B=capture.history.at(-1).capturedInstanceId;
+  const first=tradeAction(capture,2,B,'C');assert.equal(first.received.source.givenInstanceId,B);assert.deepEqual(liveUndo.undoLastAction(first.run).run.roster,capture.roster);
+  const event=structuredClone(first.event),dna=liveDna(first.run,'A','C',undefined,'D');
+  assert.deepEqual(liveUndo.undoLastAction(dna.run).run.roster,first.run.roster);assert.deepEqual(liveUndo.undoLastAction(liveUndo.undoLastAction(dna.run).run).run.roster,capture.roster);
+  const capturedAgain=recordKeepingAll(dna.run,tradeCaptureRequest('Numemon')).run,E=capturedAgain.history.at(-1).capturedInstanceId;
+  const second=tradeAction(capturedAgain,2,E,'F');assert.equal(second.event.tradeId,first.event.tradeId);
+  const final=liveDna(second.run,'D','F',undefined,'G').run;
+  assert.deepEqual(final.roster.map(p=>p.instanceId),['G']);assert.deepEqual(validateRunPlan(final),[]);assert.deepEqual(final.history.find(e=>e.id===event.id),event);
+  assert.ok(renderPlanner(final).includes('Numemon → Megadramon'));assert.equal(storage.saveRunPlannerData(envelope(final)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(final));
+  for(const consumed of ['A',B,'C','D',E,'F'])assert.ok(lifecycle.getHistoricalInstanceIds(final).has(consumed));
+  for(const reused of ['A',B,'C'])assert.throws(()=>tradeRecording.recordTradeAction(capturedAgain,'trade-193',E,()=>reused),/fresh Trade ID/);
+  assert.throws(()=>dnaRecording.recordDnaAction(second.run,'D','F',undefined,()=>B),/fresh DNA ID/);
+  const corrupt=structuredClone(final);corrupt.roster.push(structuredClone(capture.roster.find(p=>p.instanceId===B)));assert.equal(storage.saveRunPlannerData(envelope(corrupt)),false);
+  let undone=final;while(undone.history.length){const undo=liveUndo.undoLastAction(undone);assert.equal(undo.ok,true,undo.reason);undone=undo.run;}
+  assert.deepEqual(meaningfulRun(undone),meaningfulRun(initial));
+});
+test('Trade/Battle/Undo/Undo restores exact pre-trade state',()=>{
+  const initial=tradeFixture(2),traded=tradeAction(initial,2).run,after=recordKeepingAll(traded,strongestTradeTestBattle()).run;
+  assert.deepEqual(liveUndo.undoLastAction(after).run.roster,traded.roster);
+  assert.deepEqual(meaningfulRun(liveUndo.undoLastAction(liveUndo.undoLastAction(after).run).run),meaningfulRun(initial));
+});
+test('trade received individual evolves normally, keeps acquisition history, and can discard/inherit trade techniques',()=>{
+  const initial=tradeFixture(0);initial.roster.push(foundationMember('Greymon',49,{instanceId:'partner'}));
+  const traded=tradeAction(initial),event=structuredClone(traded.event);let run=traded.run;const battle=strongestTradeTestBattle();
+  while(run.roster[0].level<11)run=recordKeepingAll(run,battle).run;
+  run=recordRunDigivolution(run,'received').run;assert.deepEqual(run.roster[0].techs,['Hail Storm','Rock Fist']);assert.deepEqual(run.history.find(e=>e.id===event.id),event);
+  const choices=battleChoices.getBattleTechniqueChoices(run.roster,run.digiline,load('src/utils/rewardMatching.ts').getResolvedReward(battle.encounterId).xp);assert.equal(choices.length,1);
+  const keys=choices[0].choice.candidates.filter(p=>p.name!=='Hail Storm').map(p=>p.key);
+  const learned=recording.recordRunBattle(run,{...battle,techniqueSelections:[{instanceId:'received',keptKeys:keys}]}).run;
+  assert.equal(potential(learned.roster[0],'Hail Storm').unlock.status,'discarded');assert.ok(learned.roster[0].techs.includes('Rock Fist'));
+  const descendant=liveDna(learned,'received','partner',undefined,'descendant').run;
+  assert.ok(!potential(descendant.roster[0],'Hail Storm')?.sources.some(s=>s.type==='inherited'));assert.ok(potential(descendant.roster[0],'Rock Fist'));
+  assert.equal(potential(childTech('Biyomon',1,learned.roster[0],techParent('other',[])),'Hail Storm'),undefined);
+  assert.deepEqual(descendant.history.find(e=>e.id===event.id),event);assert.ok(renderPlanner(descendant).includes('ToyAgumon → SnowAgumon'));assert.deepEqual(validateRunPlan(descendant),[]);
+});
+test('normally evolved current Give species qualifies regardless of starter origin',()=>{
+  const give=tradeData.TRADE_DEFINITIONS[3].giveSpeciesId;
+  const rule=evolution.EVOLUTION_RANGES.find(r=>r.to===give&&progressionData.getSpeciesProgression(r.from)?.rank==='Rookie');assert.ok(rule);
+  const initial=evolutionRun(speciesLookup.getDigimonById(rule.from).name,11,{dp:rule.min});
+  const evolved=recordRunDigivolution(initial,initial.starterInstanceId).run;assert.equal(evolved.roster[0].speciesId,give);
+  const result=tradeAction(evolved,3,initial.starterInstanceId);assert.equal(result.received.name,'MagnaAngemon');assert.equal(result.run.starterInstanceId,initial.starterInstanceId);
+});
+test('DNA-created Give species may be traded and its consumed DNA history remains valid',()=>{
+  const parents=dnaSource.DNA_FAMILY_SOURCE.map(([name])=>foundationMember(name,49)).filter(p=>progressionData.getSpeciesProgression(p.speciesId).rank==='Ultimate');
+  let pair;
+  outer:for(const a of parents)for(const b of parents){const preview=dnaPreview({...a,instanceId:'a'},{...b,instanceId:'b'});if(preview.status==='success'&&tradeData.TRADE_DEFINITIONS.some(t=>t.giveSpeciesId===preview.actualResultSpeciesId)){pair=[a,b,tradeData.TRADE_DEFINITIONS.findIndex(t=>t.giveSpeciesId===preview.actualResultSpeciesId)];break outer;}}
+  assert.ok(pair);const initial=liveRun(pair[0].name,pair[1].name),dna=liveDna(initial),result=tradeAction(dna.run,pair[2],'child');
+  assert.deepEqual(validateRunPlan(result.run),[]);assert.deepEqual(result.run.history[0],dna.event);assert.deepEqual(liveUndo.undoLastAction(result.run).run.roster,dna.run.roster);
+});
+test('trade-origin eligibility depends only on current species while preserving the historical given ID',()=>{
+  const received=tradeAction(tradeFixture()).received,definition=tradeData.TRADE_DEFINITIONS[2];
+  assert.throws(()=>tradeProposal.createTradeReceivedProposal(definition.id,received),/required Give species/);
+  const proposal=tradeProposal.createTradeReceivedProposal(definition.id,{...received,speciesId:definition.giveSpeciesId});
+  assert.equal(proposal.source.givenInstanceId,received.instanceId);assert.equal(proposal.name,'Megadramon');
+});
+test('Trading Center shows all nine definitions, reference previews and informational timing without story gates',()=>{
+  const run=createRunPlan('gold-hawk','Reference'),render=componentHost('src/components/run-planner/TradeControls.tsx','TradeControls'),props={run,onTrade:()=>assert.fail('must not trade'),error:null};
+  const selector=elements(render(props)).find(e=>e.props['aria-label']==='Trade definition');assert.equal(elements(selector).filter(e=>e.type==='option').length,10);
+  for(let i=0;i<9;i++){
+    elements(render(props)).find(e=>e.props['aria-label']==='Trade definition').props.onChange({target:{value:tradeData.TRADE_DEFINITIONS[i].id}});
+    const tree=render(props),text=elementText(tree);assert.ok(text.includes(`Receive: ${tradeExpected[i][1]}`));assert.ok(text.includes(`Requires ${tradeExpected[i][0]} in current roster.`));
+    assert.equal(elements(tree).find(e=>e.props.children==='Trade Digimon').props.disabled,true);assert.ok(elements(tree).some(e=>e.props.title===tradeData.TRADE_DEFINITIONS[i].availabilityNote));
+    assert.ok(!elements(tree).some(e=>e.props['aria-label']==='Maximum EL'));
+  }
+});
+test('Trading UI chooses the exact duplicate, confirms consumption, then clears all state on success',()=>{
+  const run=tradeFixture(8);run.roster.push({...structuredClone(run.roster[0]),instanceId:'duplicate',dp:4,level:13});
+  storage.saveRunPlannerData(envelope(run));const host=plannerHost(),planner=host(),render=componentHost('src/components/run-planner/TradeControls.tsx','TradeControls'),props={run,onTrade:planner.trade,error:null};
+  elements(render(props)).find(e=>e.props['aria-label']==='Trade definition').props.onChange({target:{value:'trade-199'}});
+  let tree=render(props);const selector=elements(tree).find(e=>e.props['aria-label']==='Trade given Digimon');const options=elements(selector).filter(e=>e.type==='option');assert.deepEqual(options.map(e=>e.props.value),['','given','duplicate']);assert.ok(elementText(selector).includes('Reserve'));assert.ok(elementText(selector).includes('Active'));
+  selector.props.onChange({target:{value:'duplicate'}});tree=render(props);assert.equal(host().activeRun.history.length,0);assert.ok(elementText(tree).includes('Max EL33'));
+  elements(tree).find(e=>e.props.children==='Trade Digimon').props.onClick();tree=render(props);assert.ok(elementText(tree).includes('SkullGreymon will leave the roster'));
+  elements(tree).find(e=>e.props.children==='Confirm Trade').props.onClick({preventDefault:()=>assert.fail('unexpected failure')});
+  const next=host().activeRun;assert.equal(next.history[0].givenInstanceId,'duplicate');assert.equal(next.roster[0].instanceId,'given');assert.deepEqual(next.digiline,['given']);
+  tree=render({...props,run:next});assert.equal(elements(tree).find(e=>e.props['aria-label']==='Trade definition').props.value,'');assert.ok(!elementText(tree).includes('Receive:'));
+});
+test('Trading UI preserves review after failed confirmation and resets selection when trade changes',()=>{
+  const run=tradeFixture(),render=componentHost('src/components/run-planner/TradeControls.tsx','TradeControls'),props={run,onTrade:()=>false,error:'Save failed'};
+  elements(render(props)).find(e=>e.props['aria-label']==='Trade definition').props.onChange({target:{value:'trade-191'}});elements(render(props)).find(e=>e.props['aria-label']==='Trade given Digimon').props.onChange({target:{value:'given'}});
+  elements(render(props)).find(e=>e.props.children==='Trade Digimon').props.onClick();let prevented=false;elements(render(props)).find(e=>e.props.children==='Confirm Trade').props.onClick({preventDefault:()=>prevented=true});assert.equal(prevented,true);assert.equal(elements(render(props)).find(e=>e.props['aria-label']==='Trade given Digimon').props.value,'given');
+  elements(render(props)).find(e=>e.props['aria-label']==='Trade definition').props.onChange({target:{value:'trade-192'}});assert.equal(elements(render(props)).find(e=>e.props['aria-label']==='Trade given Digimon').props.value,'');
+});
+
+test('trade fixed caps and preview never call random acquisition cap resolution or generate IDs',()=>{
+  const api=load('src/utils/levelCap.ts'),original=api.getAcquisitionLevelCap,capture=load('src/utils/capture.ts'),id=capture.newInstanceId;
+  try{
+    api.getAcquisitionLevelCap=()=>{throw Error('Unexpected acquisition cap');};capture.newInstanceId=()=>{throw Error('Unexpected preview ID');};
+    assert.deepEqual(tradeData.TRADE_DEFINITIONS.map(t=>tradeProposal.previewTrade(t.id).received.levelCap.resolved),[14,19,27,27,27,27,35,35,33]);
+  }finally{api.getAcquisitionLevelCap=original;capture.newInstanceId=id;}
+});
+test('trade audit rejects changed Bits, reordered survivors, duplicate IDs and consumed current Digiline IDs',()=>{
+  const run=tradeFixture();run.roster.push(foundationMember('Greymon',11,{instanceId:'other'}));const result=tradeAction(run);
+  for(const mutate of [r=>r.totalBits++,r=>r.roster.reverse(),r=>r.roster.push(structuredClone(r.roster[0])),r=>r.digiline=['given']]){
+    const bad=structuredClone(result.run);mutate(bad);assert.equal(storage.saveRunPlannerData(envelope(bad)),false);
+  }
+});
+test('fresh trade IDs reject an existing event ID even when no current individual uses it',()=>{
+  const run=tradeFixture();run.roster.push({...structuredClone(run.roster[0]),instanceId:'another'});const first=tradeAction(run);
+  assert.throws(()=>tradeRecording.recordTradeAction(first.run,'trade-191','another',()=>first.event.id),/fresh Trade ID/);
 });

@@ -1,3 +1,4 @@
+import { isValidTradeEvent } from '@/utils/runTradeValidation';
 import { isValidDnaEvent } from '@/utils/runDnaValidation';
 import { getDigimonById } from '@/utils/digimonLookup';
 import { isValidBattleTechniqueAudit } from '@/utils/battleTechniqueChoices';
@@ -40,6 +41,7 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
       (v.capturedEnemySlot === undefined || v.capturedEnemySlot === null || integer(v.capturedEnemySlot, 1)) &&
       reward(v.xpReward) && reward(v.bitsReward);
   }
+  if (v.type === 'trade') return isValidTradeEvent(v, checkpoint);
   if (v.type === 'dna') return isValidDnaEvent(v, checkpoint);
   if (v.type !== 'digivolve' || !nonEmptyString(v.instanceId) ||
       !nonEmptyString(v.fromSpeciesId) || !nonEmptyString(v.toSpeciesId) ||

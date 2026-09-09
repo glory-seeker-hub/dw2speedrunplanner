@@ -6,6 +6,7 @@ export type TechniqueUnlock =
   | { status: 'pending' | 'missed'; level: number };
 
 export type TechniqueSource =
+  | { type: 'trade'; tradeId: string }
   | { type: 'starter' | 'own-species'; speciesId: string }
   | { type: 'capture'; encounterId: number; enemySlot: number }
   | { type: 'inherited'; parentInstanceId: string };

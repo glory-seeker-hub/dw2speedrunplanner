@@ -1,3 +1,4 @@
+import { getTradeDefinition } from '@/data/trades';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 import { getTechniqueIdentity, normalizeTechniqueName, TECHNIQUE_UNLOCK_LEVELS } from '@/data/techniqueMetadata';
 import { DigimonRank, TechniquePotential, TechniqueSource, TechniqueState } from '@/types/techniqueInheritance';
@@ -98,6 +99,7 @@ const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v ===
 const text = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const validSource = (v: unknown): boolean => {
   if (!object(v)) return false;
+  if (v.type === 'trade') return Object.keys(v).length === 2 && text(v.tradeId) && !!getTradeDefinition(v.tradeId);
   if (v.type === 'starter' || v.type === 'own-species') return Object.keys(v).length === 2 && text(v.speciesId);
   if (v.type === 'inherited') return Object.keys(v).length === 2 && text(v.parentInstanceId);
   return v.type === 'capture' && Object.keys(v).length === 3 && Number.isInteger(v.encounterId) && Number.isInteger(v.enemySlot);
