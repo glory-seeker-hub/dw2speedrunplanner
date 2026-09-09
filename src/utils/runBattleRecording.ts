@@ -1,3 +1,4 @@
+import { TechniqueSelection } from '@/types/techniqueCapacity';
 import { createRunActionCheckpoint } from '@/utils/runActionCheckpoint';
 import { RunBattleEvent, RunPlan } from '@/types/runPlanner';
 import { BattleSelection, getEncountersForFloor } from '@/utils/runBattleSelection';
@@ -7,7 +8,7 @@ import { newInstanceId } from '@/utils/capture';
 import { validateRunPlan } from '@/utils/runInvariants';
 import { getInitialLevelCap, getAcquisitionLevelCap } from '@/utils/levelCap';
 
-export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null; capturedMaxLevel?: number | null };
+export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null; capturedMaxLevel?: number | null; techniqueSelections?: TechniqueSelection[]; reviewTechniques?: boolean; expectedRunState?: string };
 
 /** Re-query location metadata at submission time; never trust a UI-provided boss flag. */
 export const getRecordingEncounter = (selection: BattleSelection) =>
@@ -52,12 +53,13 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
   const preActionCheckpoint = createRunActionCheckpoint(run);
   const resolution = resolveBattle({
     encounterId: option.encounterId, digilineInstanceIds: [...run.digiline],
+    techniqueSelections: request.techniqueSelections, reviewTechniques: request.reviewTechniques,
     roster: run.roster, totalBits: run.totalBits, capturedEnemySlot: slot, capturedMaxLevel: request.capturedMaxLevel,
   });
   if (resolution.rewardUnknown) throw new Error('Reward metadata is missing. This battle cannot be recorded.');
   if (resolution.captureError) throw new Error(resolution.captureError);
   const event: RunBattleEvent = {
-    type: 'battle',
+    type: 'battle', techniqueChoices: resolution.techniqueChoices,
     id: newInstanceId(), order: run.history.length ? run.history[run.history.length - 1].order + 1 : 0,
     domainId: request.domainId, phase: request.phase, floor: request.floor!, encounterId: option.encounterId,
     digilineInstanceIds: [...resolution.participantIds], capturedEnemySlot: slot,

@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
 import { recordRunDigivolution } from '@/utils/runDigivolutionRecording';
-import { BattleResolution } from '@/utils/runProgression';
+import { BattleResolution, BattleChoiceReview } from '@/utils/runProgression';
+import { BattleTechniqueSelectionRequired } from '@/utils/techniqueCapacity';
 import { undoLastAction } from '@/utils/runActionUndo';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
 import { PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
@@ -52,15 +53,23 @@ export const useRunPlanner = () => {
   const moveMember = (id: string, direction: DigilineDirection) =>
     updateDigiline((run) => moveDigilineMember(run, id, direction));
 
-  const recordBattle = (request: RecordBattleRequest): BattleResolution | null => {
+  const recordBattle = (request: RecordBattleRequest): BattleResolution | BattleChoiceReview | null => {
     const current = currentData.current;
     const run = current.runs.find(entry => entry.id === current.activeRunId);
     if (!run) return null;
+    if ((request.techniqueSelections !== undefined || request.expectedRunState !== undefined) && request.expectedRunState !== JSON.stringify(run)) {
+      setError('The run has changed. Cancel technique selection and review this battle again.');
+      return null;
+    }
     try {
       const recorded = recordRunBattle(run, request);
       return persist({ ...current, runs: current.runs.map(entry => entry.id === run.id ? recorded.run : entry) })
         ? recorded.resolution : null;
     } catch (cause) {
+      if (cause instanceof BattleTechniqueSelectionRequired) {
+        setError(null);
+        return { status: 'selection-required', choices: cause.choices, expectedRunState: JSON.stringify(run) };
+      }
       setError(cause instanceof Error ? cause.message : 'Could not record this battle.');
       return null;
     }

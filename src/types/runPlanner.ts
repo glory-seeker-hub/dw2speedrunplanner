@@ -1,3 +1,4 @@
+import { BattleTechniqueAudit } from '@/types/techniqueCapacity';
 import { TechniquePotential } from '@/types/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
 import { DomainPhase } from '@/types/encounter';
@@ -44,6 +45,7 @@ interface RunEventBase {
 
 export interface RunBattleEvent extends RunEventBase {
   type: 'battle';
+  techniqueChoices: BattleTechniqueAudit[];
   domainId: string;
   phase: DomainPhase;
   floor: number;
@@ -90,7 +92,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 4;
+  schemaVersion: 5;
   runs: RunPlan[];
   activeRunId: string | null;
 }

@@ -1,3 +1,6 @@
+import { BattleTechniqueAudit, BattleTechniqueChoice, TechniqueSelection } from '@/types/techniqueCapacity';
+import { getBattleTechniqueChoices } from '@/utils/battleTechniqueChoices';
+import { BattleTechniqueSelectionRequired, resolveTechniqueChoice } from '@/utils/techniqueCapacity';
 import { RosterDigimon } from '@/types/runPlanner';
 import { StatGrowthEstimate } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
@@ -45,6 +48,7 @@ export interface ParticipantOutcome {
 }
 
 export interface BattleResolution {
+  techniqueChoices: BattleTechniqueAudit[];
   encounterId: number;
   /** Snapshot of the participating instance IDs, taken before any mutation. */
   participantIds: string[];
@@ -59,6 +63,12 @@ export interface BattleResolution {
   totalBits: number;
 }
 
+export interface BattleChoiceReview {
+  status: 'selection-required';
+  choices: BattleTechniqueChoice[];
+  expectedRunState: string;
+}
+
 export interface ResolveBattleInput {
   encounterId: number;
   /** Instance IDs of the Digiline that fought (max 3). */
@@ -67,6 +77,8 @@ export interface ResolveBattleInput {
   totalBits: number;
   capturedEnemySlot?: number | null;
   capturedMaxLevel?: number | null;
+  techniqueSelections?: TechniqueSelection[];
+  reviewTechniques?: boolean;
 }
 
 export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
@@ -82,16 +94,30 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
   const xpAwarded = reward?.xp ?? 0;
   const bitsAwarded = reward?.bits ?? 0;
 
+  const choices = getBattleTechniqueChoices(roster, participantIds, xpAwarded);
+  const selections = input.techniqueSelections ?? [];
+  if (new Set(selections.map(s => s.instanceId)).size !== selections.length ||
+      selections.some(s => !choices.some(c => c.instanceId === s.instanceId))) throw new Error('Invalid participant technique selection');
+  const resolvedChoices = choices.map(entry => ({ entry, result: resolveTechniqueChoice(entry.choice,
+    selections.find(s => s.instanceId === entry.instanceId)?.keptKeys) }));
+  if ((input.reviewTechniques && choices.length > 0) || resolvedChoices.some(c => c.result.status === 'selection-required')) {
+    throw new BattleTechniqueSelectionRequired(choices);
+  }
+  const techniqueChoices: BattleTechniqueAudit[] = [];
   const outcomes: ParticipantOutcome[] = [];
   const nextRoster = roster.map((entry) => {
     if (!participantIds.includes(entry.instanceId)) return entry;
 
     // 2. Cap-aware XP + 3. at most one level-up.
     const xp = applyBattleXp(entry.level, entry.totalXp, xpAwarded, entry.levelCap);
-    const techniqueState = xp.leveledUp
+    const selected = resolvedChoices.find(c => c.entry.instanceId === entry.instanceId)?.result;
+    const techniqueState = selected?.status === 'resolved'
+      ? { techs: selected.techs, techniquePool: selected.techniquePool, learnedTechniques: selected.learned }
+      : xp.leveledUp
       ? advanceTechniqueState(registerOwnTechnique({ techs: entry.techs, techniquePool: entry.techniquePool }, entry.speciesId, entry.level), entry.level, xp.newLevel)
       : { techs: entry.techs, techniquePool: entry.techniquePool, learnedTechniques: [] };
     const { learnedTechniques } = techniqueState;
+    if (selected?.status === 'resolved') techniqueChoices.push({ instanceId: entry.instanceId, learned: selected.learned, discarded: selected.discarded });
 
     // 4. Deterministic expected stat growth on level-up only.
     let newStats = entry.stats;
@@ -143,6 +169,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
 
   return {
     encounterId,
+    techniqueChoices,
     participantIds,
     xpAwarded,
     bitsAwarded,
