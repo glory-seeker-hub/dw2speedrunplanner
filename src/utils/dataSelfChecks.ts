@@ -65,6 +65,7 @@ const roster = (partial: Partial<RosterDigimon>): RosterDigimon => ({
   levelCap: { min: 50, max: 50, resolved: 50 },
   stats: { hp: 30, mp: 20, atk: 20, def: 18, spd: 12 },
   techs: [],
+  techniquePool: [],
   ...partial,
 });
 

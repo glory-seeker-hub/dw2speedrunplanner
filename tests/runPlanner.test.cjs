@@ -38,7 +38,7 @@ beforeEach(() => {
     removeItem: (key) => values.delete(key),
   };
 });
-const envelope = (run) => ({ schemaVersion: 3, runs: [run], activeRunId: run.id });
+const envelope = (run) => ({ schemaVersion: 4, runs: [run], activeRunId: run.id });
 for (const starter of STARTERS) {
   test(starter.label + ' creates, persists, reloads, resets and recreates a valid run', () => {
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
@@ -93,11 +93,11 @@ test('storage rejects duplicate instances, duplicate run IDs and broken active r
     envelope({...run, digiline: [run.starterInstanceId, run.starterInstanceId]}),
   ]) assert.equal(storage.saveRunPlannerData(data), false);
 });
-test('saving a remaining run preserves the version-3 multi-run envelope', () => {
+test('saving a remaining run preserves the version-4 multi-run envelope', () => {
   const first = createRunPlan('gold-hawk', 'First');
   const second = createRunPlan('blue-falcon', 'Second');
-  assert.equal(storage.saveRunPlannerData({schemaVersion: 3,runs:[first,second],activeRunId:first.id}),true);
-  const remaining = {schemaVersion: 3,runs:[second],activeRunId:null};
+  assert.equal(storage.saveRunPlannerData({schemaVersion: 4,runs:[first,second],activeRunId:first.id}),true);
+  const remaining = {schemaVersion: 4,runs:[second],activeRunId:null};
   assert.equal(storage.saveRunPlannerData(remaining), true);
   assert.deepEqual(storage.loadRunPlannerData(), remaining);
 });
@@ -691,7 +691,7 @@ test('failed Undo save leaves current run, history and feedback revision unchang
 test('stale confirmation cannot undo a different battle or another saved run', () => {
   const first=recording.recordRunBattle(multiRun(),normalBattle()).run;
   const other=createRunPlan('blue-falcon','Other');
-  storage.saveRunPlannerData({schemaVersion: 3,runs:[first,other],activeRunId:first.id});
+  storage.saveRunPlannerData({schemaVersion: 4,runs:[first,other],activeRunId:first.id});
   const render=plannerHost(); const planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.undoAction(first.history[0].id,first.id),false);
@@ -711,10 +711,13 @@ const captureFoundation = load('src/utils/capture.ts');
 const battleFoundation = load('src/utils/runProgression.ts');
 const speciesLookup = load('src/utils/digimonLookup.ts');
 const techLookup = load('src/utils/techLookup.ts');
+const inheritance = load('src/utils/techniqueInheritance.ts');
+const techniqueMetadata = load('src/data/techniqueMetadata.ts');
 const foundationMember = (name, level, extra={}) => {
   const species=speciesLookup.getDigimonByName(name);
-  return {...createRunPlan('gold-hawk','Fixture').roster[0],speciesId:species.id,name:species.name,
+  const member = {...createRunPlan('gold-hawk','Fixture').roster[0],speciesId:species.id,name:species.name,
     level,totalXp:1000000,levelCap:{min:53,max:53,resolved:53},...extra};
+  return {...member, ...inheritance.createAvailableTechniqueState(member.techs, {type:"starter",speciesId:species.id})};
 };
 test('Phase 2F authoritative data audit preserves all counts and known diagnostics', () => {
   const r=progressionAudit.getProgressionValidationReport();
@@ -900,10 +903,10 @@ const renderPlanner = run => require('react-dom/server').renderToStaticMarkup(re
   {planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}
 ));
 
-test('schema v3 is explicit and rejects schema v2 without migration or writes',()=>{
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,3);
-  assert.equal(storage.emptyRunPlannerData().schemaVersion,3);
-  const old={...envelope(evolutionRun()),schemaVersion:2};
+test('schema v4 is explicit and rejects schema v3 without migration or writes',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,4);
+  assert.equal(storage.emptyRunPlannerData().schemaVersion,4);
+  const old={...envelope(evolutionRun()),schemaVersion:3};
   const raw=JSON.stringify(old);values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
   assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
   assert.equal(storage.saveRunPlannerData(old),false);
@@ -1058,7 +1061,7 @@ test('Digivolution save failure is atomic; retry succeeds once and stale preview
 
 test('changed stats or switched runs invalidate previews; immediate Digiline edits retain new history',()=>{
   const initial=evolutionRun(),other=evolutionRun();
-  storage.saveRunPlannerData({schemaVersion:3,runs:[initial,other],activeRunId:initial.id});
+  storage.saveRunPlannerData({schemaVersion: 4,runs:[initial,other],activeRunId:initial.id});
   const render=plannerHost(),planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
@@ -1429,4 +1432,306 @@ test('DNA unsupported actual result rank fails instead of falling back to matrix
  const metadata=progressionData.getSpeciesProgression('vademon');const old=metadata.rank;
  try{metadata.rank='Mega';assert.equal(dnaPreview(dnaParent('Cherrymon','a'),dnaParent('MasterTyrannomon','b')).reason,'unsupported-result-rank');}
  finally{metadata.rank=old;}
+});
+
+// Phase 2G-B: explicit planner identity, latent potentials, and pure DNA inheritance.
+const techniqueAudit = load('src/utils/techniqueValidation.ts');
+const techniqueReport = techniqueAudit.getTechniqueValidationReport();
+for (const [field,expected] of Object.entries({species:195,named:182,none:13,unique:179,crossRankConflicts:0,captureSlots:238,captureLabels:173,captureResolved:173,captureAmbiguous:0})) {
+  test(`technique metadata audit ${field} = ${expected}`,()=>assert.equal(techniqueReport[field],expected));
+}
+test('technique ranks and Party Time duplicate owners are intrinsic and unique',()=>{
+  assert.deepEqual(techniqueReport.rankCounts,{Rookie:31,Champion:69,Ultimate:51,Mega:28});
+  assert.deepEqual(techniqueReport.partyTimeOwners.map(id=>speciesLookup.getDigimonById(id).name).sort(),['Nanimon','Numemon','Sukamon','Vegiemon']);
+  assert.equal(techniqueMetadata.getTechniqueRank('Party Time'),'Champion');
+  assert.throws(()=>techniqueMetadata.buildTechniqueMetadata([{ownTechnique:'Party Time',rank:'Rookie'},{ownTechnique:'Party Time',rank:'Champion'}]),/Conflicting/);
+});
+for(const [raw,canonical] of [['Blaze Blaster','Blaze Buster'],['FLer Cannon','Flower Cannon'],['Ninja FLer','Ninja Flower']]) {
+  test(`reviewed technique alias ${raw} -> ${canonical}`,()=>{
+    assert.equal(techniqueMetadata.getTechniqueIdentity(raw).name,canonical);
+    assert.equal(techniqueMetadata.normalizeTechniqueName(raw),techniqueMetadata.normalizeTechniqueName(canonical));
+  });
+}
+test('technique normalization does not guess similar spellings',()=>{
+  assert.equal(techniqueMetadata.getTechniqueIdentity('Blaze Blaste'),undefined);
+  assert.notEqual(techniqueMetadata.normalizeTechniqueName('Blaze Blast'),techniqueMetadata.normalizeTechniqueName('Blaze Blaster'));
+  assert.notEqual(techniqueMetadata.normalizeTechniqueName('Left Hand'),techniqueMetadata.normalizeTechniqueName('Right Hand'));
+});
+test('all 45 simulator-unresolved labels retain planner ranks independently',()=>{
+  assert.equal(techniqueReport.unresolvedSimulatorLabels.length,45);
+  assert.deepEqual(techniqueReport.simulatorLabelsWithoutRank,[]);
+  assert.deepEqual(techniqueReport.captureUnresolved,[]);
+});
+for(const starter of STARTERS) test(`starter pool preserves ${starter.name} current techniques`,()=>{
+  const member=captureFoundation.createStarterDigimon(starter);
+  assert.deepEqual(member.techs,starter.techs);
+  assert.ok(inheritance.isValidTechniqueState(member));
+  assert.ok(member.techniquePool.every(p=>p.unlock.status==='available' && p.sources[0].type==='starter'));
+});
+test('every recordable capture preserves source techniques and resolves intrinsic ranks',()=>{
+  const {DOMAIN_GROUPS}=load('src/data/domainGroups.ts');const {encounters}=load('src/data/encounters.ts');
+  const cap=load('src/utils/levelCap.ts');const xp=load('src/utils/experience.ts');
+  const ids=new Set(DOMAIN_GROUPS.filter(g=>!g.isBoss).map(g=>g.encounterId));let count=0;
+  for(const e of encounters.filter(e=>ids.has(e.id))) for(const d of e.digimons){
+    const c=cap.getInitialLevelCap(d.level);if(!c || xp.getRequiredTotalXpForLevel(d.level)===null)continue;
+    const result=captureFoundation.tryCreateCapturedDigimon(e.id,d.slot,c.min);
+    assert.equal(result.ok,true,`${e.id}/${d.slot}: ${result.reason}`);
+    assert.deepEqual(result.digimon.techs,d.techs);
+    assert.ok(inheritance.isValidTechniqueState(result.digimon));
+    assert.ok(result.digimon.techniquePool.every(p=>p.unlock.status==='available'));
+    count++;
+  }
+  assert.equal(count,238);
+  const capture=captureFoundation.tryCreateCapturedDigimon(10,1,cap.getInitialLevelCap(encounters.find(e=>e.id===10).digimons.find(d=>d.slot===1).level).min).digimon;
+  assert.equal(progressionData.getSpeciesProgression(capture.speciesId).rank,'Champion');
+  assert.equal(capture.techniquePool.find(p=>p.name==='Spiral Twister').rank,'Rookie');
+});
+const techParent=(id,names)=>({instanceId:id,...inheritance.createAvailableTechniqueState(names,{type:'starter',speciesId:'agumon'})});
+const rankedNames=['Pepper Breath','Spiral Twister','Party Time','Mega Heal','Ninja Flower','Venom Infusion'];
+const childTech=(name,level,a=techParent('a',rankedNames),b=techParent('b',['Party Time']))=>{
+  const species=speciesLookup.getDigimonByName(name);
+  return inheritance.calculateDnaTechniqueState({speciesId:species.id,actualRank:progressionData.getSpeciesProgression(species.id).rank,startingLevel:level},a,b);
+};
+const potential=(state,name)=>state.techniquePool.find(p=>p.key===techniqueMetadata.normalizeTechniqueName(name));
+for(const [name,level] of [['Agumon',1],['Greymon',11],['MetalGreymon',21],['Vademon',21],['Yanmamon',11],['SandYanmamon',11],['WarGreymon',31]]){
+  test(`${name} DNA uses actual rank and starting threshold for every inherited rank`,()=>{
+    const a=freeze(techParent('a',rankedNames)),b=freeze(techParent('b',['Party Time']));const before=JSON.stringify([a,b]);
+    const child=childTech(name,level,a,b);
+    assert.ok(inheritance.isValidTechniqueState(child));
+    assert.equal(JSON.stringify([a,b]),before);
+    assert.deepEqual(child,childTech(name,level,b,a));
+    const own=progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).ownTechnique;
+    for(const raw of rankedNames){
+      const p=potential(child,raw);const threshold=techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[p.rank];
+      assert.deepEqual(p.unlock,(level>=threshold || (level===1 && p.key===techniqueMetadata.normalizeTechniqueName(own))) ? {status:'available'} : {status:'pending',level:threshold});
+    }
+    assert.deepEqual(potential(child,own).unlock,level===1 ? {status:'available'} : {status:'pending',level:level+1});
+    assert.equal(child.techniquePool.filter(p=>p.name==='Party Time').length,1);
+    assert.deepEqual(potential(child,'Party Time').sources,[{type:'inherited',parentInstanceId:'a'},{type:'inherited',parentInstanceId:'b'}]);
+  });
+}
+test('DNA own Rookie duplicate wins EL1 and merges own/inherited provenance',()=>{
+  const child=childTech('Agumon',1);
+  assert.equal(child.techs.filter(n=>n==='Pepper Breath').length,1);
+  assert.deepEqual(potential(child,'Pepper Breath').unlock,{status:'available'});
+  assert.equal(potential(child,'Pepper Breath').sources.length,2);
+  assert.deepEqual(potential(child,'Spiral Twister').unlock,{status:'pending',level:2});
+});
+for(const [name,level] of [['Agumon',11],['Greymon',21],['MetalGreymon',31]]){
+  test(`normal ${name} evolution registers own potential and preserves existing state`,()=>{
+    const member=foundationMember(name,level);const old=structuredClone(member);
+    const evolved=evolution.applyNormalDigivolution(freeze(member));
+    assert.deepEqual(member,old);assert.deepEqual(evolved.techs,old.techs);
+    for(const p of old.techniquePool)assert.deepEqual(potential(evolved,p.name),p);
+    const own=progressionData.getSpeciesProgression(evolved.speciesId).ownTechnique;
+    assert.deepEqual(potential(evolved,own).unlock,{status:'pending',level:level+1});
+    const advanced=inheritance.advanceTechniqueState(evolved,level,level+1);
+    assert.deepEqual(advanced.learnedTechniques,[techniqueMetadata.getTechniqueIdentity(own).name]);
+    assert.deepEqual(potential(advanced,own).unlock,{status:'available'});
+    assert.deepEqual(inheritance.advanceTechniqueState(advanced,level+1,level+2).learnedTechniques,[]);
+    const late=evolution.applyNormalDigivolution(foundationMember(name,level+2));
+    assert.deepEqual(potential(late,own).unlock,{status:'missed',level:level+1});
+    assert.deepEqual(inheritance.advanceTechniqueState(late,level+2,level+3).learnedTechniques,[]);
+    const at=evolution.applyNormalDigivolution(foundationMember(name,level+1));
+    assert.equal(potential(at,own).unlock.status,'missed');
+  });
+}
+for(const [rank,threshold] of Object.entries(techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS)){
+  test(`${rank} level-up returns the full batch once without a 12-technique limit`,()=>{
+    const names=[...new Set(progressionData.SPECIES_PROGRESSION.filter(r=>r.rank===rank && r.ownTechnique).map(r=>r.ownTechnique))];
+    const initial=childTech('Agumon',1,techParent('a',names),techParent('b',names));
+    const pending=initial.techniquePool.filter(p=>p.rank===rank && p.unlock.status==='pending').map(p=>p.name);
+    const next=inheritance.advanceTechniqueState(freeze(initial),threshold-1,threshold);
+    assert.deepEqual(next.learnedTechniques,pending);
+    assert.ok(next.learnedTechniques.length>12);
+    assert.equal(new Set(next.techs.map(techniqueMetadata.normalizeTechniqueName)).size,next.techs.length);
+    assert.ok(inheritance.isValidTechniqueState(next));
+    assert.deepEqual(inheritance.advanceTechniqueState(next,threshold,threshold+1).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold-1).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold+1).learnedTechniques,[]);
+  });
+}
+test('multiple generations exclude missed and pending pools and reset own Rookie privilege',()=>{
+  const late=evolution.applyNormalDigivolution(foundationMember('Agumon',13));
+  const missed=late.techniquePool.find(p=>p.unlock.status==='missed');assert.ok(missed);
+  const first=childTech('Agumon',1,{...late,instanceId:'a'},techParent('b',['Venom Infusion']));
+  assert.equal(potential(first,missed.name),undefined);
+  const member={...foundationMember('Agumon',11),...first};
+  const evolved=evolution.applyNormalDigivolution(freeze(member));
+  for(const p of first.techniquePool)assert.deepEqual(potential(evolved,p.name),p);
+  const second=childTech('MetalGreymon',21,{...evolved,instanceId:'a'},techParent('b',[]));
+  assert.equal(potential(second,missed.name),undefined);
+  assert.equal(potential(second,'Venom Infusion'),undefined);
+  const rookie=childTech('Biyomon',1,{...first,instanceId:'a'},techParent('b',[]));
+  assert.deepEqual(potential(rookie,'Pepper Breath').unlock,{status:'pending',level:2});
+});
+test('pure DNA rejects mismatched actual rank and malformed parent metadata',()=>{
+  const species=speciesLookup.getDigimonByName('Vademon');
+  assert.throws(()=>inheritance.calculateDnaTechniqueState({speciesId:species.id,actualRank:'Champion',startingLevel:21},techParent('a',[]),techParent('b',[])),/actual DNA/);
+  assert.throws(()=>childTech('Agumon',1,{...techParent('a',['Party Time']),techs:[]},techParent('b',[])),/parent technique/);
+});
+test('schema v4 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
+  const undo=load('src/utils/runActionUndo.ts');const checkpoint=load('src/utils/runActionCheckpoint.ts');
+  const run=evolutionRun();run.roster[0]={...run.roster[0],...childTech('Agumon',1)};
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,4);
+  assert.equal(storage.saveRunPlannerData(envelope(run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(run));
+  assert.deepEqual(checkpoint.createRunActionCheckpoint(run).roster,run.roster);
+  const evolved=recordRunDigivolution(freeze(run),run.starterInstanceId).run;
+  assert.deepEqual(undo.undoLastAction(evolved).run.roster,run.roster);
+  const battle=recording.recordRunBattle(evolved,normalBattle());
+  assert.ok(battle.resolution.outcomes[0].learnedTechniques.includes('Party Time'));
+  assert.deepEqual(undo.undoLastAction(battle.run).run.roster,evolved.roster);
+  assert.equal(storage.saveRunPlannerData(envelope(battle.run)),true);
+  assert.deepEqual(storage.loadRunPlannerData(),envelope(battle.run));
+});
+for(const [label,change] of [
+  ['duplicate pool keys',s=>s.techniquePool.push(structuredClone(s.techniquePool[0]))],
+  ['conflicting rank',s=>s.techniquePool[0].rank='Mega'],
+  ['missing available label',s=>s.techs=[]],
+  ['available missing pool',s=>s.techniquePool=[]],
+  ['pending in techs',s=>s.techniquePool[0].unlock={status:'pending',level:2}],
+  ['missed in techs',s=>s.techniquePool[0].unlock={status:'missed',level:2}],
+  ['duplicate usable alias',s=>s.techs.push('pepper-breath')],
+  ['incorrect unlock level',s=>{s.techs=[];s.techniquePool[0].unlock={status:'pending',level:12};}],
+  ['missing provenance',s=>s.techniquePool[0].sources=[]],
+  ['missing pool',s=>delete s.techniquePool],
+])test(`schema v4 rejects ${label} in roster and checkpoints`,()=>{
+  const run=createRunPlan('gold-hawk','Validation');change(run.roster[0]);
+  assert.equal(inheritance.isValidTechniqueState(run.roster[0]),false);
+  assert.ok(validateRunPlan(run).length>0);
+  assert.equal(storage.saveRunPlannerData(envelope(run)),false);
+  const cp=load('src/utils/runActionCheckpoint.ts');assert.equal(cp.isValidRunActionCheckpoint(cp.createRunActionCheckpoint(run)),false);
+});
+for(const [rank,level,name] of [['Rookie',1,'Agumon'],['Champion',11,'Greymon'],['Ultimate',21,'MetalGreymon'],['Mega',31,'WarGreymon']])test(`battle integration unlocks ${rank} batch and leaves no-level state untouched`,()=>{
+  const names=progressionData.SPECIES_PROGRESSION.filter(r=>r.rank===rank && r.ownTechnique).slice(0,16).map(r=>r.ownTechnique);
+  const state=childTech(name,level,techParent('a',names),techParent('b',[]));
+  const member={...foundationMember(name,level),...state};
+  const input={encounterId:1,digilineInstanceIds:[member.instanceId],roster:[member],totalBits:1030};
+  const resolved=battleFoundation.resolveBattle(freeze(input));
+  assert.equal(resolved.outcomes[0].newLevel,level+1);
+  assert.deepEqual(resolved.outcomes[0].learnedTechniques,state.techniquePool.filter(p=>p.unlock.status==='pending' && p.unlock.level===level+1).map(p=>p.name));
+  assert.ok(inheritance.isValidTechniqueState(resolved.roster[0]));
+  const capped={...member,levelCap:{min:level,max:level,resolved:level}};
+  const unchanged=battleFoundation.resolveBattle({...input,roster:[capped]});
+  assert.deepEqual(unchanged.outcomes[0].learnedTechniques,[]);
+  assert.deepEqual(unchanged.roster[0].techniquePool,state.techniquePool);
+});
+test('normal Rookie progression never introduces a new own technique and null own is not invented',()=>{
+  const empty={techs:[],techniquePool:[]};
+  assert.deepEqual(inheritance.registerOwnTechnique(empty,speciesLookup.getDigimonByName('Agumon').id,1),empty);
+  const species=progressionData.SPECIES_PROGRESSION.find(s=>s.ownTechnique===null);
+  assert.deepEqual(inheritance.calculateDnaTechniqueState({speciesId:species.speciesId,actualRank:species.rank,startingLevel:1},techParent('a',[]),techParent('b',[])),empty);
+});
+
+// Corrected Phase 2G-B inheritance: only current possession propagates.
+const withoutPossession=(state,name,unlock)=>{
+  const next=structuredClone(state),key=techniqueMetadata.normalizeTechniqueName(name);
+  next.techs=next.techs.filter(n=>techniqueMetadata.normalizeTechniqueName(n)!==key);
+  potential(next,name).unlock=unlock;
+  return next;
+};
+for(const [status,unlock] of [['pending',{status:'pending',level:12}],['missed',{status:'missed',level:12}],['discarded',{status:'discarded'}]]){
+  test(`DNA excludes ${status} metadata even with inherited provenance`,()=>{
+    const original=techParent('a',['Party Time','Spiral Twister']);
+    const parent=withoutPossession(original,'Party Time',unlock);
+    potential(parent,'Party Time').sources.push({type:'inherited',parentInstanceId:'earlier-generation'});
+    assert.ok(inheritance.isValidTechniqueState(parent));
+    const child=childTech('Agumon',1,freeze(parent),techParent('b',[]));
+    assert.equal(potential(child,'Party Time'),undefined);
+    assert.deepEqual(potential(child,'Spiral Twister').unlock,{status:'pending',level:2});
+    assert.deepEqual(potential(parent,'Party Time').unlock,unlock);
+  });
+  test(`DNA rejects ${status} metadata appearing in current techs`,()=>{
+    const parent=techParent('a',['Party Time']);potential(parent,'Party Time').unlock=unlock;
+    assert.equal(inheritance.isValidTechniqueState(parent),false);
+    assert.throws(()=>childTech('Agumon',1,parent,techParent('b',[])),/parent technique state/);
+  });
+}
+for(const [name,level] of [['Vademon',21],['Yanmamon',11],['SandYanmamon',11]]){
+  test(`${name} inherits only possessed techniques and independently creates its own potential`,()=>{
+    let parent=techParent('a',['Spiral Twister','Party Time','Ninja Flower','Venom Infusion']);
+    parent=withoutPossession(parent,'Party Time',{status:'missed',level:12});
+    parent=withoutPossession(parent,'Ninja Flower',{status:'discarded'});
+    parent=withoutPossession(parent,'Venom Infusion',{status:'pending',level:32});
+    const child=childTech(name,level,parent,techParent('b',[]));
+    assert.equal(child.techniquePool.length,2);
+    assert.equal(potential(child,'Spiral Twister').unlock.status,'available');
+    for(const label of ['Party Time','Ninja Flower','Venom Infusion'])assert.equal(potential(child,label),undefined);
+    const own=progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).ownTechnique;
+    assert.deepEqual(potential(child,own).unlock,{status:'pending',level:level+1});
+    assert.deepEqual(potential(child,own).sources,[{type:'own-species',speciesId:speciesLookup.getDigimonByName(name).id}]);
+    assert.deepEqual(child,childTech(name,level,techParent('b',[]),parent));
+  });
+}
+for(const [label,level] of [['Party Time',12],['Ninja Flower',22],['Venom Infusion',32]]){
+  test(`${label} cannot propagate before EL${level}, but can after its actual battle unlock`,()=>{
+    const first=childTech('Agumon',1,techParent('a',[label]),techParent('b',[]));
+    assert.deepEqual(potential(first,label).unlock,{status:'pending',level});
+    const before={...foundationMember('Agumon',level-1),...first,instanceId:'second-generation'};
+    assert.equal(potential(childTech('Biyomon',1,before,techParent('other',[])),label),undefined);
+    const battle=battleFoundation.resolveBattle({encounterId:1,digilineInstanceIds:[before.instanceId],roster:[freeze(before)],totalBits:1030});
+    const learned=battle.roster[0];
+    assert.equal(learned.level,level);assert.ok(learned.techs.includes(label));
+    assert.deepEqual(potential(learned,label).unlock,{status:'available'});
+    const third=childTech('Biyomon',1,learned,techParent('other',[]));
+    assert.deepEqual(potential(third,label).unlock,{status:'pending',level});
+    assert.deepEqual(potential(third,label).sources,[{type:'inherited',parentInstanceId:'second-generation'}]);
+  });
+}
+test('DNA current labels resolve reviewed aliases through available pool metadata',()=>{
+  const parent=techParent('a',['Blaze Blaster','FLer Cannon','Ninja FLer']);
+  const child=childTech('Agumon',1,parent,techParent('b',['Blaze Buster']));
+  for(const name of ['Blaze Buster','Flower Cannon','Ninja Flower'])assert.ok(potential(child,name));
+  assert.deepEqual(potential(child,'Blaze Buster').sources,[{type:'inherited',parentInstanceId:'a'},{type:'inherited',parentInstanceId:'b'}]);
+  assert.deepEqual(child,childTech('Agumon',1,techParent('b',['Blaze Buster']),parent));
+});
+test('child own technique is recreated independently of excluded parent discarded state',()=>{
+  const parent=withoutPossession(techParent('a',['Pepper Breath']),'Pepper Breath',{status:'discarded'});
+  const child=childTech('Agumon',1,parent,techParent('b',[]));
+  assert.deepEqual(child.techs,['Pepper Breath']);
+  assert.deepEqual(potential(child,'Pepper Breath').sources,[{type:'own-species',speciesId:speciesLookup.getDigimonByName('Agumon').id}]);
+});
+test('discarded former own techniques remain discarded through evolution and battle milestones',()=>{
+  const own=progressionData.getSpeciesProgression(evolution.applyNormalDigivolution(foundationMember('Agumon',11)).speciesId).ownTechnique;
+  const base=foundationMember('Agumon',11,{techs:['Pepper Breath',own]});
+  const member=withoutPossession(base,own,{status:'discarded'});
+  const evolved=evolution.applyNormalDigivolution(freeze(member));
+  assert.equal(progressionData.getSpeciesProgression(evolved.speciesId).ownTechnique,own);
+  assert.deepEqual(potential(evolved,own),potential(member,own));
+  assert.deepEqual(evolution.getLearnedTechniques(evolved,12),[]);
+  const battle=battleFoundation.resolveBattle({encounterId:1,digilineInstanceIds:[evolved.instanceId],roster:[evolved],totalBits:1030});
+  assert.equal(battle.roster[0].level,12);
+  assert.deepEqual(battle.outcomes[0].learnedTechniques,[]);
+  assert.deepEqual(potential(battle.roster[0],own).unlock,{status:'discarded'});
+  assert.equal(potential(childTech('Biyomon',1,battle.roster[0],techParent('b',[])),own),undefined);
+});
+test('schema v4 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
+  const run=evolutionRun();
+  run.roster[0]={...run.roster[0],...inheritance.createAvailableTechniqueState(['Pepper Breath','Party Time'],{type:'starter',speciesId:run.roster[0].speciesId})};
+  run.roster[0]=withoutPossession(run.roster[0],'Party Time',{status:'discarded'});
+  const original=structuredClone(run.roster[0].techniquePool);
+  assert.equal(storage.isValidPersistedRunPlannerData(envelope(run)),true);
+  assert.equal(storage.saveRunPlannerData(envelope(run)),true);
+  assert.deepEqual(storage.loadRunPlannerData(),envelope(run));
+  const checkpoint=load('src/utils/runActionCheckpoint.ts');
+  const cp=checkpoint.createRunActionCheckpoint(run);
+  assert.ok(checkpoint.isValidRunActionCheckpoint(cp));assert.deepEqual(cp.roster[0].techniquePool,original);
+  const evolved=recordRunDigivolution(run,run.starterInstanceId).run;
+  const undo=load('src/utils/runActionUndo.ts');
+  assert.deepEqual(undo.undoLastAction(evolved).run.roster[0].techniquePool,original);
+  const battle=recording.recordRunBattle(evolved,normalBattle()).run;
+  assert.deepEqual(undo.undoLastAction(battle).run.roster,evolved.roster);
+  assert.equal(storage.saveRunPlannerData(envelope(battle)),true);
+  assert.deepEqual(storage.loadRunPlannerData(),envelope(battle));
+});
+test('storage rejects discarded entries in techs or with invalid level metadata',()=>{
+  for(const inTechs of [true,false]){
+    const run=createRunPlan('gold-hawk','Invalid discarded');
+    if(inTechs)run.roster[0].techniquePool[0].unlock={status:'discarded'};
+    else {run.roster[0].techs=[];run.roster[0].techniquePool[0].unlock={status:'discarded',level:2};}
+    assert.equal(storage.saveRunPlannerData(envelope(run)),false);
+    assert.ok(validateRunPlan(run).length>0);
+    const cp=load('src/utils/runActionCheckpoint.ts');
+    assert.equal(cp.isValidRunActionCheckpoint(cp.createRunActionCheckpoint(run)),false);
+  }
 });

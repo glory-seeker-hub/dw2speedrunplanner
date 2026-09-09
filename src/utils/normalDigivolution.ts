@@ -1,3 +1,5 @@
+import { registerOwnTechnique } from '@/utils/techniqueInheritance';
+import { normalizeTechniqueName } from '@/data/techniqueMetadata';
 import { METALKID_DIGIMON_SOURCE, METALKID_EVOLUTION_SOURCE } from '@/data/evolutionSource';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 import { getDigimonById, getDigimonByName } from '@/utils/digimonLookup';
@@ -42,7 +44,7 @@ export const previewNormalDigivolution = (entry: RosterDigimon): DigivolutionPre
   if (!target || getSpeciesProgression(target.id)?.rank !== rule.target) return { canDigivolve: false, reason: 'Invalid target rank metadata' };
   return { canDigivolve: true, targetSpeciesId: target.id, digimon: { ...entry,
     speciesId: target.id, name: target.name, source: { ...entry.source }, levelCap: { ...entry.levelCap },
-    stats: { ...entry.stats, hp: entry.stats.hp + 30, mp: entry.stats.mp + 30 }, techs: [...entry.techs] } };
+    stats: { ...entry.stats, hp: entry.stats.hp + 30, mp: entry.stats.mp + 30 }, ...registerOwnTechnique({ techs: entry.techs, techniquePool: entry.techniquePool }, target.id, entry.level) } };
 };
 
 export const applyNormalDigivolution = (entry: RosterDigimon): RosterDigimon => {
@@ -55,5 +57,7 @@ export const getLearnedTechniques = (entry: RosterDigimon, newLevel: number): st
   const metadata = getSpeciesProgression(entry.speciesId);
   const unlock = { Champion: 12, Ultimate: 22, Mega: 32 };
   const tech = metadata?.ownTechnique;
-  return tech && newLevel === entry.level + 1 && newLevel === unlock[metadata.rank as keyof typeof unlock] && !entry.techs.includes(tech) ? [tech] : [];
+  const potential = tech && entry.techniquePool.find(p => p.key === normalizeTechniqueName(tech));
+  if (potential && (potential.unlock.status === 'missed' || potential.unlock.status === 'discarded')) return [];
+  return tech && newLevel === entry.level + 1 && newLevel === unlock[metadata.rank as keyof typeof unlock] && !entry.techs.some(name => normalizeTechniqueName(name) === normalizeTechniqueName(tech)) ? [tech] : [];
 };
