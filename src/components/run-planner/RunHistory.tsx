@@ -43,6 +43,10 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
               <p>{event.xpReward} XP · {event.bitsReward} Bits</p>
               <p>Participants: {event.digilineInstanceIds.map(id => event.preActionCheckpoint.roster.find(member => member.instanceId === id)?.name ?? id).join(' · ')}</p>
               <p>Capture: {event.capturedEnemySlot == null ? 'None' : `Slot ${event.capturedEnemySlot} — ${captured?.name ?? 'Unknown enemy'}`}</p>
+              {event.techniqueChoices.map(choice => <p key={choice.instanceId}>
+                {event.preActionCheckpoint.roster.find(member => member.instanceId === choice.instanceId)?.name ?? choice.instanceId}:
+                {' '}Learned {choice.learned.join(', ') || 'none'} · Discarded {choice.discarded.join(', ') || 'none'}
+              </p>)}
               <p className="text-xs text-muted-foreground">Encounter {event.encounterId}</p>
             </li>;
           })}

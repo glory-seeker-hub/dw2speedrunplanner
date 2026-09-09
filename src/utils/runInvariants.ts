@@ -1,3 +1,4 @@
+import { MAX_TECHNIQUES } from '@/types/techniqueCapacity';
 import { isValidRunEvent } from '@/utils/runEventValidation';
 import { isRosterDigimon } from '@/utils/runActionCheckpoint';
 import {
@@ -49,6 +50,7 @@ export const validateRosterDigimonInvariants = (
   entry: RosterDigimon
 ): InvariantViolation[] => {
   const violations: InvariantViolation[] = [];
+  if (entry.techs?.length > MAX_TECHNIQUES) violations.push({ code: 'roster-technique-capacity', message: `A Digimon may possess at most ${MAX_TECHNIQUES} techniques.` });
   if (!isValidTechniqueState(entry)) violations.push({ code: 'roster-invalid-techniques', message: 'Technique pool metadata and available techniques must agree.' });
   if (!Number.isInteger(entry.dp) || entry.dp < 0) violations.push({ code: 'roster-invalid-dp', message: 'DP must be a non-negative integer.' });
   if (!isValidLevelCap(entry.levelCap)) violations.push({ code: 'roster-invalid-cap', message: 'Invalid level cap state.' });

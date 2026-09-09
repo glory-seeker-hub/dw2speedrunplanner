@@ -1,3 +1,4 @@
+import { isValidBattleTechniqueAudit } from '@/utils/battleTechniqueChoices';
 import { RunEvent } from '@/types/runPlanner';
 import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
 import { isValidRunActionCheckpoint } from '@/utils/runActionCheckpoint';
@@ -18,6 +19,7 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
   if (!nonEmptyString(v.id) || !integer(v.order, 0) || !isValidRunActionCheckpoint(v.preActionCheckpoint)) return false;
   const checkpoint = v.preActionCheckpoint;
   if (v.type === 'battle') {
+    if (!reward(v.xpReward) || !isValidBattleTechniqueAudit(v.techniqueChoices, checkpoint.roster, checkpoint.digiline, v.xpReward)) return false;
     if (v.capturedEnemySlot == null) {
       if (v.capturedInstanceId !== null || v.capturedLevelCap !== null) return false;
     } else {

@@ -38,7 +38,7 @@ beforeEach(() => {
     removeItem: (key) => values.delete(key),
   };
 });
-const envelope = (run) => ({ schemaVersion: 4, runs: [run], activeRunId: run.id });
+const envelope = (run) => ({ schemaVersion: 5, runs: [run], activeRunId: run.id });
 for (const starter of STARTERS) {
   test(starter.label + ' creates, persists, reloads, resets and recreates a valid run', () => {
     assert.deepEqual(storage.loadRunPlannerData(), storage.emptyRunPlannerData());
@@ -93,11 +93,11 @@ test('storage rejects duplicate instances, duplicate run IDs and broken active r
     envelope({...run, digiline: [run.starterInstanceId, run.starterInstanceId]}),
   ]) assert.equal(storage.saveRunPlannerData(data), false);
 });
-test('saving a remaining run preserves the version-4 multi-run envelope', () => {
+test('saving a remaining run preserves the version-5 multi-run envelope', () => {
   const first = createRunPlan('gold-hawk', 'First');
   const second = createRunPlan('blue-falcon', 'Second');
-  assert.equal(storage.saveRunPlannerData({schemaVersion: 4,runs:[first,second],activeRunId:first.id}),true);
-  const remaining = {schemaVersion: 4,runs:[second],activeRunId:null};
+  assert.equal(storage.saveRunPlannerData({schemaVersion: 5,runs:[first,second],activeRunId:first.id}),true);
+  const remaining = {schemaVersion: 5,runs:[second],activeRunId:null};
   assert.equal(storage.saveRunPlannerData(remaining), true);
   assert.deepEqual(storage.loadRunPlannerData(), remaining);
 });
@@ -222,7 +222,7 @@ test('add, reorder and remove each survive save/load with exact slot order', () 
 test('Digiline mutations preserve history snapshots, rewards, fractional stats and identity', () => {
   const run = multiRun();
   run.totalBits = 100;
-  run.history = [{type:'battle',id:'history',order:0,domainId:'test',phase:'before-blood-knights',floor:1,encounterId:182,
+  run.history = [{type:'battle',techniqueChoices:[],id:'history',order:0,domainId:'test',phase:'before-blood-knights',floor:1,encounterId:182,
     preActionCheckpoint:load('src/utils/runActionCheckpoint.ts').createRunActionCheckpoint(run),
     capturedEnemySlot:null,capturedInstanceId:null,capturedLevelCap:null,
     digilineInstanceIds:[run.starterInstanceId],xpReward:0,bitsReward:0}];
@@ -691,7 +691,7 @@ test('failed Undo save leaves current run, history and feedback revision unchang
 test('stale confirmation cannot undo a different battle or another saved run', () => {
   const first=recording.recordRunBattle(multiRun(),normalBattle()).run;
   const other=createRunPlan('blue-falcon','Other');
-  storage.saveRunPlannerData({schemaVersion: 4,runs:[first,other],activeRunId:first.id});
+  storage.saveRunPlannerData({schemaVersion: 5,runs:[first,other],activeRunId:first.id});
   const render=plannerHost(); const planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.undoAction(first.history[0].id,first.id),false);
@@ -903,10 +903,10 @@ const renderPlanner = run => require('react-dom/server').renderToStaticMarkup(re
   {planner:{data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0}}
 ));
 
-test('schema v4 is explicit and rejects schema v3 without migration or writes',()=>{
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,4);
-  assert.equal(storage.emptyRunPlannerData().schemaVersion,4);
-  const old={...envelope(evolutionRun()),schemaVersion:3};
+test('schema v5 is explicit and rejects schema v4 without migration or writes',()=>{
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
+  assert.equal(storage.emptyRunPlannerData().schemaVersion,5);
+  const old={...envelope(evolutionRun()),schemaVersion:4};
   const raw=JSON.stringify(old);values.set(storage.RUN_PLANNER_STORAGE_KEY,raw);
   assert.deepEqual(storage.loadRunPlannerData(),storage.emptyRunPlannerData());
   assert.equal(storage.saveRunPlannerData(old),false);
@@ -1061,7 +1061,7 @@ test('Digivolution save failure is atomic; retry succeeds once and stale preview
 
 test('changed stats or switched runs invalidate previews; immediate Digiline edits retain new history',()=>{
   const initial=evolutionRun(),other=evolutionRun();
-  storage.saveRunPlannerData({schemaVersion: 4,runs:[initial,other],activeRunId:initial.id});
+  storage.saveRunPlannerData({schemaVersion: 5,runs:[initial,other],activeRunId:initial.id});
   const render=plannerHost(),planner=render();
   planner.recordBattle(normalBattle());
   assert.equal(planner.digivolve(initial.id,initial.roster[0]),false);
@@ -1570,10 +1570,10 @@ test('pure DNA rejects mismatched actual rank and malformed parent metadata',()=
   assert.throws(()=>inheritance.calculateDnaTechniqueState({speciesId:species.id,actualRank:'Champion',startingLevel:21},techParent('a',[]),techParent('b',[])),/actual DNA/);
   assert.throws(()=>childTech('Agumon',1,{...techParent('a',['Party Time']),techs:[]},techParent('b',[])),/parent technique/);
 });
-test('schema v4 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
+test('schema v5 persists pool and checkpoints; Battle and Digivolution Undo restore exactly',()=>{
   const undo=load('src/utils/runActionUndo.ts');const checkpoint=load('src/utils/runActionCheckpoint.ts');
   const run=evolutionRun();run.roster[0]={...run.roster[0],...childTech('Agumon',1)};
-  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,4);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
   assert.equal(storage.saveRunPlannerData(envelope(run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(run));
   assert.deepEqual(checkpoint.createRunActionCheckpoint(run).roster,run.roster);
   const evolved=recordRunDigivolution(freeze(run),run.starterInstanceId).run;
@@ -1595,7 +1595,7 @@ for(const [label,change] of [
   ['incorrect unlock level',s=>{s.techs=[];s.techniquePool[0].unlock={status:'pending',level:12};}],
   ['missing provenance',s=>s.techniquePool[0].sources=[]],
   ['missing pool',s=>delete s.techniquePool],
-])test(`schema v4 rejects ${label} in roster and checkpoints`,()=>{
+])test(`schema v5 rejects ${label} in roster and checkpoints`,()=>{
   const run=createRunPlan('gold-hawk','Validation');change(run.roster[0]);
   assert.equal(inheritance.isValidTechniqueState(run.roster[0]),false);
   assert.ok(validateRunPlan(run).length>0);
@@ -1607,9 +1607,12 @@ for(const [rank,level,name] of [['Rookie',1,'Agumon'],['Champion',11,'Greymon'],
   const state=childTech(name,level,techParent('a',names),techParent('b',[]));
   const member={...foundationMember(name,level),...state};
   const input={encounterId:1,digilineInstanceIds:[member.instanceId],roster:[member],totalBits:1030};
-  const resolved=battleFoundation.resolveBattle(freeze(input));
+  let review;assert.throws(()=>battleFoundation.resolveBattle(freeze(input)),error=>{review=error.choices;return !!review;});
+  const choice=review[0].choice;
+  const keptKeys=choice.candidates.slice(-12).map(p=>p.key); // Explicit synthetic player choice.
+  const resolved=battleFoundation.resolveBattle({...input,techniqueSelections:[{instanceId:member.instanceId,keptKeys}]});
   assert.equal(resolved.outcomes[0].newLevel,level+1);
-  assert.deepEqual(resolved.outcomes[0].learnedTechniques,state.techniquePool.filter(p=>p.unlock.status==='pending' && p.unlock.level===level+1).map(p=>p.name));
+  assert.deepEqual(resolved.outcomes[0].learnedTechniques,choice.candidates.filter(p=>keptKeys.includes(p.key) && choice.newlyUnlockedKeys.includes(p.key)).map(p=>p.name));
   assert.ok(inheritance.isValidTechniqueState(resolved.roster[0]));
   const capped={...member,levelCap:{min:level,max:level,resolved:level}};
   const unchanged=battleFoundation.resolveBattle({...input,roster:[capped]});
@@ -1705,7 +1708,7 @@ test('discarded former own techniques remain discarded through evolution and bat
   assert.deepEqual(potential(battle.roster[0],own).unlock,{status:'discarded'});
   assert.equal(potential(childTech('Biyomon',1,battle.roster[0],techParent('b',[])),own),undefined);
 });
-test('schema v4 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
+test('schema v5 saves, loads and checkpoints discarded provenance exactly; Undo preserves it',()=>{
   const run=evolutionRun();
   run.roster[0]={...run.roster[0],...inheritance.createAvailableTechniqueState(['Pepper Breath','Party Time'],{type:'starter',speciesId:run.roster[0].speciesId})};
   run.roster[0]=withoutPossession(run.roster[0],'Party Time',{status:'discarded'});
@@ -1734,4 +1737,189 @@ test('storage rejects discarded entries in techs or with invalid level metadata'
     const cp=load('src/utils/runActionCheckpoint.ts');
     assert.equal(cp.isValidRunActionCheckpoint(cp.createRunActionCheckpoint(run)),false);
   }
+});
+
+// Phase 2G-C: capacity candidates are not committed roster state.
+const capacity=load('src/utils/techniqueCapacity.ts');
+const capacityTypes=load('src/types/techniqueCapacity.ts');
+const battleChoices=load('src/utils/battleTechniqueChoices.ts');
+const rookieNames=[...new Set(progressionData.SPECIES_PROGRESSION.filter(r=>r.rank==='Rookie'&&r.ownTechnique).map(r=>techniqueMetadata.getTechniqueIdentity(r.ownTechnique).name))];
+const availableState=names=>inheritance.createAvailableTechniqueState(names,{type:'starter',speciesId:'agumon'});
+const capacityRun=(name='Greymon',level=11,count=12)=>{
+  const run=evolutionRun(name,level,{techs:rookieNames.slice(0,count)});
+  return run;
+};
+const preflight=(run,reviewTechniques=false)=>{
+  let review;assert.throws(()=>recording.recordRunBattle(freeze(run),{...normalBattle(),reviewTechniques}),error=>{
+    assert.ok(error instanceof capacity.BattleTechniqueSelectionRequired);review=error.choices;return true;
+  });return review;
+};
+const keepSelection=(review,keep)=>review.map(c=>({instanceId:c.instanceId,keptKeys:keep(c)}));
+test('capacity is one authoritative 12-technique constant',()=>assert.equal(capacityTypes.MAX_TECHNIQUES,12));
+for(const count of [12,13,24])test(`${count} candidates preserve all metadata and require choice only above capacity`,()=>{
+  const state=freeze(availableState(rookieNames.slice(0,count)));const before=JSON.stringify(state);
+  const choice=capacity.buildTechniqueChoice(state);
+  assert.equal(choice.candidates.length,count);assert.equal(choice.selectionRequired,count>12);
+  const result=capacity.resolveTechniqueChoice(choice);
+  assert.equal(result.status,count>12?'selection-required':'resolved');
+  if(count<=12)assert.deepEqual(result.techs,state.techs);
+  else {assert.equal(result.choice.candidates.length,count);assert.equal('techs' in result,false);}
+  assert.equal(JSON.stringify(state),before);
+  assert.deepEqual(capacity.resolveTechniqueChoice(choice),result);
+});
+test('committed over-cap rosters and checkpoints are rejected by schema v5',()=>{
+  const run=capacityRun('Greymon',11,13);
+  assert.ok(validateRunPlan(run).some(v=>v.code==='roster-technique-capacity'));
+  assert.equal(storage.saveRunPlannerData(envelope(run)),false);
+  const checkpoints=load('src/utils/runActionCheckpoint.ts');
+  assert.equal(checkpoints.isValidRunActionCheckpoint(checkpoints.createRunActionCheckpoint(run)),false);
+  assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,5);
+});
+test('canonical aliases occupy one candidate slot',()=>{
+  const state=availableState(['Blaze Blaster','Blaze Buster','FLer Cannon','Flower Cannon']);
+  const choice=capacity.buildTechniqueChoice(state);
+  assert.equal(choice.candidates.length,2);assert.equal(capacity.resolveTechniqueChoice(choice).techs.length,2);
+});
+for(const keptCount of [0,1,2])test(`optional choice may retain ${keptCount} of 2 candidates without imposing a minimum`,()=>{
+  const state=availableState(rookieNames.slice(0,2)),choice=capacity.buildTechniqueChoice(state,[rookieNames[1]]);
+  const selected=choice.candidates.slice(0,keptCount).map(p=>p.key);
+  const result=capacity.resolveTechniqueChoice(freeze(choice),selected);
+  assert.equal(result.status,'resolved');assert.equal(result.techs.length,keptCount);
+  assert.equal(result.discarded.length,2-keptCount);assert.ok(inheritance.isValidTechniqueState(result));
+  for(const p of result.techniquePool)assert.deepEqual(p.sources,state.techniquePool.find(q=>q.key===p.key).sources);
+});
+for(const invalid of [['missing-key'],['pepperbreath','pepperbreath'],rookieNames.slice(0,13).map(techniqueMetadata.normalizeTechniqueName)])test('invalid retention set is rejected: '+invalid.join(','),()=>{
+  assert.throws(()=>capacity.resolveTechniqueChoice(capacity.buildTechniqueChoice(availableState(rookieNames.slice(0,14))),invalid),/unique candidate/);
+});
+test('no arbitrary deletion API is offered when nothing became learnable',()=>{
+  const choice=capacity.buildTechniqueChoice(availableState(['Pepper Breath']),[]);
+  assert.throws(()=>capacity.resolveTechniqueChoice(choice,[]),/learning opportunity/);
+  assert.deepEqual(capacity.resolveTechniqueChoice(choice).techs,['Pepper Breath']);
+  const run=createRunPlan('gold-hawk','No learning');
+  assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:[{instanceId:run.starterInstanceId,keptKeys:[]}]}),/participant technique/);
+});
+test('11 possessed plus one own technique defaults to all 12 and audits learning',()=>{
+  const run=capacityRun('Greymon',11,11),result=recording.recordRunBattle(run,normalBattle());
+  assert.equal(result.run.roster[0].techs.length,12);
+  const own=progressionData.getSpeciesProgression(run.roster[0].speciesId).ownTechnique;
+  assert.deepEqual(result.event.techniqueChoices,[{instanceId:run.starterInstanceId,learned:[own],discarded:[]}]);
+});
+for(const [name,level] of [['Greymon',11],['MetalGreymon',21],['WarGreymon',31]]){
+  for(const dropNew of [true,false])test(`${name} own milestone overflow lets player discard ${dropNew?'new':'old'} technique`,()=>{
+    const run=capacityRun(name,level),before=JSON.stringify(run),review=preflight(run);
+    assert.equal(review[0].choice.candidates.length,13);
+    const newly=review[0].choice.newlyUnlockedKeys[0],old=review[0].choice.candidates.find(p=>p.key!==newly).key;
+    const dropped=dropNew?newly:old;
+    const choices=keepSelection(review,c=>c.choice.candidates.filter(p=>p.key!==dropped).map(p=>p.key));
+    const next=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:choices});
+    assert.equal(JSON.stringify(run),before);assert.equal(next.run.roster[0].techs.length,12);
+    assert.deepEqual(next.run.roster[0].techniquePool.find(p=>p.key===dropped).unlock,{status:'discarded'});
+    assert.equal(next.event.techniqueChoices[0].learned.length,dropNew?0:1);
+    assert.equal(next.event.techniqueChoices[0].discarded.length,1);
+    const own=potential(next.run.roster[0],progressionData.getSpeciesProgression(run.roster[0].speciesId).ownTechnique);
+    if(dropNew)assert.equal(own.unlock.status,'discarded');
+    assert.equal(storage.saveRunPlannerData(envelope(next.run)),true);assert.deepEqual(storage.loadRunPlannerData(),envelope(next.run));
+    assert.deepEqual(load('src/utils/runActionUndo.ts').undoLastAction(next.run).run.roster,run.roster);
+  });
+}
+test('multiple participant preflight and selections are atomic, including partial choices',()=>{
+  const run=capacityRun();run.roster.push({...capacityRun('MetalGreymon',21).roster[0],instanceId:'second'});run.digiline.push('second');
+  const original=JSON.stringify(run),review=preflight(run);assert.equal(review.length,2);
+  const selections=keepSelection(review,c=>c.choice.candidates.slice(-12).map(p=>p.key));
+  assert.throws(()=>recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:selections.slice(0,1)}),capacity.BattleTechniqueSelectionRequired);
+  assert.equal(JSON.stringify(run),original);assert.equal(run.history.length,0);assert.equal(run.totalBits,1030);
+  const recorded=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:selections});
+  assert.equal(recorded.run.history.length,1);assert.equal(recorded.event.techniqueChoices.length,2);
+  assert.ok(recorded.run.roster.every(r=>r.techs.length===12));assert.deepEqual(recorded.run.roster.map(r=>r.level),[12,22]);
+});
+test('voluntary non-overflow review discards old techniques and prevents subsequent DNA inheritance',()=>{
+  const run=capacityRun('Greymon',11,2),review=preflight(run,true);
+  assert.equal(review[0].choice.selectionRequired,false);
+  const old=review[0].choice.candidates[0];
+  const choices=keepSelection(review,c=>c.choice.candidates.filter(p=>p.key!==old.key).map(p=>p.key));
+  const recorded=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:choices});
+  const parent=recorded.run.roster[0];assert.deepEqual(potential(parent,old.name).unlock,{status:'discarded'});
+  const child=childTech('Biyomon',1,parent,techParent('b',[]));assert.equal(potential(child,old.name),undefined);
+  const retained=parent.techs.find(n=>n!==progressionData.getSpeciesProgression(parent.speciesId).ownTechnique);
+  assert.ok(potential(child,retained));
+  const later=inheritance.advanceTechniqueState(parent,12,13);assert.deepEqual(potential(later,old.name).unlock,{status:'discarded'});
+});
+test('future DNA composition requires choice for 24 immediate candidates and resolves exactly 12',()=>{
+  const a=foundationMember('MetalGreymon',49,{instanceId:'a',techs:rookieNames.slice(0,12)});
+  const b=foundationMember('MetalGreymon',49,{instanceId:'b',techs:rookieNames.slice(12,24)});
+  const p=dnaPreview(a,b);assert.equal(p.status,'success');
+  const state=inheritance.calculateDnaTechniqueState({speciesId:p.actualResultSpeciesId,actualRank:p.actualResultRank,startingLevel:p.startingLevel},a,b);
+  assert.equal(state.techs.length,24);
+  const choice=capacity.buildTechniqueChoice(state);assert.equal(capacity.resolveTechniqueChoice(choice).status,'selection-required');
+  const selected=choice.candidates.filter((p,i)=>i%2===0).map(p=>p.key);
+  const final=capacity.resolveTechniqueChoice(choice,selected);
+  assert.equal(final.techs.length,12);assert.equal(final.discarded.length,12);
+  assert.ok(inheritance.isValidTechniqueState(final));
+});
+test('deferred DNA EL2 overflow exposes 25 candidates before any recorded level-up',()=>{
+  const names=rookieNames.filter(n=>n!=='Spiral Twister');
+  const a=foundationMember('AeroVeedramon',49,{instanceId:'a',techs:names.slice(0,12)});
+  const b=foundationMember('Airdramon',49,{instanceId:'b',techs:names.slice(12,24)});
+  const p=dnaPreview(a,b);assert.equal(p.actualResultName,'Biyomon');
+  const state=inheritance.calculateDnaTechniqueState({speciesId:p.actualResultSpeciesId,actualRank:p.actualResultRank,startingLevel:p.startingLevel},a,b);
+  assert.equal(state.techs.length,1);
+  const run=evolutionRun('Biyomon',1);Object.assign(run.roster[0],state);
+  const review=preflight(run);assert.equal(review[0].choice.candidates.length,25);assert.equal(review[0].choice.newlyUnlockedKeys.length,24);
+  assert.equal(run.roster[0].level,1);assert.equal(run.history.length,0);
+  const result=recording.recordRunBattle(run,{...normalBattle(),techniqueSelections:keepSelection(review,c=>c.choice.candidates.slice(-12).map(p=>p.key))});
+  assert.equal(result.run.roster[0].level,2);assert.equal(result.run.roster[0].techs.length,12);
+});
+test('choice candidates exclude other pending, missed and discarded potentials',()=>{
+  let state=childTech('Agumon',1,techParent('a',['Spiral Twister','Party Time','Venom Infusion']),techParent('b',[]));
+  potential(state,'Party Time').unlock={status:'missed',level:12};potential(state,'Venom Infusion').unlock={status:'discarded'};
+  const advanced=inheritance.advanceTechniqueState(state,1,2),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
+  assert.deepEqual(choice.candidates.map(p=>p.name).sort(),['Pepper Breath','Spiral Twister']);
+  const result=capacity.resolveTechniqueChoice(choice,[]);
+  assert.equal(potential(result,'Party Time').unlock.status,'missed');assert.equal(potential(result,'Venom Infusion').unlock.status,'discarded');
+});
+for(const mutation of [e=>e.techniqueChoices=[],e=>e.techniqueChoices[0].learned.push('Invented'),e=>e.techniqueChoices[0].discarded.push('Invented'),e=>e.techniqueChoices[0].instanceId='missing'])test('battle choice audit tampering is rejected',()=>{
+  const result=recording.recordRunBattle(capacityRun('Greymon',11,11),normalBattle());mutation(result.event);
+  assert.equal(storage.saveRunPlannerData(envelope(result.run)),false);
+});
+test('hook leaves run/storage untouched until choices resolve; failed save and stale choice are atomic',()=>{
+  const run=capacityRun();storage.saveRunPlannerData(envelope(run));const render=plannerHost(),planner=render();const serialized=values.get(storage.RUN_PLANNER_STORAGE_KEY);
+  const review=planner.recordBattle(normalBattle());assert.equal(review.status,'selection-required');
+  assert.deepEqual(render().activeRun,run);assert.equal(values.get(storage.RUN_PLANNER_STORAGE_KEY),serialized);
+  const request={...normalBattle(),expectedRunState:review.expectedRunState,techniqueSelections:keepSelection(review.choices,c=>c.choice.candidates.slice(-12).map(p=>p.key))};
+  const save=global.localStorage.setItem;global.localStorage.setItem=()=>{throw Error('quota');};
+  assert.equal(planner.recordBattle(request),null);assert.deepEqual(render().activeRun,run);
+  global.localStorage.setItem=save;assert.ok(planner.recordBattle(request));assert.equal(render().activeRun.history.length,1);
+  assert.equal(planner.recordBattle(request),null);assert.equal(render().activeRun.history.length,1);
+});
+test('mandatory choice controls start over capacity and never choose twelve automatically',()=>{
+  const run=capacityRun(),review=preflight(run);let selected=keepSelection(review,c=>c.choice.candidates.map(p=>p.key));let confirmations=0,cancellations=0;
+  const Controls=load('src/components/run-planner/TechniqueChoiceControls.tsx').TechniqueChoiceControls;
+  const render=()=>Controls({choices:review,selections:selected,onChange:v=>selected=v,onConfirm:()=>confirmations++,onCancel:()=>cancellations++});
+  let tree=render();assert.ok(elementText(tree).includes('13 / 12 selected'));
+  assert.equal(elements(tree).find(e=>e.props.children==='Confirm choices and record battle').props.disabled,true);
+  elements(tree).find(e=>e.type==='input').props.onChange({target:{checked:false}});
+  tree=render();assert.equal(elements(tree).find(e=>e.props.children==='Confirm choices and record battle').props.disabled,false);
+  elements(tree).find(e=>e.props.children==='Confirm choices and record battle').props.onClick();assert.equal(confirmations,1);
+  elements(tree).find(e=>e.props.children==='Cancel technique selection').props.onClick();assert.equal(cancellations,1);
+});
+test('battle controls route overflow through selection, freeze capture request, and commit only on confirm',()=>{
+  const run=capacityRun();storage.saveRunPlannerData(envelope(run));const hook=plannerHost(),planner=hook();
+  const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');
+  const props={selection:normalBattle(),hasParticipants:true,onRecord:planner.recordBattle};
+  let tree=render(props);elements(tree).find(e=>e.props.children==='Record Battle').props.onClick();
+  tree=render(props);const choiceElement=elements(tree).find(e=>e.type?.name==='TechniqueChoiceControls');assert.ok(choiceElement);
+  assert.equal(hook().activeRun.history.length,0);
+  const selected=keepSelection(choiceElement.props.choices,c=>c.choice.candidates.slice(-12).map(p=>p.key));choiceElement.props.onChange(selected);
+  tree=render(props);elements(tree).find(e=>e.type?.name==='TechniqueChoiceControls').props.onConfirm();
+  assert.equal(hook().activeRun.history.length,1);assert.ok(elementText(render(props)).includes('Battle recorded'));
+});
+test('optional review is exposed in battle UI and defaults all candidates selected',()=>{
+  const run=capacityRun('Greymon',11,2);storage.saveRunPlannerData(envelope(run));const hook=plannerHost(),planner=hook();
+  const render=componentHost('src/components/run-planner/BattleRecordControls.tsx','BattleRecordControls');const props={selection:normalBattle(),hasParticipants:true,onRecord:planner.recordBattle};
+  elements(render(props)).find(e=>e.props.children==='Review techniques before recording').props.onClick();
+  const choices=elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls');assert.ok(choices);
+  assert.equal(choices.props.selections[0].keptKeys.length,3);assert.equal(hook().activeRun.history.length,0);
+  choices.props.onChange(choices.props.selections.map(s=>({...s,keptKeys:[]})));
+  elements(render(props)).find(e=>e.type?.name==='TechniqueChoiceControls').props.onConfirm();
+  assert.deepEqual(hook().activeRun.roster[0].techs,[]);
 });
