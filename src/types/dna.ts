@@ -1,3 +1,4 @@
+import { DigimonRank } from '@/types/techniqueInheritance';
 import { Digimon, DigimonStats } from '@/types/digimon';
 import { LevelCapState } from '@/types/runPlanner';
 
@@ -6,7 +7,7 @@ export const DNA_SELECTION_RANKS = ['Rookie', 'Champion', 'Ultimate'] as const;
 export const DNA_TYPES = ['Data', 'Vaccine', 'Virus'] as const;
 export type DnaFamily = typeof DNA_FAMILIES[number];
 export type DnaSelectionRank = typeof DNA_SELECTION_RANKS[number];
-export type DnaRank = DnaSelectionRank | 'Mega';
+export type DnaRank = DigimonRank;
 export type DnaType = Digimon['type'];
 
 export interface DnaMatrixSourceEntry {

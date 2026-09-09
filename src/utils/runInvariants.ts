@@ -8,6 +8,7 @@ import {
 } from '@/types/runPlanner';
 import { encounters } from '@/data/encounters';
 import { isValidLevelCap } from '@/utils/levelCap';
+import { isValidTechniqueState } from '@/utils/techniqueInheritance';
 
 /**
  * Data-layer invariants. The UI must never be the only guard — impossible states are
@@ -48,6 +49,7 @@ export const validateRosterDigimonInvariants = (
   entry: RosterDigimon
 ): InvariantViolation[] => {
   const violations: InvariantViolation[] = [];
+  if (!isValidTechniqueState(entry)) violations.push({ code: 'roster-invalid-techniques', message: 'Technique pool metadata and available techniques must agree.' });
   if (!Number.isInteger(entry.dp) || entry.dp < 0) violations.push({ code: 'roster-invalid-dp', message: 'DP must be a non-negative integer.' });
   if (!isValidLevelCap(entry.levelCap)) violations.push({ code: 'roster-invalid-cap', message: 'Invalid level cap state.' });
   else if (entry.level > (entry.levelCap.resolved ?? entry.levelCap.max)) violations.push({ code: 'roster-above-cap', message: 'Level exceeds the individual cap.' });

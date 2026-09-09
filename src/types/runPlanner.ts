@@ -1,3 +1,4 @@
+import { TechniquePotential } from '@/types/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
 import { DomainPhase } from '@/types/encounter';
 
@@ -25,6 +26,7 @@ export interface RosterDigimon {
   levelCap: LevelCapState;
   stats: DigimonStats;
   techs: string[];
+  techniquePool: TechniquePotential[];
 }
 
 /** Exact progression state before an action; never includes history or UI state. */
@@ -88,7 +90,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 3;
+  schemaVersion: 4;
   runs: RunPlan[];
   activeRunId: string | null;
 }

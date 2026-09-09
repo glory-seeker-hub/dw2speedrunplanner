@@ -1,3 +1,4 @@
+import { createAvailableTechniqueState } from '@/utils/techniqueInheritance';
 import { RosterDigimon, StarterDefinition } from '@/types/runPlanner';
 import { encounters } from '@/data/encounters';
 import { getDigimonByName } from '@/utils/digimonLookup';
@@ -47,6 +48,10 @@ export const tryCreateCapturedDigimon = (
   try { levelCap = getAcquisitionLevelCap(enemy.level, selectedMaxLevel); }
   catch (error) { return { ok: false, reason: (error as Error).message }; }
 
+  let techniqueState;
+  try { techniqueState = createAvailableTechniqueState(enemy.techs, { type: 'capture', encounterId, enemySlot }); }
+  catch (error) { return { ok: false, reason: (error as Error).message }; }
+
   return {
     ok: true,
     digimon: {
@@ -65,7 +70,7 @@ export const tryCreateCapturedDigimon = (
         def: enemy.def,
         spd: enemy.spd,
       },
-      techs: [...enemy.techs],
+      ...techniqueState,
     },
   };
 };
@@ -94,7 +99,7 @@ export const createStarterDigimon = (starter: StarterDefinition): RosterDigimon 
     levelCap,
     totalXp: starter.totalXp ?? getRequiredTotalXpForLevel(starter.level) ?? 0,
     stats: { ...starter.stats },
-    techs: [...starter.techs],
+    ...createAvailableTechniqueState(starter.techs, { type: 'starter', speciesId: starter.speciesId }),
   };
 };
 

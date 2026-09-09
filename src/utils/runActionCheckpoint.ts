@@ -1,3 +1,4 @@
+import { isValidTechniqueState } from '@/utils/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
 import { MAX_DIGILINE_SIZE, RosterDigimon, RunActionCheckpoint, RunPlan } from '@/types/runPlanner';
 import { isValidLevelCap } from '@/utils/levelCap';
@@ -41,7 +42,7 @@ export const isRosterDigimon = (v: unknown): v is RosterDigimon =>
   v.level >= 1 &&
   isNonNegativeNumber(v.totalXp) &&
   isStats(v.stats) &&
-  isStringArray(v.techs) &&
+  isStringArray(v.techs) && isValidTechniqueState(v) &&
   Number.isInteger(v.dp) && (v.dp as number) >= 0 &&
   isValidLevelCap(v.levelCap) && v.level <= (v.levelCap.resolved ?? v.levelCap.max);
 

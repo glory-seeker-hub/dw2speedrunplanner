@@ -5,7 +5,7 @@ import { applyBattleXp } from '@/utils/experience';
 import { applyExpectedLevelUpGrowth, StatKey } from '@/utils/statGrowth';
 import { getResolvedReward } from '@/utils/rewardMatching';
 import { tryCreateCapturedDigimon } from '@/utils/capture';
-import { getLearnedTechniques } from '@/utils/normalDigivolution';
+import { advanceTechniqueState, registerOwnTechnique } from '@/utils/techniqueInheritance';
 
 /**
  * BATTLE RESOLUTION FOR THE RUN PLANNER (pure, deterministic)
@@ -88,7 +88,10 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
 
     // 2. Cap-aware XP + 3. at most one level-up.
     const xp = applyBattleXp(entry.level, entry.totalXp, xpAwarded, entry.levelCap);
-    const learnedTechniques = xp.leveledUp ? getLearnedTechniques(entry, xp.newLevel) : [];
+    const techniqueState = xp.leveledUp
+      ? advanceTechniqueState(registerOwnTechnique({ techs: entry.techs, techniquePool: entry.techniquePool }, entry.speciesId, entry.level), entry.level, xp.newLevel)
+      : { techs: entry.techs, techniquePool: entry.techniquePool, learnedTechniques: [] };
+    const { learnedTechniques } = techniqueState;
 
     // 4. Deterministic expected stat growth on level-up only.
     let newStats = entry.stats;
@@ -122,7 +125,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
       statsWithoutGrowthData: missing,
     });
 
-    return { ...entry, level: xp.newLevel, totalXp: xp.newTotalXp, stats: { ...newStats }, techs: [...entry.techs, ...learnedTechniques] };
+    return { ...entry, level: xp.newLevel, totalXp: xp.newTotalXp, stats: { ...newStats }, techs: techniqueState.techs, techniquePool: techniqueState.techniquePool };
   });
 
   // 6. Captured Digimon is added AFTER rewards and receives no XP from this battle.

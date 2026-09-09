@@ -4,7 +4,7 @@ import { isValidRunEvent } from '@/utils/runEventValidation';
 import { MAX_DIGILINE_SIZE, PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 
 export const RUN_PLANNER_STORAGE_KEY = 'dw2-run-planner';
-export const RUN_PLANNER_SCHEMA_VERSION = 3 as const;
+export const RUN_PLANNER_SCHEMA_VERSION = 4 as const;
 
 export const emptyRunPlannerData = (): PersistedRunPlannerData => ({
   schemaVersion: RUN_PLANNER_SCHEMA_VERSION,
