@@ -68,10 +68,12 @@ export const calculateDnaTechniqueState = (
     for (const name of parent.techs) {
       const potential = parentMetadata.get(normalizeTechniqueName(name))!;
       const meta = { key: potential.key, name: potential.name, rank: potential.rank };
-      const level = TECHNIQUE_UNLOCK_LEVELS[meta.rank];
+      // DW2 can stagger inherited learning across levels. This planner groups it at
+      // deterministic milestones, avoiding undocumented ordering with little route-planning value.
+      const level = Math.max(TECHNIQUE_UNLOCK_LEVELS[meta.rank], result.startingLevel + 1);
       let child = pool.get(meta.key);
       if (!child) {
-        child = { ...meta, unlock: result.startingLevel >= level ? { status: 'available' } : { status: 'pending', level }, sources: [] };
+        child = { ...meta, unlock: { status: 'pending', level }, sources: [] };
         pool.set(meta.key, child);
       }
       if (!child.sources.some(s => s.type === 'inherited' && s.parentInstanceId === parent.instanceId)) {
@@ -83,7 +85,8 @@ export const calculateDnaTechniqueState = (
     const meta = identity(species.ownTechnique);
     const level = TECHNIQUE_UNLOCK_LEVELS[meta.rank];
     const own = pool.get(meta.key) ?? { ...meta, unlock: { status: 'pending' as const, level }, sources: [] };
-    if (result.actualRank === 'Rookie') own.unlock = { status: 'available' };
+    // DNA birth teaches the actual result's own technique at every rank.
+    own.unlock = { status: 'available' };
     own.sources.push({ type: 'own-species', speciesId: result.speciesId });
     pool.set(meta.key, own);
   }
@@ -115,8 +118,15 @@ export const isValidTechniqueState = (v: unknown): v is TechniqueState => {
       if (!available.delete(meta.key) || 'level' in p.unlock) return false;
     } else if (p.unlock.status === 'discarded') {
       if (available.has(meta.key) || 'level' in p.unlock) return false;
-    } else if ((p.unlock.status !== 'pending' && p.unlock.status !== 'missed') ||
-      p.unlock.level !== TECHNIQUE_UNLOCK_LEVELS[meta.rank] || available.has(meta.key)) return false;
+    } else {
+      const base = TECHNIQUE_UNLOCK_LEVELS[meta.rank];
+      const inheritedPending = p.unlock.status === 'pending' && p.sources.some(s => s.type === 'inherited');
+      const validLevel = p.unlock.level === base || (inheritedPending &&
+        typeof p.unlock.level === 'number' && p.unlock.level > base &&
+        Object.values(TECHNIQUE_UNLOCK_LEVELS).includes(p.unlock.level));
+      // Exact DNA creation schedules are additionally recomputed by the historical lifecycle audit.
+      if ((p.unlock.status !== 'pending' && p.unlock.status !== 'missed') || !validLevel || available.has(meta.key)) return false;
+    }
   }
   return available.size === 0;
 };

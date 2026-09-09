@@ -4,25 +4,31 @@ import { MAX_TECHNIQUES, TechniqueChoice, BattleTechniqueChoice } from '@/types/
 import { isValidTechniqueState } from '@/utils/techniqueInheritance';
 
 /** Accepts calculated unlock state or a pure DNA result, never silently truncates. */
-export const buildTechniqueChoice = (state: TechniqueState, newlyUnlocked: readonly string[] = state.techs): TechniqueChoice => {
+export const buildTechniqueChoice = (state: TechniqueState, newlyUnlocked: readonly string[] = state.techs,
+  options: { kind?: 'learning' | 'dna'; mandatoryKeys?: readonly string[] } = {}): TechniqueChoice => {
   if (!isValidTechniqueState(state)) throw new Error('Invalid technique candidate state');
   const snapshot = structuredClone(state);
   const candidates = snapshot.techniquePool.filter(p => p.unlock.status === 'available');
   const keys = new Set(candidates.map(p => p.key));
   const newlyUnlockedKeys = [...new Set(newlyUnlocked.map(normalizeTechniqueName))];
   if (newlyUnlockedKeys.some(key => !keys.has(key))) throw new Error('New technique is not an available candidate');
-  return { state: snapshot, candidates, newlyUnlockedKeys, selectionRequired: candidates.length > MAX_TECHNIQUES };
+  const kind = options.kind ?? 'learning';
+  const mandatoryKeys = [...new Set(options.mandatoryKeys ?? [])];
+  if (mandatoryKeys.some(key => !keys.has(key))) throw new Error('Mandatory technique is not an available candidate');
+  return { state: snapshot, candidates, newlyUnlockedKeys, kind, mandatoryKeys,
+    selectionRequired: candidates.length > MAX_TECHNIQUES || (kind === 'learning' && newlyUnlockedKeys.length > 0) };
 };
 
 export const resolveTechniqueChoice = (choice: TechniqueChoice, keptKeys?: readonly string[]) => {
   // Rebuild rather than trusting caller-supplied candidate/required flags.
-  const checked = buildTechniqueChoice(choice.state, choice.newlyUnlockedKeys);
+  const checked = buildTechniqueChoice(choice.state, choice.newlyUnlockedKeys, choice);
   if (keptKeys === undefined && checked.selectionRequired) return { status: 'selection-required' as const, choice: checked };
   if (keptKeys !== undefined && checked.newlyUnlockedKeys.length === 0) throw new Error('Technique selection requires a learning opportunity');
   const selected = keptKeys ?? checked.candidates.map(p => p.key);
   const keep = new Set(selected);
-  if (keep.size !== selected.length || keep.size > MAX_TECHNIQUES ||
+  if (keep.size !== selected.length || keep.size < 1 || keep.size > MAX_TECHNIQUES ||
       selected.some(key => !checked.candidates.some(p => p.key === key))) throw new Error('Choose unique candidate techniques within capacity');
+  if (checked.mandatoryKeys.some(key => !keep.has(key))) throw new Error('The DNA result own technique is mandatory at birth');
   const state = structuredClone(checked.state);
   const discarded = checked.candidates.filter(p => !keep.has(p.key));
   for (const potential of state.techniquePool) {

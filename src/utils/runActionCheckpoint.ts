@@ -25,6 +25,9 @@ const isStats = (v: unknown): v is DigimonStats =>
 const isRosterSource = (v: unknown): boolean => {
   if (!isObject(v)) return false;
   if (v.type === 'starter') return true;
+  if (v.type === 'dna') return Object.keys(v).length === 2 && Array.isArray(v.parentInstanceIds) &&
+    v.parentInstanceIds.length === 2 && v.parentInstanceIds.every(isNonEmptyString) &&
+    v.parentInstanceIds[0] < v.parentInstanceIds[1];
   return (
     v.type === 'capture' &&
     typeof v.encounterId === 'number' &&
@@ -43,7 +46,7 @@ export const isRosterDigimon = (v: unknown): v is RosterDigimon =>
   v.level >= 1 &&
   isNonNegativeNumber(v.totalXp) &&
   isStats(v.stats) &&
-  isStringArray(v.techs) && v.techs.length <= MAX_TECHNIQUES && isValidTechniqueState(v) &&
+  isStringArray(v.techs) && v.techs.length >= 1 && v.techs.length <= MAX_TECHNIQUES && isValidTechniqueState(v) &&
   Number.isInteger(v.dp) && (v.dp as number) >= 0 &&
   isValidLevelCap(v.levelCap) && v.level <= (v.levelCap.resolved ?? v.levelCap.max);
 

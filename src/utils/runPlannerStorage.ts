@@ -4,7 +4,7 @@ import { isValidRunEvent } from '@/utils/runEventValidation';
 import { MAX_DIGILINE_SIZE, PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 
 export const RUN_PLANNER_STORAGE_KEY = 'dw2-run-planner';
-export const RUN_PLANNER_SCHEMA_VERSION = 5 as const;
+export const RUN_PLANNER_SCHEMA_VERSION = 6 as const;
 
 export const emptyRunPlannerData = (): PersistedRunPlannerData => ({
   schemaVersion: RUN_PLANNER_SCHEMA_VERSION,
@@ -30,9 +30,7 @@ const isRunPlan = (v: unknown): v is RunPlan => {
 
   const rosterIds = new Set((v.roster as RosterDigimon[]).map((r) => r.instanceId));
   if ((v.digiline as string[]).some((id) => !rosterIds.has(id))) return false;
-  if (v.starterInstanceId !== null && !rosterIds.has(v.starterInstanceId as string)) {
-    return false;
-  }
+
   return validateRunPlan(v as unknown as RunPlan).length === 0;
 };
 

@@ -1,3 +1,5 @@
+import { isValidDnaEvent } from '@/utils/runDnaValidation';
+import { getDigimonById } from '@/utils/digimonLookup';
 import { isValidBattleTechniqueAudit } from '@/utils/battleTechniqueChoices';
 import { RunEvent } from '@/types/runPlanner';
 import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
@@ -38,13 +40,14 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
       (v.capturedEnemySlot === undefined || v.capturedEnemySlot === null || integer(v.capturedEnemySlot, 1)) &&
       reward(v.xpReward) && reward(v.bitsReward);
   }
+  if (v.type === 'dna') return isValidDnaEvent(v, checkpoint);
   if (v.type !== 'digivolve' || !nonEmptyString(v.instanceId) ||
       !nonEmptyString(v.fromSpeciesId) || !nonEmptyString(v.toSpeciesId) ||
       !nonEmptyString(v.fromRank) || !nonEmptyString(v.toRank) ||
       !integer(v.level, 1) || !integer(v.dp, 0) || !isValidLevelCap(v.levelCap) ||
       v.hpBonus !== 30 || v.mpBonus !== 30) return false;
   const before = checkpoint.roster.find(member => member.instanceId === v.instanceId);
-  if (!before || before.speciesId !== v.fromSpeciesId || before.level !== v.level || before.dp !== v.dp ||
+  if (!before || before.name !== v.fromName || getDigimonById(v.toSpeciesId as string)?.name !== v.toName || before.speciesId !== v.fromSpeciesId || before.level !== v.level || before.dp !== v.dp ||
       before.levelCap.min !== v.levelCap.min || before.levelCap.max !== v.levelCap.max ||
       before.levelCap.resolved !== v.levelCap.resolved ||
       getSpeciesProgression(before.speciesId)?.rank !== v.fromRank ||

@@ -28,9 +28,17 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
       {run.history.length === 0 ? <p className="text-sm text-muted-foreground">No actions recorded yet.</p> : (
         <ol className="space-y-4" aria-label="Run History">
           {run.history.map((event, index) => {
+            if (event.type === 'dna') return <li key={event.id} className="space-y-1 rounded-lg border p-4 text-sm">
+              <p className="font-semibold">Action {index + 1} · DNA Digivolution{event.isMutation ? ' · Mutation' : ''}</p>
+              <p>{event.parentAName} + {event.parentBName} → {event.childName}</p>
+              <p>{event.actualResultRank} · {event.actualResultType}</p>
+              <p>EL{event.childStartingLevel} · DP{event.childDp} · Max EL{event.childMaxLevel}</p>
+              {event.isMutation && <p>Matrix: {event.matrixSelectionRank} / {event.matrixSelectionType}</p>}
+              {event.techniqueChoice.discarded.length > 0 && <p>Discarded: {event.techniqueChoice.discarded.join(', ')}</p>}
+            </li>;
             if (event.type === 'digivolve') return <li key={event.id} className="space-y-1 rounded-lg border p-4 text-sm">
               <p className="font-semibold">Action {index + 1} · Digivolution</p>
-              <p>{event.preActionCheckpoint.roster.find(member => member.instanceId === event.instanceId)?.name ?? event.fromSpeciesId} → {getDigimonById(event.toSpeciesId)?.name ?? event.toSpeciesId}</p>
+              <p>{event.fromName} → {event.toName}</p>
               <p>{event.fromRank} → {event.toRank} · EL {event.level} · DP {event.dp}</p>
               <p>HP +{event.hpBonus} · MP +{event.mpBonus}</p>
             </li>;
@@ -57,7 +65,7 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Undo the last recorded action?</AlertDialogTitle>
-          <AlertDialogDescription>{run.history.find(event => event.id === confirmEventId)?.type === 'digivolve' ? 'Undo this Digivolution? ' : 'Undo this battle? '}Undo restores the run to the state immediately before the last recorded action. Species, XP, levels, stats, techniques, Bits and captures will be restored. Digiline changes made after that action will also be discarded. There is no redo.</AlertDialogDescription>
+          <AlertDialogDescription>{run.history.find(event => event.id === confirmEventId)?.type === 'dna' ? 'Undo this DNA and restore both parents? ' : run.history.find(event => event.id === confirmEventId)?.type === 'digivolve' ? 'Undo this Digivolution? ' : 'Undo this battle? '}Undo restores the run to the state immediately before the last recorded action. Species, XP, levels, stats, techniques, Bits and captures will be restored. Digiline changes made after that action will also be discarded. There is no redo.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={event => {
           if (confirmEventId && onUndo(confirmEventId, run.id)) setUndoneAt(run.history.at(-2)?.id ?? 'empty');

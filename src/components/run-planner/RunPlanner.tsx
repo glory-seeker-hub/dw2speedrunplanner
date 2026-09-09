@@ -1,3 +1,4 @@
+import { DnaControls } from '@/components/run-planner/DnaControls';
 import { DigivolutionControls } from '@/components/run-planner/DigivolutionControls';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 import { useState } from 'react';
@@ -38,8 +39,7 @@ export const RunPlanner = ({ planner }: Props) => {
   const [confirmReset, setConfirmReset] = useState(false);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
   const starterMember = run?.roster.find((member) => member.instanceId === run.starterInstanceId);
-  const originalStarter = run?.history[0]?.preActionCheckpoint.roster.find(member => member.instanceId === run.starterInstanceId) ?? starterMember;
-  const starter = STARTERS.find((option) => option.speciesId === originalStarter?.speciesId);
+  const starter = STARTERS.find((option) => option.id === run?.starterDefinitionId);
 
   return (
     <section className="space-y-6" aria-label="Run Planner">
@@ -95,7 +95,7 @@ export const RunPlanner = ({ planner }: Props) => {
       ) : (
         <>
           <Card className="bg-gradient-card border-border shadow-card">
-            <CardHeader><CardTitle>{run.name}</CardTitle><CardDescription>{starter?.label ?? 'Starter'} / {starterMember?.name ?? 'No starter recorded'}</CardDescription></CardHeader>
+            <CardHeader><CardTitle>{run.name}</CardTitle><CardDescription>{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</CardDescription></CardHeader>
             <CardContent><dl className="flex flex-wrap gap-8">
               <div><dt className="text-sm text-muted-foreground">Total Bits</dt><dd className="text-xl font-semibold tabular-nums">{run.totalBits}</dd></div>
               <div><dt className="text-sm text-muted-foreground">Recorded battles</dt><dd className="text-xl font-semibold tabular-nums">{run.history.filter(event => event.type === 'battle').length}</dd></div>
@@ -139,6 +139,7 @@ export const RunPlanner = ({ planner }: Props) => {
           </Card>
           <section className="space-y-3" aria-label="Roster">
             <h3 className="text-xl font-semibold">Roster</h3>
+            <DnaControls key={`${run.id}/${planner.feedbackRevision}`} run={run} onDna={planner.dna} error={error} />
             <div className="grid gap-4 lg:grid-cols-3">
               {run.roster.map((member) => (
                 <Card key={member.instanceId}>

@@ -1,3 +1,5 @@
+import { DnaSelectionRank, DnaType } from '@/types/dna';
+import { DigimonRank } from '@/types/techniqueInheritance';
 import { BattleTechniqueAudit } from '@/types/techniqueCapacity';
 import { TechniquePotential } from '@/types/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
@@ -5,6 +7,7 @@ import { DomainPhase } from '@/types/encounter';
 
 export type RosterSource =
   | { type: 'starter' }
+  | { type: 'dna'; parentInstanceIds: [string, string] }
   | { type: 'capture'; encounterId: number; enemySlot: number };
 
 /** Individual cap uncertainty; fixed caps are resolved immediately. */
@@ -63,6 +66,8 @@ export interface RunBattleEvent extends RunEventBase {
 export interface RunDigivolveEvent extends RunEventBase {
   type: 'digivolve';
   instanceId: string;
+  fromName: string;
+  toName: string;
   fromSpeciesId: string;
   toSpeciesId: string;
   fromRank: string;
@@ -74,12 +79,36 @@ export interface RunDigivolveEvent extends RunEventBase {
   mpBonus: 30;
 }
 
-export type RunEvent = RunBattleEvent | RunDigivolveEvent;
+export interface RunDnaEvent extends RunEventBase {
+  type: 'dna';
+  parentAInstanceId: string;
+  parentBInstanceId: string;
+  parentASpeciesId: string;
+  parentAName: string;
+  parentBSpeciesId: string;
+  parentBName: string;
+  childInstanceId: string;
+  childSpeciesId: string;
+  childName: string;
+  matrixSelectionRank: DnaSelectionRank;
+  matrixSelectionType: DnaType;
+  actualResultRank: DigimonRank;
+  actualResultType: DnaType;
+  isMutation: boolean;
+  childStartingLevel: number;
+  childDp: number;
+  childMaxLevel: number;
+  techniqueChoice: { kept: string[]; discarded: string[] };
+}
+
+export type RunEvent = RunBattleEvent | RunDigivolveEvent | RunDnaEvent;
 
 export interface RunPlan {
   id: string;
   name: string;
+  /** Historical original individual; may have been consumed. */
   starterInstanceId: string | null;
+  starterDefinitionId: string;
   roster: RosterDigimon[];
   /** Current active party: RosterDigimon instance IDs, max 3. */
   digiline: string[];
@@ -92,7 +121,7 @@ export interface RunPlan {
 export const MAX_DIGILINE_SIZE = 3;
 
 export interface PersistedRunPlannerData {
-  schemaVersion: 5;
+  schemaVersion: 6;
   runs: RunPlan[];
   activeRunId: string | null;
 }

@@ -1,3 +1,4 @@
+import { recordDnaAction } from '@/utils/runDnaRecording';
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
 import { recordRunDigivolution } from '@/utils/runDigivolutionRecording';
@@ -94,6 +95,22 @@ export const useRunPlanner = () => {
     }
   };
 
+  const dna = (expectedRunId: string, expectedA: RosterDigimon, expectedB: RosterDigimon, keptKeys?: string[]): boolean => {
+    const current = currentData.current;
+    const run = current.runs.find(r => r.id === current.activeRunId);
+    const a = run?.roster.find(p => p.instanceId === expectedA.instanceId), b = run?.roster.find(p => p.instanceId === expectedB.instanceId);
+    if (!run || run.id !== expectedRunId || !a || !b || JSON.stringify(a) !== JSON.stringify(expectedA) || JSON.stringify(b) !== JSON.stringify(expectedB)) {
+      setError('The DNA parents or active run have changed. Review DNA again.'); return false;
+    }
+    try {
+      const result = recordDnaAction(run, a.instanceId, b.instanceId, keptKeys);
+      if (!persist({ ...current, runs: current.runs.map(r => r.id === run.id ? result.run : r) })) return false;
+      setFeedbackRevision(v => v + 1); return true;
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not record DNA.'); return false;
+    }
+  };
+
   const undoAction = (expectedEventId: string, expectedRunId: string): boolean => {
     const current = currentData.current;
     const run = current.runs.find(entry => entry.id === current.activeRunId);
@@ -144,5 +161,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, undoAction, feedbackRevision };
+  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, undoAction, feedbackRevision };
 };

@@ -1,3 +1,4 @@
+import { validateInstanceLifecycle } from '@/utils/runInstanceLifecycle';
 import { MAX_TECHNIQUES } from '@/types/techniqueCapacity';
 import { isValidRunEvent } from '@/utils/runEventValidation';
 import { isRosterDigimon } from '@/utils/runActionCheckpoint';
@@ -50,7 +51,7 @@ export const validateRosterDigimonInvariants = (
   entry: RosterDigimon
 ): InvariantViolation[] => {
   const violations: InvariantViolation[] = [];
-  if (entry.techs?.length > MAX_TECHNIQUES) violations.push({ code: 'roster-technique-capacity', message: `A Digimon may possess at most ${MAX_TECHNIQUES} techniques.` });
+  if (entry.techs?.length < 1 || entry.techs?.length > MAX_TECHNIQUES) violations.push({ code: 'roster-technique-capacity', message: `A Digimon must possess 1–${MAX_TECHNIQUES} techniques.` });
   if (!isValidTechniqueState(entry)) violations.push({ code: 'roster-invalid-techniques', message: 'Technique pool metadata and available techniques must agree.' });
   if (!Number.isInteger(entry.dp) || entry.dp < 0) violations.push({ code: 'roster-invalid-dp', message: 'DP must be a non-negative integer.' });
   if (!isValidLevelCap(entry.levelCap)) violations.push({ code: 'roster-invalid-cap', message: 'Invalid level cap state.' });
@@ -113,13 +114,6 @@ export const validateRunPlan = (run: RunPlan): InvariantViolation[] => {
 
   violations.push(...validateDigiline(run.digiline, run.roster));
 
-  if (run.starterInstanceId !== null && !instanceIds.has(run.starterInstanceId)) {
-    violations.push({
-      code: 'unknown-starter-instance',
-      message: `starterInstanceId "${run.starterInstanceId}" is not in the roster.`,
-    });
-  }
-
   if (!Number.isFinite(run.totalBits) || run.totalBits < 0) {
     violations.push({ code: 'negative-bits', message: 'totalBits cannot be negative.' });
   }
@@ -135,26 +129,10 @@ export const validateRunPlan = (run: RunPlan): InvariantViolation[] => {
       violations.push({ code: 'history-order-not-deterministic', message: 'Run actions require unique IDs and contiguous order values starting at zero.' });
     }
     eventIds.add(event.id);
-    if (event.preActionCheckpoint.roster.some(member => !instanceIds.has(member.instanceId)) ||
-        (run.starterInstanceId !== null && !event.preActionCheckpoint.roster.some(member => member.instanceId === run.starterInstanceId))) {
-      violations.push({ code: 'checkpoint-unknown-instance', message: 'Checkpoint roster must preserve the starter and reference existing instances.' });
-    }
-    if (event.type === 'battle') {
-      violations.push(...validateBattleEvent(event, event.preActionCheckpoint.roster));
-      if (event.capturedInstanceId !== null) {
-        const captured = run.roster.find(member => member.instanceId === event.capturedInstanceId);
-        const cap = event.capturedLevelCap!;
-        if (!captured || captured.source.type !== 'capture' ||
-            captured.source.encounterId !== event.encounterId || captured.source.enemySlot !== event.capturedEnemySlot ||
-            captured.levelCap.min !== cap.min || captured.levelCap.max !== cap.max || captured.levelCap.resolved !== cap.resolved ||
-            run.history.slice(0, index).some(previous => previous.type === 'battle' && previous.capturedInstanceId === event.capturedInstanceId)) {
-          violations.push({ code: 'capture-audit-mismatch', message: 'Capture audit must match the newly acquired roster instance and its exact cap.' });
-        }
-      }
-    }
-    else if (!instanceIds.has(event.instanceId)) violations.push({ code: 'digivolve-unknown-instance', message: 'Digivolution references an unknown roster instance.' });
+    if (event.type === 'battle') violations.push(...validateBattleEvent(event, event.preActionCheckpoint.roster));
   });
 
+  if (!violations.some(v => v.code === 'invalid-run-event')) violations.push(...validateInstanceLifecycle(run));
   return violations;
 };
 
