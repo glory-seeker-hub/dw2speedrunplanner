@@ -1,3 +1,4 @@
+import { ActionDisclosure } from '@/components/run-planner/ActionDisclosure';
 import { useState } from 'react';
 import { TRADE_DEFINITIONS, getTradeReceipt } from '@/data/trades';
 import { previewTrade } from '@/utils/tradeProposal';
@@ -7,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription,
   AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
-export const TradeControls = ({ run, onTrade, error }: {
+export const TradeControls = ({ run, onTrade, error, compact = false }: {
   run: RunPlan;
   onTrade: (runId: string, tradeId: string, given: RosterDigimon) => boolean;
   error: string | null;
+  compact?: boolean;
 }) => {
   const [tradeId, setTradeId] = useState('');
   const [reviewed, setReviewed] = useState<RosterDigimon | null>(null);
@@ -24,8 +26,7 @@ export const TradeControls = ({ run, onTrade, error }: {
   const eligible = preview ? run.roster.filter(p => p.speciesId === preview.trade.giveSpeciesId) : [];
   const blocked = !preview || !reviewed || !eligible.some(p => p.instanceId === reviewed.instanceId);
   const reset = () => { setTradeId(''); setReviewed(null); setConfirm(false); };
-  return <section className="space-y-3 rounded-lg border p-4" aria-label="Trading Center">
-    <h4 className="font-semibold">Trading Center</h4>
+  return <ActionDisclosure title="Trading Center" id="trade-controls" active={Boolean(tradeId)} onCancel={reset} compact={compact}>
     <label className="block space-y-1 text-sm"><span>Trade</span>
       <select aria-label="Trade definition" className="block w-full rounded border bg-background p-2" value={tradeId} onChange={e => {
         setTradeId(e.target.value); setReviewed(null); setConfirm(false);
@@ -64,5 +65,5 @@ export const TradeControls = ({ run, onTrade, error }: {
       }}>Confirm Trade</AlertDialogAction></AlertDialogFooter>
       {error && <p role="alert">{error}</p>}
     </AlertDialogContent></AlertDialog>
-  </section>;
+  </ActionDisclosure>;
 };

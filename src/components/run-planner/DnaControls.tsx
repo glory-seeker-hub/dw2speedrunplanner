@@ -1,3 +1,4 @@
+import { ActionDisclosure } from '@/components/run-planner/ActionDisclosure';
 import { useState } from 'react';
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
 import { proposeDnaChild } from '@/utils/dnaProposal';
@@ -9,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription,
   AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
-export const DnaControls = ({ run, onDna, error }: {
+export const DnaControls = ({ run, onDna, error, compact = false }: {
   run: RunPlan;
   onDna: (runId: string, a: RosterDigimon, b: RosterDigimon, kept?: string[]) => boolean;
   error: string | null;
+  compact?: boolean;
 }) => {
   const [parentA, setParentA] = useState(''), [parentB, setParentB] = useState('');
   const [reviewed, setReviewed] = useState<{ a: RosterDigimon; b: RosterDigimon; proposal: ReturnType<typeof proposeDnaChild> } | null>(null);
@@ -40,9 +42,8 @@ export const DnaControls = ({ run, onDna, error }: {
     // Mechanical result is fixed to the reviewed snapshots; only capacity changes here.
     try { resolution = resolveTechniqueChoice(result.choice, result.choice.candidates.length ? kept : undefined); } catch { /* Invalid selection keeps confirmation disabled. */ }
   }
-  const reset = () => { setParentA(''); setParentB(''); setReviewed(null); setKept([]); setReviewTechniques(false); setConfirm(false); };
-  return <section className="space-y-3 rounded-lg border p-4" aria-label="DNA Digivolution">
-    <h4 className="font-semibold">DNA Digivolution</h4>
+  const reset = () => { setLocalError(null); setParentA(''); setParentB(''); setReviewed(null); setKept([]); setReviewTechniques(false); setConfirm(false); };
+  return <ActionDisclosure title="DNA Digivolution" id="dna-controls" active={Boolean(parentA || parentB)} onCancel={reset} compact={compact}>
     <div className="grid gap-3 sm:grid-cols-2">{(['A', 'B'] as const).map(which => <label key={which} className="space-y-1 text-sm">
       <span>Parent {which}</span>
       <select aria-label={`DNA Parent ${which}`} className="block w-full rounded border bg-background p-2" value={which === 'A' ? parentA : parentB}
@@ -88,5 +89,5 @@ export const DnaControls = ({ run, onDna, error }: {
       }}>Confirm DNA</AlertDialogAction></AlertDialogFooter>
       {error && <p role="alert">{error}</p>}
     </AlertDialogContent></AlertDialog>
-  </section>;
+  </ActionDisclosure>;
 };

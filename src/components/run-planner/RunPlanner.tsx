@@ -1,3 +1,4 @@
+import { TechniquePlanningSummary } from '@/components/run-planner/TechniquePlanningSummary';
 import { TradeControls } from '@/components/run-planner/TradeControls';
 import { DnaControls } from '@/components/run-planner/DnaControls';
 import { DigivolutionControls } from '@/components/run-planner/DigivolutionControls';
@@ -24,9 +25,9 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const Stats = ({ stats }: { stats: DigimonStats }) => (
-  <dl className="grid grid-cols-5 gap-2 text-center text-sm">
+  <dl className="grid grid-cols-5 gap-1 text-center text-sm">
     {(['hp', 'mp', 'atk', 'def', 'spd'] as const).map((stat) => (
-      <div key={stat} className="rounded bg-muted/30 p-2">
+      <div key={stat} className="rounded bg-muted/30 px-1 py-1">
         <dt className="text-xs text-muted-foreground">{stat.toUpperCase()}</dt>
         <dd className="font-semibold tabular-nums">{stats[stat]}</dd>
       </div>
@@ -39,11 +40,10 @@ type Props = { planner: ReturnType<typeof useRunPlanner> };
 export const RunPlanner = ({ planner }: Props) => {
   const [confirmReset, setConfirmReset] = useState<string | null>(null);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
-  const starterMember = run?.roster.find((member) => member.instanceId === run.starterInstanceId);
   const starter = STARTERS.find((option) => option.id === run?.starterDefinitionId);
 
   return (
-    <section className="space-y-6" aria-label="Run Planner">
+    <section className="space-y-4" aria-label="Run Planner">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Run Planner</h2>
@@ -96,25 +96,29 @@ export const RunPlanner = ({ planner }: Props) => {
         </Card>
       ) : (
         <>
-          <Card className="bg-gradient-card border-border shadow-card">
-            <CardHeader><CardTitle>{run.name}</CardTitle><CardDescription>{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</CardDescription></CardHeader>
-            <CardContent><dl className="flex flex-wrap gap-8">
-              <div><dt className="text-sm text-muted-foreground">Total Bits</dt><dd className="text-xl font-semibold tabular-nums">{run.totalBits}</dd></div>
-              <div><dt className="text-sm text-muted-foreground">Recorded battles</dt><dd className="text-xl font-semibold tabular-nums">{run.history.filter(event => event.type === 'battle').length}</dd></div>
-            </dl></CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Digiline</CardTitle>
+          <section aria-label="Run summary" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-3">
+            <div><h3 className="font-semibold">{run.name}</h3><p className="text-xs text-muted-foreground">{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</p></div>
+            <dl className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <div><dt className="text-xs text-muted-foreground">Total Bits</dt><dd className="font-semibold tabular-nums">{run.totalBits}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Recorded battles</dt><dd className="font-semibold tabular-nums">{run.history.filter(event => event.type === 'battle').length}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Total actions</dt><dd className="font-semibold tabular-nums">{run.history.length}</dd></div>
+              <div><dt className="text-xs text-muted-foreground">Roster / Active</dt><dd className="font-semibold tabular-nums">{run.roster.length} / {run.digiline.length}</dd></div>
+            </dl>
+            <a href="#run-battle" className="rounded-md border px-3 py-2 text-sm font-medium hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Go to Battle ↓</a>
+          </section>
+          <div id="run-roster" tabIndex={-1} aria-label="Roster workspace" role="region" className="grid scroll-mt-28 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+          <Card className="min-w-0">
+            <CardHeader className="p-3 pb-2">
+              <CardTitle className="text-lg" id="current-digiline">Current Digiline</CardTitle>
               <CardDescription>{run.digiline.length} / {MAX_DIGILINE_SIZE} active members. Removing a member keeps it in your roster.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ol className="grid gap-4 lg:grid-cols-3" aria-label="Digiline slots">
+            <CardContent className="p-3 pt-0">
+              <ol className="grid gap-2" aria-label="Digiline slots">
                 {Array.from({ length: MAX_DIGILINE_SIZE }, (_, index) => {
                   const id = run.digiline[index];
                   const member = run.roster.find((entry) => entry.instanceId === id);
                   return (
-                    <li key={index} className="space-y-3 rounded-lg border border-border bg-muted/10 p-4" aria-label={'Slot ' + (index + 1)}>
+                    <li key={index} className="space-y-1.5 rounded-lg border border-border bg-muted/10 p-3" aria-label={'Slot ' + (index + 1)}>
                       <p className="text-sm text-muted-foreground">Slot {index + 1}</p>
                       {member ? (
                         <>
@@ -136,24 +140,22 @@ export const RunPlanner = ({ planner }: Props) => {
                   );
                 })}
               </ol>
-              {run.digiline.length === 0 && <p className="mt-4 text-sm text-muted-foreground">No active members. Add a reserve from your roster below.</p>}
+              {run.digiline.length === 0 && <p className="mt-4 text-sm text-muted-foreground">No active members. Add a reserve from your roster.</p>}
             </CardContent>
           </Card>
-          <section className="space-y-3" aria-label="Roster">
+          <section className="min-w-0 space-y-3" aria-label="Roster">
             <h3 className="text-xl font-semibold">Roster</h3>
-            <TradeControls key={`trade/${run.id}/${planner.feedbackRevision}`} run={run} onTrade={planner.trade} error={error} />
-            <DnaControls key={`${run.id}/${planner.feedbackRevision}`} run={run} onDna={planner.dna} error={error} />
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {run.roster.map((member) => (
-                <Card key={member.instanceId}>
-                  <CardHeader><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
+                <Card key={member.instanceId} aria-label={`${member.name} roster card`} className="min-w-0">
+                  <CardHeader className="space-y-1 p-3 pb-2"><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
                     <p className="text-sm text-muted-foreground">{getSpeciesProgression(member.speciesId)?.rank ?? 'Unknown rank'} · DP {member.dp}</p>
                     <LevelCapDisplay member={member} />
-                    <CardDescription>Total XP {member.totalXp}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-2 p-3 pt-0">
                     <Stats stats={member.stats} />
                     <p className="text-sm"><span className="text-muted-foreground">Known techniques: </span>{member.techs.join(', ') || 'None'}</p>
+                    <TechniquePlanningSummary member={member} />
                     <DigivolutionControls runId={run.id} member={member} onDigivolve={planner.digivolve} error={error} />
                     {!run.digiline.includes(member.instanceId) && (
                       <div className="space-y-2">
@@ -163,12 +165,24 @@ export const RunPlanner = ({ planner }: Props) => {
                         {run.digiline.length >= MAX_DIGILINE_SIZE && <p id={'digiline-full-' + member.instanceId} className="text-xs text-muted-foreground">Digiline full ({MAX_DIGILINE_SIZE}/{MAX_DIGILINE_SIZE}). Remove an active member first.</p>}
                       </div>
                     )}
+                    <details className="text-xs text-muted-foreground"><summary className="cursor-pointer rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Details</summary><p>Total XP {member.totalXp}</p><p>Source: {member.source.type}</p></details>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </section>
+          </div>
+          <section aria-label="Roster Actions" className="space-y-2">
+            <h3 className="text-lg font-semibold">Roster Actions</h3>
+            <div className="grid items-start gap-3 md:grid-cols-2">
+              <TradeControls compact key={`trade/${run.id}`} run={run} onTrade={planner.trade} error={error} />
+              <DnaControls compact key={`dna/${run.id}`} run={run} onDna={planner.dna} error={error} />
+            </div>
+          </section>
+          <section id="run-battle" tabIndex={-1} aria-label="Battle recording" className="scroll-mt-28 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+          <a href="#run-roster" className="mb-2 inline-block rounded px-2 py-1 text-sm underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Back to roster ↑</a>
           <BattleSelector key={`${run.id}/${planner.feedbackRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
+          </section>
           <RunHistory key={run.id} run={run} onUndo={planner.undoAction} error={error} />
         </>
       )}
