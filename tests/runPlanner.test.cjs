@@ -2576,3 +2576,125 @@ test('fresh trade IDs reject an existing event ID even when no current individua
   const run=tradeFixture();run.roster.push({...structuredClone(run.roster[0]),instanceId:'another'});const first=tradeAction(run);
   assert.throws(()=>tradeRecording.recordTradeAction(first.run,'trade-191','another',()=>first.event.id),/fresh Trade ID/);
 });
+
+// Phase 2I-A: presentation-only fixtures use the existing component host and mechanics.
+const layoutPlanner = run => ({data:envelope(run),activeRun:run,error:null,starterId:'',name:'',feedbackRevision:0});
+const layoutTree = run => componentHost('src/components/run-planner/RunPlanner.tsx','RunPlanner')({planner:layoutPlanner(run)});
+const named = (tree,label) => elements(tree).find(e=>e.props['aria-label']===label);
+const clickText = (tree,text) => {const el=elements(tree).find(e=>e.props.onClick && elementText(e)===text);assert.ok(el,`Missing ${text}`);el.props.onClick();};
+const planningDisplay = load('src/utils/runPlanningDisplay.ts');
+const layoutPendingMember=()=>{const run=liveRun('MetalGreymon','MetalGreymon');Object.assign(run.roster[0],availableState(rookieNames.slice(0,6)));return liveDna(run).child;};
+const planningHtml = member => require('react-dom/server').renderToStaticMarkup(require('react').createElement(load('src/components/run-planner/TechniquePlanningSummary.tsx').TechniquePlanningSummary,{member}));
+
+test('2I workspace contains Digiline and Roster together with no intervening action forms',()=>{
+  const tree=layoutTree(fullRun()),workspace=named(tree,'Roster workspace');assert.ok(workspace);
+  assert.ok(named(workspace,'Digiline slots'));assert.ok(named(workspace,'Roster'));
+  assert.equal(elements(workspace).filter(e=>e.props.onTrade || e.props.onDna).length,0);
+  assert.ok(named(tree,'Roster Actions'));
+});
+test('2I desktop exposes a proportional two-panel grid, narrow screens stack with readable roster columns',()=>{
+  const tree=layoutTree(fullRun()),workspace=named(tree,'Roster workspace');
+  assert.match(workspace.props.className,/xl:grid-cols-\[minmax\(0,1fr\)_minmax\(0,2fr\)\]/);
+  assert.ok(!workspace.props.className.includes('grid-cols-2 '));
+  assert.ok(elements(named(tree,'Roster')).some(e=>e.props.className==='grid gap-3 md:grid-cols-2'));
+});
+test('2I all three populated slots preserve move and remove controls',()=>{
+  const tree=layoutTree(fullRun()),slots=elements(named(tree,'Digiline slots')).filter(e=>e.type==='li');assert.equal(slots.length,3);
+  for(let i=0;i<3;i++){assert.equal(slots[i].props['aria-label'],`Slot ${i+1}`);assert.match(elementText(slots[i]),/Move UpMove DownRemove/);}
+});
+test('2I compact roster retains exact fractional stats, rank, DP, cap, techniques, evolution and details',()=>{
+  const run=evolutionRun(),member=run.roster[0],html=renderPlanner(run);
+  for(const text of [member.name,'Active Digiline','Rookie','DP 0','EL 11 /','Known techniques:',...member.techs,'Next:', 'Details',`Total XP ${member.totalXp}`,...Object.values(member.stats).map(String)])assert.ok(html.includes(text),text);
+  for(const stat of ['HP','MP','ATK','DEF','SPD'])assert.ok(html.includes(stat));
+});
+test('2I summary includes original starter, Bits, battles, actions and roster count',()=>{
+  const tree=layoutTree(tradeAction(tradeFixture()).run),summary=named(tree,'Run summary'),text=elementText(summary);
+  for(const label of ['Gold Hawk / Agumon','Total Bits','Recorded battles0','Total actions1','Roster / Active1 / 1'])assert.ok(text.includes(label),label);
+});
+test('2I pending technique summary shows authoritative own and inherited thresholds in stable order',()=>{
+  const member=layoutPendingMember(),before=JSON.stringify(member),summary=planningDisplay.getPlanningSummary(freeze(member));
+  assert.ok(summary.pending.length);const html=planningHtml(member);
+  for(const p of summary.pending){assert.ok(html.includes(p.name));assert.ok(html.includes(`EL${p.level}`));}
+  assert.ok(html.includes('inherited'));assert.equal(JSON.stringify(member),before);
+});
+test('2I empty pending state does not invent techniques',()=>{
+  const member=createRunPlan('gold-hawk','Empty').roster[0];assert.deepEqual(planningDisplay.getPlanningSummary(member).pending,[]);
+  assert.match(planningHtml(member),/Pending: <\/span>None/);
+});
+test('2I large pending pools expand behind a native accessible summary',()=>{
+  const member=layoutPendingMember(),pending=planningDisplay.getPlanningSummary(member).pending;assert.ok(pending.length>3);
+  const html=planningHtml(member);assert.match(html,/<details><summary/);assert.ok(html.includes(`Pending: ${pending.length}`));for(const p of pending)assert.ok(html.includes(p.name));
+});
+for(const title of ['Trading Center','DNA Digivolution'])test(`2I ${title} disclosure toggles safely and retains mounted content`,()=>{
+  const render=componentHost('src/components/run-planner/ActionDisclosure.tsx','ActionDisclosure');let cancelled=0;
+  const child=require('react').createElement('input',{value:'selection',readOnly:true});const props={title,id:'test-panel',active:false,onCancel:()=>cancelled++,compact:true,children:child};
+  let tree=render(props);assert.equal(elements(tree).find(e=>e.props.id==='test-panel').props.hidden,true);
+  elements(tree).find(e=>e.props['aria-controls']==='test-panel').props.onClick();tree=render(props);assert.equal(elements(tree).find(e=>e.props.id==='test-panel').props.hidden,false);
+  elements(tree).find(e=>e.props['aria-controls']==='test-panel').props.onClick();tree=render(props);assert.equal(elements(tree).find(e=>e.props.id==='test-panel').props.children,child);
+  props.active=true;tree=render(props);assert.equal(elements(tree).find(e=>e.props.id==='test-panel').props.hidden,false);assert.equal(elements(tree).find(e=>e.props['aria-controls']==='test-panel').props.disabled,true);
+  clickText(tree,`Cancel ${title}`);assert.equal(cancelled,1);props.active=false;assert.equal(elements(render(props)).find(e=>e.props.id==='test-panel').props.hidden,true);
+});
+for(const kind of ['Trade','DNA'])test(`2I active ${kind} selection survives rerender and failed confirmation, clears on explicit cancel`,()=>{
+  const isTrade=kind==='Trade',run=isTrade?tradeFixture():liveRun(),before=JSON.stringify(run);
+  const render=componentHost(`src/components/run-planner/${isTrade?'TradeControls':'DnaControls'}.tsx`,isTrade?'TradeControls':'DnaControls');
+  const props={run,error:null,compact:true,onTrade:()=>false,onDna:()=>false};
+  if(isTrade){named(render(props),'Trade definition').props.onChange({target:{value:'trade-191'}});named(render(props),'Trade given Digimon').props.onChange({target:{value:'given'}});}
+  else {named(render(props),'DNA Parent A').props.onChange({target:{value:'a'}});named(render(props),'DNA Parent B').props.onChange({target:{value:'b'}});}
+  let tree=render(props);assert.equal(tree.props.active,true);clickText(tree,isTrade?'Trade Digimon':'DNA Digivolve');
+  tree=render(props);let prevented=false;elements(tree).find(e=>elementText(e)===(isTrade?'Confirm Trade':'Confirm DNA')&&e.props.onClick).props.onClick({preventDefault:()=>prevented=true});assert.ok(prevented);
+  props.run={...run,digiline:[...run.digiline].reverse()};tree=render(props);assert.equal(tree.props.active,true);assert.equal(named(tree,isTrade?'Trade given Digimon':'DNA Parent A').props.value,isTrade?'given':'a');
+  tree.props.onCancel();tree=render(props);assert.equal(tree.props.active,false);assert.equal(named(tree,isTrade?'Trade definition':'DNA Parent A').props.value,'');assert.equal(JSON.stringify(run),before);
+});
+test('2I unrelated action feedback does not remount Trade or DNA while changing runs does',()=>{
+  const run=fullRun(),render=componentHost('src/components/run-planner/RunPlanner.tsx','RunPlanner'),planner=layoutPlanner(run);
+  const keys=()=>elements(render({planner})).filter(e=>e.props.onTrade!==undefined||e.type?.name==='TradeControls'||e.type?.name==='DnaControls').map(e=>e.key);
+  const initial=keys();assert.equal(initial.length,2);planner.feedbackRevision++;assert.deepEqual(keys(),initial);
+  planner.activeRun={...run,id:'another-run'};assert.notDeepEqual(keys(),initial);
+});
+function layoutHistory(){
+  const evoRun=evolutionRun();
+  // Independent valid event snapshots, combined solely to exercise presentation filters.
+  const events=[recordKeepingAll(createRunPlan('gold-hawk','Battle'),normalBattle()).event,
+    recordRunDigivolution(evoRun,evoRun.starterInstanceId).event,liveDna(liveRun()).event,tradeAction(tradeFixture()).event];
+  return {...createRunPlan('gold-hawk','History display'),history:events.map((event,order)=>({...event,order,id:`display-${order}`}))};
+}
+for(const [label,expected] of [['All',[1,2,3,4]],['Battles',[1]],['Digivolution',[2]],['DNA',[3]],['Trades',[4]]])test(`2I History ${label} filter preserves chronological action numbers`,()=>{
+  const run=freeze(layoutHistory()),before=JSON.stringify(run),render=componentHost('src/components/run-planner/RunHistory.tsx','RunHistory'),props={run,onUndo:()=>assert.fail('layout must not undo'),error:null};
+  clickText(render(props),label);const tree=render(props),list=named(tree,'Run History');
+  assert.deepEqual(elements(list).filter(e=>e.type==='li').map(e=>Number(elementText(e).match(/^Action (\d+)/)[1])),expected);
+  assert.equal(JSON.stringify(run),before);
+});
+test('2I History collapse and expansion preserve selected filter with Undo outside disclosure',()=>{
+  const render=componentHost('src/components/run-planner/RunHistory.tsx','RunHistory'),props={run:layoutHistory(),onUndo:()=>true,error:null};
+  clickText(render(props),'DNA');clickText(render(props),'Collapse History');let tree=render(props);const panel=elements(tree).find(e=>e.props.id==='run-history-content');assert.equal(panel.props.hidden,true);
+  assert.ok(!elementText(panel).includes('Undo Last Action'));clickText(tree,'Expand History');tree=render(props);assert.equal(elements(tree).find(e=>e.props.id==='run-history-content').props.hidden,false);assert.equal(elements(tree).find(e=>elementText(e)==='DNA'&&e.props.onClick).props['aria-pressed'],true);
+});
+test('2I filtered and collapsed Undo confirms the real latest event, including an empty filter',()=>{
+  const run=tradeAction(tradeFixture()).run,render=componentHost('src/components/run-planner/RunHistory.tsx','RunHistory');let submitted;
+  const props={run,onUndo:(...args)=>{submitted=args;return true;},error:null};clickText(render(props),'Battles');assert.match(elementText(render(props)),/No actions match this filter/);
+  clickText(render(props),'Collapse History');clickText(render(props),'Undo Last Action');
+  elements(render(props)).find(e=>e.props.onClick&&elementText(e)==='Confirm Undo').props.onClick({preventDefault:()=>assert.fail('must undo')});assert.deepEqual(submitted,[run.history.at(-1).id,run.id]);
+});
+test('2I milestones are deterministic, read-only and use engine eligibility',()=>{
+  for(const [name,level,extra,expected] of [['Agumon',10,{},'EL11 — Digivolution available'],['Agumon',12,{levelCap:{min:13,max:13,resolved:13}},'EL13 — MAX'],['Agumon',13,{levelCap:{min:13,max:13,resolved:13}},'MAX reached'],['Agumon',50,{levelCap:{min:55,max:55,resolved:55}},'Verified XP progression ends at EL50']]){
+    const member=freeze(evolutionRun(name,level,extra).roster[0]),before=JSON.stringify(member),summary=planningDisplay.getPlanningSummary(member);
+    assert.equal(summary.next,expected);assert.deepEqual(summary,planningDisplay.getPlanningSummary(member));assert.equal(JSON.stringify(member),before);
+  }
+});
+test('2I pending own technique, unresolved cap and simultaneous milestones remain explicit',()=>{
+  const run=evolutionRun(),evolved=recordRunDigivolution(run,run.starterInstanceId).run.roster[0];
+  assert.equal(planningDisplay.getPlanningSummary(evolved).next,'EL12 — Technique learning · 1 pending');assert.ok(planningHtml(evolved).includes('(own)'));
+  const unknown={...evolved,levelCap:{min:11,max:15,resolved:null}};assert.equal(planningDisplay.getPlanningSummary(unknown).next,'Cap resolution required');assert.ok(planningHtml(unknown).includes('requires cap resolution'));
+  const tie={...evolved,levelCap:{min:12,max:12,resolved:12}};assert.equal(planningDisplay.getPlanningSummary(tie).next,'EL12 — Technique learning · 1 pending · MAX');
+});
+test('2I Battle jump leads to one focusable recording region and one BattleSelector',()=>{
+  const tree=layoutTree(fullRun()),anchor=elements(tree).find(e=>e.type==='a'&&e.props.href==='#run-battle'),target=elements(tree).find(e=>e.props.id==='run-battle');assert.ok(anchor);assert.equal(target.props.tabIndex,-1);
+  assert.equal(elements(tree).filter(e=>e.type===load('src/components/run-planner/BattleSelector.tsx').BattleSelector).length,1);
+});
+test('2I layout rendering, details and filtering do not write persistence or mutate schema v7',()=>{
+  const run=freeze(createRunPlan('gold-hawk','Read only')),before=JSON.stringify(envelope(run));let writes=0;
+  global.localStorage.setItem=()=>writes++;renderPlanner(run);planningHtml(run.roster[0]);
+  const render=componentHost('src/components/run-planner/RunHistory.tsx','RunHistory'),props={run,error:null,onUndo:()=>assert.fail('unexpected action')};
+  clickText(render(props),'Trades');clickText(render(props),'Collapse History');clickText(render(props),'Expand History');
+  assert.equal(writes,0);assert.equal(JSON.stringify(envelope(run)),before);assert.equal(storage.RUN_PLANNER_SCHEMA_VERSION,7);
+});
