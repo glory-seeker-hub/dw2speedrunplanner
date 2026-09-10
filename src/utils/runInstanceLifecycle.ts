@@ -1,8 +1,7 @@
-import { createTradeReceivedProposal } from '@/utils/tradeProposal';
+import { validateStarterBinding } from '@/utils/runStarterValidation';
+import { equalRunState as equal, validateActionContinuity } from '@/utils/runTransitionValidation';
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
 import { getStarterById } from '@/data/starters';
-import { proposeDnaChild, replaceDnaParents } from '@/utils/dnaProposal';
-import { normalizeTechniqueName } from '@/data/techniqueMetadata';
 
 export const getHistoricalInstanceIds = (run: RunPlan): Set<string> => new Set([
   ...run.roster.map(p => p.instanceId),
@@ -10,14 +9,7 @@ export const getHistoricalInstanceIds = (run: RunPlan): Set<string> => new Set([
     ...(e.type === 'trade' ? [e.receivedInstanceId] : e.type === 'dna' ? [e.childInstanceId] : e.type === 'battle' && e.capturedInstanceId ? [e.capturedInstanceId] : [])]),
 ]);
 
-const equal = (a: unknown, b: unknown): boolean => {
-  if (a === b) return true;
-  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
-  const x = a as Record<string, unknown>, y = b as Record<string, unknown>;
-  return Object.keys(x).length === Object.keys(y).length && Object.keys(x).every(k => Object.prototype.hasOwnProperty.call(y, k) && equal(x[k], y[k]));
-};
-
-/** Membership and immediate post-action audits, not XP/stat replay of the entire run. */
+/** One chronological pass checks identity and exact action-controlled state. */
 export const validateInstanceLifecycle = (run: RunPlan) => {
   const errors: { code: string; message: string }[] = [];
   const fail = (code: string, message: string) => errors.push({ code, message });
@@ -26,6 +18,7 @@ export const validateInstanceLifecycle = (run: RunPlan) => {
   if (!getStarterById(run.starterDefinitionId) || !starter || starter.source?.type !== 'starter') {
     fail('unknown-starter-instance', 'Original starter definition and historical individual must be present in the initial state.');
   }
+  errors.push(...validateStarterBinding(run));
   const live = new Set(initial.map(p => p.instanceId));
   const seen = new Set(live);
   const sources = new Map(initial.map(p => [p.instanceId, p.source]));
@@ -60,31 +53,15 @@ export const validateInstanceLifecycle = (run: RunPlan) => {
       if (!live.has(event.givenInstanceId)) fail('trade-missing-given', 'Given individual must exist at trade time.');
       live.delete(event.givenInstanceId);
       introduce(event.receivedInstanceId);
-      const given = before.roster.find(p => p.instanceId === event.givenInstanceId)!;
-      const expected = { ...createTradeReceivedProposal(event.tradeId, given), instanceId: event.receivedInstanceId };
-      sources.set(event.receivedInstanceId, expected.source);
-      // Audit receipt species/state at creation; later normal evolution may change species, preserving provenance.
-      const expectedRoster = before.roster.map(p => p.instanceId === event.givenInstanceId ? expected : p);
-      if (!equal(after.roster, expectedRoster)) fail('trade-received-audit-mismatch', 'Trade must replace only the given individual with the exact authoritative received state.');
-      if (after.totalBits !== before.totalBits) fail('trade-bits-changed', 'Trading does not change Bits.');
-      // Digiline may be edited between actions; local membership remains strict in every snapshot.
+      sources.set(event.receivedInstanceId, { type: 'trade', tradeId: event.tradeId, givenInstanceId: event.givenInstanceId });
     } else if (event.type === 'dna') {
       const parents = [event.parentAInstanceId, event.parentBInstanceId];
       if (!parents.every(id => live.has(id))) fail('dna-missing-parent', 'DNA parents must exist at consumption time.');
       parents.forEach(id => live.delete(id));
       introduce(event.childInstanceId);
       sources.set(event.childInstanceId, { type: 'dna', parentInstanceIds: parents as [string, string] });
-      const a = before.roster.find(p => p.instanceId === parents[0])!, b = before.roster.find(p => p.instanceId === parents[1])!;
-      const proposal = proposeDnaChild(a, b, event.techniqueChoice.kept.map(normalizeTechniqueName));
-      const child = after.roster.find(p => p.instanceId === event.childInstanceId);
-      if (proposal.status !== 'ready' || !equal(child, { instanceId: event.childInstanceId, ...proposal.child })) {
-        fail('dna-child-audit-mismatch', 'DNA child state must match the recomputed creation state.');
-      }
-      const expectedOrder = replaceDnaParents(before.roster.map(p => p.instanceId), id => id, parents, event.childInstanceId);
-      if (!equal(after.roster.map(p => p.instanceId), expectedOrder)) fail('dna-roster-order', 'DNA roster placement must preserve unaffected order.');
-      if (after.totalBits !== before.totalBits) fail('dna-bits-changed', 'DNA does not change Bits.');
-      // Digiline can be edited between actions; its local membership remains strict in each snapshot.
     }
+    errors.push(...validateActionContinuity(event, after));
     if (!matches(after.roster)) fail('lifecycle-roster-mismatch', 'Post-action roster membership does not match the lifecycle.');
     checkSources(after.roster);
   });

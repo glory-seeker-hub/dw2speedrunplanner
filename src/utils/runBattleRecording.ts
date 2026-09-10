@@ -8,7 +8,7 @@ import { newInstanceId } from '@/utils/capture';
 import { validateRunPlan } from '@/utils/runInvariants';
 import { getInitialLevelCap, getAcquisitionLevelCap } from '@/utils/levelCap';
 
-export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null; capturedMaxLevel?: number | null; techniqueSelections?: TechniqueSelection[]; reviewTechniques?: boolean; expectedRunState?: string };
+export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null; capturedMaxLevel?: number | null; techniqueSelections?: TechniqueSelection[]; reviewTechniques?: boolean; expectedRunId?: string; expectedRunState?: string };
 
 /** Re-query location metadata at submission time; never trust a UI-provided boss flag. */
 export const getRecordingEncounter = (selection: BattleSelection) =>

@@ -1,4 +1,5 @@
 import { validateInstanceLifecycle } from '@/utils/runInstanceLifecycle';
+import { hasConsistentRosterIdentity, hasSufficientLevelXp } from '@/utils/rosterIdentityValidation';
 import { MAX_TECHNIQUES } from '@/types/techniqueCapacity';
 import { isValidRunEvent } from '@/utils/runEventValidation';
 import { isRosterDigimon } from '@/utils/runActionCheckpoint';
@@ -51,6 +52,8 @@ export const validateRosterDigimonInvariants = (
   entry: RosterDigimon
 ): InvariantViolation[] => {
   const violations: InvariantViolation[] = [];
+  if (!hasConsistentRosterIdentity(entry.speciesId, entry.name)) violations.push({ code: 'roster-species-mismatch', message: 'Roster species ID and name do not identify the same canonical Digimon.' });
+  if (!hasSufficientLevelXp(entry.level, entry.totalXp)) violations.push({ code: 'roster-xp-below-level', message: 'Roster XP is below the authoritative threshold for its current EL.' });
   if (entry.techs?.length < 1 || entry.techs?.length > MAX_TECHNIQUES) violations.push({ code: 'roster-technique-capacity', message: `A Digimon must possess 1–${MAX_TECHNIQUES} techniques.` });
   if (!isValidTechniqueState(entry)) violations.push({ code: 'roster-invalid-techniques', message: 'Technique pool metadata and available techniques must agree.' });
   if (!Number.isInteger(entry.dp) || entry.dp < 0) violations.push({ code: 'roster-invalid-dp', message: 'DP must be a non-negative integer.' });
