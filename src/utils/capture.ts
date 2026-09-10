@@ -25,7 +25,8 @@ export type CaptureResult =
 export const tryCreateCapturedDigimon = (
   encounterId: number,
   enemySlot: number,
-  selectedMaxLevel?: number | null
+  selectedMaxLevel?: number | null,
+  makeId: () => string = newInstanceId,
 ): CaptureResult => {
   const encounter = encounters.find((e) => e.id === encounterId);
   if (!encounter) return { ok: false, reason: `Unknown encounter ${encounterId}` };
@@ -55,7 +56,7 @@ export const tryCreateCapturedDigimon = (
   return {
     ok: true,
     digimon: {
-      instanceId: newInstanceId(),
+      instanceId: makeId(),
       speciesId: species?.id ?? enemy.name.toLowerCase(),
       name: species?.name ?? enemy.name,
       source: { type: 'capture', encounterId, enemySlot },
@@ -86,11 +87,11 @@ export const createCapturedDigimon = (
 };
 
 /** Creates the initial roster Digimon from a starter definition. */
-export const createStarterDigimon = (starter: StarterDefinition): RosterDigimon => {
+export const createStarterDigimon = (starter: StarterDefinition, makeId: () => string = newInstanceId): RosterDigimon => {
   const levelCap = getAcquisitionLevelCap(starter.level);
   if (!levelCap) throw new Error(`No authoritative acquisition cap for EL${starter.level}`);
   return {
-    instanceId: newInstanceId(),
+    instanceId: makeId(),
     speciesId: starter.speciesId,
     name: starter.name,
     source: { type: 'starter' },

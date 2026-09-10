@@ -9,11 +9,12 @@ import { undoLastAction } from '@/utils/runActionUndo';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
 import { PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
-import { loadRunPlannerData, saveRunPlannerData, resetRunPlannerData } from '@/utils/runPlannerStorage';
+import { loadRunPlannerDataResult, saveRunPlannerDataResult, resetRunPlannerData } from '@/utils/runPlannerStorage';
 
 /** Own the persisted envelope above tab content. Save only explicit user changes. */
 export const useRunPlanner = () => {
-  const [data, setData] = useState(loadRunPlannerData);
+  const [stored, setStored] = useState(loadRunPlannerDataResult);
+  const { data, warning: storageWarning } = stored;
   const currentData = useRef(data);
   const [error, setError] = useState<string | null>(null);
   const [starterId, setStarterId] = useState('');
@@ -21,12 +22,18 @@ export const useRunPlanner = () => {
   const [feedbackRevision, setFeedbackRevision] = useState(0);
   const activeRun = data.runs.find((run) => run.id === data.activeRunId) ?? null;
 
+  // Exact content snapshot: harmless rerenders are accepted, committed changes require review.
+  const reviewedRunState = JSON.stringify(activeRun);
+
   const persist = (next: PersistedRunPlannerData): boolean => {
-    if (!saveRunPlannerData(next)) {
-      setError('Could not save this change. Your current run has been kept. Check browser storage and try again.');
+    const saved = saveRunPlannerDataResult(next);
+    if (saved.ok === false) {
+      setError(saved.reason === 'quota'
+        ? 'Run was not saved because browser storage is full. No planner changes were committed. Existing runs were kept.'
+        : 'Could not save this change. Your current run has been kept. Check browser storage and try again.');
       return false;
     }
-    setData(next);
+    setStored({ data: next, warning: null });
     currentData.current = next;
     setError(null);
     return true;
@@ -59,8 +66,10 @@ export const useRunPlanner = () => {
     const current = currentData.current;
     const run = current.runs.find(entry => entry.id === current.activeRunId);
     if (!run) return null;
-    if ((request.techniqueSelections !== undefined || request.expectedRunState !== undefined) && request.expectedRunState !== JSON.stringify(run)) {
-      setError('The run has changed. Cancel technique selection and review this battle again.');
+    if ((request.techniqueSelections !== undefined && request.expectedRunState === undefined) ||
+        run.id !== activeRun?.id || (request.expectedRunId !== undefined && request.expectedRunId !== run.id) ||
+        (request.expectedRunState ?? reviewedRunState) !== JSON.stringify(run)) {
+      setError('The run has changed. Cancel technique selection if open and review this battle again.');
       return null;
     }
     try {
@@ -144,10 +153,11 @@ export const useRunPlanner = () => {
   };
 
   const startRun = (): boolean => {
-    if (activeRun) return false; // Replacement requires the confirmed reset flow.
+    const current = currentData.current;
+    if (current.activeRunId !== null) return false; // Replacement requires the confirmed reset flow.
     try {
       const run = createRunPlan(starterId, name);
-      return persist({ ...data, runs: [...data.runs, run], activeRunId: run.id });
+      return persist({ ...current, runs: [...current.runs, run], activeRunId: run.id });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not create the run.');
       return false;
@@ -155,13 +165,18 @@ export const useRunPlanner = () => {
   };
 
   const loadRun = (id: string) => {
-    if (data.runs.some((run) => run.id === id)) persist({ ...data, activeRunId: id });
+    const current = currentData.current;
+    if (current.runs.some((run) => run.id === id)) persist({ ...current, activeRunId: id });
   };
 
   // Discard only the active run; other saved runs belong to the user too.
-  const resetRun = (): boolean => {
-    if (!activeRun) return false;
-    const next = { ...data, runs: data.runs.filter((run) => run.id !== activeRun.id), activeRunId: null };
+  const resetRun = (expectedRunId: string = activeRun?.id ?? ''): boolean => {
+    const current = currentData.current;
+    if (!expectedRunId || current.activeRunId !== expectedRunId) {
+      setError('The active run has changed. Cancel and review the reset again.');
+      return false;
+    }
+    const next = { ...current, runs: current.runs.filter((run) => run.id !== expectedRunId), activeRunId: null };
     if (next.runs.length > 0) {
       if (!persist(next)) return false;
     } else {
@@ -169,7 +184,7 @@ export const useRunPlanner = () => {
         setError('Could not reset the saved run. Your current run has been kept. Try again.');
         return false;
       }
-      setData(next);
+      setStored({ data: next, warning: null });
       currentData.current = next;
       setError(null);
     }
@@ -178,5 +193,5 @@ export const useRunPlanner = () => {
     return true;
   };
 
-  return { data, activeRun, error, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
+  return { data, activeRun, error, storageWarning, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
 };

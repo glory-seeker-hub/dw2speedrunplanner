@@ -9,6 +9,11 @@ const root = path.resolve(__dirname, '..');
 const cache = new Map();
 function load(file) {
   file = path.resolve(root, file);
+  // These legacy mechanics/component cases deliberately seed progressed starters.
+  // Only their initial-origin binding is a test double; transition replay stays real.
+  // runPlannerHardening.test.cjs uses an independent, entirely unmocked module graph
+  // for authoritative starter binding and end-to-end acquisition histories.
+  if (file === path.resolve(root, 'src/utils/runStarterValidation.ts')) return {validateStarterBinding:()=>[]};
   if (cache.has(file)) return cache.get(file).exports;
   const mod = { exports: {} };
   cache.set(file, mod);
@@ -236,12 +241,7 @@ test('add, reorder and remove each survive save/load with exact slot order', () 
   assert.deepEqual(run.roster, original.roster);
 });
 test('Digiline mutations preserve history snapshots, rewards, fractional stats and identity', () => {
-  const run = multiRun();
-  run.totalBits = 100;
-  run.history = [{type:'battle',techniqueChoices:[],id:'history',order:0,domainId:'test',phase:'before-blood-knights',floor:1,encounterId:182,
-    preActionCheckpoint:load('src/utils/runActionCheckpoint.ts').createRunActionCheckpoint(run),
-    capturedEnemySlot:null,capturedInstanceId:null,capturedLevelCap:null,
-    digilineInstanceIds:[run.starterInstanceId],xpReward:0,bitsReward:0}];
+  const run = recordKeepingAll(multiRun(),normalBattle()).run;
   freeze(run);
   const before = JSON.stringify(run);
   const changed = moveDigilineMember(addToDigiline(run,'reserve-a'),'reserve-a','up');
@@ -539,8 +539,9 @@ test('record action snapshots latest committed Digiline and consecutive calls do
   storage.saveRunPlannerData(envelope(multiRun()));
   const render=plannerHost(); const planner=render();
   planner.addMember('reserve-a');
-  planner.recordBattle(normalBattle());
-  planner.recordBattle(normalBattle());
+  assert.equal(planner.recordBattle(normalBattle()),null); // Stale participants require review.
+  render().recordBattle(normalBattle());
+  render().recordBattle(normalBattle());
   const run=render().activeRun;
   assert.equal(run.history.length,2);
   assert.deepEqual(run.history[0].digilineInstanceIds,[run.starterInstanceId,'reserve-a']);
@@ -582,9 +583,10 @@ test('normal battle undo restores all meaningful run state and does not mutate i
   assert.equal(recorded.history[0].preActionCheckpoint.roster[0].stats.hp,before.roster[0].stats.hp);
 });
 test('level-up undo restores exact fractional stats, level, XP and Bits', () => {
-  const before = recordKeepingAll(recordKeepingAll(multiRun(),normalBattle()).run,normalBattle()).run;
-  before.roster[0].totalXp=100000;
-  before.totalBits=123.5;
+  const seed = multiRun();
+  seed.roster[0].totalXp=100000;
+  seed.totalBits=123.5;
+  const before = recordKeepingAll(recordKeepingAll(seed,normalBattle()).run,normalBattle()).run;
   assert.ok(Object.values(before.roster[0].stats).some(v => !Number.isInteger(v)));
   const recorded=recordKeepingAll(freeze(before),normalBattle()).run;
   assert.equal(recorded.roster[0].level,before.roster[0].level+1);

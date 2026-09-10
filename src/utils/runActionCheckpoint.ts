@@ -1,4 +1,5 @@
 import { getTradeDefinition } from '@/data/trades';
+import { hasConsistentRosterIdentity, hasSufficientLevelXp } from '@/utils/rosterIdentityValidation';
 import { MAX_TECHNIQUES } from '@/types/techniqueCapacity';
 import { isValidTechniqueState } from '@/utils/techniqueInheritance';
 import { DigimonStats } from '@/types/digimon';
@@ -48,6 +49,7 @@ export const isRosterDigimon = (v: unknown): v is RosterDigimon =>
   Number.isInteger(v.level) &&
   v.level >= 1 &&
   isNonNegativeNumber(v.totalXp) &&
+  hasConsistentRosterIdentity(v.speciesId, v.name) && hasSufficientLevelXp(v.level, v.totalXp) &&
   isStats(v.stats) &&
   isStringArray(v.techs) && v.techs.length >= 1 && v.techs.length <= MAX_TECHNIQUES && isValidTechniqueState(v) &&
   Number.isInteger(v.dp) && (v.dp as number) >= 0 &&

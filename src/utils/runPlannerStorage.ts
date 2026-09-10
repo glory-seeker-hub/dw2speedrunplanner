@@ -51,33 +51,39 @@ export const isValidPersistedRunPlannerData = (
   return true;
 };
 
-/** Loads persisted data. Corrupted or outdated payloads fail safely to an empty state. */
-export const loadRunPlannerData = (): PersistedRunPlannerData => {
+export interface RunPlannerLoadResult { data: PersistedRunPlannerData; warning: string | null }
+const invalidStorageWarning = 'Saved data could not be validated and was not automatically deleted. Creating or saving new data may replace it.';
+
+/** Invalid payloads remain in storage; distinguish them from a fresh browser. */
+export const loadRunPlannerDataResult = (): RunPlannerLoadResult => {
   try {
     const raw = localStorage.getItem(RUN_PLANNER_STORAGE_KEY);
-    if (!raw) return emptyRunPlannerData();
+    if (raw === null) return { data: emptyRunPlannerData(), warning: null };
     const parsed = JSON.parse(raw);
-    if (!isValidPersistedRunPlannerData(parsed)) return emptyRunPlannerData();
-    return parsed;
+    if (!isValidPersistedRunPlannerData(parsed)) return { data: emptyRunPlannerData(), warning: invalidStorageWarning };
+    return { data: parsed, warning: null };
   } catch {
-    return emptyRunPlannerData();
+    return { data: emptyRunPlannerData(), warning: invalidStorageWarning };
   }
 };
+export const loadRunPlannerData = (): PersistedRunPlannerData => loadRunPlannerDataResult().data;
 
-export const saveRunPlannerData = (data: PersistedRunPlannerData): boolean => {
+export type RunPlannerSaveResult = { ok: true } | { ok: false; reason: 'invalid' | 'quota' | 'unavailable' };
+export const saveRunPlannerDataResult = (data: PersistedRunPlannerData): RunPlannerSaveResult => {
   try {
-    if (!isValidPersistedRunPlannerData(data)) {
-      return false;
-    }
-    localStorage.setItem(
-      RUN_PLANNER_STORAGE_KEY,
-      JSON.stringify({ ...data, schemaVersion: RUN_PLANNER_SCHEMA_VERSION })
-    );
-    return true;
-  } catch {
-    return false;
+    if (!isValidPersistedRunPlannerData(data)) return { ok: false, reason: 'invalid' };
+    localStorage.setItem(RUN_PLANNER_STORAGE_KEY, JSON.stringify({ ...data, schemaVersion: RUN_PLANNER_SCHEMA_VERSION }));
+    return { ok: true };
+  } catch (cause) {
+    const error = cause as { name?: string; code?: number } | null;
+    const quota = error?.name === 'QuotaExceededError' || error?.name === 'NS_ERROR_DOM_QUOTA_REACHED' || error?.code === 22 || error?.code === 1014;
+    return { ok: false, reason: quota ? 'quota' : 'unavailable' };
   }
 };
+export const saveRunPlannerData = (data: PersistedRunPlannerData): boolean => saveRunPlannerDataResult(data).ok;
+
+/** UTF-8 serialized size, not an estimate of the browser quota. */
+export const getRunPlannerSerializedBytes = (data: PersistedRunPlannerData): number => new TextEncoder().encode(JSON.stringify(data)).byteLength;
 
 export const resetRunPlannerData = (): boolean => {
   try {

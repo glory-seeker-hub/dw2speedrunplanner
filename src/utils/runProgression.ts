@@ -70,6 +70,8 @@ export interface BattleChoiceReview {
 }
 
 export interface ResolveBattleInput {
+  /** Historical replay injects the recorded capture identity; no random IDs are allocated. */
+  captureIdFactory?: () => string;
   encounterId: number;
   /** Instance IDs of the Digiline that fought (max 3). */
   digilineInstanceIds: string[];
@@ -158,7 +160,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
   let capturedInstanceId: string | null = null;
   let captureError: string | null = null;
   if (typeof input.capturedEnemySlot === 'number') {
-    const result = tryCreateCapturedDigimon(encounterId, input.capturedEnemySlot, input.capturedMaxLevel);
+    const result = tryCreateCapturedDigimon(encounterId, input.capturedEnemySlot, input.capturedMaxLevel, input.captureIdFactory);
     if (result.ok === true) {
       nextRoster.push(result.digimon);
       capturedInstanceId = result.digimon.instanceId;

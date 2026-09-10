@@ -37,7 +37,7 @@ const Stats = ({ stats }: { stats: DigimonStats }) => (
 type Props = { planner: ReturnType<typeof useRunPlanner> };
 
 export const RunPlanner = ({ planner }: Props) => {
-  const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmReset, setConfirmReset] = useState<string | null>(null);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
   const starterMember = run?.roster.find((member) => member.instanceId === run.starterInstanceId);
   const starter = STARTERS.find((option) => option.id === run?.starterDefinitionId);
@@ -49,8 +49,9 @@ export const RunPlanner = ({ planner }: Props) => {
           <h2 className="text-2xl font-bold">Run Planner</h2>
           <p className="text-sm text-muted-foreground">Choose your starter and keep your run saved in this browser.</p>
         </div>
-        {run && <Button variant="outline" onClick={() => setConfirmReset(true)}>New Run</Button>}
+        {run && <Button variant="outline" onClick={() => setConfirmReset(run.id)}>New Run</Button>}
       </div>
+      {planner.storageWarning && <Alert><AlertDescription>{planner.storageWarning}</AlertDescription></Alert>}
       {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
       {data.runs.length > 0 && (
         <div className="max-w-sm space-y-2">
@@ -171,12 +172,12 @@ export const RunPlanner = ({ planner }: Props) => {
           <RunHistory key={run.id} run={run} onUndo={planner.undoAction} error={error} />
         </>
       )}
-      <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
+      <AlertDialog open={confirmReset !== null} onOpenChange={(open) => { if (!open) setConfirmReset(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader><AlertDialogTitle>Discard this run and start again?</AlertDialogTitle>
             <AlertDialogDescription>This permanently removes {run?.name ?? 'the current run'}, including its roster and progress, from this browser. Other saved runs are kept. You will return to starter selection.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={(event) => { if (!planner.resetRun()) event.preventDefault(); }}>Discard Run</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={(event) => { if (!planner.resetRun(confirmReset ?? '')) event.preventDefault(); }}>Discard Run</AlertDialogAction></AlertDialogFooter>
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         </AlertDialogContent>
       </AlertDialog>

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { RosterDigimon } from '@/types/runPlanner';
 import { getLevelCapDisplay } from '@/utils/levelCapDisplay';
+import { PLANNER_SCOPE_MAX_EL } from '@/data/statGrowthTables';
 
 export const LevelCapDisplay = ({ member }: { member: Pick<RosterDigimon, 'level' | 'levelCap'> }) => {
   const display = getLevelCapDisplay(member);
@@ -12,6 +13,9 @@ export const LevelCapDisplay = ({ member }: { member: Pick<RosterDigimon, 'level
           title={display.isMax ? 'Maximum level reached. Additional battles grant no XP.' : undefined}>
           {display.statusLabel}
         </Badge>
+      )}
+      {(member.levelCap.resolved ?? member.levelCap.max) > PLANNER_SCOPE_MAX_EL && (
+        <span className="text-xs text-muted-foreground">Verified XP progression ends at EL{PLANNER_SCOPE_MAX_EL}, even when Maximum EL is higher.</span>
       )}
     </div>
   );
