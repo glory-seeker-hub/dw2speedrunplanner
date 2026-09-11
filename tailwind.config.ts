@@ -47,6 +47,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        selection: { DEFAULT: "hsl(var(--selection))", foreground: "hsl(var(--selection-foreground))" },
+        info: "hsl(var(--info))",
+        success: { DEFAULT: "hsl(var(--success))", foreground: "hsl(var(--success-foreground))" },
+        overlay: "hsl(var(--overlay))",
         digital: {
           blue: "hsl(var(--digital-blue))",
           purple: "hsl(var(--digital-purple))",

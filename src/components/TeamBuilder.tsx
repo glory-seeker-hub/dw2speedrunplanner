@@ -59,23 +59,24 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
     <div className="space-y-6">
       <Card className="bg-gradient-card border-border">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold bg-gradient-digital bg-clip-text text-transparent">
+          <CardTitle className="menu-heading text-2xl font-bold">
             Team Builder
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             {[0, 1, 2].map((slotIndex) => (
               <Card 
                 key={slotIndex}
                 className={`
                   relative min-h-[120px] cursor-pointer transition-all duration-300
-                  ${activeSlot === slotIndex ? 'ring-2 ring-digital-blue shadow-digital' : 'hover:border-digital-blue/30'}
+                  ${activeSlot === slotIndex ? 'menu-selected' : 'hover:border-digital-blue/30'}
                   ${selectedDigimons[slotIndex] ? 'bg-gradient-card' : 'bg-muted/20 border-dashed'}
                 `}
                 onClick={() => setActiveSlot(slotIndex)}
               >
-                <CardContent className="flex flex-col items-center justify-center h-full p-4">
+                <CardContent className="flex flex-col items-center justify-center h-full gap-2 p-4">
+                  <Button variant="ghost" size="sm" aria-pressed={activeSlot === slotIndex} aria-label={`Select team slot ${slotIndex + 1}`} onClick={() => setActiveSlot(slotIndex)}>Slot {slotIndex + 1}</Button>
                   {selectedDigimons[slotIndex] ? (
                     <>
                       <div className="text-center">
@@ -92,6 +93,7 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
                       <Button
                         size="sm"
                         variant="destructive"
+                        aria-label={`Remove ${selectedDigimons[slotIndex].digimon.name} from team`}
                         className="absolute top-2 right-2 h-6 w-6 p-0"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -113,7 +115,7 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
           </div>
 
           <Tabs defaultValue="select" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid h-auto w-full grid-cols-3">
               <TabsTrigger value="select">Select Digimon</TabsTrigger>
               <TabsTrigger value="stats" disabled={!activeDigimon}>
                 Customize Stats
@@ -193,7 +195,7 @@ export const TeamBuilder = ({ onSaveTeam }: TeamBuilderProps) => {
             <Button 
               onClick={() => onSaveTeam?.(selectedDigimons)}
               disabled={selectedDigimons.length === 0}
-              className="bg-gradient-button hover:opacity-80"
+              className="shadow-sm"
             >
               <Save className="h-4 w-4 mr-2" />
               Save Team

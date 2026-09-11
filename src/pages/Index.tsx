@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TeamBuilder } from '@/components/TeamBuilder';
 import { BattleSimulation } from '@/components/BattleSimulation';
@@ -28,18 +27,18 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="menu-header sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-digital rounded-lg flex items-center justify-center animate-digital-pulse">
-                <Database className="h-6 w-6 text-background" />
+            <div className="flex items-center gap-3">
+              <div className="menu-inset w-10 h-10 rounded flex items-center justify-center">
+                <Database className="h-6 w-6 text-info" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-digital bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-wide text-foreground">
                   Digimon World 2
                 </h1>
-                <p className="text-sm text-muted-foreground">Battle Simulator</p>
+                <p className="text-sm text-muted-foreground">Run Planner & Battle Simulator</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -50,45 +49,12 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          {/* Welcome Card */}
-          <Card className="bg-gradient-card border-border shadow-card">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold text-center">
-                Welcome to the Digital World
-              </CardTitle>
-              <p className="text-center text-muted-foreground">
-                Build your ultimate Digimon team and simulate epic battles against preset enemy teams.
-                Customize stats, select powerful techs, and analyze battle statistics to perfect your strategy.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <Database className="h-8 w-8 mx-auto mb-2 text-digital-blue" />
-                  <h3 className="font-semibold">Team Builder</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Select up to 3 Digimon and customize their stats and techs
-                  </p>
-                </div>
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <Zap className="h-8 w-8 mx-auto mb-2 text-digital-cyan" />
-                  <h3 className="font-semibold">Battle Simulation</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Simulate millions of battles with advanced mechanics
-                  </p>
-                </div>
-                <div className="text-center p-4 bg-muted/20 rounded-lg">
-                  <Trophy className="h-8 w-8 mx-auto mb-2 text-digital-magenta" />
-                  <h3 className="font-semibold">Statistics</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Analyze win rates, turn counts, and battle histories
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <main className="container mx-auto px-4 py-5">
+        <div className="space-y-4">
+          <section aria-label="Planner introduction" className="menu-inset rounded-md px-4 py-3 text-sm">
+            <p className="font-semibold text-info">Plan the route. Build the team. Test the battle.</p>
+            <p className="mt-1 text-muted-foreground">Run Planner tracks your roster and route. Team Builder prepares simulation teams; Battle Simulation tests them and Results shows the outcome.</p>
+          </section>
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

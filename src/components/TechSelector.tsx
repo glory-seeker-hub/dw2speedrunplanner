@@ -30,20 +30,6 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
     onTechsChange(selectedTechs.filter(t => t.id !== tech.id));
   };
 
-  const getElementColor = (element: string) => {
-    const colors = {
-      Fire: 'text-red-400',
-      Water: 'text-blue-400',
-      Earth: 'text-yellow-600',
-      Air: 'text-cyan-400',
-      Nature: 'text-green-400',
-      Dark: 'text-purple-400',
-      Machine: 'text-gray-400',
-      Neutral: 'text-gray-300'
-    };
-    return colors[element as keyof typeof colors] || 'text-gray-300';
-  };
-
   return (
     <div className="space-y-4">
       {/* Selected Techs */}
@@ -70,15 +56,15 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
               {selectedTechs.map((tech) => (
                 <div
                   key={tech.id}
-                  className="flex items-center justify-between p-2 bg-card rounded border"
+                  className="flex items-center justify-between p-2 menu-selected rounded border"
                 >
                   <div className="flex-1">
                     <div className="font-medium text-sm">{tech.name}</div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <Badge variant="outline" className="text-xs px-1">
                         {tech.type}
                       </Badge>
-                      <span className={getElementColor(tech.element)}>
+                      <span className="text-info">
                         {tech.element}
                       </span>
                        <span>AP: {tech.ap}</span>
@@ -88,7 +74,7 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                     size="sm"
                     variant="ghost"
                     className="h-6 w-6 p-0"
-                    onClick={() => removeTech(tech)}
+                    aria-label={`Remove ${tech.name}`} onClick={() => removeTech(tech)}
                   >
                     <Minus className="h-3 w-3" />
                   </Button>
@@ -125,7 +111,7 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                     key={tech.id}
                     className={`
                       cursor-pointer transition-all duration-200
-                      ${isSelected ? 'bg-secondary/20 border-secondary' : 'hover:bg-muted/40'}
+                      ${isSelected ? 'menu-selected' : 'hover:bg-muted/40'}
                     `}
                   >
                     <CardContent className="p-3">
@@ -136,11 +122,11 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                             <Badge variant="outline" className="text-xs px-1">
                               {tech.type}
                             </Badge>
-                            <span className={getElementColor(tech.element)}>
+                            <span className="text-info">
                               {tech.element}
                             </span>
                             <span>AP: {tech.ap}</span>
-                            {tech.isCounter && <span className="text-amber-400">Counter</span>}
+                            {tech.isCounter && <span className="text-info">Counter</span>}
                             <span>{tech.target}</span>
                           </div>
                         </div>
@@ -148,7 +134,7 @@ export const TechSelector = ({ selectedTechs, onTechsChange }: TechSelectorProps
                           size="sm"
                           variant={isSelected ? "secondary" : "outline"}
                           className="h-8 w-8 p-0"
-                          onClick={() => isSelected ? removeTech(tech) : addTech(tech)}
+                          aria-pressed={Boolean(isSelected)} aria-label={`${isSelected ? 'Remove' : 'Add'} ${tech.name}`} onClick={() => isSelected ? removeTech(tech) : addTech(tech)}
                           disabled={!isSelected && !canAdd}
                         >
                           {isSelected ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}

@@ -27,7 +27,7 @@ import {
 const Stats = ({ stats }: { stats: DigimonStats }) => (
   <dl className="grid grid-cols-5 gap-1 text-center text-sm">
     {(['hp', 'mp', 'atk', 'def', 'spd'] as const).map((stat) => (
-      <div key={stat} className="rounded bg-muted/30 px-1 py-1">
+      <div key={stat} className="stat-cell px-1 py-1">
         <dt className="text-xs text-muted-foreground">{stat.toUpperCase()}</dt>
         <dd className="font-semibold tabular-nums">{stats[stat]}</dd>
       </div>
@@ -79,7 +79,7 @@ export const RunPlanner = ({ planner }: Props) => {
                 <RadioGroup value={starterId} onValueChange={setStarterId} aria-label="Starter" className="grid gap-4 lg:grid-cols-3">
                   {STARTERS.map((option) => (
                     <label key={option.id} htmlFor={'starter-' + option.id}
-                      className={'cursor-pointer rounded-lg border p-4 space-y-4 ' + (starterId === option.id ? 'border-primary bg-primary/10' : 'border-border bg-muted/10')}>
+                      className={'cursor-pointer rounded-lg border p-4 space-y-4 ' + (starterId === option.id ? 'menu-selected' : 'border-border bg-muted/10')}>
                       <div className="flex items-center gap-3">
                         <RadioGroupItem id={'starter-' + option.id} value={option.id} aria-label={option.label + ' / ' + option.name} />
                         <div><p className="text-sm text-muted-foreground">{option.label}</p><p className="font-semibold">{option.name} <span className="text-sm font-normal">EL {option.level}</span></p></div>
@@ -96,7 +96,7 @@ export const RunPlanner = ({ planner }: Props) => {
         </Card>
       ) : (
         <>
-          <section aria-label="Run summary" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-3">
+          <section aria-label="Run summary" className="run-status status-panel flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
             <div><h3 className="font-semibold">{run.name}</h3><p className="text-xs text-muted-foreground">{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</p></div>
             <dl className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
               <div><dt className="text-xs text-muted-foreground">Total Bits</dt><dd className="font-semibold tabular-nums">{run.totalBits}</dd></div>
@@ -118,7 +118,7 @@ export const RunPlanner = ({ planner }: Props) => {
                   const id = run.digiline[index];
                   const member = run.roster.find((entry) => entry.instanceId === id);
                   return (
-                    <li key={index} className="space-y-1.5 rounded-lg border border-border bg-muted/10 p-3" aria-label={'Slot ' + (index + 1)}>
+                    <li key={index} className="menu-inset space-y-1.5 rounded-lg p-3" aria-label={'Slot ' + (index + 1)}>
                       <p className="text-sm text-muted-foreground">Slot {index + 1}</p>
                       {member ? (
                         <>
@@ -147,8 +147,8 @@ export const RunPlanner = ({ planner }: Props) => {
             <h3 className="text-xl font-semibold">Roster</h3>
             <div className="grid gap-3 md:grid-cols-2">
               {run.roster.map((member) => (
-                <Card key={member.instanceId} aria-label={`${member.name} roster card`} className="min-w-0">
-                  <CardHeader className="space-y-1 p-3 pb-2"><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge variant={run.digiline.includes(member.instanceId) ? "secondary" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
+                <Card key={member.instanceId} aria-label={`${member.name} roster card`} className="status-panel min-w-0">
+                  <CardHeader className="space-y-1 p-3 pb-2"><div className="flex flex-wrap items-center gap-2"><CardTitle className="text-lg">{member.name}</CardTitle><Badge className={run.digiline.includes(member.instanceId) ? "menu-active-badge" : undefined} variant={run.digiline.includes(member.instanceId) ? "active" : "outline"}>{run.digiline.includes(member.instanceId) ? "Active Digiline" : "Reserve"}</Badge></div>
                     <p className="text-sm text-muted-foreground">{getSpeciesProgression(member.speciesId)?.rank ?? 'Unknown rank'} · DP {member.dp}</p>
                     <LevelCapDisplay member={member} />
                   </CardHeader>
@@ -191,7 +191,7 @@ export const RunPlanner = ({ planner }: Props) => {
           <AlertDialogHeader><AlertDialogTitle>Discard this run and start again?</AlertDialogTitle>
             <AlertDialogDescription>This permanently removes {run?.name ?? 'the current run'}, including its roster and progress, from this browser. Other saved runs are kept. You will return to starter selection.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={(event) => { if (!planner.resetRun(confirmReset ?? '')) event.preventDefault(); }}>Discard Run</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={(event) => { if (!planner.resetRun(confirmReset ?? '')) event.preventDefault(); }}>Discard Run</AlertDialogAction></AlertDialogFooter>
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         </AlertDialogContent>
       </AlertDialog>

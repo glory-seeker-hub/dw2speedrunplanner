@@ -2,120 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* DW2-inspired menu system. Original CSS only; semantic HSL tokens also support future print overrides. */
 @layer base {
-  :root {
-    --background: 220 30% 5%;
-    --foreground: 200 100% 95%;
+  :root, .dark {
+    color-scheme: dark;
+    --background: 222 55% 9%;
+    --foreground: 210 50% 94%;
+    --card: 217 48% 16%;
+    --card-foreground: var(--foreground);
+    --popover: 216 45% 21%;
+    --popover-foreground: var(--foreground);
+    --primary: 196 80% 62%;
+    --primary-foreground: 222 55% 9%;
+    --secondary: 214 35% 25%;
+    --secondary-foreground: var(--foreground);
+    --muted: 216 30% 19%;
+    --muted-foreground: 208 30% 75%;
+    --accent: 212 42% 27%;
+    --accent-foreground: var(--foreground);
+    --destructive: 12 88% 70%;
+    --destructive-foreground: 222 55% 9%;
+    --border: 210 30% 51%;
+    --input: 210 30% 51%;
+    --ring: 44 95% 68%;
+    --selection: 44 95% 68%;
+    --selection-foreground: 222 55% 9%;
+    --selection-surface: 216 40% 24%;
+    --info: 195 65% 78%;
+    --success: 160 55% 64%;
+    --success-foreground: 222 55% 9%;
+    --panel-raised: 216 45% 21%;
+    --panel-inset: 220 45% 12%;
+    --panel-highlight: 205 65% 76%;
+    --overlay: 222 60% 4%;
+    --shadow-color: 225 60% 3%;
+    --radius: 0.375rem;
 
-    --card: 220 25% 8%;
-    --card-foreground: 200 100% 95%;
-
-    --popover: 220 25% 8%;
-    --popover-foreground: 200 100% 95%;
-
-    --primary: 195 100% 50%;
-    --primary-foreground: 220 30% 5%;
-
-    --secondary: 270 100% 35%;
-    --secondary-foreground: 200 100% 95%;
-
-    --muted: 220 15% 15%;
-    --muted-foreground: 200 50% 70%;
-
-    --accent: 285 100% 60%;
-    --accent-foreground: 220 30% 5%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 200 100% 95%;
-
-    --border: 220 15% 20%;
-    --input: 220 15% 15%;
-    --ring: 195 100% 50%;
-
-    --digital-blue: 195 100% 50%;
-    --digital-purple: 270 100% 35%;
-    --digital-cyan: 180 100% 60%;
-    --digital-magenta: 285 100% 60%;
-    --digital-glow: 195 100% 50%;
-    
-    --gradient-digital: linear-gradient(135deg, hsl(var(--digital-blue)), hsl(var(--digital-purple)));
-    --gradient-card: linear-gradient(145deg, hsl(220 25% 8%), hsl(220 20% 12%));
-    --gradient-button: linear-gradient(135deg, hsl(var(--digital-cyan)), hsl(var(--digital-blue)));
-    
-    --shadow-digital: 0 10px 30px -10px hsl(var(--digital-glow) / 0.3);
-    --shadow-card: 0 4px 20px hsl(var(--digital-blue) / 0.1);
-    
-    --animation-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Compatibility aliases for older utility names; no purple/neon palette remains. */
+    --digital-blue: var(--primary);
+    --digital-purple: var(--info);
+    --digital-cyan: var(--info);
+    --digital-magenta: var(--info);
+    --digital-glow: var(--panel-highlight);
+    --gradient-digital: linear-gradient(180deg, hsl(var(--panel-raised)), hsl(var(--card)));
+    --gradient-card: linear-gradient(160deg, hsl(var(--panel-raised) / 0.45), hsl(var(--card)) 65%);
+    --gradient-button: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--primary) / 0.92));
+    --shadow-card: inset 1px 1px 0 hsl(var(--panel-highlight) / 0.16), inset -1px -1px 0 hsl(var(--shadow-color) / 0.4), 0 3px 8px hsl(var(--shadow-color) / 0.25);
+    --shadow-digital: var(--shadow-card);
+    --sidebar-background: var(--card);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
   }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+  input[type="checkbox"], input[type="radio"] { accent-color: hsl(var(--selection)); }
+  select { color: hsl(var(--foreground)); color-scheme: dark; }
+  select option { background: hsl(var(--popover)); color: hsl(var(--popover-foreground)); }
+  * { scrollbar-color: hsl(var(--border)) hsl(var(--panel-inset)); scrollbar-width: thin; }
+  ::selection { background: hsl(var(--selection)); color: hsl(var(--selection-foreground)); }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .menu-panel {
+    background-color: hsl(var(--card));
+    background-image: var(--gradient-card);
+    box-shadow: var(--shadow-card);
   }
+  .status-panel {
+    background: hsl(var(--panel-raised));
+    box-shadow: inset 0 1px 0 hsl(var(--panel-highlight) / 0.2);
+  }
+  .menu-inset, .stat-cell {
+    background: hsl(var(--panel-inset));
+    border: 1px solid hsl(var(--border) / 0.65);
+    box-shadow: inset 1px 1px 2px hsl(var(--shadow-color) / 0.4);
+  }
+  .stat-cell { border-radius: calc(var(--radius) - 2px); }
+  .stat-cell dt { color: hsl(var(--info)); }
+  .stat-cell dd { color: hsl(var(--foreground)); font-weight: 600; }
+  .menu-heading { color: hsl(var(--info)); letter-spacing: 0.035em; }
+  .menu-header {
+    background: hsl(var(--card));
+    border-bottom: 2px solid hsl(var(--border));
+    box-shadow: inset 0 -3px 0 hsl(var(--panel-inset)), 0 3px 8px hsl(var(--shadow-color) / 0.35);
+  }
+  .menu-tab { border: 1px solid transparent; }
+  .menu-tab[data-state="active"], .menu-filter[aria-pressed="true"], .menu-selected {
+    background: hsl(var(--selection-surface));
+    border-color: hsl(var(--selection));
+    box-shadow: inset 3px 0 0 hsl(var(--selection));
+    color: hsl(var(--selection));
+  }
+  .menu-tab[data-state="active"] { font-weight: 700; text-decoration: underline; text-underline-offset: 5px; }
+  .menu-tab:disabled { border-style: dashed; border-color: hsl(var(--border) / 0.6); }
+  .menu-choice {
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    background: hsl(var(--panel-inset));
+  }
+  .menu-choice:has(input:checked), .menu-choice:has([role="radio"][data-state="checked"]) {
+    border-color: hsl(var(--selection));
+    background: hsl(var(--selection-surface));
+    box-shadow: inset 3px 0 0 hsl(var(--selection));
+  }
+  .menu-choice:focus-within { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+  .menu-active-badge { border-color: hsl(var(--primary)); background: hsl(var(--accent)); color: hsl(var(--info)); }
+  .menu-active-badge::before { content: '◆'; margin-right: 0.3rem; font-size: 0.625rem; }
+  .planning-note { border-left: 2px solid hsl(var(--border)); padding-left: 0.5rem; }
+  .planning-note .text-muted-foreground { color: hsl(var(--info)); }
+  .menu-submenu > div:first-child > button[aria-expanded="true"] { color: hsl(var(--selection)); }
+  .menu-submenu > div:first-child > button[aria-expanded="true"]:disabled { opacity: 1; }
+  .menu-result { border: 1px solid hsl(var(--primary)); background: hsl(var(--accent)); padding: 0.75rem; border-radius: var(--radius); }
+  .menu-window { background: hsl(var(--popover)); box-shadow: var(--shadow-card), 0 16px 48px hsl(var(--shadow-color) / 0.7); border-color: hsl(var(--panel-highlight)); }
+  .route-log { background: hsl(var(--panel-inset)); background-image: none; box-shadow: none; }
+  .route-log li { background: hsl(var(--card) / 0.5); border-color: hsl(var(--border) / 0.6); }
+  .run-status dl > div { border-left: 1px solid hsl(var(--border)); padding-left: 0.6rem; }
+}
 
-  body {
-    @apply bg-background text-foreground;
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

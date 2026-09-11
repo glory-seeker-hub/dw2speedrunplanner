@@ -7,7 +7,7 @@ export const ActionDisclosure = ({ title, id, active, onCancel, compact, childre
 }) => {
   const [expanded, setExpanded] = useState(false);
   const open = !compact || expanded || active;
-  return <section aria-label={title} className="min-w-0 rounded-lg border p-3">
+  return <section aria-label={title} className="menu-panel menu-submenu min-w-0 rounded-lg border p-3">
     {compact ? <div className="flex flex-wrap items-center justify-between gap-2">
       <Button variant="ghost" size="sm" aria-expanded={open} aria-controls={id} disabled={active}
         onClick={() => setExpanded(!expanded)}>{title} {open ? '−' : '+'}</Button>
