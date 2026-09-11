@@ -16,7 +16,7 @@ export const InfoDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="h-10 w-10">
+        <Button variant="outline" size="icon" aria-label="About this application" className="h-10 w-10">
           <Info className="h-5 w-5" />
         </Button>
       </DialogTrigger>
@@ -29,7 +29,7 @@ export const InfoDialog = () => {
         </DialogHeader>
 
         <Tabs defaultValue="how-to" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid h-auto w-full grid-cols-3">
             <TabsTrigger value="how-to">How to Use</TabsTrigger>
             <TabsTrigger value="mechanics">Battle Mechanics</TabsTrigger>
             <TabsTrigger value="credits">Credits</TabsTrigger>

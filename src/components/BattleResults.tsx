@@ -11,9 +11,9 @@ interface BattleResultsProps {
 
 export const BattleResults = ({ results }: BattleResultsProps) => {
   const getResultColor = (winRate: number) => {
-    if (winRate >= 80) return 'bg-digital-cyan text-background';
+    if (winRate >= 80) return 'bg-success text-success-foreground';
     if (winRate >= 60) return 'bg-digital-blue text-background';
-    if (winRate >= 40) return 'bg-digital-purple text-background';
+    if (winRate >= 40) return 'bg-secondary text-secondary-foreground';
     return 'bg-destructive text-destructive-foreground';
   };
 
@@ -31,7 +31,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
   return (
     <div className="space-y-6">
       {/* Summary Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-gradient-card border-border">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
@@ -61,10 +61,10 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
         <Card className="bg-gradient-card border-border">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
-              <Timer className="h-4 w-4 text-digital-purple" />
+              <Timer className="h-4 w-4 text-info" />
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">Min Time</p>
-                <p className="text-2xl font-bold text-digital-purple">{results.minTime}s</p>
+                <p className="text-2xl font-bold text-info">{results.minTime}s</p>
               </div>
             </div>
           </CardContent>
@@ -73,10 +73,10 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
         <Card className="bg-gradient-card border-border">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
-              <Target className="h-4 w-4 text-digital-magenta" />
+              <Target className="h-4 w-4 text-info" />
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">Simulations</p>
-                <p className="text-2xl font-bold text-digital-magenta">{results.totalSimulations.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-info">{results.totalSimulations.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
@@ -105,7 +105,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
                       <span className="text-muted-foreground">uses</span>
                       <span className="font-medium text-digital-blue">{turn.tech}</span>
                       <span className="text-muted-foreground">on</span>
-                      <span className="font-medium text-digital-purple">{turn.target}</span>
+                      <span className="font-medium text-info">{turn.target}</span>
                     </div>
                   </div>
                   
@@ -123,7 +123,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
                     </div>
 
                     <div className="flex items-center space-x-1">
-                      <span className="text-digital-magenta font-bold">{turn.timeSeconds}s</span>
+                      <span className="text-info font-bold">{turn.timeSeconds}s</span>
                     </div>
                     
                     <div className="flex items-center space-x-1">
@@ -165,7 +165,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
                       <span className="text-muted-foreground">uses</span>
                       <span className="font-medium text-digital-blue">{turn.tech}</span>
                       <span className="text-muted-foreground">on</span>
-                      <span className="font-medium text-digital-purple">{turn.target}</span>
+                      <span className="font-medium text-info">{turn.target}</span>
                     </div>
                   </div>
                   
@@ -183,7 +183,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
                     </div>
 
                     <div className="flex items-center space-x-1">
-                      <span className="text-digital-magenta font-bold">{turn.timeSeconds}s</span>
+                      <span className="text-info font-bold">{turn.timeSeconds}s</span>
                     </div>
                     
                     <div className="flex items-center space-x-1">
@@ -247,7 +247,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-semibold text-digital-purple">Performance</h4>
+              <h4 className="font-semibold text-info">Performance</h4>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Wins:</span>
@@ -276,7 +276,7 @@ export const BattleResults = ({ results }: BattleResultsProps) => {
           <Separator className="my-4" />
 
           <div className="space-y-2">
-            <h4 className="font-semibold text-digital-purple">Recommendations</h4>
+            <h4 className="font-semibold text-info">Recommendations</h4>
             <div className="space-y-1 text-xs text-muted-foreground">
               {results.winRate >= 80 ? (
                 <p>🎉 Excellent team! Consider challenging stronger enemies.</p>

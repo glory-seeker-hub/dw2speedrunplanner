@@ -14,15 +14,15 @@ export const DigimonCard = ({ digimon, isSelected, onSelect }: DigimonCardProps)
     <Card 
       className={`
         relative overflow-hidden transition-all duration-300 cursor-pointer
-        bg-gradient-card border-border hover:border-digital-blue/50
-        ${isSelected ? 'ring-2 ring-digital-blue shadow-digital animate-glow' : 'hover:shadow-card'}
+        status-panel hover:border-primary
+        ${isSelected ? 'menu-selected' : 'hover:shadow-card'}
       `}
       onClick={() => onSelect?.(digimon)}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-bold text-foreground">{digimon.name}</CardTitle>
-          <Badge variant="secondary" className="bg-secondary/20 text-secondary">
+          <Badge variant="secondary" className="text-info">
             {digimon.specialty}
           </Badge>
         </div>
@@ -33,25 +33,25 @@ export const DigimonCard = ({ digimon, isSelected, onSelect }: DigimonCardProps)
       
       <CardContent className="space-y-3">
         <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="flex justify-between">
+          <div className="stat-cell flex justify-between gap-1 px-2 py-1">
             <span className="text-muted-foreground">HP:</span>
-            <span className="font-mono text-digital-cyan">{digimon.baseStats.hp}</span>
+            <span className="font-mono text-foreground">{digimon.baseStats.hp}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="stat-cell flex justify-between gap-1 px-2 py-1">
             <span className="text-muted-foreground">MP:</span>
-            <span className="font-mono text-digital-blue">{digimon.baseStats.mp}</span>
+            <span className="font-mono text-foreground">{digimon.baseStats.mp}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="stat-cell flex justify-between gap-1 px-2 py-1">
             <span className="text-muted-foreground">ATK:</span>
-            <span className="font-mono text-destructive">{digimon.baseStats.atk}</span>
+            <span className="font-mono text-foreground">{digimon.baseStats.atk}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="stat-cell flex justify-between gap-1 px-2 py-1">
             <span className="text-muted-foreground">DEF:</span>
-            <span className="font-mono text-accent">{digimon.baseStats.def}</span>
+            <span className="font-mono text-foreground">{digimon.baseStats.def}</span>
           </div>
-          <div className="flex justify-between col-span-2">
+          <div className="stat-cell flex justify-between gap-1 px-2 py-1 col-span-2">
             <span className="text-muted-foreground">SPD:</span>
-            <span className="font-mono text-digital-magenta">{digimon.baseStats.spd}</span>
+            <span className="font-mono text-foreground">{digimon.baseStats.spd}</span>
           </div>
         </div>
         
@@ -59,7 +59,7 @@ export const DigimonCard = ({ digimon, isSelected, onSelect }: DigimonCardProps)
           <Button 
             variant={isSelected ? "secondary" : "outline"}
             size="sm" 
-            className="w-full mt-4"
+            aria-pressed={Boolean(isSelected)} className="w-full mt-4"
           >
             {isSelected ? 'Selected' : 'Select'}
           </Button>

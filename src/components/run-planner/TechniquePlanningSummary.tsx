@@ -9,7 +9,7 @@ export const TechniquePlanningSummary = ({ member }: { member: RosterDigimon }) 
       : member.levelCap.resolved !== null && p.level > member.levelCap.resolved ? '; beyond current cap'
       : member.levelCap.resolved === null && p.level > member.levelCap.min ? '; requires cap resolution' : ''})</span>
   </li>)}</ul>;
-  return <div className="space-y-1 text-sm" aria-label={`Technique planning for ${member.name}`}>
+  return <div className="planning-note space-y-1 text-sm" aria-label={`Technique planning for ${member.name}`}>
     {pending.length > 3 ? <details><summary className="cursor-pointer rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
       Pending: {pending.length} · next EL{pending[0].level}</summary>{pendingList}</details>
       : <div><span className="text-muted-foreground">Pending: </span>{pending.length ? pendingList : 'None'}</div>}

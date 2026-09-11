@@ -16,7 +16,7 @@ export const TechniqueChoiceControls = ({ choices, selections, onChange, onConfi
       selected.keptKeys.every(key => entry.choice.candidates.some(p => p.key === key)) &&
       entry.choice.mandatoryKeys.every(key => selected.keptKeys.includes(key));
   });
-  return <section className="space-y-4 rounded-lg border p-4" aria-label="Technique selection">
+  return <section className="menu-panel space-y-4 rounded-lg border p-4" aria-label="Technique selection">
     <p className="font-semibold">Choose techniques to keep</p>
     <p className="text-sm">Keep 1–{MAX_TECHNIQUES} techniques. Unselected techniques will be discarded. The {context === 'dna' ? 'DNA' : 'battle'} is not recorded until you confirm all choices.</p>
     {choices.map(entry => {
@@ -25,8 +25,8 @@ export const TechniqueChoiceControls = ({ choices, selections, onChange, onConfi
         <legend className="font-semibold">{entry.name} · EL {entry.newLevel}</legend>
         <p className="text-sm">New techniques offered: {entry.choice.candidates.filter(p => entry.choice.newlyUnlockedKeys.includes(p.key)).map(p => p.name).join(', ')}</p>
         <p className="text-sm">Currently possessed: {entry.currentlyPossessed.join(', ') || 'None'}</p>
-        <p className="text-sm">{selected.length} / {MAX_TECHNIQUES} selected{entry.choice.selectionRequired ? ' · Selection required' : ' · Optional changes'}</p>
-        <div className="grid gap-2 sm:grid-cols-2">{entry.choice.candidates.map(p => <label key={p.key} className="flex items-center gap-2 text-sm">
+        <p className="menu-inset rounded px-2 py-1 text-sm font-semibold">{selected.length} / {MAX_TECHNIQUES} selected{entry.choice.selectionRequired ? ' · Selection required' : ' · Optional changes'}</p>
+        <div className="grid gap-2 sm:grid-cols-2">{entry.choice.candidates.map(p => <label key={p.key} className="menu-choice flex items-center gap-2 text-sm">
           <input type="checkbox" checked={selected.includes(p.key)} disabled={entry.choice.mandatoryKeys.includes(p.key)} aria-label={`${entry.name}: keep ${p.name}`} onChange={event => {
             const keptKeys = event.target.checked ? [...selected, p.key] : selected.filter(key => key !== p.key);
             onChange(selections.map(s => s.instanceId === entry.instanceId ? { ...s, keptKeys } : s));
@@ -34,7 +34,7 @@ export const TechniqueChoiceControls = ({ choices, selections, onChange, onConfi
         </label>)}</div>
       </fieldset>;
     })}
-    <div className="flex gap-2"><Button disabled={!valid} onClick={onConfirm}>{context === 'dna' ? 'Use selected techniques' : 'Confirm choices and record battle'}</Button>
+    <div className="flex flex-wrap gap-2"><Button className="h-auto min-h-10 whitespace-normal" disabled={!valid} onClick={onConfirm}>{context === 'dna' ? 'Use selected techniques' : 'Confirm choices and record battle'}</Button>
       <Button variant="outline" onClick={onCancel}>Cancel technique selection</Button></div>
   </section>;
 };

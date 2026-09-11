@@ -56,7 +56,7 @@ export const BattleSelector = ({ hasParticipants, onRecord }: { hasParticipants:
             {options.length === 0 ? <p className="text-sm text-muted-foreground">{floor === null ? 'Choose a Domain and floor to browse encounters.' : 'No encounters mapped to this selection.'}</p> : (
               <RadioGroup aria-label="Available Encounters" value={encounterId === null ? '' : String(encounterId)} onValueChange={(value) => dispatch({ type: 'encounter', encounterId: Number(value) })} className="grid gap-3 lg:grid-cols-2">
                 {options.map((option) => (
-                  <label key={option.encounterId} htmlFor={'battle-encounter-' + option.encounterId} className={'flex cursor-pointer items-start gap-3 rounded-lg border p-4 ' + (encounterId === option.encounterId ? 'border-primary bg-primary/10' : 'border-border')}>
+                  <label key={option.encounterId} htmlFor={'battle-encounter-' + option.encounterId} className={'flex cursor-pointer items-start gap-3 rounded-lg border p-4 ' + (encounterId === option.encounterId ? 'menu-selected' : 'border-border')}>
                     <RadioGroupItem id={'battle-encounter-' + option.encounterId} value={String(option.encounterId)} className="mt-1" />
                     <div className="space-y-2">
                       {option.isBoss && <Badge>Boss</Badge>}

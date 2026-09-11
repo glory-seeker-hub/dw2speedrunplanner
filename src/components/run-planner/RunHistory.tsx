@@ -19,7 +19,7 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
   const latestId = run.history.at(-1)?.id ?? 'empty';
   const unavailable = getUndoUnavailableReason(run);
   return (
-  <Card>
+  <Card className="route-log">
     <CardHeader className="space-y-2 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <CardTitle className="text-lg">Run History <span className="text-sm font-normal text-muted-foreground">({run.history.length} actions)</span></CardTitle>
@@ -33,7 +33,7 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
     </CardHeader>
     <CardContent id="run-history-content" hidden={!expanded} className="space-y-3 p-3 pt-0">
       <div className="flex flex-wrap gap-2" role="group" aria-label="History filters">{filters.map(([value, label]) =>
-        <Button key={value} size="sm" variant={filter === value ? 'secondary' : 'outline'} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</Button>
+        <Button className="menu-filter aria-pressed:border-selection aria-pressed:bg-accent aria-pressed:text-selection" key={value} size="sm" variant="outline" aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</Button>
       )}</div>
       {run.history.length > 0 && visible.length === 0 && <p role="status" className="text-sm text-muted-foreground">No actions match this filter.</p>}
       {run.history.length === 0 ? <p className="text-sm text-muted-foreground">No actions recorded yet.</p> : (

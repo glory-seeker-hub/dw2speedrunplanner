@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { ActionDisclosure } from '@/components/run-planner/ActionDisclosure';
 import { useState } from 'react';
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
@@ -58,11 +59,11 @@ export const DnaControls = ({ run, onDna, error, compact = false }: {
       <div className="grid gap-4 sm:grid-cols-2 text-sm">{[reviewed.a, reviewed.b].map((p, index) => {
         // Form labels follow selector order; mechanical/audit metadata stays canonical.
         const metadata = result.mechanical.parents.find(parent => parent.instanceId === p.instanceId)!;
-        return <div key={p.instanceId}><p className="font-semibold">Parent {index === 0 ? 'A' : 'B'} · {p.name}</p>
+        return <div key={p.instanceId} className="menu-inset rounded p-3"><p className="font-semibold">Parent {index === 0 ? 'A' : 'B'} · {p.name}</p>
           <p>{metadata.rank} · {metadata.type} · {metadata.family}</p><p>EL{p.level} · DP{p.dp} · Max EL {getLevelCapDisplay(p).levelLabel}</p>
           <p>Possessed techniques: {p.techs.length}</p></div>;
       })}</div>
-      <div className="space-y-1 text-sm"><p className="font-semibold">Result: {result.mechanical.actualResultName}{result.mechanical.isMutation ? ' · Mutation' : ''}</p>
+      <div className="menu-result space-y-1 text-sm"><div className="font-semibold">Result: {result.mechanical.actualResultName}{result.mechanical.isMutation && <Badge variant="outline" className="ml-2 border-primary text-info">Mutation</Badge>}</div>
         <p>{result.mechanical.actualResultRank} · {result.mechanical.actualResultType}</p>
         <p>EL{result.mechanical.startingLevel} · DP{result.mechanical.childDp} · Max EL{result.mechanical.childMaxLevel}</p>
         <p>{Object.entries(result.mechanical.childStats).map(([stat, value]) => `${stat.toUpperCase()} ${value}`).join(' · ')}</p>

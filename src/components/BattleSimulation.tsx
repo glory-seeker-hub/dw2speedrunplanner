@@ -151,7 +151,7 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
                         <SelectItem key={encounter.id} value={encounter.id.toString()}>
                           <div className="flex items-center gap-2">
                             Fight {encounter.id}
-                            <div className="flex gap-1">
+                            <div className="flex flex-wrap gap-1">
                               {encounter.digimons.map((digimon, idx) => (
                                 <Badge key={idx} variant="outline" className="text-xs">
                                   {digimon.name} Lv.{digimon.level}

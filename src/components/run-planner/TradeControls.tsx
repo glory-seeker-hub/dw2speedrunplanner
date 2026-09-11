@@ -47,7 +47,7 @@ export const TradeControls = ({ run, onTrade, error, compact = false }: {
         </select>
       </label>
       {!eligible.length && <p role="status">Requires {getDigimonById(preview.trade.giveSpeciesId)?.name} in current roster.</p>}
-      <div className="space-y-1 text-sm">
+      <div className="menu-result space-y-1 text-sm">
         <p className="font-semibold">Receive: {preview.received.name}</p>
         <p>EL{preview.received.level} · DP0 · Max EL{preview.trade.fixedMaxLevel}</p>
         <p>{Object.entries(preview.received.stats).map(([stat, value]) => `${stat.toUpperCase()} ${value}`).join(' · ')}</p>
