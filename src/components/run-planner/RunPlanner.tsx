@@ -1,4 +1,6 @@
 import { TechniquePlanningSummary } from '@/components/run-planner/TechniquePlanningSummary';
+import { RunRouteExport } from '@/components/run-planner/export/RunRouteExport';
+import { buildRouteDocument, RouteDocumentModel } from '@/utils/routeDocument';
 import { TradeControls } from '@/components/run-planner/TradeControls';
 import { DnaControls } from '@/components/run-planner/DnaControls';
 import { DigivolutionControls } from '@/components/run-planner/DigivolutionControls';
@@ -39,6 +41,8 @@ type Props = { planner: ReturnType<typeof useRunPlanner> };
 
 export const RunPlanner = ({ planner }: Props) => {
   const [confirmReset, setConfirmReset] = useState<string | null>(null);
+  const [routeDocument, setRouteDocument] = useState<RouteDocumentModel | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
   const starter = STARTERS.find((option) => option.id === run?.starterDefinitionId);
 
@@ -104,8 +108,14 @@ export const RunPlanner = ({ planner }: Props) => {
               <div><dt className="text-xs text-muted-foreground">Total actions</dt><dd className="font-semibold tabular-nums">{run.history.length}</dd></div>
               <div><dt className="text-xs text-muted-foreground">Roster / Active</dt><dd className="font-semibold tabular-nums">{run.roster.length} / {run.digiline.length}</dd></div>
             </dl>
+            <Button variant="outline" onClick={() => {
+              try { setRouteDocument(buildRouteDocument(run, new Date())); setExportError(null); }
+              catch { setExportError('This run must validate before export. Return to the Planner to review it.'); }
+            }}>Export Route</Button>
             <a href="#run-battle" className="rounded-md border px-3 py-2 text-sm font-medium hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Go to Battle ↓</a>
           </section>
+          {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
+          {routeDocument && <RunRouteExport model={routeDocument} onBack={() => setRouteDocument(null)} />}
           <div id="run-roster" tabIndex={-1} aria-label="Roster workspace" role="region" className="grid scroll-mt-28 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <Card className="min-w-0">
             <CardHeader className="p-3 pb-2">
