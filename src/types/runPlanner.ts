@@ -49,6 +49,8 @@ interface RunEventBase {
 
 export interface RunBattleEvent extends RunEventBase {
   type: 'battle';
+  /** Present only when pending techniques were missed at a rank-gated milestone. */
+  techniqueMisses?: { instanceId: string; missed: string[] }[];
   techniqueChoices: BattleTechniqueAudit[];
   domainId: string;
   phase: DomainPhase;

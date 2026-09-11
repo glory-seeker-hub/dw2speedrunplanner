@@ -7,7 +7,7 @@ import { getPlanningSummary } from '@/utils/runPlanningDisplay';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 
 export interface RouteDecision { name: string; learned?: string[]; kept?: string[]; discarded: string[] }
-export interface RouteAction { number: number; kind: 'battle' | 'digivolve' | 'dna' | 'trade'; title: string; lines: string[]; rewards?: string; decisions: RouteDecision[] }
+export interface RouteAction { number: number; kind: 'battle' | 'digivolve' | 'dna' | 'trade'; title: string; lines: string[]; rewards?: string; decisions: RouteDecision[]; misses?: { name: string; missed: string[] }[] }
 export interface RouteMember {
   name: string; status: string; rank: string; level: number; maxLevel: string; dp: number;
   stats: { label: string; value: number }[]; techniques: string[];
@@ -70,6 +70,7 @@ export const buildRouteDocument = (run: RunPlan, generatedAt: Date): RouteDocume
       `Participants: ${event.digilineInstanceIds.map(nameAtBattle).join(', ')}`,
       `Capture: ${captured ? `Slot ${captured.slot} — ${captured.name} EL${captured.level}` : 'None'}`],
       rewards: `+${event.xpReward} XP · +${event.bitsReward} Bits`,
+      ...(event.techniqueMisses?.length ? { misses: event.techniqueMisses.map(miss => ({ name: nameAtBattle(miss.instanceId), missed: [...miss.missed] })) } : {}),
       // The audit stores learned/discarded, not a complete offered/kept list. Do not invent one.
       decisions: event.techniqueChoices.map(choice => ({ name: nameAtBattle(choice.instanceId),
         learned: [...choice.learned], discarded: [...choice.discarded] })) };

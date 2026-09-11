@@ -4,11 +4,10 @@ import { BattleTechniqueSelectionRequired, resolveTechniqueChoice } from '@/util
 import { RosterDigimon } from '@/types/runPlanner';
 import { StatGrowthEstimate } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
-import { applyBattleXp } from '@/utils/experience';
+import { getBattleTechniqueProgression } from '@/utils/battleTechniqueProgression';
 import { applyExpectedLevelUpGrowth, StatKey } from '@/utils/statGrowth';
 import { getResolvedReward } from '@/utils/rewardMatching';
 import { tryCreateCapturedDigimon } from '@/utils/capture';
-import { advanceTechniqueState, registerOwnTechnique } from '@/utils/techniqueInheritance';
 
 /**
  * BATTLE RESOLUTION FOR THE RUN PLANNER (pure, deterministic)
@@ -34,6 +33,7 @@ export interface ParticipantOutcome {
   capResolutionRequired: boolean;
   plannerScopeUnsupported: boolean;
   learnedTechniques: string[];
+  missedTechniques: string[];
   instanceId: string;
   previousLevel: number;
   newLevel: number;
@@ -48,6 +48,7 @@ export interface ParticipantOutcome {
 }
 
 export interface BattleResolution {
+  techniqueMisses: { instanceId: string; missed: string[] }[];
   techniqueChoices: BattleTechniqueAudit[];
   encounterId: number;
   /** Snapshot of the participating instance IDs, taken before any mutation. */
@@ -106,19 +107,19 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
     throw new BattleTechniqueSelectionRequired(choices);
   }
   const techniqueChoices: BattleTechniqueAudit[] = [];
+  const techniqueMisses: BattleResolution['techniqueMisses'] = [];
   const outcomes: ParticipantOutcome[] = [];
   const nextRoster = roster.map((entry) => {
     if (!participantIds.includes(entry.instanceId)) return entry;
 
     // 2. Cap-aware XP + 3. at most one level-up.
-    const xp = applyBattleXp(entry.level, entry.totalXp, xpAwarded, entry.levelCap);
+    const { xp, state: advanced } = getBattleTechniqueProgression(entry, xpAwarded);
     const selected = resolvedChoices.find(c => c.entry.instanceId === entry.instanceId)?.result;
     const techniqueState = selected?.status === 'resolved'
-      ? { techs: selected.techs, techniquePool: selected.techniquePool, learnedTechniques: selected.learned }
-      : xp.leveledUp
-      ? advanceTechniqueState(registerOwnTechnique({ techs: entry.techs, techniquePool: entry.techniquePool }, entry.speciesId, entry.level), entry.level, xp.newLevel)
-      : { techs: entry.techs, techniquePool: entry.techniquePool, learnedTechniques: [] };
-    const { learnedTechniques } = techniqueState;
+      ? { techs: selected.techs, techniquePool: selected.techniquePool, learnedTechniques: selected.learned, missedTechniques: advanced.missedTechniques }
+      : advanced;
+    const { learnedTechniques, missedTechniques } = techniqueState;
+    if (missedTechniques.length) techniqueMisses.push({ instanceId: entry.instanceId, missed: missedTechniques });
     if (selected?.status === 'resolved') techniqueChoices.push({ instanceId: entry.instanceId, learned: selected.learned, discarded: selected.discarded });
 
     // 4. Deterministic expected stat growth on level-up only.
@@ -139,7 +140,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
     outcomes.push({
       encounterXpReward: xpAwarded, actualXpApplied: xp.actualXpApplied,
       capped: xp.capped, capResolutionRequired: xp.capResolutionRequired,
-      plannerScopeUnsupported: xp.plannerScopeUnsupported, learnedTechniques,
+      plannerScopeUnsupported: xp.plannerScopeUnsupported, learnedTechniques, missedTechniques,
       instanceId: entry.instanceId,
       previousLevel: xp.previousLevel,
       newLevel: xp.newLevel,
@@ -172,6 +173,7 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
   return {
     encounterId,
     techniqueChoices,
+    techniqueMisses,
     participantIds,
     xpAwarded,
     bitsAwarded,

@@ -1,4 +1,5 @@
 import { getTradeDefinition } from '@/data/trades';
+import { canCompleteLearningMilestone } from '@/utils/learningMilestones';
 import { getSpeciesProgression } from '@/data/speciesProgression';
 import { getTechniqueIdentity, normalizeTechniqueName, TECHNIQUE_UNLOCK_LEVELS } from '@/data/techniqueMetadata';
 import { DigimonRank, TechniquePotential, TechniqueSource, TechniqueState } from '@/types/techniqueInheritance';
@@ -36,19 +37,25 @@ export const registerOwnTechnique = (state: TechniqueState, speciesId: string, l
 };
 
 /** Valid +1 transitions only: missed and discarded entries never unlock. */
-export const advanceTechniqueState = (state: TechniqueState, previousLevel: number, newLevel: number) => {
+export const advanceTechniqueState = (state: TechniqueState, previousLevel: number, newLevel: number, currentRank: DigimonRank) => {
   if (!isValidTechniqueState(state)) throw new Error('Invalid technique state');
   const next = structuredClone(state);
   const learnedTechniques: string[] = [];
+  const missedTechniques: string[] = [];
   if (newLevel === previousLevel + 1) {
     for (const potential of next.techniquePool) {
       if (potential.unlock.status !== 'pending' || potential.unlock.level !== newLevel) continue;
+      if (!canCompleteLearningMilestone(currentRank, newLevel)) {
+        potential.unlock = { status: 'missed', level: newLevel };
+        missedTechniques.push(potential.name);
+        continue;
+      }
       potential.unlock = { status: 'available' };
       next.techs.push(potential.name);
       learnedTechniques.push(potential.name);
     }
   }
-  return { ...next, learnedTechniques };
+  return { ...next, learnedTechniques, missedTechniques };
 };
 
 /** Pure foundation only: no roster creation, history, parent consumption, or capacity limit. */
@@ -122,8 +129,8 @@ export const isValidTechniqueState = (v: unknown): v is TechniqueState => {
       if (available.has(meta.key) || 'level' in p.unlock) return false;
     } else {
       const base = TECHNIQUE_UNLOCK_LEVELS[meta.rank];
-      const inheritedPending = p.unlock.status === 'pending' && p.sources.some(s => s.type === 'inherited');
-      const validLevel = p.unlock.level === base || (inheritedPending &&
+      const inheritedScheduled = (p.unlock.status === 'pending' || p.unlock.status === 'missed') && p.sources.some(s => s.type === 'inherited');
+      const validLevel = p.unlock.level === base || (inheritedScheduled &&
         typeof p.unlock.level === 'number' && p.unlock.level > base &&
         Object.values(TECHNIQUE_UNLOCK_LEVELS).includes(p.unlock.level));
       // Exact DNA creation schedules are additionally recomputed by the historical lifecycle audit.
