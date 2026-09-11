@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { RunPlan } from '@/types/runPlanner';
+import { getBattleLearningWarnings } from '@/utils/battleLearningWarnings';
+import { BattleLearningWarnings } from '@/components/run-planner/BattleLearningWarnings';
 import { getLevelCapChoices } from '@/utils/levelCap';
 import { BattleSelection } from '@/utils/runBattleSelection';
 import { getCaptureChoices, getRecordingEncounter, RecordBattleRequest } from '@/utils/runBattleRecording';
@@ -11,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export type RecordBattleHandler = (request: RecordBattleRequest) => BattleResolution | BattleChoiceReview | null;
 
-export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
+export const BattleRecordControls = ({ selection, hasParticipants, onRecord, run }: {
+  run?: RunPlan;
   selection: BattleSelection;
   hasParticipants: boolean;
   onRecord: RecordBattleHandler;
@@ -22,6 +26,7 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
   const [review, setReview] = useState<{ response: BattleChoiceReview; request: RecordBattleRequest } | null>(null);
   const [selections, setSelections] = useState<TechniqueSelection[]>([]);
   const option = getRecordingEncounter(selection);
+  const warnings = run ? getBattleLearningWarnings(run, selection) : [];
   const choices = getCaptureChoices(selection);
   const cap = choices.find(enemy => String(enemy.slot) === capture)?.levelCap;
   const capRequired = cap?.resolved === null;
@@ -64,7 +69,8 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
         </div>
       )}
       <p className="text-sm text-muted-foreground">Recording keeps this encounter selected for the next battle and resets capture to No capture.</p>
-      <Button onClick={() => record()} disabled={Boolean(blocked) || review !== null} aria-describedby={blocked ? 'record-battle-reason' : undefined}>Record Battle</Button>
+      <BattleLearningWarnings warnings={warnings} />
+      <Button onClick={() => record()} disabled={Boolean(blocked) || review !== null} aria-describedby={blocked ? 'record-battle-reason' : warnings.length ? 'battle-learning-warning' : undefined}>Record Battle</Button>
       <Button variant="outline" onClick={() => record(true)} disabled={Boolean(blocked) || review !== null}>Review techniques before recording</Button>
       {review && <TechniqueChoiceControls choices={review.response.choices} selections={selections} onChange={setSelections}
         onCancel={() => setReview(null)} onConfirm={() => submit({ ...review.request, reviewTechniques: false,
@@ -76,6 +82,7 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord }: {
           <div key={outcome.instanceId} className="space-y-1">
             <p>{result.roster.find(member => member.instanceId === outcome.instanceId)?.name} · EL {outcome.previousLevel} → {outcome.newLevel} · +{result.xpAwarded} XP</p>
             {outcome.learnedTechniques.length > 0 && <p>Learned technique: {outcome.learnedTechniques.join(', ')}</p>}
+            {outcome.missedTechniques.length > 0 && <p>Missed techniques: {outcome.missedTechniques.join(', ')}</p>}
             {result.techniqueChoices.find(c => c.instanceId === outcome.instanceId)?.discarded.length > 0 &&
               <p>Discarded: {result.techniqueChoices.find(c => c.instanceId === outcome.instanceId)?.discarded.join(', ')}</p>}
             <p className="text-muted-foreground">Expected growth: {(['hp', 'mp', 'atk', 'def', 'spd'] as const).map(stat => `${stat.toUpperCase()} ${outcome.previousStats[stat]} → ${outcome.newStats[stat]}`).join(' · ')}</p>

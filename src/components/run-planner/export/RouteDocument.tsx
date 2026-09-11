@@ -10,6 +10,7 @@ export const RouteActionList = ({ actions, options }: { actions: RouteAction[]; 
       <h3>Action {action.number} · {action.title}</h3>
       {action.lines.map((line, i) => <p key={i}>{line}</p>)}
       {options.rewards && action.rewards && <p>{action.rewards}</p>}
+      {options.techniques && action.misses?.map((miss, i) => <p key={`miss-${i}`}>{miss.name} — Missed: {names(miss.missed)}</p>)}
       {options.techniques && action.decisions.map((decision, i) => <div className="route-decision" key={i}>
         <p><strong>{decision.name} — Technique decision</strong></p>
         {decision.learned && <p>Learned: {names(decision.learned)}</p>}

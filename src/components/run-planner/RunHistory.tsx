@@ -72,6 +72,9 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
                 {' '}Learned {choice.learned.join(', ') || 'none'} · Discarded {choice.discarded.join(', ') || 'none'}
               </p>)}
               <p className="text-xs text-muted-foreground">Encounter {event.encounterId}</p>
+              {event.techniqueMisses?.map(miss => <p key={miss.instanceId}>
+                {event.preActionCheckpoint.roster.find(member => member.instanceId === miss.instanceId)?.name}: Missed techniques: {miss.missed.join(', ')}
+              </p>)}
             </li>;
           })}
         </ol>

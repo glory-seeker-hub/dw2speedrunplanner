@@ -1,4 +1,5 @@
 import { useReducer } from 'react';
+import { RunPlan } from '@/types/runPlanner';
 import { DOMAIN_PHASES, DomainPhase } from '@/types/encounter';
 import { battleSelectionReducer, initialBattleSelection, getDomainsForPhase, getFloorsForDomain, getEncountersForFloor } from '@/utils/runBattleSelection';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,7 @@ const phaseLabels: Record<DomainPhase, string> = {
   'after-blood-knights': 'After Blood Knights',
 };
 
-export const BattleSelector = ({ hasParticipants, onRecord }: { hasParticipants: boolean; onRecord: RecordBattleHandler }) => {
+export const BattleSelector = ({ hasParticipants, onRecord, run }: { hasParticipants: boolean; onRecord: RecordBattleHandler; run?: RunPlan }) => {
   const [selection, dispatch] = useReducer(battleSelectionReducer, initialBattleSelection);
   const { phase, domainId, floor, encounterId } = selection;
   const domains = getDomainsForPhase(phase);
@@ -72,7 +73,7 @@ export const BattleSelector = ({ hasParticipants, onRecord }: { hasParticipants:
         </CardContent>
       </Card>
       {selected && domain && floor !== null && <BattlePreview encounterId={selected.encounterId} domainName={domain.name} phaseLabel={phaseLabels[phase]} floor={floor} isBoss={selected.isBoss} />}
-      {selected && <BattleRecordControls key={`${phase}/${domainId}/${floor}/${encounterId}`} selection={selection} hasParticipants={hasParticipants} onRecord={onRecord} />}
+      {selected && <BattleRecordControls key={`${phase}/${domainId}/${floor}/${encounterId}`} selection={selection} hasParticipants={hasParticipants} onRecord={onRecord} run={run} />}
     </section>
   );
 };

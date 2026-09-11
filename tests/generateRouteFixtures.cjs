@@ -36,10 +36,19 @@ run=record(run,battle,'Nova Blast');
 const a=capture(run,'D-Tyrannomon'),b=capture(a.run,'Nanimon');run=recordDnaAction(b.run,a.id,b.id).run;
 const c=capture(run,'Cherrymon'),d=capture(c.run,'MasterTyrannomon');const mutation=recordDnaAction(d.run,c.id,d.id);run=solo(mutation.run,mutation.child.instanceId);
 const mixed=structuredClone(run);
+// Real DNA lineage reproducing a Rookie crossing the Champion milestone.
+const snowA=capture(run,'Greymon'),snowB=capture(snowA.run,'Frigimon');
+const snowDna=recordDnaAction(snowB.run,snowA.id,snowB.id);
+run=solo(snowDna.run,snowDna.child.instanceId);
+while(run.roster.find(p=>p.instanceId===snowDna.child.instanceId).level<11)run=record(run);
+const snowReady=structuredClone(run);
+const snowEvolved=record(recordRunDigivolution(run,snowDna.child.instanceId).run);
+while(run.roster.find(p=>p.instanceId===snowDna.child.instanceId).level<14)run=record(run);
+run=solo(run,mutation.child.instanceId);
 // A complete, valid long route rather than duplicated event IDs/checkpoints.
 while(run.history.length<220)run=record(run);
 run.name='Long route — 220 actions';
-for(const [name,value] of Object.entries({fresh,short,mixed,long:run})){
+for(const [name,value] of Object.entries({fresh,short,mixed,long:run,'snow-ready':snowReady,'snow-evolved':snowEvolved})){
  const errors=validateRunPlan(value);if(errors.length)throw Error(JSON.stringify(errors));
  fs.writeFileSync(`tests/fixtures/route-${name}.json`,JSON.stringify(value));
  console.log(name,value.history.length,JSON.stringify(value).length);

@@ -1,4 +1,5 @@
 import { isValidTradeEvent } from '@/utils/runTradeValidation';
+import { isValidBattleTechniqueMisses } from '@/utils/battleTechniqueProgression';
 import { isValidDnaEvent } from '@/utils/runDnaValidation';
 import { getDigimonById } from '@/utils/digimonLookup';
 import { isValidBattleTechniqueAudit } from '@/utils/battleTechniqueChoices';
@@ -23,6 +24,7 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
   const checkpoint = v.preActionCheckpoint;
   if (v.type === 'battle') {
     if (!reward(v.xpReward) || !isValidBattleTechniqueAudit(v.techniqueChoices, checkpoint.roster, checkpoint.digiline, v.xpReward)) return false;
+    if (!isValidBattleTechniqueMisses(v.techniqueMisses, checkpoint.roster, checkpoint.digiline, v.xpReward)) return false;
     if (v.capturedEnemySlot == null) {
       if (v.capturedInstanceId !== null || v.capturedLevelCap !== null) return false;
     } else {

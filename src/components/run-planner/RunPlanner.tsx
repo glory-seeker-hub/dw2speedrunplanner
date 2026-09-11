@@ -191,7 +191,7 @@ export const RunPlanner = ({ planner }: Props) => {
           </section>
           <section id="run-battle" tabIndex={-1} aria-label="Battle recording" className="scroll-mt-28 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
           <a href="#run-roster" className="mb-2 inline-block rounded px-2 py-1 text-sm underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Back to roster ↑</a>
-          <BattleSelector key={`${run.id}/${planner.feedbackRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} />
+          <BattleSelector key={`${run.id}/${planner.feedbackRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} run={run} />
           </section>
           <RunHistory key={run.id} run={run} onUndo={planner.undoAction} error={error} />
         </>

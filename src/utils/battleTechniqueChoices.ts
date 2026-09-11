@@ -1,15 +1,12 @@
 import { RosterDigimon } from '@/types/runPlanner';
 import { BattleTechniqueChoice, BattleTechniqueAudit, TechniqueSelection } from '@/types/techniqueCapacity';
-import { applyBattleXp } from '@/utils/experience';
-import { advanceTechniqueState, registerOwnTechnique } from '@/utils/techniqueInheritance';
+import { getBattleTechniqueProgression } from '@/utils/battleTechniqueProgression';
 import { buildTechniqueChoice, resolveTechniqueChoice } from '@/utils/techniqueCapacity';
 
 export const getBattleTechniqueChoices = (roster: RosterDigimon[], participantIds: string[], xpReward: number): BattleTechniqueChoice[] =>
   roster.filter(entry => participantIds.includes(entry.instanceId)).flatMap(entry => {
-    const xp = applyBattleXp(entry.level, entry.totalXp, xpReward, entry.levelCap);
+    const { xp, state: advanced } = getBattleTechniqueProgression(entry, xpReward);
     if (!xp.leveledUp) return [];
-    const registered = registerOwnTechnique({ techs: entry.techs, techniquePool: entry.techniquePool }, entry.speciesId, entry.level);
-    const advanced = advanceTechniqueState(registered, entry.level, xp.newLevel);
     if (!advanced.learnedTechniques.length) return [];
     return [{ instanceId: entry.instanceId, name: entry.name, newLevel: xp.newLevel, currentlyPossessed: [...entry.techs],
       choice: buildTechniqueChoice(advanced, advanced.learnedTechniques) }];

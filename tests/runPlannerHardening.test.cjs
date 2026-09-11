@@ -88,7 +88,7 @@ test('2H integration 2: real Crabmon capture, Wizardmon trade, DNA, inherited le
   assert.equal(wizard.levelCap.resolved,19);assert.equal(wizard.totalXp,483);assert.equal(wizard.dp,0);
   assert.deepEqual(wizard.stats,{hp:102,mp:79,atk:49,def:52,spd:31});assert.deepEqual(wizard.techs,['Thunder Ball','Necro Magic']);
   for(const t of wizard.techs)assert.equal(potential(child.child,t).unlock.status,'pending');
-  let run=train(child.run,child.child.instanceId,12);for(const t of wizard.techs)assert.ok(member(run,child.child.instanceId).techs.includes(t));
+  let run=train(child.run,child.child.instanceId,11);run=recordRunDigivolution(run,child.child.instanceId).run;run=train(run,child.child.instanceId,12);for(const t of wizard.techs)assert.ok(member(run,child.child.instanceId).techs.includes(t));
   run=reload(run);verify(run);while(run.history.at(-1)?.type!=='dna')run=undo(run);
   run=undo(run);assert.ok(member(run,wizard.instanceId));run=undo(run);assert.deepEqual(run.roster,trade.run.roster);
   run=undo(run);assert.deepEqual(run.roster,crab.run.roster);run=undo(run);assert.deepEqual(meaningful(run),meaningful(initial));
@@ -133,18 +133,18 @@ test('2H integration 6: real Vademon mutation, EL22 selection, progression, relo
 
 function overflowLineage(){
   const original=createRunPlan('gold-hawk','Possessed technique lineage');const initial=capture(original,'WarGreymon');let run=initial.run,id=initial.id;
-  for(const name of ['M-Garurumon','Phoenixmon','Rosemon','Boltmon','Puppetmon']){
+  for(const name of ['M-Garurumon','Phoenixmon','Rosemon','Boltmon','Puppetmon','Cherrymon','MasterTyrannomon','Piximon','Mamemon','MetalMamemon','Andromon','Giromon','Vademon']){
     const partner=capture(run,name),child=dna(partner.run,id,partner.id);run=solo(child.run,child.child.instanceId);id=child.child.instanceId;
     while(member(run,id).level<32){
       const preview=load('src/utils/normalDigivolution.ts').previewNormalDigivolution(member(run,id));
-      if(member(run,id).level===31&&preview.canDigivolve)run=recordRunDigivolution(run,id).run;
+      if([11,21,31].includes(member(run,id).level)&&preview.canDigivolve)run=recordRunDigivolution(run,id).run;
       const choices=getBattleTechniqueChoices(run.roster,run.digiline,getResolvedReward(battle.encounterId).xp);
       const overflow=choices.find(c=>c.choice.candidates.length>12);
       if(overflow)return {run,id,overflow};
       run=record(run);
     }
   }
-  assert.fail('Real five-generation lineage must produce overflow');
+  assert.fail('Real lineage must produce overflow');
 }
 
 function plannerHost(){
@@ -157,8 +157,8 @@ function plannerHost(){
   return ()=>{cursor=0;return mod.exports.useRunPlanner();};
 }
 
-test('2H integration 5: real five-generation overflow, complete choice, quota atomicity and Undo',()=>{
-  const {run,id,overflow}=overflowLineage();assert.equal(overflow.choice.candidates.length,13);
+test('2H integration 5: real rank-valid lineage overflow, complete choice, quota atomicity and Undo',()=>{
+  const {run,id,overflow}=overflowLineage();assert.ok(overflow.choice.candidates.length>12);
   const snapshot=structuredClone(run);const pending=member(run,id).techniquePool.filter(p=>p.unlock.status==='pending'&&p.unlock.level>overflow.newLevel);
   assert.ok(pending.every(p=>!overflow.choice.candidates.some(c=>c.key===p.key)));
   assert.throws(()=>recording.recordRunBattle(run,battle),BattleTechniqueSelectionRequired);

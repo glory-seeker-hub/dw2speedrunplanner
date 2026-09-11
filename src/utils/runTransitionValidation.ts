@@ -40,7 +40,8 @@ export const deriveActionPostState = (event: RunEvent): Pick<RunActionCheckpoint
     });
     if (resolution.captureError || resolution.rewardUnknown) throw new Error(resolution.captureError ?? 'Unknown reward.');
     if (resolution.xpAwarded !== event.xpReward || resolution.bitsAwarded !== event.bitsReward ||
-        !equalRunState(resolution.techniqueChoices, event.techniqueChoices)) throw new Error('Reward or technique decision audit differs from authoritative battle.');
+        !equalRunState(resolution.techniqueChoices, event.techniqueChoices) ||
+        !equalRunState(resolution.techniqueMisses, event.techniqueMisses ?? [])) throw new Error('Reward or technique decision audit differs from authoritative battle.');
     return resolution;
   }
   if (event.type === 'digivolve') return { totalBits: before.totalBits,

@@ -1543,13 +1543,13 @@ for(const [name,level] of [['Agumon',11],['Greymon',21],['MetalGreymon',31]]){
     for(const p of old.techniquePool)assert.deepEqual(potential(evolved,p.name),p);
     const own=progressionData.getSpeciesProgression(evolved.speciesId).ownTechnique;
     assert.deepEqual(potential(evolved,own).unlock,{status:'pending',level:level+1});
-    const advanced=inheritance.advanceTechniqueState(evolved,level,level+1);
+    const advanced=inheritance.advanceTechniqueState(evolved,level,level+1,progressionData.getSpeciesProgression(evolved.speciesId).rank);
     assert.deepEqual(advanced.learnedTechniques,[techniqueMetadata.getTechniqueIdentity(own).name]);
     assert.deepEqual(potential(advanced,own).unlock,{status:'available'});
-    assert.deepEqual(inheritance.advanceTechniqueState(advanced,level+1,level+2).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(advanced,level+1,level+2,progressionData.getSpeciesProgression(evolved.speciesId).rank).learnedTechniques,[]);
     const late=evolution.applyNormalDigivolution(foundationMember(name,level+2));
     assert.deepEqual(potential(late,own).unlock,{status:'missed',level:level+1});
-    assert.deepEqual(inheritance.advanceTechniqueState(late,level+2,level+3).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(late,level+2,level+3,progressionData.getSpeciesProgression(late.speciesId).rank).learnedTechniques,[]);
     const at=evolution.applyNormalDigivolution(foundationMember(name,level+1));
     assert.equal(potential(at,own).unlock.status,'missed');
   });
@@ -1559,14 +1559,14 @@ for(const [rank,threshold] of Object.entries(techniqueMetadata.TECHNIQUE_UNLOCK_
     const names=[...new Set(progressionData.SPECIES_PROGRESSION.filter(r=>r.rank===rank && r.ownTechnique).map(r=>r.ownTechnique))];
     const initial=childTech('Agumon',1,techParent('a',names),techParent('b',names));
     const pending=initial.techniquePool.filter(p=>p.rank===rank && p.unlock.status==='pending').map(p=>p.name);
-    const next=inheritance.advanceTechniqueState(freeze(initial),threshold-1,threshold);
+    const next=inheritance.advanceTechniqueState(freeze(initial),threshold-1,threshold,rank);
     assert.deepEqual(next.learnedTechniques,pending);
     assert.ok(next.learnedTechniques.length>12);
     assert.equal(new Set(next.techs.map(techniqueMetadata.normalizeTechniqueName)).size,next.techs.length);
     assert.ok(inheritance.isValidTechniqueState(next));
-    assert.deepEqual(inheritance.advanceTechniqueState(next,threshold,threshold+1).learnedTechniques,[]);
-    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold-1).learnedTechniques,[]);
-    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold+1).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(next,threshold,threshold+1,rank).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold-1,rank).learnedTechniques,[]);
+    assert.deepEqual(inheritance.advanceTechniqueState(initial,threshold-1,threshold+1,rank).learnedTechniques,[]);
   });
 }
 test('multiple generations exclude missed and pending pools and reset own Rookie privilege',()=>{
@@ -1688,7 +1688,7 @@ for(const [label,level] of [['Party Time',12],['Ninja Flower',22],['Venom Infusi
   test(`${label} cannot propagate before EL${level}, but can after its actual battle unlock`,()=>{
     const first=childTech('Agumon',1,techParent('a',[label]),techParent('b',[]));
     assert.deepEqual(potential(first,label).unlock,{status:'pending',level});
-    const before={...foundationMember('Agumon',level-1),...first,instanceId:'second-generation'};
+    const before={...foundationMember(({12:'Greymon',22:'MetalGreymon',32:'WarGreymon'})[level],level-1),...first,instanceId:'second-generation'};
     assert.equal(potential(childTech('Biyomon',1,before,techParent('other',[])),label),undefined);
     const battle=resolveKeepingAll({encounterId:1,digilineInstanceIds:[before.instanceId],roster:[freeze(before)],totalBits:1030});
     const learned=battle.roster[0];
@@ -1860,7 +1860,7 @@ test('voluntary non-overflow review discards old techniques and prevents subsequ
   const child=childTech('Biyomon',1,parent,techParent('b',[]));assert.equal(potential(child,old.name),undefined);
   const retained=parent.techs.find(n=>n!==progressionData.getSpeciesProgression(parent.speciesId).ownTechnique);
   assert.ok(potential(child,retained));
-  const later=inheritance.advanceTechniqueState(parent,12,13);assert.deepEqual(potential(later,old.name).unlock,{status:'discarded'});
+  const later=inheritance.advanceTechniqueState(parent,12,13,'Champion');assert.deepEqual(potential(later,old.name).unlock,{status:'discarded'});
 });
 test('DNA composition defers 24 inherited candidates until EL12 and resolves exactly 12',()=>{
   const a=foundationMember('MetalGreymon',49,{instanceId:'a',techs:rookieNames.slice(0,12)});
@@ -1868,7 +1868,7 @@ test('DNA composition defers 24 inherited candidates until EL12 and resolves exa
   const p=dnaPreview(a,b);assert.equal(p.status,'success');
   const state=inheritance.calculateDnaTechniqueState({speciesId:p.actualResultSpeciesId,actualRank:p.actualResultRank,startingLevel:p.startingLevel},a,b);
   assert.equal(state.techs.length,1);
-  const advanced=inheritance.advanceTechniqueState(state,11,12);assert.equal(advanced.learnedTechniques.length,24);
+  const advanced=inheritance.advanceTechniqueState(state,11,12,'Champion');assert.equal(advanced.learnedTechniques.length,24);
   const choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);assert.equal(capacity.resolveTechniqueChoice(choice).status,'selection-required');
   const selected=choice.candidates.filter((p,i)=>i%2===1).map(p=>p.key);
   const final=capacity.resolveTechniqueChoice(choice,selected);
@@ -1891,7 +1891,7 @@ test('deferred DNA EL2 overflow exposes 25 candidates before any recorded level-
 test('choice candidates exclude other pending, missed and discarded potentials',()=>{
   let state=childTech('Agumon',1,techParent('a',['Spiral Twister','Party Time','Venom Infusion']),techParent('b',[]));
   potential(state,'Party Time').unlock={status:'missed',level:12};potential(state,'Venom Infusion').unlock={status:'discarded'};
-  const advanced=inheritance.advanceTechniqueState(state,1,2),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
+  const advanced=inheritance.advanceTechniqueState(state,1,2,'Rookie'),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
   assert.deepEqual(choice.candidates.map(p=>p.name).sort(),['Pepper Breath','Spiral Twister']);
   const result=capacity.resolveTechniqueChoice(choice,[choice.candidates[0].key]);
   assert.equal(potential(result,'Party Time').unlock.status,'missed');assert.equal(potential(result,'Venom Infusion').unlock.status,'discarded');
@@ -2183,12 +2183,12 @@ for(const [name,level] of [['Agumon',1],['ShimaUnimon',11],['Vademon',21],['Yanm
   const state=childTech(name,level,techParent('a',[own]),techParent('b',[own]));
   assert.deepEqual(state.techs,[techniqueMetadata.getTechniqueIdentity(own).name]);assert.equal(state.techniquePool.length,1);
   assert.equal(state.techniquePool[0].unlock.status,'available');assert.equal(state.techniquePool[0].sources.length,3);
-  assert.deepEqual(inheritance.advanceTechniqueState(state,level,level+1).learnedTechniques,[]);
+  assert.deepEqual(inheritance.advanceTechniqueState(state,level,level+1,progressionData.getSpeciesProgression(speciesLookup.getDigimonByName(name).id).rank).learnedTechniques,[]);
 });
 for(const [rank,threshold] of Object.entries(techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS))test(`${rank} EL${threshold} requires a below-cap learning choice with complete current union`,()=>{
   const name=rankNames(rank).find(n=>n!=='Pepper Breath');
   const state=childTech('Agumon',1,techParent('a',[name,'Venom Infusion']),techParent('b',[]));
-  const member={...foundationMember('Agumon',threshold-1),...state};
+  const member={...foundationMember(({Rookie:'Agumon',Champion:'Greymon',Ultimate:'MetalGreymon',Mega:'WarGreymon'})[rank],threshold-1),...state};
   const run=evolutionRun('Agumon',threshold-1);run.roster[0]={...member,instanceId:run.starterInstanceId};
   const review=preflight(run);assert.equal(review.length,1);assert.equal(review[0].choice.selectionRequired,true);
   assert.ok(review[0].choice.candidates.some(p=>p.name==='Pepper Breath'));assert.ok(review[0].choice.candidates.some(p=>p.name===name));
@@ -2319,7 +2319,7 @@ for(const [a,b,name,level] of [['MetalGreymon','MetalGreymon',null,11],['WarGrey
   const result=liveDna(run),own=ownName(result.child);if(name)assert.equal(result.child.name,name);assert.equal(result.child.level,level);
   assert.deepEqual(result.child.techs,[own]);
   for(const label of [...names,'Tusk Crusher'])if(label!==own)assert.deepEqual(potential(result.child,label).unlock,{status:'pending',level:Math.max(techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[techniqueMetadata.getTechniqueRank(label)],level+1)});
-  const advanced=inheritance.advanceTechniqueState(result.child,level,level+1),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
+  const advanced=inheritance.advanceTechniqueState(result.child,level,level+1,progressionData.getSpeciesProgression(result.child.speciesId).rank),choice=capacity.buildTechniqueChoice(advanced,advanced.learnedTechniques);
   const expected=[...names,'Tusk Crusher'].filter(label=>label!==own&&techniqueMetadata.TECHNIQUE_UNLOCK_LEVELS[techniqueMetadata.getTechniqueRank(label)]<=level+1);
   assert.deepEqual(new Set(advanced.learnedTechniques),new Set(expected));assert.ok(!advanced.learnedTechniques.includes(own));
   assert.deepEqual(new Set(choice.candidates.map(p=>p.name)),new Set([own,...expected]));assert.equal(choice.selectionRequired,true);

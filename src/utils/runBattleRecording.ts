@@ -60,6 +60,7 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
   if (resolution.captureError) throw new Error(resolution.captureError);
   const event: RunBattleEvent = {
     type: 'battle', techniqueChoices: resolution.techniqueChoices,
+    ...(resolution.techniqueMisses.length ? { techniqueMisses: resolution.techniqueMisses } : {}),
     id: newInstanceId(), order: run.history.length ? run.history[run.history.length - 1].order + 1 : 0,
     domainId: request.domainId, phase: request.phase, floor: request.floor!, encounterId: option.encounterId,
     digilineInstanceIds: [...resolution.participantIds], capturedEnemySlot: slot,
