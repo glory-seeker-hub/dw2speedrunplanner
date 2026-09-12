@@ -1,0 +1,3052 @@
+{
+  "source": {
+    "workbook": "DW2 Modding Info.xlsx",
+    "sha256": "38869acaa3908eb9b9dc0d9b46f32a6421af5e0d5c3a8e632983d26a7699e494",
+    "sheet": "WAZADATA",
+    "dimension": "A1:BP1001",
+    "recordSize": 68,
+    "headers": {
+      "A": "Skill ID",
+      "C": "Skill Type/Target",
+      "D": "Lvl/Element",
+      "E": "MP",
+      "F": "Audio",
+      "I": "Atk",
+      "M": "Text Popup",
+      "Q": "Effects & Properties",
+      "AG": "Target",
+      "AK": "Name pointer",
+      "AO": "Description",
+      "AS": "Launch Particle Effects",
+      "BI": "Impact Effects"
+    },
+    "effectSheet": "Skill Effects",
+    "effectDimension": "A1:Z99",
+    "recordCount": 256,
+    "namedRecordCount": 217,
+    "nonemptyRows": 475
+  },
+  "allRecords": {
+    "records": 256,
+    "actions": {
+      "attack": 190,
+      "counter": 14,
+      "interrupt": 9,
+      "assist": 43
+    },
+    "targets": {
+      "one-enemy": 116,
+      "all-enemies": 52,
+      "interrupt-target": 9,
+      "field": 17,
+      "all-allies": 12,
+      "one-ally": 42,
+      "self": 8
+    },
+    "animations": {
+      "physical": 45,
+      "magic": 59,
+      "projectile": 152
+    },
+    "ranks": {
+      "Rookie": 81,
+      "Champion": 68,
+      "Ultimate": 52,
+      "Mega": 55
+    },
+    "elements": {
+      "Nature": 27,
+      "Fire": 20,
+      "Neutral": 140,
+      "Machine": 35,
+      "Water": 16,
+      "Darkness": 16,
+      "unknown": 2
+    },
+    "statusInflicting": 17,
+    "statusCuring": 11,
+    "parameterModifiers": 18,
+    "parameterResets": 1,
+    "temporaryPowers": 9,
+    "specialStates": 13
+  },
+  "namedTechniques": {
+    "records": 201,
+    "actions": {
+      "attack": 137,
+      "counter": 14,
+      "interrupt": 9,
+      "assist": 41
+    },
+    "targets": {
+      "one-enemy": 108,
+      "all-enemies": 46,
+      "interrupt-target": 9,
+      "field": 5,
+      "all-allies": 4,
+      "one-ally": 23,
+      "self": 6
+    },
+    "animations": {
+      "physical": 43,
+      "magic": 57,
+      "projectile": 101
+    },
+    "ranks": {
+      "Rookie": 32,
+      "Champion": 68,
+      "Ultimate": 52,
+      "Mega": 49
+    },
+    "elements": {
+      "Nature": 25,
+      "Fire": 18,
+      "Neutral": 99,
+      "Machine": 31,
+      "Water": 13,
+      "Darkness": 13,
+      "unknown": 2
+    },
+    "statusInflicting": 17,
+    "statusCuring": 6,
+    "parameterModifiers": 18,
+    "parameterResets": 1,
+    "temporaryPowers": 9,
+    "specialStates": 9
+  },
+  "usableTechniqueRecords": 191,
+  "recordKinds": {
+    "technique": 201,
+    "unresolved": 7,
+    "item-or-system": 48
+  },
+  "unnamedRecords": [
+    {
+      "id": 0,
+      "row": 423
+    },
+    {
+      "id": 257,
+      "row": 424
+    },
+    {
+      "id": 258,
+      "row": 425
+    },
+    {
+      "id": 263,
+      "row": 434
+    },
+    {
+      "id": 264,
+      "row": 435
+    },
+    {
+      "id": 265,
+      "row": 436
+    },
+    {
+      "id": 266,
+      "row": 437
+    },
+    {
+      "id": 267,
+      "row": 438
+    },
+    {
+      "id": 268,
+      "row": 439
+    },
+    {
+      "id": 269,
+      "row": 440
+    },
+    {
+      "id": 270,
+      "row": 441
+    },
+    {
+      "id": 271,
+      "row": 442
+    },
+    {
+      "id": 272,
+      "row": 443
+    },
+    {
+      "id": 273,
+      "row": 444
+    },
+    {
+      "id": 274,
+      "row": 445
+    },
+    {
+      "id": 275,
+      "row": 446
+    },
+    {
+      "id": 276,
+      "row": 447
+    },
+    {
+      "id": 277,
+      "row": 448
+    },
+    {
+      "id": 278,
+      "row": 449
+    },
+    {
+      "id": 279,
+      "row": 450
+    },
+    {
+      "id": 281,
+      "row": 453
+    },
+    {
+      "id": 282,
+      "row": 454
+    },
+    {
+      "id": 283,
+      "row": 455
+    },
+    {
+      "id": 284,
+      "row": 456
+    },
+    {
+      "id": 285,
+      "row": 457
+    },
+    {
+      "id": 286,
+      "row": 458
+    },
+    {
+      "id": 287,
+      "row": 459
+    },
+    {
+      "id": 288,
+      "row": 460
+    },
+    {
+      "id": 289,
+      "row": 461
+    },
+    {
+      "id": 290,
+      "row": 462
+    },
+    {
+      "id": 291,
+      "row": 463
+    },
+    {
+      "id": 293,
+      "row": 466
+    },
+    {
+      "id": 294,
+      "row": 467
+    },
+    {
+      "id": 295,
+      "row": 468
+    },
+    {
+      "id": 296,
+      "row": 469
+    },
+    {
+      "id": 298,
+      "row": 472
+    },
+    {
+      "id": 299,
+      "row": 473
+    },
+    {
+      "id": 300,
+      "row": 474
+    },
+    {
+      "id": 301,
+      "row": 475
+    }
+  ],
+  "uncertainIdentities": [
+    {
+      "id": 223,
+      "name": "abc? Unused?"
+    },
+    {
+      "id": 224,
+      "name": "abc? Unused?"
+    },
+    {
+      "id": 230,
+      "name": "abc? Unused?"
+    },
+    {
+      "id": 233,
+      "name": "Energy Blast (?)"
+    },
+    {
+      "id": 234,
+      "name": "Alias Fake (?)"
+    },
+    {
+      "id": 236,
+      "name": "abc? Unused?"
+    }
+  ],
+  "unknownValues": [
+    {
+      "id": 133,
+      "name": "Tail Blade",
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 181,
+      "name": "HP Recovery",
+      "field": "attackPower",
+      "value": 65386,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 184,
+      "name": "Full HP Cure",
+      "field": "attackPower",
+      "value": 65535,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 188,
+      "name": "Small HP Cure",
+      "field": "attackPower",
+      "value": 65486,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 203,
+      "name": "Mega Heal",
+      "field": "attackPower",
+      "value": 65386,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 205,
+      "name": "Full Recovery",
+      "field": "attackPower",
+      "value": 65535,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "field": "byte33",
+      "value": 8,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 230,
+      "name": "abc? Unused?",
+      "field": "attackPower",
+      "value": 65336,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 241,
+      "name": "Fantasmic Bomb",
+      "field": "byte4",
+      "value": 54,
+      "detail": "Unknown rank or element nibble."
+    },
+    {
+      "id": 244,
+      "name": "Fantasmic Ray",
+      "field": "byte4",
+      "value": 54,
+      "detail": "Unknown rank or element nibble."
+    },
+    {
+      "id": 252,
+      "name": "Poison Wing",
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 253,
+      "name": "HP Disk 40 HP",
+      "field": "attackPower",
+      "value": 65496,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 254,
+      "name": "HP Disk 80 HP",
+      "field": "attackPower",
+      "value": 65456,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 255,
+      "name": "HP Disk 160 HP",
+      "field": "attackPower",
+      "value": 65376,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 0,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 257,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 258,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 263,
+      "name": null,
+      "field": "attackPower",
+      "value": 65496,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 264,
+      "name": null,
+      "field": "attackPower",
+      "value": 65456,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 265,
+      "name": null,
+      "field": "attackPower",
+      "value": 65376,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 266,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 267,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 268,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 270,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 271,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 271,
+      "name": null,
+      "field": "attackPower",
+      "value": 65535,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 272,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 273,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 274,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 274,
+      "name": null,
+      "field": "attackPower",
+      "value": 65535,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 275,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 276,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 277,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 277,
+      "name": null,
+      "field": "attackPower",
+      "value": 65535,
+      "detail": "High-bit AP: signed healing/sentinel interpretation not specified by sources."
+    },
+    {
+      "id": 278,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 279,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 280,
+      "name": "R-Cannon Shots",
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 281,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 282,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 283,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 284,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 285,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 286,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 287,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 288,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 289,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 290,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    },
+    {
+      "id": 291,
+      "name": null,
+      "field": "byte33",
+      "value": 0,
+      "detail": "Undocumented target mode value/combination; known bits decoded independently."
+    }
+  ],
+  "unknownEffectBits": [
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "byte": 31,
+      "mask": 4
+    },
+    {
+      "id": 137,
+      "name": "Pummel Whack",
+      "byte": 22,
+      "mask": 1
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "byte": 33,
+      "mask": 8
+    }
+  ],
+  "unresolvedDocumentedFlags": [
+    {
+      "id": 1,
+      "name": "Poison Ivy",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 2,
+      "name": "Rain of Pollen",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 3,
+      "name": "Boom Bubble",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 4,
+      "name": "Flame Bomber",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 5,
+      "name": "Scissor Magic",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 6,
+      "name": "Rock Fist",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 7,
+      "name": "S-Thunder Smack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 8,
+      "name": "Blue Blaster",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 9,
+      "name": "Pummel Peck",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 10,
+      "name": "Fireball",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 11,
+      "name": "Fossil Bite",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 12,
+      "name": "Hydro Blaster",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 13,
+      "name": "Volcanic Strike",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 14,
+      "name": "Blaze Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 15,
+      "name": "Stun Flame Shot",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 16,
+      "name": "Iron Drill Spin",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 17,
+      "name": "Solar Ray",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 18,
+      "name": "Flower Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 19,
+      "name": "Royal Smasher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 20,
+      "name": "Ninja Flower",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 21,
+      "name": "Trick Or Treat",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 22,
+      "name": "Metal Fireball",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 23,
+      "name": "Lightning Spear",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 24,
+      "name": "Tri-Horn Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 25,
+      "name": "Magical Tail",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 26,
+      "name": "Tomahawk Crunch",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 27,
+      "name": "Energy Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 28,
+      "name": "Howling Crusher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 29,
+      "name": "Legendary Blade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 30,
+      "name": "Freeze Breath",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 31,
+      "name": "Pepper Breath",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 32,
+      "name": "Spiral Twister",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 33,
+      "name": "Super Shocker",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 34,
+      "name": "Waking Dream",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 35,
+      "name": "Marching Fishes",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 36,
+      "name": "Nova Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 37,
+      "name": "V-Nova Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 38,
+      "name": "Spinning Needle",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 39,
+      "name": "Meteor Wing",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 40,
+      "name": "Fist Of Fate",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 41,
+      "name": "Air Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 42,
+      "name": "Howling Blaster",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 43,
+      "name": "Wolf Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 44,
+      "name": "Icicle Shot",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 45,
+      "name": "Strong Carapace",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 46,
+      "name": "Harpoon Torpedo",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 47,
+      "name": "Pulse Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 48,
+      "name": "Giga Blaster",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 49,
+      "name": "V-Wing Blade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 50,
+      "name": "Lightning Blade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 51,
+      "name": "Mega Bone Stick",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 52,
+      "name": "Tusk Crusher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 53,
+      "name": "Vulcan's Hammer",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 54,
+      "name": "Tidal Wave",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 55,
+      "name": "Big Bang Boom",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 56,
+      "name": "Terra Force",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 57,
+      "name": "S-bone Crusher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 59,
+      "name": "Electric Shock",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 60,
+      "name": "Demi Dart",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 62,
+      "name": "Stun Bubble",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 63,
+      "name": "Electro Thread",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 64,
+      "name": "Party Time",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 65,
+      "name": "Evil Touch",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 66,
+      "name": "Evil Charm",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 67,
+      "name": "Coral Crusher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 68,
+      "name": "Spurting Ink",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 69,
+      "name": "Sonic Crusher",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 70,
+      "name": "Scissor Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 71,
+      "name": "Twig Tap",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 72,
+      "name": "Alien Ray",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 74,
+      "name": "Dark Shot",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 75,
+      "name": "Darkside Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 76,
+      "name": "Grisly Wing",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 77,
+      "name": "Shadow Scythe",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 78,
+      "name": "Evil Wind",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 79,
+      "name": "Tentacle Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 80,
+      "name": "Musical Fist",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 81,
+      "name": "Duo Scissor Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 82,
+      "name": "Pit Pelter",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 83,
+      "name": "Junk Chunker",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 84,
+      "name": "Trump Sword",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 85,
+      "name": "Needle Squall",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 86,
+      "name": "X-Scissor Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 87,
+      "name": "Puppet Pummel",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 88,
+      "name": "Toy Flame",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 89,
+      "name": "Super Slap",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 90,
+      "name": "Hail Storm",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 91,
+      "name": "Ice Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 92,
+      "name": "Hyper Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 93,
+      "name": "Thunder Ray",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 94,
+      "name": "Sad Water Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 95,
+      "name": "Rose Spear",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 96,
+      "name": "SubZero Ice Punch",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 97,
+      "name": "Lightning Paw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 98,
+      "name": "Heaven's Arrow",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 99,
+      "name": "Fire Tornado",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 100,
+      "name": "Darkness Gear",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 101,
+      "name": "Bolt Strike",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 102,
+      "name": "Protect Grenade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 103,
+      "name": "GigaByte Wing",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 104,
+      "name": "Giga Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 105,
+      "name": "E-Stun Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 106,
+      "name": "Spiral Saw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 107,
+      "name": "Brown Stinger",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 108,
+      "name": "Hyper Heat",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 109,
+      "name": "Triple Forces",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 110,
+      "name": "Slamming Tusk",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 111,
+      "name": "Fire Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 112,
+      "name": "Crimson Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 113,
+      "name": "Digital Bomb",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 114,
+      "name": "Fire Blast II",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 115,
+      "name": "Pretty Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 130,
+      "name": "Needle Spray",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 131,
+      "name": "Meteor Stream",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 132,
+      "name": "Thunder Ball",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 134,
+      "name": "Smiley Bomb",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 135,
+      "name": "Energetic Bomb",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 136,
+      "name": "Smiley Warhead",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 137,
+      "name": "Pummel Whack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 138,
+      "name": "Ninja Knife Throw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 139,
+      "name": "Beast King Fist",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 140,
+      "name": "Buffalo Breath",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 160,
+      "name": "Electro Shocker",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 161,
+      "name": "Wing Blade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 161,
+      "name": "Wing Blade",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source: Wing Blade / MP Destroyer legacy flag.",
+      "byte": 32,
+      "mask": 1,
+      "sourceRow": 82,
+      "sourceLabel": "Deprecated (Wing Blade, MP Destroyer have this on)"
+    },
+    {
+      "id": 162,
+      "name": "Horn Buster",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 163,
+      "name": "Giga Scissor Claw",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 164,
+      "name": "Venom Infusion",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source: unused Venom Infusion flag.",
+      "byte": 32,
+      "mask": 16,
+      "sourceRow": 86,
+      "sourceLabel": "Deprecated (It was enabled for Venom Infusion but is not used)"
+    },
+    {
+      "id": 165,
+      "name": "Chrono Breaker",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 167,
+      "name": "Life Shield",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source: Life Shield legacy flag.",
+      "byte": 32,
+      "mask": 64,
+      "sourceRow": 88,
+      "sourceLabel": "Deprecated (Life Shield)"
+    },
+    {
+      "id": 168,
+      "name": "MP Destroyer",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source: Wing Blade / MP Destroyer legacy flag.",
+      "byte": 32,
+      "mask": 1,
+      "sourceRow": 82,
+      "sourceLabel": "Deprecated (Wing Blade, MP Destroyer have this on)"
+    },
+    {
+      "id": 181,
+      "name": "HP Recovery",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 188,
+      "name": "Small HP Cure",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 190,
+      "name": "Parameter Patch",
+      "kind": "unresolved",
+      "reason": "uncertain-source",
+      "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "byte": 23,
+      "mask": 4,
+      "sourceRow": 42,
+      "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
+    },
+    {
+      "id": 198,
+      "name": "Re-Format",
+      "kind": "unresolved",
+      "reason": "uncertain-source",
+      "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "byte": 23,
+      "mask": 8,
+      "sourceRow": 43,
+      "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
+    },
+    {
+      "id": 203,
+      "name": "Mega Heal",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 204,
+      "name": "Zen Recovery",
+      "kind": "unresolved",
+      "reason": "uncertain-source",
+      "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "byte": 23,
+      "mask": 4,
+      "sourceRow": 42,
+      "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
+    },
+    {
+      "id": 206,
+      "name": "Hung on Death",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 207,
+      "name": "Friendly Fire",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated.",
+      "byte": 21,
+      "mask": 128,
+      "sourceRow": 32,
+      "sourceLabel": "(Deprecated)"
+    },
+    {
+      "id": 212,
+      "name": "Re-Initialize",
+      "kind": "unresolved",
+      "reason": "uncertain-source",
+      "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "byte": 23,
+      "mask": 8,
+      "sourceRow": 43,
+      "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
+    },
+    {
+      "id": 216,
+      "name": "Vee Head Butt",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 217,
+      "name": "Flaming Rocket",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 218,
+      "name": "Lightning Blast",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 219,
+      "name": "Mega Fire",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 220,
+      "name": "Chaos Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 221,
+      "name": "Blind Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 223,
+      "name": "abc? Unused?",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 224,
+      "name": "abc? Unused?",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 228,
+      "name": "Transcend Sword",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 229,
+      "name": "Garuru Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 230,
+      "name": "abc? Unused?",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 231,
+      "name": "Safety Sphere",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Safety Sphere legacy flag.",
+      "byte": 23,
+      "mask": 2,
+      "sourceRow": 41,
+      "sourceLabel": "(Deprecated) (Safety Sphere)"
+    },
+    {
+      "id": 232,
+      "name": "Karate Sweep",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 233,
+      "name": "Energy Blast (?)",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 235,
+      "name": "Inferno Missile",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 236,
+      "name": "abc? Unused?",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 237,
+      "name": "Stun Punch",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 238,
+      "name": "Rail Cannon",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 239,
+      "name": "Armor Aid",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Armor Aid legacy flag.",
+      "byte": 23,
+      "mask": 1,
+      "sourceRow": 40,
+      "sourceLabel": "(Deprecated) (Armor Aid)"
+    },
+    {
+      "id": 240,
+      "name": "Titan Laser",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 241,
+      "name": "Fantasmic Bomb",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 242,
+      "name": "GAIA Gear",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 243,
+      "name": "Light Gun",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 244,
+      "name": "Fantasmic Ray",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 245,
+      "name": "Tubular Attack",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 246,
+      "name": "Left Hand",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 248,
+      "name": "Right Hand",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 251,
+      "name": "Shadow Scythe (0MP)",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 253,
+      "name": "HP Disk 40 HP",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 254,
+      "name": "HP Disk 80 HP",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 255,
+      "name": "HP Disk 160 HP",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 263,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 264,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 265,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 292,
+      "name": "Z cannon Single Target",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 293,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 294,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 295,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 296,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 297,
+      "name": "Z cannon AoE",
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 298,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 299,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 300,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    },
+    {
+      "id": 301,
+      "name": null,
+      "kind": "unresolved",
+      "reason": "deprecated",
+      "note": "Source marks this bit deprecated; no damage semantics inferred.",
+      "byte": 21,
+      "mask": 1,
+      "sourceRow": 25,
+      "sourceLabel": "Deprecated"
+    }
+  ],
+  "planner": {
+    "total": 179,
+    "resolved": 179,
+    "unresolved": []
+  },
+  "plannerLabels": {
+    "total": 179,
+    "resolved": 179,
+    "unresolved": []
+  },
+  "encounterLabels": {
+    "total": 196,
+    "resolved": 195,
+    "unresolved": [
+      "Alias Fake"
+    ]
+  },
+  "encounterReferences": {
+    "total": 673,
+    "resolved": 672,
+    "unresolved": [
+      {
+        "encounterId": 149,
+        "slot": 1,
+        "label": "Alias Fake"
+      }
+    ]
+  },
+  "legacyUnsupportedEncounterLabels": [
+    "AntiConfusion",
+    "AntiDote",
+    "AntiFreeze",
+    "Armor Aid",
+    "Armor Coating",
+    "Banana Slip",
+    "Blaze Blaster",
+    "Crimson Flame",
+    "Critical Blow",
+    "Darkness Ray",
+    "Defensive Ray",
+    "Destabilizer Ray",
+    "Fantasmic Bomb",
+    "Fantasmic Ray",
+    "Full HP Cure",
+    "Full Recovery",
+    "Fungus Cruncher",
+    "GAIA Gear",
+    "Garuru Cannon",
+    "HP Recovery",
+    "HP Zapper",
+    "Heart Break Hit",
+    "Hung on Death",
+    "Hyper Flashing",
+    "Inferno Missile",
+    "Invincibility",
+    "Invisibility",
+    "Karate Sweep",
+    "Kongou",
+    "Left Hand",
+    "Life Shield",
+    "Light Gun",
+    "MP Destroyer",
+    "MP Magic",
+    "Mech Ray",
+    "Mega Heal",
+    "Nature Hit Ray",
+    "Necro Magic",
+    "Panic Wave",
+    "Parameter Patch",
+    "Poison Wave",
+    "Rail Cannon",
+    "Re-Format",
+    "Re-Initialize",
+    "Recovery Power",
+    "Reduction Ray",
+    "Reset Status",
+    "Right Hand",
+    "Rotten Rainballs",
+    "Safety Sphere",
+    "Small HP Cure",
+    "Stun Punch",
+    "Stun Ray",
+    "Titan Laser",
+    "Transcend Sword",
+    "Tubular Attack",
+    "Venom Infusion",
+    "Virus Attack",
+    "Water Ray",
+    "Zen Recovery",
+    "Zip Boom"
+  ],
+  "assists": [
+    {
+      "id": 180,
+      "name": "Hyper Flashing",
+      "animationKind": "magic",
+      "targetGroup": "field"
+    },
+    {
+      "id": 181,
+      "name": "HP Recovery",
+      "animationKind": "magic",
+      "targetGroup": "all-allies"
+    },
+    {
+      "id": 182,
+      "name": "Virus Attack",
+      "animationKind": "magic",
+      "targetGroup": "field"
+    },
+    {
+      "id": 183,
+      "name": "Crimson Flame",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 184,
+      "name": "Full HP Cure",
+      "animationKind": "magic",
+      "targetGroup": "all-allies"
+    },
+    {
+      "id": 185,
+      "name": "Fungus Cruncher",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 186,
+      "name": "Rotten Rainballs",
+      "animationKind": "projectile",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 187,
+      "name": "Banana Slip",
+      "animationKind": "projectile",
+      "targetGroup": "all-enemies"
+    },
+    {
+      "id": 188,
+      "name": "Small HP Cure",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 189,
+      "name": "Defensive Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 190,
+      "name": "Parameter Patch",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 191,
+      "name": "Zip Boom",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 192,
+      "name": "Stun Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 193,
+      "name": "Armor Coating",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 194,
+      "name": "Mech Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 195,
+      "name": "Blaze Blaster",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 196,
+      "name": "Nature Hit Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 197,
+      "name": "Invincibility",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 198,
+      "name": "Re-Format",
+      "animationKind": "magic",
+      "targetGroup": "all-enemies"
+    },
+    {
+      "id": 199,
+      "name": "Recovery Power",
+      "animationKind": "magic",
+      "targetGroup": "all-allies"
+    },
+    {
+      "id": 200,
+      "name": "AntiDote",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 201,
+      "name": "AntiFreeze",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 202,
+      "name": "AntiConfusion",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 203,
+      "name": "Mega Heal",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 204,
+      "name": "Zen Recovery",
+      "animationKind": "magic",
+      "targetGroup": "all-allies"
+    },
+    {
+      "id": 205,
+      "name": "Full Recovery",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 206,
+      "name": "Hung on Death",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 208,
+      "name": "Invisibility",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 209,
+      "name": "Water Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "animationKind": "magic",
+      "targetGroup": "field"
+    },
+    {
+      "id": 211,
+      "name": "Darkness Ray",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 212,
+      "name": "Re-Initialize",
+      "animationKind": "magic",
+      "targetGroup": "one-enemy"
+    },
+    {
+      "id": 213,
+      "name": "Panic Wave",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 214,
+      "name": "Heart Break Hit",
+      "animationKind": "magic",
+      "targetGroup": "field"
+    },
+    {
+      "id": 215,
+      "name": "Poison Wave",
+      "animationKind": "magic",
+      "targetGroup": "one-ally"
+    },
+    {
+      "id": 222,
+      "name": "Kongou",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 227,
+      "name": "Reset Status",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 231,
+      "name": "Safety Sphere",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 239,
+      "name": "Armor Aid",
+      "animationKind": "magic",
+      "targetGroup": "self"
+    },
+    {
+      "id": 247,
+      "name": "Reduction Ray",
+      "animationKind": "projectile",
+      "targetGroup": "one-enemy"
+    },
+    {
+      "id": 249,
+      "name": "Destablizer Ray",
+      "animationKind": "magic",
+      "targetGroup": "all-enemies"
+    }
+  ]
+}

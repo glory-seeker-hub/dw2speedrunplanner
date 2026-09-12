@@ -1,4 +1,5 @@
 import { DOMAIN_GROUPS } from '@/data/domainGroups';
+import { runBattleSkillSelfChecks } from '@/utils/battleSkillValidation';
 import { ENCOUNTER_REWARD_SOURCE } from '@/data/encounterRewardSource';
 import {
   ATK_DEF_GROWTH_ROWS,
@@ -70,7 +71,7 @@ const roster = (partial: Partial<RosterDigimon>): RosterDigimon => ({
 });
 
 export const runDataSelfChecks = (): SelfCheckResult[] => {
-  const results: SelfCheckResult[] = [];
+  const results: SelfCheckResult[] = runBattleSkillSelfChecks();
 
   // --- Rewards -------------------------------------------------------------
   check(results, 'zero XP / zero Bits records are valid known data', () => {

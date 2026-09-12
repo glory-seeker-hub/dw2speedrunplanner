@@ -133,7 +133,7 @@ test('storage access failures are reported without throwing', () => {
 });
 test('all existing Phase 1.6a data self-checks still pass', () => {
   const checks = runDataSelfChecks();
-  assert.equal(checks.length, 46);
+  assert.equal(checks.length, 57); // Original 46 plus 11 Phase 2K-B battle-data checks.
   assert.deepEqual(checks.filter((check) => !check.passed), []);
 });
 
@@ -746,7 +746,8 @@ test('Phase 2F authoritative data audit preserves all counts and known diagnosti
   assert.equal(r.metalKidDigimonCount,194); assert.equal(r.metalKidEvolutionRowCount,216);
   assert.deepEqual(r.unresolvedEndpoints,[]); assert.equal(r.workbookDp0AssertionsChecked,137);
   assert.deepEqual(r.dp0AssertionMismatches,[]); assert.equal(r.workbookNullMetalKidPresent.length,5);
-  assert.equal(r.noOwnTechnique,13); assert.equal(r.unresolvedPlannerTechniqueLabels.length,45);
+  // Phase 2K-B reuses the reviewed Flower Cannon / Ninja Flower aliases in Tech lookup.
+  assert.equal(r.noOwnTechnique,13); assert.equal(r.unresolvedPlannerTechniqueLabels.length,43);
   assert.deepEqual(r.evolutionRangeAmbiguities,[]);
   assert.deepEqual(r.plannerXpSupportedRange,{min:1,max:50});
 });
@@ -1475,8 +1476,8 @@ test('technique normalization does not guess similar spellings',()=>{
   assert.notEqual(techniqueMetadata.normalizeTechniqueName('Blaze Blast'),techniqueMetadata.normalizeTechniqueName('Blaze Blaster'));
   assert.notEqual(techniqueMetadata.normalizeTechniqueName('Left Hand'),techniqueMetadata.normalizeTechniqueName('Right Hand'));
 });
-test('all 45 simulator-unresolved labels retain planner ranks independently',()=>{
-  assert.equal(techniqueReport.unresolvedSimulatorLabels.length,45);
+test('all 43 remaining simulator-unresolved labels retain planner ranks independently',()=>{
+  assert.equal(techniqueReport.unresolvedSimulatorLabels.length,43);
   assert.deepEqual(techniqueReport.simulatorLabelsWithoutRank,[]);
   assert.deepEqual(techniqueReport.captureUnresolved,[]);
 });
