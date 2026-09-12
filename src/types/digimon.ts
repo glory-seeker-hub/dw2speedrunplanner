@@ -1,3 +1,4 @@
+import type { BattleActionRecord } from '@/utils/battle/battleTypes';
 export interface DigimonStats {
   hp: number;
   mp: number;
@@ -67,7 +68,6 @@ export interface BattleTurn {
   damage: number;
   hpRemaining: number;
   result: string;
-  timeSeconds: number;
   targetsHit: number;
 }
 
@@ -93,12 +93,20 @@ export interface BattleDigimon {
 export interface SimulationResult {
   winRate: number;
   totalSimulations: number;
-  minTurns: number;
-  avgTurns: number;
-  maxTurns: number;
-  minTime: number;
-  avgTime: number;
-  maxTime: number;
-  fastestBattleHistory: BattleTurn[];
-  fastestBattleByTime: BattleTurn[];
+  completedSuccesses: number;
+  timedSuccesses: number;
+  incompleteTimingSuccesses: number;
+  outcomeCounts: Record<'player-win' | 'enemy-win' | 'limit-reached' | 'invalid' | 'unsupported', number>;
+  minTurns: number | null;
+  avgTurns: number | null;
+  maxTurns: number | null;
+  /** Aggregates cover only completed successes with complete measured timing. */
+  minFrames: number | null;
+  avgFrames: number | null;
+  maxFrames: number | null;
+  fastestBattleHistory: BattleActionRecord[];
+  fastestBattleByFrames: BattleActionRecord[];
+  timingDiagnostics: string[];
+  resourceDiagnostics: string[];
+  runsWithResourceAlerts: number;
 }

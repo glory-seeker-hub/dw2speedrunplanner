@@ -2,9 +2,10 @@ import type { DigimonStats, Tech, TeamDigimon } from '@/types/digimon';
 import type { ActionKind, Ailment, SkillElement } from '@/types/battleSkill';
 import type { Encounter } from '@/types/encounter';
 import type { BattleRng } from './battleRng';
+import type { ExecutionOutcome, TimingClass } from './battleTiming';
 
 export type BattleSide = 'player' | 'enemy';
-export type BattleActionKind = ActionKind | 'guard';
+export type BattleActionKind = ActionKind;
 export type ActionState = 'planned' | 'waiting' | 'resolving' | 'resolved' | 'cancelled' | 'skipped';
 export interface BattleSkillSelection {
   key: string;
@@ -29,6 +30,7 @@ export interface BattleCombatantState {
   maxMp: number;
   currentMp: number;
   parameterModifiers: Partial<Record<'atk' | 'def' | 'spd', number>>;
+  /** Scheduling/target eligibility: players remain active at zero HP; enemies KO. */
   isAlive: boolean;
   skills: BattleSkillSelection[];
   plannedActionId: string | null;
@@ -36,7 +38,6 @@ export interface BattleCombatantState {
   legacy: { lastTechUsed?: string; consecutiveTechCount: number; damageTakenThisTurn: number };
   statuses: Partial<Record<Ailment | 'poison-body' | 'zombie' | 'invisibility' | 'invincibility', true>>;
   temporaryPowers: Partial<Record<SkillElement | 'poison' | 'paralysis' | 'confusion', true>>;
-  guarding: boolean;
 }
 export type TargetIntent =
   | { kind: 'opponents'; side: BattleSide; selection: 'random-at-execution' | 'all' }
@@ -46,12 +47,10 @@ interface PlannedActionBase {
   id: string; round: number; actorId: string; targetIntent: TargetIntent;
   state: ActionState; initiative: number | null; priority: 'normal' | 'legacy-counter-last' | 'legacy-reaction';
   reaction: ReactionContext | null;
+  chainFromActionId: string | null;
 }
-export type PlannedAction = PlannedActionBase & (
-  | { kind: ActionKind; skill: BattleSkillSelection }
-  | { kind: 'guard'; skill: null }
-);
-export type ActionChoice = { kind: 'skill'; skillKey: string; targetIntent?: TargetIntent } | { kind: 'guard' };
+export type PlannedAction = PlannedActionBase & { kind: ActionKind; skill: BattleSkillSelection };
+export type ActionChoice = { kind: 'skill'; skillKey: string; targetIntent?: TargetIntent };
 export interface ActionPolicy {
   chooseAction(actor: Readonly<BattleCombatantState>, context: { round: number; combatants: readonly BattleCombatantState[] }, rng: BattleRng): ActionChoice;
 }
@@ -61,15 +60,19 @@ export interface BattleImpact {
   appliedEffects: { source: 'legacy'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
   ko: boolean;
 }
+export interface BattleResourceAlert {
+  kind: 'player-hp-depleted' | 'player-mp-depleted'; combatantId: string; combatantName: string;
+}
 export interface BattleActionRecord {
   id: string; round: number; sequence: number; actorId: string; actorName: string;
   skillKey: string | null; skillName: string | null; canonicalSkillId: number | null;
-  kind: BattleActionKind; source: BattleSkillSelection['source'] | 'guard';
+  kind: BattleActionKind; source: BattleSkillSelection['source'];
   targetIntent: TargetIntent; effectiveTargetIds: string[]; impacts: BattleImpact[];
   reaction: ReactionContext | null; state: ActionState; reason?: string;
-  durationFrames: null;
-  /** Input to the old timing projection only. Never canonical duration. */
-  legacyTimingTargetCount: number;
+  outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
+  timingDiagnostics: string[]; chainFromActionId: string | null;
+  resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
+  mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete' } | null;
 }
 export interface BattleState {
   combatants: BattleCombatantState[];
@@ -84,6 +87,7 @@ export interface BattleRunResult {
   engineVersion: string; outcome: BattleOutcome; winner: BattleSide | null;
   rounds: number; actionCount: number; actions: BattleActionRecord[];
   state: BattleState; diagnostics: string[];
+  totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
 export type BattleTeamMember = TeamDigimon & { instanceId?: string };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }

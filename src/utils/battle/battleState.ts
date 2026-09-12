@@ -34,8 +34,7 @@ export const actorById = (state: BattleState, id: string): BattleCombatantState 
   if (!actor) throw new BattleInputError(`Unknown combatant ${id}.`);
   return actor;
 };
-export function completedOutcome(state: BattleState): 'player-win' | 'enemy-win' | null {
-  if (!state.combatants.some(a => a.side === 'player' && a.isAlive)) return 'enemy-win';
+export function completedOutcome(state: BattleState): 'player-win' | null {
   if (!state.combatants.some(a => a.side === 'enemy' && a.isAlive)) return 'player-win';
   return null;
 }

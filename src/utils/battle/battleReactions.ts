@@ -8,7 +8,7 @@ export function legacyCounterPolicy(state: BattleState, cause: PlannedAction, ta
   target.reaction.counterUsed = true;
   target.reaction.isCountering = true;
   waiting.state = 'cancelled';
-  const reaction: PlannedAction = { ...waiting, id: nextActionId(state), state: 'planned', priority: 'legacy-reaction', reaction: {
+  const reaction: PlannedAction = { ...waiting, id: nextActionId(state), state: 'planned', priority: 'legacy-reaction', chainFromActionId: null, reaction: {
     reactionToActionId: cause.id, triggeredByActorId: cause.actorId, counterActorId: target.id,
   } };
   state.plannedActions.push(reaction);
