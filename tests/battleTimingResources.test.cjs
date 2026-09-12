@@ -13,7 +13,7 @@ const { legacyActionPolicy, planAction } = load('src/utils/battle/battleActions.
 const { getBattleSkillById, BATTLE_SKILLS } = load('src/data/battleSkills.ts');
 const { resolveEffectiveTargets } = load('src/utils/battle/battleTargets.ts');
 const input = (player, enemy) => ({ player, enemy, floorSpecialty: 'None' });
-const run = (p, e, options={}) => simulate(input(p,e), {rng: seeded(42), ...options});
+const run = (p, e, options={}) => simulate(input(p,e), {rng: sequence(Array(10000).fill(0)), ...options});
 const executed = r => r.actions.filter(a=>a.state==='resolved');
 const resolve = (timingClass, effectiveTargetCount, outcome='hit', actionKind='attack') => timing({timingClass,effectiveTargetCount,outcome,actionKind});
 const foes = (count, hp=1) => Array.from({length:count},()=>member('Duplicate',[tech('Rock Fist')],{hp}));
@@ -69,7 +69,7 @@ test('one impact Miss never infers a full action Miss',()=>{
 });
 
 function resourceRun(options={}) {
- return run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:0,atk:1})],[member('E',[tech('Rock Fist')],{hp:1000,mp:1,spd:100})],{maxRounds:3,...options});
+ return run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:10,atk:1})],[member('E',[tech('Rock Fist')],{hp:1000,mp:1,spd:100})],{maxRounds:3,...options});
 }
 test('player depletion does not stop selection, targeting, actions or create enemy victory',()=>{
  const r=resourceRun();const p=r.state.combatants[0];assert.equal(p.currentHp,0);assert.equal(p.isAlive,true);assert.equal(r.outcome,'limit-reached');assert.equal(r.winner,null);
@@ -85,12 +85,12 @@ test('player initialized at zero HP remains active and receives no invented tran
  const r=run([member('P',[tech('Rock Fist')],{hp:0,spd:100})],foes(1));assert.equal(r.outcome,'player-win');assert.equal(r.state.combatants[0].isAlive,true);assert.ok(!r.actions.flatMap(a=>a.resourceAlerts).some(a=>a.kind==='player-hp-depleted'));
 });
 test('after actual legacy drain restores HP a new depletion transition can alert',()=>{
- const r=run([member('P',[tech('Twig Tap')],{hp:1,spd:0})],[member('E',[tech('Rock Fist')],{hp:1000,spd:100})],{maxRounds:3});
+ const r=run([member('P',[tech('Twig Tap')],{hp:1,spd:10})],[member('E',[tech('Rock Fist')],{hp:1000,spd:100})],{maxRounds:3});
  assert.equal(r.actions.flatMap(a=>a.resourceAlerts).filter(a=>a.kind==='player-hp-depleted').length,3);
  assert.ok(executed(r).filter(a=>a.actorId==='player-0').every(a=>a.impacts.some(i=>i.appliedEffects.some(e=>e.kind==='drain'))));
 });
 test('all enemies KO completes success despite depleted player resources',()=>{
- const r=run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:0})],[member('E',[tech('Rock Fist')],{hp:1,spd:100})]);
+ const r=run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:10})],[member('E',[tech('Rock Fist')],{hp:1,spd:100})]);
  assert.equal(r.outcome,'player-win');assert.equal(r.state.combatants[0].currentHp,0);assert.equal(r.state.combatants[1].isAlive,false);assert.equal(r.totalFrames,1370);
 });
 for(const side of ['player','enemy']) test(`${side} MP cost is canonical and insufficient/zero MP never gates execution`,()=>{
@@ -164,9 +164,9 @@ test('first Shadow Scythe without KO has no causal repeat',()=>{
  const r=run([member('P',[tech('Shadow Scythe')],{spd:100})],foes(3,1000),{maxRounds:1});assert.equal(executed(r).filter(a=>a.actorId==='player-0').length,1);
 });
 test('chain RNG chooses remaining targets with no new action-choice or initiative draws',()=>{
- const rng=sequence([0,0,0,0,0,0,0,0,0.99,0.99,0]);const r=run([member('P',[tech('Shadow Scythe')],{spd:100})],foes(3),{rng});
- assert.equal(rng.consumed,11);assert.deepEqual(executed(r).map(a=>a.impacts[0].targetId),['enemy-2','enemy-1','enemy-0']);
- assert.deepEqual(rng.draws.map(d=>d.category),[...Array(4).fill('action-choice'),...Array(4).fill('initiative'),...Array(3).fill('target-choice')]);
+ const rng=sequence([0,0,0,0,0,0,0,0,0.99,0,0.99,0,0,0]);const r=run([member('P',[tech('Shadow Scythe')],{spd:100})],foes(3),{rng});
+ assert.equal(rng.consumed,14);assert.deepEqual(executed(r).map(a=>a.impacts[0].targetId),['enemy-2','enemy-1','enemy-0']);
+ assert.deepEqual(rng.draws.map(d=>d.category),[...Array(4).fill('action-choice'),...Array(4).fill('initiative'),'target-choice','accuracy','target-choice','accuracy','target-choice','accuracy']);
  assert.throws(()=>rng.nextFloat(),/exhausted/);
 });
 test('Shadow Scythe complete histories are reproducible by seed',()=>assert.deepEqual(shadow(),shadow()));
@@ -212,14 +212,14 @@ test('no complete timed victories yields null aggregates, no Infinity or invente
 test('public result contains frames and action histories, no obsolete seconds fields',()=>{
  const r=runBattleSimulation(...cases.single,'None',2,{rng:seeded(42)});assert.ok(r.minFrames>0);assert.ok(r.fastestBattleByFrames.length);assert.ok(!('minTime'in r));assert.ok(!('fastestBattleByTime'in r));assert.ok(!JSON.stringify(r).includes('timeSeconds'));
 });
-test('production simulations draw no hit/miss or status RNG and produce no Misses',()=>{
- const rng=sequence(Array(10000).fill(0));const r=run(...cases.aoe,{rng});assert.ok(executed(r).every(a=>a.outcome==='hit'));assert.ok(rng.draws.every(d=>['action-choice','initiative','target-choice'].includes(d.category)));
+test('programmed successful simulations consume accuracy but no unrelated status RNG',()=>{
+ const rng=sequence(Array(10000).fill(0));const r=run(...cases.aoe,{rng});assert.ok(executed(r).every(a=>a.outcome==='hit'));assert.ok(rng.draws.every(d=>['action-choice','initiative','target-choice','accuracy'].includes(d.category)));
  assert.ok(r.state.combatants.every(a=>Object.keys(a.statuses).length===0));
 });
 test('BattleResults renders frames, action-level impacts, MP traces and informational alerts',()=>{
  const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');const {BattleResults}=load('src/components/BattleResults.tsx');
  const r=aggregateBattleRuns([resourceRun()]); // no victory history; use successful depleted resource fixture
- const success=run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:0})],[member('E',[tech('Rock Fist')],{hp:1,spd:100})]);
+ const success=run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:10})],[member('E',[tech('Rock Fist')],{hp:1,spd:100})]);
  const html=renderToStaticMarkup(React.createElement(BattleResults,{results:aggregateBattleRuns([success])}));
  assert.match(html,/1,370 f/);assert.match(html,/685 f/);assert.match(html,/P reached 0 HP/);assert.match(html,/P reached 0 MP/);assert.match(html,/role="note"/);assert.match(html,/Guard\/item/);assert.match(html,/MP:/);assert.match(html,/Fastest Battle by Frames/);assert.doesNotMatch(html,/seconds|200 seconds|50 seconds/);
  const empty=renderToStaticMarkup(React.createElement(BattleResults,{results:r}));assert.match(empty,/Unavailable/);assert.doesNotMatch(empty,/Infinity|NaN/);

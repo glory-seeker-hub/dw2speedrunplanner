@@ -1,4 +1,4 @@
-export type BattleDrawCategory = 'action-choice' | 'target-choice' | 'initiative' | 'hit-miss' | 'status-application' | 'status-recovery' | 'interrupt' | 'counter' | 'assist';
+export type BattleDrawCategory = 'action-choice' | 'target-choice' | 'initiative' | 'hit-miss' | 'status-application' | 'status-recovery' | 'interrupt' | 'counter' | 'assist' | 'status-recovery-paralysis' | 'status-recovery-confusion' | 'confusion-action-choice' | 'confusion-target' | 'paralysis-failure' | 'accuracy' | 'status-apply-poison' | 'status-apply-paralysis' | 'status-apply-confusion';
 export interface BattleRng {
   nextFloat(category?: BattleDrawCategory): number;
   nextIntExclusive(max: number, category?: BattleDrawCategory): number;

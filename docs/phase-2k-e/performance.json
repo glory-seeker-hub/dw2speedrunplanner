@@ -1,0 +1,132 @@
+{
+  "aoe": [
+    {
+      "count": 1,
+      "ms": 9.842800000000011,
+      "averageActionCount": 21,
+      "averageRecordCount": 24,
+      "draws": {
+        "action-choice": 24,
+        "initiative": 24,
+        "accuracy": 21,
+        "target-choice": 15
+      },
+      "totalDraws": 84,
+      "firstHistoryBytes": 34130,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "count": 100,
+      "ms": 60.700500000000034,
+      "averageActionCount": 21.6,
+      "averageRecordCount": 24.6,
+      "draws": {
+        "action-choice": 2460,
+        "initiative": 2460,
+        "accuracy": 2160,
+        "target-choice": 1545
+      },
+      "totalDraws": 8625,
+      "firstHistoryBytes": 34130,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "count": 1000,
+      "ms": 323.89930000000004,
+      "averageActionCount": 21.556,
+      "averageRecordCount": 24.556,
+      "draws": {
+        "action-choice": 24556,
+        "initiative": 24556,
+        "accuracy": 21556,
+        "target-choice": 15417
+      },
+      "totalDraws": 86085,
+      "firstHistoryBytes": 34130,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "statusHeavy": [
+    {
+      "count": 1,
+      "ms": 1.3385000000000673,
+      "averageActionCount": 6,
+      "averageRecordCount": 6,
+      "draws": {
+        "action-choice": 6,
+        "initiative": 6,
+        "status-recovery-paralysis": 2,
+        "target-choice": 3,
+        "accuracy": 6,
+        "status-apply-confusion": 1,
+        "status-recovery-confusion": 3,
+        "confusion-action-choice": 3,
+        "confusion-target": 3,
+        "status-apply-paralysis": 3,
+        "status-apply-poison": 2,
+        "paralysis-failure": 1
+      },
+      "totalDraws": 39,
+      "firstHistoryBytes": 9314,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "count": 100,
+      "ms": 36.46270000000004,
+      "averageActionCount": 17.14,
+      "averageRecordCount": 17.8,
+      "draws": {
+        "action-choice": 1780,
+        "initiative": 1780,
+        "status-recovery-paralysis": 707,
+        "target-choice": 1195,
+        "accuracy": 1461,
+        "status-apply-confusion": 688,
+        "status-recovery-confusion": 677,
+        "confusion-action-choice": 519,
+        "confusion-target": 519,
+        "status-apply-paralysis": 372,
+        "status-apply-poison": 320,
+        "paralysis-failure": 518
+      },
+      "totalDraws": 10536,
+      "firstHistoryBytes": 9314,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "count": 1000,
+      "ms": 268.7407999999998,
+      "averageActionCount": 18.012,
+      "averageRecordCount": 18.74,
+      "draws": {
+        "action-choice": 18740,
+        "initiative": 18740,
+        "status-recovery-paralysis": 7524,
+        "target-choice": 12539,
+        "accuracy": 15230,
+        "status-apply-confusion": 7290,
+        "status-recovery-confusion": 7171,
+        "confusion-action-choice": 5473,
+        "confusion-target": 5473,
+        "status-apply-paralysis": 3816,
+        "status-apply-poison": 3338,
+        "paralysis-failure": 5605
+      },
+      "totalDraws": 110939,
+      "firstHistoryBytes": 9314,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ]
+}

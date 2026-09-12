@@ -12,8 +12,11 @@ import { legacyCounterPolicy } from './battleReactions';
 import { classifySkillTiming, resolveActionTiming, summarizeBattleTiming } from './battleTiming';
 import { accountActionMp, depletionAlert } from './battleResources';
 import { scheduleShadowScytheRepeat, SHADOW_SCYTHE_ID } from './battleChains';
+import { recoverStatuses, statusSnapshot, resolveImpactStatuses } from './battleStatuses';
+import { prepareConfusionAction } from './battleConfusion';
+import { resolveActionAccuracy } from './battleAccuracy';
 
-export const BATTLE_ENGINE_VERSION = '2k-d-frames-resources-v1';
+export const BATTLE_ENGINE_VERSION = '2k-e-accuracy-status-v1';
 export const DEFAULT_MAX_ROUNDS = 1000;
 export function simulateBattleCore(input: BattleInput, options: BattleEngineOptions = {}): BattleRunResult {
   const rng = options.rng ?? createProductionBattleRng();
@@ -36,6 +39,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
       state: action.state, outcome: action.state === 'cancelled' ? 'cancelled' : 'skipped',
       timingClass: classifySkillTiming(action.skill), durationFrames: null, timingDiagnostics: [],
       chainFromActionId: action.chainFromActionId, resourceAlerts: [], resourceDiagnostics: [], mpAccounting: null,
+      accuracy: null, statusesBefore: statusSnapshot(actor), statusesAfterRecovery: statusSnapshot(actor), statusRecoveries: [], confusion: null,
       ...(reason ? { reason } : {}),
     };
     records.push(entry); return entry;
@@ -73,32 +77,46 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           if (action.state !== 'cancelled') action.state = 'skipped';
           record(action, reason ?? 'already-acted'); continue;
         }
+        const actor = actorById(state, action.actorId);
+        const statusesBefore = statusSnapshot(actor);
+        const statusRecoveries = action.chainFromActionId ? [] : recoverStatuses(actor, rng);
+        const statusesAfterRecovery = statusSnapshot(actor);
+        const confusion = prepareConfusionAction(state, actor, action, policy, rng);
+        const recordPrepared = (reason?: string) => Object.assign(record(action, reason), { statusesBefore, statusesAfterRecovery, statusRecoveries, confusion });
+        if (confusion.skipped) {
+          action.state = 'skipped'; acted.add(actor.id); recordPrepared('confusion-no-eligible-skill'); continue;
+        }
         if (action.kind === 'assist') {
-          action.state = 'skipped'; record(action, 'future-mechanic-unsupported').outcome = 'unsupported'; finishPending();
+          action.state = 'skipped'; const entry = recordPrepared('future-mechanic-unsupported'); entry.outcome = 'unsupported';
+          entry.accuracy = resolveActionAccuracy(actor, 'assist', [], rng); finishPending();
           return result('unsupported', [`${action.kind} resolution is deferred.`]);
         }
-        const actor = actorById(state, action.actorId);
-        const targetIds = resolveEffectiveTargets(state, action, rng);
-        if (!targetIds.length) { action.state = 'skipped'; record(action, 'no-living-targets'); continue; }
+        const targetIds = resolveEffectiveTargets(state, action, rng, confusion.redirected);
+        if (!targetIds.length) { action.state = 'skipped'; recordPrepared('no-living-targets'); continue; }
         action.state = 'resolving';
-        const entry = record(action);
-        if (targetIds.some(id => actorById(state, id).side === actor.side)) entry.timingClass = 'unknown';
+        const entry = recordPrepared();
+        if (!confusion.redirected && targetIds.some(id => actorById(state, id).side === actor.side)) entry.timingClass = 'unknown';
+        entry.effectiveTargetIds = [...targetIds];
         acted.add(actor.id); executionCount++;
         accountActionMp(actor, action, entry);
         beforeLegacyAction(actor, action);
-        for (let index = 0; index < targetIds.length; index++) {
+        entry.accuracy = resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng);
+        if (entry.accuracy.outcome === 'unsupported') throw new BattleInputError('Accuracy has no effective target.', 'unsupported');
+        entry.outcome = entry.accuracy.outcome;
+        // Full-action Miss retains target IDs but has no impacts or on-hit draws.
+        for (let index = 0; entry.outcome === 'hit' && index < targetIds.length; index++) {
           const target = actorById(state, targetIds[index]);
           if (!target.isAlive) continue;
-          // beforeHitRoll / afterHit: current legacy path always hits; no RNG drawn.
-          const damage = calculateLegacyDamage(actor, target, action.skill.legacyTech, input.floorSpecialty, action.reaction !== null);
+          const baseDamage = calculateLegacyDamage(actor, target, action.skill.legacyTech, input.floorSpecialty, action.reaction !== null);
+          const { damage, poisonBonusDamage, statusApplications } = resolveImpactStatuses(target, action.skill, baseDamage, rng);
           const hpBefore = target.currentHp;
           target.currentHp = Math.max(0, hpBefore - damage);
           target.legacy.damageTakenThisTurn = damage;
           const appliedEffects = applyLegacyImpactEffects(actor, target, action, damage);
           target.isAlive = target.side === 'player' || target.currentHp > 0;
           entry.resourceAlerts.push(...depletionAlert(target, 'hp', hpBefore, target.currentHp));
-          entry.effectiveTargetIds.push(target.id);
-          entry.impacts.push({ targetId: target.id, targetName: target.name, hpBefore, hpAfter: target.currentHp, damage, healing: 0, outcome: target.isAlive ? 'hit' : 'ko', ko: !target.isAlive, appliedEffects });
+          if (!entry.effectiveTargetIds.includes(target.id)) entry.effectiveTargetIds.push(target.id);
+          entry.impacts.push({ targetId: target.id, targetName: target.name, hpBefore, hpAfter: target.currentHp, baseDamage, poisonBonusDamage, statusApplications, damage, healing: 0, outcome: target.isAlive ? 'hit' : 'ko', ko: !target.isAlive, appliedEffects });
           legacyCounterPolicy(state, action, target, acted);
           // Preserve old generic chain only for Single-target compatibility inputs.
           if (action.skill.canonicalSkillId === null && action.skill.legacyTech.target === 'Single' && legacyChainContinues(action, !target.isAlive)) {
@@ -107,7 +125,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           }
         }
         afterLegacyAction(actor);
-        action.state = 'resolved'; entry.state = 'resolved'; entry.outcome = 'hit';
+        action.state = 'resolved'; entry.state = 'resolved';
         // Custom legacy chains have no measured multi-execution timing claim.
         const timing = resolveActionTiming({ actionKind: action.kind, timingClass: entry.timingClass,
           effectiveTargetCount: entry.effectiveTargetIds.length, outcome: entry.outcome });
@@ -116,7 +134,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         outcome = completedOutcome(state);
         if (outcome) { finishPending(); return result(outcome); }
       }
-      // Round cleanup hook: natural status recovery stays at the future action-time hook.
+      // No round-based status recovery, cure or Poison tick.
     }
     return result('limit-reached', [`Operational maxRounds (${maxRounds}) reached; no winner assigned.`]);
   } catch (error) {
