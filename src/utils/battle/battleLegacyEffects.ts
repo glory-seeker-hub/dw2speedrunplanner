@@ -28,5 +28,5 @@ export function applyLegacyImpactEffects(actor: BattleCombatantState, target: Ba
 }
 /** Legacy chain remains reachable only for explicitly supplied old specialEffect. */
 export const legacyChainContinues = (action: PlannedAction, ko: boolean) => ko && action.skill?.legacyTech.specialEffect?.type === 'chainOnKill';
-/** afterAction / future cleanup hook; MP/status/Guard stay untouched. */
+/** afterAction legacy cleanup; resource accounting is separate. */
 export const afterLegacyAction = (actor: BattleCombatantState) => { actor.legacy.damageTakenThisTurn = 0; };

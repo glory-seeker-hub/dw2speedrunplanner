@@ -1,0 +1,27 @@
+{
+  "measurements": [
+    {
+      "count": 1,
+      "ms": 5.1684999999999945
+    },
+    {
+      "count": 100,
+      "ms": 18.35590000000002
+    },
+    {
+      "count": 1000,
+      "ms": 115.24419999999998
+    }
+  ],
+  "actionCount": 21,
+  "recordCount": 24,
+  "impactCount": 33,
+  "shadowScythe": {
+    "count": 1000,
+    "ms": 27.868099999999913,
+    "actionCount": 3,
+    "recordCount": 6,
+    "impactCount": 3,
+    "totalFrames": 2055
+  }
+}

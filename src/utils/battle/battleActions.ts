@@ -15,13 +15,14 @@ export function nextActionId(state: BattleState): string {
   return `s${state.simulationIndex}-r${state.round}-a${state.nextActionNumber++}`;
 }
 export function planAction(state: BattleState, actor: BattleCombatantState, choice: ActionChoice): PlannedAction {
-  const skill = choice.kind === 'skill' ? actor.skills.find(s => s.key === choice.skillKey) : null;
-  if (choice.kind === 'skill' && !skill) throw new BattleInputError(`Policy selected unknown skill ${choice.skillKey}.`);
+  if (choice.kind !== 'skill') throw new BattleInputError('Guard and other non-skill choices are excluded from simulation.', 'unsupported');
+  const skill = actor.skills.find(s => s.key === choice.skillKey);
+  if (!skill) throw new BattleInputError(`Policy selected unknown skill ${choice.skillKey}.`);
   const targetIntent: TargetIntent = choice.kind === 'skill' && choice.targetIntent ? structuredClone(choice.targetIntent) : {
     kind: 'opponents', side: actor.side === 'player' ? 'enemy' : 'player', selection: skill?.legacyTech.target === 'All' ? 'all' : 'random-at-execution',
   };
-  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill?.legacyTech.isCounter ? 'legacy-counter-last' as const : 'normal' as const, reaction: null };
-  const action: PlannedAction = skill ? { ...base, kind: skill.kind, skill } : { ...base, kind: 'guard', skill: null };
+  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill?.legacyTech.isCounter ? 'legacy-counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };
+  const action: PlannedAction = { ...base, kind: skill.kind, skill };
   actor.plannedActionId = action.id;
   state.plannedActions.push(action);
   return action;

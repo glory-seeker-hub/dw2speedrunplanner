@@ -1,0 +1,19 @@
+{
+  "measurements": [
+    {
+      "count": 1,
+      "ms": 4.282699999999977
+    },
+    {
+      "count": 100,
+      "ms": 12.567600000000084
+    },
+    {
+      "count": 1000,
+      "ms": 103.36419999999998
+    }
+  ],
+  "actionCount": 6,
+  "recordCount": 8,
+  "impactCount": 10
+}

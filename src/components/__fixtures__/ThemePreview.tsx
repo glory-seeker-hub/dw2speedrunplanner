@@ -12,7 +12,9 @@ import { TradeControls } from '@/components/run-planner/TradeControls';
 import { DnaControls } from '@/components/run-planner/DnaControls';
 import { TechniqueChoiceControls } from '@/components/run-planner/TechniqueChoiceControls';
 import { BattleResults } from '@/components/BattleResults';
-import { SimulationResult } from '@/types/digimon';
+import { runBattleSimulation } from '@/utils/battleEngine';
+import { createSeededBattleRng } from '@/utils/battle/battleRng';
+import { getTechByName } from '@/utils/techLookup';
 
 const run = createRunPlan('gold-hawk', 'Visual fixture');
 run.roster = ['D-Tyrannomon', 'Nanimon', 'ToyAgumon', 'Cherrymon', 'MasterTyrannomon'].map((name, index) => {
@@ -26,12 +28,9 @@ run.roster = ['D-Tyrannomon', 'Nanimon', 'ToyAgumon', 'Cherrymon', 'MasterTyrann
 run.digiline = run.roster.slice(0, 2).map(p => p.instanceId);
 const choice = buildTechniqueChoice(createAvailableTechniqueState(['Pepper Breath', 'Fire Blast', 'Party Time'],
   { type: 'inherited', parentInstanceId: 'fixture-parent' }), ['Fire Blast', 'Party Time']);
-const results: SimulationResult = { winRate: 86.5, totalSimulations: 200, minTurns: 2, avgTurns: 4.3, maxTurns: 8,
-  minTime: 12, avgTime: 24.5, maxTime: 44,
-  fastestBattleHistory: [{ turn: 1, round: 1, digimon: 'Agumon', tech: 'Pepper Breath', target: 'Biyomon', damage: 32,
-    hpRemaining: 0, result: 'KO', timeSeconds: 6, targetsHit: 1 }],
-  fastestBattleByTime: [{ turn: 1, round: 1, digimon: 'Agumon', tech: 'Pepper Breath', target: 'Biyomon', damage: 32,
-    hpRemaining: 0, result: 'KO', timeSeconds: 6, targetsHit: 1 }] };
+const fixtureMember = (name: string) => ({ digimon: getDigimonByName(name)!,
+  customStats: { hp: 10, mp: 1, atk: 20, def: 20, spd: 20 }, techs: [getTechByName('Pepper Breath')!] });
+const results = runBattleSimulation([fixtureMember('Agumon')], [fixtureMember('Biyomon')], 'None', 1, { rng: createSeededBattleRng(42) });
 
 export function ThemePreview() {
   const [selections, setSelections] = useState([{ instanceId: 'fixture', keptKeys: choice.candidates.map(p => p.key) }]);

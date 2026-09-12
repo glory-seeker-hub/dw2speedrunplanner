@@ -22,7 +22,7 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
     return true;
   });
   if (deferred.length) return { level: 'future-mechanic-unsupported', reasons: ['Canonical effects are described but not executed by this resolver.'] };
-  return { level: 'legacy-compatibility', reasons: ['Legacy damage/targeting/effect path; timing and full effects resolution remain deferred.'] };
+  return { level: 'legacy-compatibility', reasons: ['Legacy damage/targeting/effect path; unmeasured timing classes and full effects resolution remain deferred.'] };
 }
 export function assessBattleScenario(input: BattleInput) {
   try {

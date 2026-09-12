@@ -105,7 +105,7 @@ for (const count of [1, 2, 3]) test(`one AOE execution produces ${count} indepen
   assert.equal(a.impacts.length, count); assert.equal(new Set(a.impacts.map(i => i.targetId)).size, count);
   assert.deepEqual(a.impacts.map(i => i.hpBefore), enemies.map(e => e.customStats.hp));
   assert.ok(a.impacts.every(i => i.hpAfter === Math.max(0, i.hpBefore - i.damage)));
-  assert.equal(a.durationFrames, null); assert.equal(a.canonicalSkillId, getBattleSkillByName('Triple Forces').id);
+  assert.equal(a.durationFrames, [703, 873, 990][count - 1]); assert.equal(a.canonicalSkillId, getBattleSkillByName('Triple Forces').id);
   assert.equal(r.actionCount, executed(r).length);
 });
 test('Single action has one impact and preserves normal damage', () => {
@@ -158,10 +158,10 @@ test('normal battle below maxRounds still completes', () => {
 test('legacy public API rejects incomplete batch rather than counting a fabricated victory', () => {
   assert.throws(() => runBattleSimulation(...cases.single, 'None', 1, { maxRounds: 1, rng: zeros() }), /limit-reached/);
 });
-test('runtime state explicitly tracks HP/MP, positions and future state slots without MP consumption', () => {
+test('runtime state tracks HP/MP with Phase 2K-D resource accounting and future status slots', () => {
   const r = run(...cases.single); const a = r.state.combatants[0];
-  assert.equal(a.currentMp, a.maxMp); assert.equal(a.maxHp, 80); assert.equal(a.side, 'player'); assert.equal(a.position, 0);
-  assert.deepEqual(a.statuses, {}); assert.deepEqual(a.temporaryPowers, {}); assert.equal(a.guarding, false);
+  assert.ok(a.currentMp < a.maxMp); assert.equal(a.maxHp, 80); assert.equal(a.side, 'player'); assert.equal(a.position, 0);
+  assert.deepEqual(a.statuses, {}); assert.deepEqual(a.temporaryPowers, {}); assert.equal(a.guarding, undefined);
 });
 test('input snapshots are isolated and caller instance IDs are preserved', () => {
   const p = structuredClone(cases.single[0]); p[0].instanceId = 'planner-slot-future'; const original = structuredClone(p);
@@ -169,10 +169,10 @@ test('input snapshots are isolated and caller instance IDs are preserved', () =>
   assert.equal(r.state.combatants[0].sourceInstanceId, 'planner-slot-future');
   assert.equal(r.state.combatants[0].id, 'player-instance-planner-slot-future');
 });
-test('Guard can be planned, but is unsupported and has no MP/DEF behavior', () => {
+test('Guard is rejected before planning and has no MP/DEF behavior', () => {
   const r = run(...cases.single, { actionPolicy: { chooseAction: () => ({ kind: 'guard' }) } });
   assert.equal(r.outcome, 'unsupported'); assert.equal(r.winner, null);
-  assert.equal(r.actions[0].kind, 'guard'); assert.equal(r.actions[0].canonicalSkillId, null);
+  assert.deepEqual(r.actions, []); assert.deepEqual(r.state.plannedActions, []);
   assert.ok(r.state.combatants.every(a => a.currentMp === a.maxMp && Object.keys(a.parameterModifiers).length === 0));
 });
 test('policy-selected Assist keeps canonical kind but does not receive invented resolution', () => {
@@ -228,7 +228,7 @@ test('support diagnostic distinguishes unknown, incomplete and future mechanics'
 test('canonical effects are not executed alongside legacy effects', () => {
   const r = run([member('P', [tech('Poison Ivy')], { spd: 100 })], cases.single[1]);
   assert.ok(r.state.combatants.every(a => Object.keys(a.statuses).length === 0));
-  assert.ok(r.actions.every(a => a.durationFrames === null));
+  assert.ok(executed(r).every(a => a.outcome === 'hit')); // Timing now measured; status resolution remains deferred.
 });
 test('a planned action can be cancelled before execution without changing its identity', () => {
   const { state, actions } = preparation(); const id = actions[0].id;
