@@ -6,7 +6,7 @@ import type { BattleRng } from './battleRng';
 export type BattleStatus = 'poison' | 'paralysis' | 'confusion';
 export type StatusSnapshot = Record<BattleStatus, boolean>;
 export interface StatusRecoveryResult { status: 'paralysis' | 'confusion'; roll: number; recovered: boolean }
-export interface StatusApplicationResult { status: BattleStatus; roll: number; successesOutOf3: 1 | 2; applied: boolean; alreadyActive: boolean }
+export interface StatusApplicationResult { status: BattleStatus; roll: number | null; successesOutOf3: 1 | 2 | null; condition?: 'counter-activated'; applied: boolean; alreadyActive: boolean }
 export const statusSnapshot = (actor: BattleCombatantState): StatusSnapshot => ({ poison: !!actor.statuses.poison, paralysis: !!actor.statuses.paralysis, confusion: !!actor.statuses.confusion });
 export function recoverStatuses(actor: BattleCombatantState, rng: BattleRng): StatusRecoveryResult[] {
   const results: StatusRecoveryResult[] = [];
@@ -33,10 +33,17 @@ export function applyDirectStatuses(target: BattleCombatantState, effects: reado
   }
   return results;
 }
-export function resolveImpactStatuses(target: BattleCombatantState, skill: BattleSkillSelection, baseDamage: number, rng: BattleRng) {
+export function resolveImpactStatuses(target: BattleCombatantState, skill: BattleSkillSelection, baseDamage: number, rng: BattleRng, activatedCounter = false) {
   const wasPoisoned = !!target.statuses.poison;
   const canonical = skill.canonicalSkillId === null ? undefined : getBattleSkillById(skill.canonicalSkillId);
   const statusApplications = applyDirectStatuses(target, canonical?.effects ?? [], rng);
+  if (activatedCounter) for (const effect of canonical?.effects ?? []) {
+    if (effect.kind !== 'status-application' || effect.condition !== 'counter-triggered' || effect.chancePercent !== 100) continue;
+    if (effect.status !== 'poison' && effect.status !== 'paralysis' && effect.status !== 'confusion') continue;
+    const alreadyActive = !!target.statuses[effect.status];
+    target.statuses[effect.status] = true;
+    statusApplications.push({ status: effect.status, roll: null, successesOutOf3: null, condition: 'counter-activated', applied: true, alreadyActive });
+  }
   const poisonBonusDamage = wasPoisoned || statusApplications.some(s => s.status === 'poison' && s.applied) ? 10 : 0;
   return { statusApplications, poisonBonusDamage, damage: baseDamage + poisonBonusDamage };
 }

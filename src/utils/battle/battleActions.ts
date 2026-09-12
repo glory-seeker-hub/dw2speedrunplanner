@@ -21,8 +21,8 @@ export function planAction(state: BattleState, actor: BattleCombatantState, choi
   const targetIntent: TargetIntent = choice.kind === 'skill' && choice.targetIntent ? structuredClone(choice.targetIntent) : {
     kind: 'opponents', side: actor.side === 'player' ? 'enemy' : 'player', selection: skill?.legacyTech.target === 'All' ? 'all' : 'random-at-execution',
   };
-  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill?.legacyTech.isCounter ? 'legacy-counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };
-  const action: PlannedAction = { ...base, kind: skill.kind, skill };
+  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill.kind === 'counter' ? 'counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };
+  const action: PlannedAction = { ...base, kind: skill.kind, skill, counter: skill.kind === 'counter' ? { selected: true, executionMode: 'waiting', activatedMechanics: false } : null };
   actor.plannedActionId = action.id;
   state.plannedActions.push(action);
   return action;

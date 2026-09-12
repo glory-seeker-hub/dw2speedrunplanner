@@ -6,9 +6,10 @@ export function beforeLegacyAction(actor: BattleCombatantState, action: PlannedA
   if (actor.legacy.lastTechUsed === name) actor.legacy.consecutiveTechCount++;
   else { actor.legacy.lastTechUsed = name; actor.legacy.consecutiveTechCount = 1; }
 }
-/** afterImpact hook. No canonical effects[] resolver runs alongside this path. */
+/** Ordinary compatibility effects only; Counter descriptors have their own resolver. */
 export function applyLegacyImpactEffects(actor: BattleCombatantState, target: BattleCombatantState, action: PlannedAction, damage: number): BattleImpact['appliedEffects'] {
   const applied: BattleImpact['appliedEffects'] = [];
+  if (action.kind === 'counter' && action.skill.canonicalSkillId !== null) return applied;
   const effect = action.skill?.legacyTech.specialEffect;
   if (effect?.type === 'healOnDamage') {
     const before = actor.currentHp;

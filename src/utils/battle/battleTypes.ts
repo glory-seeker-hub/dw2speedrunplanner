@@ -15,8 +15,18 @@ export interface BattleSkillSelection {
   canonicalSkillId: number | null;
   kind: ActionKind;
   source: 'legacy-known-technique' | 'legacy-custom-technique' | 'synthetic-legacy-fallback';
-  /** The sole executed effect path in this phase; canonical effects stay diagnostic. */
+  /** Compatibility input for the retained base damage and ordinary legacy effects. */
   legacyTech: Tech;
+}
+export type CounterExecutionMode = 'activated' | 'shared-trigger-promoted' | 'untriggered-end-of-turn';
+export interface CounterRuntimeState {
+  selected: true;
+  executionMode: 'waiting' | CounterExecutionMode | 'resolved';
+  activatedMechanics: boolean;
+  triggerActionId?: string; triggerActorId?: string; triggerActorName?: string;
+  triggerImpactTargetId?: string; damageReceivedFromTrigger?: number;
+  targetRule?: 'causal-attacker' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement';
+  replacedByConfusion?: boolean;
 }
 export interface BattleCombatantState {
   id: string;
@@ -37,7 +47,6 @@ export interface BattleCombatantState {
   isAlive: boolean;
   skills: BattleSkillSelection[];
   plannedActionId: string | null;
-  reaction: { counterUsed: boolean; isCountering: boolean };
   legacy: { lastTechUsed?: string; consecutiveTechCount: number; damageTakenThisTurn: number };
   statuses: Partial<Record<Ailment | 'poison-body' | 'zombie' | 'invisibility' | 'invincibility', true>>;
   temporaryPowers: Partial<Record<SkillElement | 'poison' | 'paralysis' | 'confusion', true>>;
@@ -48,7 +57,8 @@ export type TargetIntent =
 export interface ReactionContext { reactionToActionId: string; triggeredByActorId: string; counterActorId: string }
 interface PlannedActionBase {
   id: string; round: number; actorId: string; targetIntent: TargetIntent;
-  state: ActionState; initiative: number | null; priority: 'normal' | 'legacy-counter-last' | 'legacy-reaction';
+  state: ActionState; initiative: number | null; priority: 'normal' | 'counter-last' | 'counter-promoted';
+  counter: CounterRuntimeState | null;
   reaction: ReactionContext | null;
   chainFromActionId: string | null;
 }
@@ -72,13 +82,13 @@ export interface BattleActionRecord {
   skillKey: string | null; skillName: string | null; canonicalSkillId: number | null;
   kind: BattleActionKind; source: BattleSkillSelection['source'];
   targetIntent: TargetIntent; effectiveTargetIds: string[]; impacts: BattleImpact[];
-  reaction: ReactionContext | null; state: ActionState; reason?: string;
+  reaction: ReactionContext | null; counter: CounterRuntimeState | null; state: ActionState; reason?: string;
   accuracy: AccuracyResolution | null; statusesBefore: StatusSnapshot; statusesAfterRecovery: StatusSnapshot;
   statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution | null;
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
   timingDiagnostics: string[]; chainFromActionId: string | null;
   resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
-  mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete' } | null;
+  mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete'; payerCombatantId: string | null; payerName: string | null; payerSide: BattleSide | null; paymentRule: 'own' | 'counter-triggering-actor' | 'shadow-scythe-free-repeat' | 'none-on-miss' | 'unknown' } | null;
 }
 export interface BattleState {
   combatants: BattleCombatantState[];
