@@ -12,9 +12,9 @@ const canonicalIds = new Map(LEGACY_TECH_IDENTITIES.map(([id, legacyId]) => [leg
 export function linkLegacySkill(tech: Tech & { canonicalSkillId?: number }): BattleSkillSelection {
   const explicit = tech.canonicalSkillId;
   const byName = getBattleSkillByName(tech.name);
-  // The reviewed 0x4D exception requires a numeric or reviewed legacy identity.
+  // The reviewed 0x4D and 0x85 exceptions require a numeric or reviewed legacy identity.
   // A custom technique borrowing the display name cannot acquire the rule.
-  const canonical = explicit !== undefined ? getBattleSkillById(explicit) : getBattleSkillById(canonicalIds.get(tech.id) ?? -1) ?? (byName?.id === 0x4d ? undefined : byName);
+  const canonical = explicit !== undefined ? getBattleSkillById(explicit) : getBattleSkillById(canonicalIds.get(tech.id) ?? -1) ?? ([0x4d, 0x85].includes(byName?.id ?? -1) ? undefined : byName);
   if (explicit !== undefined && !canonical) throw new BattleInputError(`Unknown WAZADATA identity ${explicit}.`);
   return { key: tech.id, canonicalSkillId: canonical?.id ?? null, kind: canonical?.actionKind ?? (tech.isCounter ? 'counter' : 'attack'), source: canonical ? 'legacy-known-technique' : 'legacy-custom-technique', legacyTech: { ...tech, ...(tech.specialEffect ? { specialEffect: { ...tech.specialEffect } } : {}) } };
 }
@@ -32,7 +32,7 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     baseStats: { ...member.customStats }, maxHp: member.customStats.hp, currentHp: member.customStats.hp,
     maxMp: member.customStats.mp, currentMp: member.customStats.mp, isAlive: side === 'player' || member.customStats.hp > 0,
     parameterModifiers: {}, skills, plannedActionId: null,
-    reaction: { counterUsed: false, isCountering: false }, legacy: { consecutiveTechCount: 0, damageTakenThisTurn: 0 },
+    legacy: { consecutiveTechCount: 0, damageTakenThisTurn: 0 },
     statuses: initialStatuses, temporaryPowers: {},
   };
   validateCombatant(actor);

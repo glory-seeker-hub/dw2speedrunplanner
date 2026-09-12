@@ -5,3 +5,6 @@ export { assessBattleSkill, assessBattleScenario } from '@/utils/battle/battleSu
 export { resolveActionTiming, summarizeBattleTiming, ACTION_TIMING_PROFILE } from '@/utils/battle/battleTiming';
 export { aggregateBattleRuns } from '@/utils/battle/battleCompatibility';
 export type { BattleEngineOptions, BattleRunResult, BattleCombatantState, PlannedAction, BattleActionRecord, BattleImpact, ActionPolicy } from '@/utils/battle/battleTypes';
+
+export { canInterruptCounter } from '@/utils/battle/battleReactions';
+export type { CounterRuntimeState, CounterExecutionMode } from '@/utils/battle/battleTypes';

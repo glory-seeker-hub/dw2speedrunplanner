@@ -23,7 +23,7 @@ for(const [kind,count,frames] of [['single-target',1,685],['aoe',1,703],['aoe',2
 for(const kind of ['single-target','aoe','field-all','unknown']) for(const count of [0,1,3,7]) test(`explicit full ${kind} Miss against ${count} costs 194 once`,()=>assert.deepEqual(resolve(kind,count,'miss'),{durationFrames:194,diagnostics:[]}));
 for(const outcome of ['cancelled','skipped','unsupported','invalid']) test(`${outcome} is not a 194f Miss`,()=>{const r=resolve('single-target',1,outcome);assert.equal(r.durationFrames,null);assert.ok(r.diagnostics.length);});
 for(const [kind,count] of [['unknown',1],['aoe',4],['field-all',1],['field-all',7],['single-target',2],['single-target',0],['aoe',1.5],['aoe',NaN],['aoe',Infinity]]) test(`no interpolation: ${kind} / ${count}`,()=>{const r=resolve(kind,count);assert.equal(r.durationFrames,null);assert.ok(r.diagnostics.length);});
-for(const kind of ['counter','interrupt','assist']) test(`no guessed ${kind} successful duration`,()=>assert.equal(resolve('single-target',1,'hit',kind).durationFrames,null));
+for(const kind of ['interrupt','assist']) test(`no guessed ${kind} successful duration`,()=>assert.equal(resolve('single-target',1,'hit',kind).durationFrames,null));
 test('Guard has no timing even for an untyped purported Miss',()=>assert.equal(resolve('single-target',1,'miss','guard').durationFrames,null));
 for(const count of [1,2,3]) test(`AOE ${count} impacts charge exactly one action duration`,()=>{
  const r=run([member('P',[tech('Triple Forces')],{spd:100})],foes(count));const a=executed(r)[0];
@@ -59,9 +59,9 @@ test('total equals measured executed actions; cancelled and skipped contribute n
  const r=run(...cases.koSkip);assert.equal(r.totalFrames,executed(r).reduce((sum,a)=>sum+a.durationFrames,0));assert.ok(r.actions.some(a=>a.state==='skipped'));
  assert.ok(r.actions.filter(a=>a.state==='skipped').every(a=>a.durationFrames===null));
 });
-test('legacy Counter timings remain incomplete including otherwise measured Attacks',()=>{
- const r=run(...cases.counter);assert.equal(r.timingCompleteness,'incomplete');assert.equal(r.totalFrames,null);assert.ok(r.knownFrames>0);
- assert.ok(executed(r).filter(a=>a.kind==='counter').every(a=>a.durationFrames===null && a.timingDiagnostics.length));
+test('Counter Single hits use measured timing',()=>{
+ const r=run(...cases.counter);assert.equal(r.timingCompleteness,'complete');assert.equal(r.totalFrames,r.knownFrames);
+ assert.ok(executed(r).filter(a=>a.kind==='counter').every(a=>a.durationFrames===685 && !a.timingDiagnostics.length));
 });
 test('one impact Miss never infers a full action Miss',()=>{
  const a=structuredClone(executed(run(...cases.aoe))[0]);a.impacts[0].outcome='miss';assert.equal(a.outcome,'hit');
@@ -104,13 +104,13 @@ test('MP positive-to-zero transition alerts once for player, never for enemy',()
 });
 test('normal sufficient MP subtracts exact WAZADATA cost, not a caller-supplied cost',()=>{
  const r=run([member('P',[tech('Rock Fist',{mpCost:999})],{mp:50,spd:100})],foes(1));const a=executed(r)[0];
- const cost=getBattleSkillById(a.canonicalSkillId).mpCost;assert.deepEqual(a.mpAccounting,{before:50,costCharged:cost,after:50-cost,completeness:'complete'});
+ const cost=getBattleSkillById(a.canonicalSkillId).mpCost;assert.deepEqual(a.mpAccounting,{before:50,costCharged:cost,after:50-cost,completeness:'complete',payerCombatantId:'player-0',payerName:'P',payerSide:'player',paymentRule:'own'});
 });
-test('special Counter payer stays isolated and reports exact 0x89 limitation',()=>{
+test('activated 0x89 charges the causal actor',()=>{
  const skill=tech('Pummel Whack');assert.ok(skill.id);
  const r=run([member('P',[skill],{mp:50})],[member('E',[tech('Rock Fist')],{hp:1000})],{maxRounds:1});
- const a=executed(r).find(a=>a.canonicalSkillId===0x89);assert.ok(a);assert.deepEqual(a.mpAccounting,{before:50,costCharged:null,after:50,completeness:'incomplete'});
- assert.match(a.resourceDiagnostics.join(),/0x89 Pummel Whack.*payer unresolved/);
+ const a=executed(r).find(a=>a.canonicalSkillId===0x89);assert.ok(a);assert.deepEqual(a.mpAccounting,{before:42,costCharged:20,after:22,completeness:'complete',payerCombatantId:'enemy-0',payerName:'E',payerSide:'enemy',paymentRule:'counter-triggering-actor'});
+ assert.deepEqual(a.resourceDiagnostics,[]); assert.equal(r.state.combatants[0].currentMp,50);
  assert.deepEqual(BATTLE_SKILLS.filter(s=>s.effects.some(e=>e.kind==='counter-payment')).map(s=>s.id),[0x89]);
 });
 test('unknown custom/synthetic MP has explicit limitation instead of an invented cost',()=>{
@@ -196,7 +196,7 @@ test('custom legacy chain remains labeled custom and has no canonical MP/timing 
 });
 
 test('victory-only aggregates exclude invalid/unsupported/limit/defeat and select actual frame minimum',()=>{
- const slow=shadow(3),fast=shadow(1),middle=shadow(2),unknown=run(...cases.counter);
+ const slow=shadow(3),fast=shadow(1),middle=shadow(2),unknown=unknownVictory();
  const invalid=run([member('P',[tech('Rock Fist')],{def:0})],foes(1));
  const unsupported=run(...cases.single,{actionPolicy:{chooseAction:()=>({kind:'guard'})}});
  const limit=resourceRun();const defeat={...fast,outcome:'enemy-win',winner:'enemy',totalFrames:1};
@@ -206,7 +206,7 @@ test('victory-only aggregates exclude invalid/unsupported/limit/defeat and selec
  assert.equal(batch.totalSimulations,8);assert.equal(batch.winRate,50);
 });
 test('no complete timed victories yields null aggregates, no Infinity or invented zero',()=>{
- const batch=aggregateBattleRuns([resourceRun(),run(...cases.counter)]);assert.equal(batch.minFrames,null);assert.equal(batch.avgFrames,null);assert.equal(batch.maxFrames,null);assert.deepEqual(batch.fastestBattleByFrames,[]);
+ const batch=aggregateBattleRuns([resourceRun(),unknownVictory()]);assert.equal(batch.minFrames,null);assert.equal(batch.avgFrames,null);assert.equal(batch.maxFrames,null);assert.deepEqual(batch.fastestBattleByFrames,[]);
  const empty=aggregateBattleRuns([]);assert.equal(empty.minTurns,null);assert.equal(empty.avgTurns,null);assert.equal(empty.maxTurns,null);
 });
 test('public result contains frames and action histories, no obsolete seconds fields',()=>{
@@ -226,9 +226,11 @@ test('BattleResults renders frames, action-level impacts, MP traces and informat
 });
 test('BattleResults visibly explains incomplete timing and excludes obsolete thresholds',()=>{
  const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');const {BattleResults}=load('src/components/BattleResults.tsx');
- const html=renderToStaticMarkup(React.createElement(BattleResults,{results:aggregateBattleRuns([run(...cases.counter)])}));assert.match(html,/incomplete timing/);assert.match(html,/No proven measured timing for counter/);
+ const html=renderToStaticMarkup(React.createElement(BattleResults,{results:aggregateBattleRuns([unknownVictory()])}));assert.match(html,/incomplete timing/);assert.match(html,/unknown, 1 effective targets/);
  const source=fs.readFileSync('src/components/BattleResults.tsx','utf8');assert.doesNotMatch(source,/minTime|maxTime|avgTime|timeSeconds|> 200|< 50/);
 });
 test('Guard has no selection option in BattleSimulation UI or Team Builder',()=>{
  for(const file of ['src/components/BattleSimulation.tsx','src/components/TeamBuilder.tsx'])assert.doesNotMatch(fs.readFileSync(file,'utf8'),/value=["']guard["']|kind: ["']guard["']/i);
 });
+
+function unknownVictory() { return run([member('Custom',[{...tech('Rock Fist'),id:'custom',name:'Custom'}],{spd:100,atk:1000})],foes(1)); }

@@ -1,3 +1,5 @@
+import { counterDefinition, usesActivatedCounterMechanics } from './battleReactions';
+import type { PlannedAction } from './battleTypes';
 import type { Tech } from '@/types/digimon';
 import { BattleCombatantState, BattleInputError } from './battleTypes';
 
@@ -48,26 +50,13 @@ export function calculateLegacyDamage(
   attacker: BattleCombatantState,
   defender: BattleCombatantState,
   tech: Tech,
-  floorSpecialty: string,
-  isCounterAttack: boolean = false
+  floorSpecialty: string
 ): number {
   const typeBonus = getTypeBonus(attacker.type, defender.type);
   const specialtyBonus = getSpecialtyBonus(tech.element, defender.specialty);
 
   // Handle special effects that modify AP
   let attackPower = tech.ap;
-
-  // Legacy returned-damage approximation.
-  if (isCounterAttack && tech.specialEffect?.type === 'counterDamageMultiplier' && attacker.legacy.damageTakenThisTurn) {
-    const returned = Math.floor(attacker.legacy.damageTakenThisTurn * (tech.specialEffect.value || 1.5));
-    if (!Number.isFinite(returned) || returned < 0) throw new BattleInputError('Invalid returned-damage arithmetic.');
-    return returned;
-  }
-
-  // Counter AP multiplier effects
-  if (isCounterAttack && (tech.specialEffect?.type === 'counterApMultiplier' || tech.specialEffect?.type === 'counterApMultiplierAndTargetAll')) {
-    attackPower *= (tech.specialEffect.value || 1.5);
-  }
 
   // Legacy consecutive-use bonus, including the unvalidated +25 cap.
   if (tech.specialEffect?.type === 'consecutiveApIncrease' && attacker.legacy.lastTechUsed === tech.name && attacker.legacy.consecutiveTechCount) {
@@ -88,4 +77,20 @@ export function calculateLegacyDamage(
 
   if (![attackPower, attack, defense, baseDamage, adjustedDefense, finalDamage].every(Number.isFinite) || adjustedDefense <= 0 || finalDamage < 0) throw new BattleInputError('Invalid damage arithmetic or effective DEF.');
   return finalDamage;
+}
+
+/** Counter descriptors modify damage output, not AP. Floor base formula first,
+ * then each documented output multiplier; causal return replaces base damage.
+ * Poison is added by the status resolver after this function. */
+export function calculateActionDamage(attacker: BattleCombatantState, defender: BattleCombatantState, action: PlannedAction, floorSpecialty: string): number {
+  const canonical = counterDefinition(action);
+  const tech = action.kind === 'counter' && canonical?.attackPower !== null && canonical?.attackPower !== undefined
+    ? { ...action.skill.legacyTech, ap: canonical.attackPower, specialEffect: undefined } : action.skill.legacyTech;
+  let damage = calculateLegacyDamage(attacker, defender, tech, floorSpecialty);
+  if (usesActivatedCounterMechanics(action)) for (const effect of canonical?.effects ?? []) {
+    if (effect.kind !== 'damage-modifier' || effect.condition !== 'counter-triggered') continue;
+    damage = Math.floor((effect.modifier === 'returned-damage' ? action.counter!.damageReceivedFromTrigger! : damage) * effect.multiplier);
+  }
+  if (!Number.isFinite(damage) || damage < 0) throw new BattleInputError('Invalid Counter damage arithmetic.');
+  return damage;
 }

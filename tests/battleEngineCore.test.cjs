@@ -133,7 +133,7 @@ test('queues empty on normal completion and operational limit', () => {
   assert.deepEqual(run(...cases.single).state.queue, []);
   assert.deepEqual(run(...cases.single, { maxRounds: 1 }).state.queue, []);
 });
-test('Counter reaction has separate ID and correct causal actor/action linkage', () => {
+test('Counter promotion preserves its intention ID and correct causal actor/action linkage', () => {
   const r = run(...cases.counter);
   const reaction = executed(r).find(a => a.reaction);
   assert.ok(reaction); assert.equal(reaction.kind, 'counter');
@@ -141,9 +141,10 @@ test('Counter reaction has separate ID and correct causal actor/action linkage',
   assert.equal(reaction.reaction.triggeredByActorId, cause.actorId);
   assert.equal(reaction.reaction.counterActorId, reaction.actorId);
   assert.notEqual(reaction.id, cause.id);
-  assert.ok(r.actions.some(a => a.actorId === reaction.actorId && a.state === 'cancelled'));
+  assert.equal(r.state.plannedActions.filter(a => a.round === reaction.round && a.actorId === reaction.actorId).length, 1);
+  assert.equal(r.actions.filter(a => a.id === reaction.id).length, 1);
 });
-test('Counter non-trigger behavior remains legacy offense with no fabricated reaction context', () => {
+test('Counter non-trigger behavior uses base offense with no fabricated reaction context', () => {
   const r = run(...cases.noCounter);
   const counters = executed(r).filter(a => a.kind === 'counter');
   assert.ok(counters.length); assert.ok(counters.every(a => a.reaction === null));

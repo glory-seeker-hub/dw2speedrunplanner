@@ -49,14 +49,14 @@ for(const condition of ['counter-triggered','interrupt-triggered'])test(`conditi
 for(const id of [1,107,15,105,62,66,69,228])test(`status source uses canonical descriptors at ID ${id}`,()=>{
  const skill=linkLegacySkill({...tech('Pepper Breath'),id:`renamed-${id}`,name:'Arbitrary name',canonicalSkillId:id});const s=prep();const result=resolveImpactStatuses(s.combatants[1],skill,20,zeros());const direct=getBattleSkillById(id).effects.filter(e=>e.kind==='status-application'&&e.condition==='always');assert.equal(result.statusApplications.length,direct.length);assert.ok(result.statusApplications.every(a=>a.applied));
 });
-test('normal Miss pays MP, costs 194, preserves target IDs and has no impacts/effect RNG',()=>{
- const rng=choices({accuracy:[127]});const r=run([unit('P','Poison Ivy',{spd:20})],[unit('E','Rock Fist',{spd:20})],{rng});const a=executed(r)[0];assert.equal(a.outcome,'miss');assert.equal(a.accuracy.cause,'normal-accuracy');assert.equal(a.durationFrames,194);assert.deepEqual(a.impacts,[]);assert.deepEqual(a.effectiveTargetIds,['enemy-0']);assert.equal(a.mpAccounting.costCharged,getBattleSkillById(1).mpCost);assert.ok(!rng.draws.some(d=>d.category.startsWith('status-apply')));assert.equal(r.state.combatants[1].statuses.poison,undefined);
+test('normal Miss costs no MP, costs 194, preserves target IDs and has no impacts/effect RNG',()=>{
+ const rng=choices({accuracy:[127]});const r=run([unit('P','Poison Ivy',{spd:20})],[unit('E','Rock Fist',{spd:20})],{rng});const a=executed(r)[0];assert.equal(a.outcome,'miss');assert.equal(a.accuracy.cause,'normal-accuracy');assert.equal(a.durationFrames,194);assert.deepEqual(a.impacts,[]);assert.deepEqual(a.effectiveTargetIds,['enemy-0']);assert.equal(a.mpAccounting.costCharged,0);assert.ok(!rng.draws.some(d=>d.category.startsWith('status-apply')));assert.equal(r.state.combatants[1].statuses.poison,undefined);
 });
-test('paralysis failure short circuits accuracy and on-hit rolls, preserving attempted MP/time',()=>{
+test('paralysis failure short circuits accuracy and on-hit rolls, preserving MP and charging Miss time',()=>{
  const p=unit('P','Poison Ivy',{spd:40},{paralysis:true});const e=unit('E','Twig Tap',{hp:0});
  // Keep a living target but make it a confused Physical skip so no later RNG is needed.
  e.customStats.hp=1000;e.initialStatuses={confusion:true};const r=run([p],[e],{rng:choices({'status-recovery-paralysis':[3],'paralysis-failure':[1],'status-recovery-confusion':[3]})});const a=executed(r)[0];
- assert.equal(a.accuracy.cause,'paralysis');assert.equal(a.accuracy.roll128,undefined);assert.equal(a.durationFrames,194);assert.equal(a.mpAccounting.costCharged,8);assert.deepEqual(a.impacts,[]);assert.equal(a.statusesAfterRecovery.paralysis,true);
+ assert.equal(a.accuracy.cause,'paralysis');assert.equal(a.accuracy.roll128,undefined);assert.equal(a.durationFrames,194);assert.equal(a.mpAccounting.costCharged,0);assert.deepEqual(a.impacts,[]);assert.equal(a.statusesAfterRecovery.paralysis,true);
  const state=prep(p);const strict=sequence([0.99]);assert.equal(resolveActionAccuracy(state.combatants[0],'attack',[state.combatants[1]],strict).cause,'paralysis');assert.equal(strict.consumed,1);
 });
 for(const [roll,outcome] of [[0,'hit'],[127,'miss']])test(`paralysis passes then accuracy ${outcome} remains separately auditable`,()=>{
@@ -100,7 +100,7 @@ for(const target of [0,1])test(`confused Single selects own-side ${target===0?'s
 for(const miss of [false,true])test(`confused AOE ${miss?'Miss':'Hit'} affects own side once and includes zero-HP players`,()=>{
  const p=unit('P','Triple Forces',{spd:100,mp:1},{confusion:true});const rng=choices({'status-recovery-confusion':[3],accuracy:[0,miss?127:0]});const r=run([p,unit('Zero','Rock Fist',{hp:0,spd:200})],[unit('E','Rock Fist',{spd:10})],{rng});
  // Zero acts first; inspect the redirected action specifically.
- const a=executed(r).find(a=>a.confusion?.redirected);assert.deepEqual(a.effectiveTargetIds,['player-0','player-1']);assert.equal(a.accuracy.referenceRule,'average-effective-target-spd');assert.equal(a.impacts.length,miss?0:2);assert.equal(a.durationFrames,miss?194:873);assert.equal(a.mpAccounting.costCharged,getBattleSkillById(a.canonicalSkillId).mpCost);
+ const a=executed(r).find(a=>a.confusion?.redirected);assert.deepEqual(a.effectiveTargetIds,['player-0','player-1']);assert.equal(a.accuracy.referenceRule,'average-effective-target-spd');assert.equal(a.impacts.length,miss?0:2);assert.equal(a.durationFrames,miss?194:873);assert.equal(a.mpAccounting.costCharged,miss?0:getBattleSkillById(a.canonicalSkillId).mpCost);
 });
 test('confused Enemy AOE includes self/living allies but excludes KO enemy allies',()=>{
  const e=unit('E','Triple Forces',{spd:100},{confusion:true});const r=run([unit()],[e,unit('Dead','Rock Fist',{hp:0}),unit('Alive','Rock Fist',{hp:1})],{rng:choices({'status-recovery-confusion':[3]})});const a=executed(r)[0];assert.deepEqual(a.effectiveTargetIds,['enemy-0','enemy-2']);assert.equal(a.impacts.length,2);assert.equal(r.state.combatants[2].isAlive,false);
@@ -135,9 +135,9 @@ test('persistent Confusion blocks Shadow Scythe while recovery allows its chain'
  const p=unit('P','Shadow Scythe',{spd:100},{confusion:true});const e=[unit('E1','Rock Fist',{hp:1}),unit('E2','Rock Fist',{hp:1})];const blocked=run([p],e,{rng:choices({'status-recovery-confusion':[3]})});assert.equal(blocked.actions[0].reason,'confusion-no-eligible-skill');assert.ok(!blocked.actions.some(a=>a.chainFromActionId));const allowed=run([p],e);assert.equal(executed(allowed).length,2);assert.equal(allowed.totalFrames,1370);
 });
 test('initial status input is validated and simulation does not mutate it',()=>{const p=unit('P','Pepper Breath',{}, {poison:true,paralysis:true,confusion:true});const before=structuredClone(p);run([p],[unit('E')]);assert.deepEqual(p,before);for(const initialStatuses of [{poison:'yes'},{freeze:true}])assert.equal(run([{...p,initialStatuses}],[unit('E')]).outcome,'invalid');});
-test('support diagnostics no longer mark direct ailments as future but retain conditional effects',()=>{
+test('support diagnostics no longer mark direct ailments as future and support conditional Counter ailments',()=>{
  for(const name of ['Poison Ivy','Brown Stinger','Stun Flame Shot','Evil Charm'])assert.equal(assessBattleSkill(linkLegacySkill(tech(name))).level,'legacy-compatibility');
- const conditional=BATTLE_SKILLS.find(s=>s.actionKind==='counter'&&s.effects.some(e=>e.kind==='status-application'&&e.condition==='counter-triggered'));assert.ok(conditional);assert.notEqual(assessBattleSkill(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:conditional.id})).level,'supported');
+ const conditional=BATTLE_SKILLS.find(s=>s.actionKind==='counter'&&s.effects.some(e=>e.kind==='status-application'&&e.condition==='counter-triggered'));assert.ok(conditional);assert.equal(assessBattleSkill(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:conditional.id})).level,'supported');
 });
 test('legacy Counter compatibility now checks accuracy; a missed incoming hit triggers no counter',()=>{
  const r=run([unit('P','Rock Fist',{spd:20})],[unit('E','Beast King Fist',{spd:20})],{rng:choices({accuracy:[127]})});assert.equal(executed(r)[0].outcome,'miss');assert.ok(!r.actions.some(a=>a.reaction));assert.ok(executed(r).find(a=>a.kind==='counter').accuracy);

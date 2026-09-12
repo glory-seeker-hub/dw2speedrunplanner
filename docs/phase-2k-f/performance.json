@@ -1,0 +1,172 @@
+{
+  "singleCounter": [
+    {
+      "count": 1,
+      "wallClockMs": 10.932800000000043,
+      "averageExecutedActions": 7,
+      "averageRecords": 8,
+      "totalRngDraws": 23,
+      "draws": {
+        "action-choice": 8,
+        "initiative": 4,
+        "target-choice": 4,
+        "accuracy": 7
+      },
+      "firstHistoryBytes": 12445,
+      "firstHistoryWithoutCounterAuditBytes": 11530,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "count": 100,
+      "wallClockMs": 36.7514000000001,
+      "averageExecutedActions": 7.18,
+      "averageRecords": 8.18,
+      "totalRngDraws": 2363,
+      "draws": {
+        "action-choice": 818,
+        "initiative": 409,
+        "target-choice": 418,
+        "accuracy": 718
+      },
+      "firstHistoryBytes": 12445,
+      "firstHistoryWithoutCounterAuditBytes": 11530,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "count": 1000,
+      "wallClockMs": 189.24609999999984,
+      "averageExecutedActions": 7.204,
+      "averageRecords": 8.204,
+      "totalRngDraws": 23714,
+      "draws": {
+        "action-choice": 8204,
+        "initiative": 4102,
+        "target-choice": 4204,
+        "accuracy": 7204
+      },
+      "firstHistoryBytes": 12445,
+      "firstHistoryWithoutCounterAuditBytes": 11530,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "multiCounterAoe": [
+    {
+      "count": 1,
+      "wallClockMs": 3.1825999999998658,
+      "averageExecutedActions": 37,
+      "averageRecords": 40,
+      "totalRngDraws": 87,
+      "draws": {
+        "action-choice": 40,
+        "initiative": 10,
+        "accuracy": 37
+      },
+      "firstHistoryBytes": 73061,
+      "firstHistoryWithoutCounterAuditBytes": 65225,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "count": 100,
+      "wallClockMs": 97.90300000000002,
+      "averageExecutedActions": 38.44,
+      "averageRecords": 41.44,
+      "totalRngDraws": 9132,
+      "draws": {
+        "action-choice": 4144,
+        "initiative": 1036,
+        "accuracy": 3844,
+        "target-choice": 108
+      },
+      "firstHistoryBytes": 73061,
+      "firstHistoryWithoutCounterAuditBytes": 65225,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "count": 1000,
+      "wallClockMs": 618.5204999999999,
+      "averageExecutedActions": 38.304,
+      "averageRecords": 41.304,
+      "totalRngDraws": 90912,
+      "draws": {
+        "action-choice": 41304,
+        "initiative": 10326,
+        "accuracy": 38304,
+        "target-choice": 978
+      },
+      "firstHistoryBytes": 73061,
+      "firstHistoryWithoutCounterAuditBytes": 65225,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "tailBlade": [
+    {
+      "count": 1,
+      "wallClockMs": 1.7803000000003522,
+      "averageExecutedActions": 25,
+      "averageRecords": 26,
+      "totalRngDraws": 90,
+      "draws": {
+        "action-choice": 26,
+        "initiative": 13,
+        "target-choice": 18,
+        "tail-blade-evasion": 13,
+        "accuracy": 20
+      },
+      "firstHistoryBytes": 40848,
+      "firstHistoryWithoutCounterAuditBytes": 38090,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "count": 100,
+      "wallClockMs": 40.322000000000116,
+      "averageExecutedActions": 24.1,
+      "averageRecords": 25.1,
+      "totalRngDraws": 8703,
+      "draws": {
+        "action-choice": 2510,
+        "initiative": 1255,
+        "target-choice": 1710,
+        "tail-blade-evasion": 1255,
+        "accuracy": 1973
+      },
+      "firstHistoryBytes": 40848,
+      "firstHistoryWithoutCounterAuditBytes": 38090,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "count": 1000,
+      "wallClockMs": 329.3625000000002,
+      "averageExecutedActions": 23.458,
+      "averageRecords": 24.458,
+      "totalRngDraws": 84792,
+      "draws": {
+        "action-choice": 24458,
+        "initiative": 12229,
+        "target-choice": 16458,
+        "tail-blade-evasion": 12229,
+        "accuracy": 19418
+      },
+      "firstHistoryBytes": 40848,
+      "firstHistoryWithoutCounterAuditBytes": 38090,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ]
+}

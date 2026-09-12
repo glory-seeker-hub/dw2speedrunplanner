@@ -14,6 +14,13 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
   if (canonical.actionKind === 'interrupt' || canonical.actionKind === 'assist') return { level: 'future-mechanic-unsupported', reasons: [`Authoritative ${canonical.actionKind} resolution is deferred.`] };
   const legacyEffect = skill.legacyTech.specialEffect?.type;
   const deferred = canonical.effects.filter(e => {
+    if (canonical.actionKind === 'counter') {
+      if (e.kind === 'damage-modifier' && e.condition === 'counter-triggered') return false;
+      if (e.kind === 'status-application' && e.condition === 'counter-triggered' && e.chancePercent === 100 && ['poison', 'paralysis', 'confusion'].includes(e.status)) return false;
+      if (e.kind === 'counter-payment') return false;
+      if (e.kind === 'accuracy-modifier' && (e.modifier === 'miss-unless-counter' || (canonical.id === 0x85 && e.modifier === 'increased-evasion'))) return false;
+      if (e.kind === 'target-mode-modifier' && e.mode === 'all-on-counter') return false;
+    }
     if (isDirectBattleStatus(e)) return false;
     if (e.kind === 'unresolved') return false; // Only deprecated entries reach here.
     if (e.kind === 'target-mode-modifier') return e.mode !== 'normal' && !(e.mode === 'all-on-counter' && ['counterTargetAll', 'counterApMultiplierAndTargetAll'].includes(legacyEffect ?? ''));
@@ -24,6 +31,7 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
     return true;
   });
   if (deferred.length) return { level: 'future-mechanic-unsupported', reasons: ['Canonical effects are described but not executed by this resolver.'] };
+  if (canonical.actionKind === 'counter') return { level: 'supported', reasons: ['Authoritative Counter resolution using the retained base damage formula.'] };
   return { level: 'legacy-compatibility', reasons: ['Legacy damage/targeting/effect path; unmeasured timing classes and full effects resolution remain deferred.'] };
 }
 export function assessBattleScenario(input: BattleInput) {

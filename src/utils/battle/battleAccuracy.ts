@@ -6,8 +6,8 @@ import type { BattleRng } from './battleRng';
 
 export interface AccuracyResolution {
   outcome: 'hit' | 'miss' | 'unsupported';
-  cause: 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target';
-  hitThreshold128?: number; roll128?: number; paralysisRoll?: number;
+  cause: 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated';
+  hitThreshold128?: number; roll128?: number; paralysisRoll?: number; tailBladeRoll?: number;
   referenceTargetId: string | null;
   referenceRule?: 'single-target' | 'average-effective-target-spd';
   targetEffectiveSpd?: number;
@@ -40,14 +40,18 @@ function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[])
 }
 /** One resolution per action. User-confirmed Phase 2K-E clarification:
  * multi-target accuracy uses the average of valid targets' effective SPD. */
-export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng): AccuracyResolution {
+export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false): AccuracyResolution {
   if (kind === 'assist') return { outcome: 'hit', cause: 'guaranteed', referenceTargetId: null };
-  const audit: { paralysisRoll?: number } = {};
+  const audit: { paralysisRoll?: number; tailBladeRoll?: number } = {};
   if (actor.statuses.paralysis) {
     audit.paralysisRoll = rng.nextIntExclusive(2, 'paralysis-failure');
     if (audit.paralysisRoll === 1) return { outcome: 'miss', cause: 'paralysis', referenceTargetId: null, ...audit };
   }
   if (!targets.length) return { outcome: 'unsupported', cause: 'no-effective-target', referenceTargetId: null, ...audit };
+  if (kind === 'attack' && tailBladeEligible && targets.length === 1) {
+    audit.tailBladeRoll = rng.nextIntExclusive(3, 'tail-blade-evasion');
+    if (audit.tailBladeRoll === 0) return { outcome: 'miss', cause: 'tail-blade-evasion', referenceTargetId: targets[0].id, ...audit };
+  }
   const targetSpds = targets.map(target => effectiveParameter(target, 'spd'));
   const threshold = thresholdForTargetSpds(effectiveParameter(actor, 'spd'), targetSpds);
   // Display only; threshold calculation averages exact rationals before flooring.
