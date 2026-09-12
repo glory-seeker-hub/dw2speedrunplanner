@@ -1,0 +1,307 @@
+[
+  {
+    "name": "Air Attack",
+    "skillId": 41,
+    "changes": [
+      {
+        "field": "element",
+        "before": "None",
+        "after": "Nature"
+      }
+    ]
+  },
+  {
+    "name": "Boom Bubble",
+    "skillId": 3,
+    "changes": [
+      {
+        "field": "element",
+        "before": "None",
+        "after": "Nature"
+      }
+    ]
+  },
+  {
+    "name": "Chaos Cannon",
+    "skillId": 220,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      },
+      {
+        "field": "specialEffect",
+        "before": null,
+        "after": {
+          "type": "noTriggerCounter"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Coral Crusher",
+    "skillId": 67,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "spd",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "spd"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Dark Shot",
+    "skillId": 74,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Demi Dart",
+    "skillId": 60,
+    "changes": [
+      {
+        "field": "element",
+        "before": "Darkness",
+        "after": "Dark"
+      }
+    ]
+  },
+  {
+    "name": "Duo Scissor Claw",
+    "skillId": 81,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "def",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "def"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Electric Shock",
+    "skillId": 59,
+    "changes": [
+      {
+        "field": "element",
+        "before": "None",
+        "after": "Nature"
+      }
+    ]
+  },
+  {
+    "name": "Evil Wind",
+    "skillId": 78,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "spd",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "spd"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Giga Cannon",
+    "skillId": 104,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      },
+      {
+        "field": "specialEffect",
+        "before": null,
+        "after": {
+          "type": "noTriggerCounter"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Hydro Blaster",
+    "skillId": 12,
+    "changes": [
+      {
+        "field": "element",
+        "before": "Water",
+        "after": "Fire"
+      }
+    ]
+  },
+  {
+    "name": "Mega Fire",
+    "skillId": 219,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Musical Fist",
+    "skillId": 80,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Ocean Love",
+    "skillId": 58,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Pulse Blast",
+    "skillId": 47,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "atk",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "atk"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Scissor Claw",
+    "skillId": 70,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "def",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "def"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Shadow Scythe",
+    "skillId": 77,
+    "changes": [
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "chainOnKill"
+        },
+        "after": null
+      }
+    ]
+  },
+  {
+    "name": "Spinning Needle",
+    "skillId": 38,
+    "changes": [
+      {
+        "field": "element",
+        "before": "None",
+        "after": "Nature"
+      }
+    ]
+  },
+  {
+    "name": "S-Thunder Smack",
+    "skillId": 7,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Super Shocker",
+    "skillId": 33,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Thunder Ball",
+    "skillId": 132,
+    "changes": [
+      {
+        "field": "target",
+        "before": "Single",
+        "after": "All"
+      }
+    ]
+  },
+  {
+    "name": "Tidal Wave",
+    "skillId": 54,
+    "changes": [
+      {
+        "field": "element",
+        "before": "Wave",
+        "after": "Water"
+      },
+      {
+        "field": "specialEffect",
+        "before": {
+          "type": "debuffStat",
+          "stat": "atk",
+          "maxStacks": 2
+        },
+        "after": {
+          "type": "debuffStat",
+          "stat": "atk"
+        }
+      }
+    ]
+  }
+]

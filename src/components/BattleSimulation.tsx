@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { runBattleSimulation } from '@/utils/battleEngine';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BattleSimulationProps {
   savedTeams: TeamDigimon[][];
@@ -59,15 +60,16 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
       
       // Run simulation in a setTimeout to allow UI to update
       setTimeout(() => {
-        const results = runBattleSimulation(
-          playerTeam,
-          enemyTeam,
-          floorSpecialty,
-          simulationCount
-        );
-        
-        onSimulationComplete(results);
-        setIsSimulating(false);
+        // Source validation can reject incomplete encounter data asynchronously.
+        try {
+          const results = runBattleSimulation(playerTeam, enemyTeam, floorSpecialty, simulationCount);
+          onSimulationComplete(results);
+        } catch (error) {
+          console.error('Simulation error:', error);
+          toast.error('Simulation unavailable', { description: error instanceof Error ? error.message : 'Could not validate battle data.' });
+        } finally {
+          setIsSimulating(false);
+        }
       }, 100);
     } catch (error) {
       console.error('Simulation error:', error);

@@ -1,5 +1,5 @@
 import { TeamDigimon, Tech, BattleDigimon, BattleTurn, SimulationResult, BattleSettings } from '@/types/digimon';
-import { TECHS } from '@/data/techs';
+import { requireEncounterTechs } from '@/utils/encounterBattleSkills';
 import { DIGIMONS } from '@/data/digimons';
 
 // Specialty bonus matrix based on attacker tech specialty vs defender digimon specialty
@@ -114,16 +114,7 @@ function createBattleDigimon(teamDigimon: TeamDigimon[], teamPrefix: string): Ba
 function createBattleDigimonFromEncounter(encounter: any): BattleDigimon[] {
   return encounter.digimons.map((digimon: any, index: number) => {
     // Convert tech names to Tech objects
-    const techs = digimon.techs.map((techName: string) => 
-      TECHS.find(t => t.name === techName) || {
-        id: `unknown-${techName}`,
-        name: techName,
-        ap: 10,
-        element: 'None' as const,
-        target: 'Single' as const,
-        isCounter: false
-      }
-    );
+    const techs = requireEncounterTechs(digimon.techs);
 
     // Look up the actual Digimon data to get correct type and specialty
     const digimonData = DIGIMONS.find(d => d.name === digimon.name);

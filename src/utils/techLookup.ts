@@ -1,5 +1,6 @@
 import { Tech } from '@/types/digimon';
 import { TECHS } from '@/data/techs';
+import { normalizeBattleSkillName } from '@/data/battleSkills';
 
 /**
  * Canonical tech lookup. Centralizes normalization and the (explicit) alias table so
@@ -12,7 +13,7 @@ export const TECH_NAME_ALIASES: Record<string, string> = {
 };
 
 export const normalizeTechName = (name: string): string => {
-  const key = (name ?? '').toLowerCase().replace(/[\s._'’-]/g, '');
+  const key = normalizeBattleSkillName(name ?? '');
   return TECH_NAME_ALIASES[key] ?? key;
 };
 
