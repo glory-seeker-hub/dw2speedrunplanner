@@ -67,11 +67,11 @@ test('action and target selection consume exactly the requested programmed draws
   assert.deepEqual(r.draws.map(d => d.category), ['action-choice', 'target-choice']);
   assert.equal(r.consumed, 2);
 });
-test('one-hit battle has exact draw budget; future mechanics draw nothing', () => {
-  const r = sequence([0, 0, 0, 0, 0]);
+test('one-hit battle has exact draw budget including Phase 2K-E accuracy', () => {
+  const r = sequence([0, 0, 0, 0, 0, 0]);
   const result = run([member('P', [tech('Terra Force')], { spd: 100 })], [member('E', [tech('Rock Fist')], { hp: 1 })], { rng: r });
-  assert.equal(result.outcome, 'player-win'); assert.equal(r.consumed, 5);
-  assert.deepEqual(r.draws.map(d => d.category), ['action-choice', 'action-choice', 'initiative', 'initiative', 'target-choice']);
+  assert.equal(result.outcome, 'player-win'); assert.equal(r.consumed, 6);
+  assert.deepEqual(r.draws.map(d => d.category), ['action-choice', 'action-choice', 'initiative', 'initiative', 'target-choice', 'accuracy']);
 });
 for (const [float, expected] of [[0, 20], [0.999999, 30]]) test(`initiative roll reaches ${expected - 20}`, () => {
   const { state, actions } = preparation(); calculateActionOrder(state, actions, sequence([float, 0]));
@@ -220,14 +220,15 @@ test('invalid operational limits and simulation counts are rejected', () => {
 test('support diagnostic distinguishes unknown, incomplete and future mechanics', () => {
   assert.equal(assessBattleSkill(linkLegacySkill({ ...tech('Rock Fist'), id: 'unknown', name: 'unknown' })).level, 'unknown');
   assert.equal(assessBattleSkill(linkLegacySkill(tech('Black Pearl Shot'))).level, 'canonical-data-incomplete');
-  assert.equal(assessBattleSkill(linkLegacySkill(tech('Poison Ivy'))).level, 'future-mechanic-unsupported');
+  assert.equal(assessBattleSkill(linkLegacySkill(tech('Poison Ivy'))).level, 'legacy-compatibility');
   assert.equal(assessBattleSkill(linkLegacySkill(tech('Rock Fist'))).level, 'legacy-compatibility');
   const scenario = input(...cases.single); const copy = structuredClone(scenario);
   assert.equal(assessBattleScenario(scenario).valid, true); assert.deepEqual(scenario, copy);
 });
-test('canonical effects are not executed alongside legacy effects', () => {
+test('implemented canonical direct ailments coexist with the single legacy effect path', () => {
   const r = run([member('P', [tech('Poison Ivy')], { spd: 100 })], cases.single[1]);
-  assert.ok(r.state.combatants.every(a => Object.keys(a.statuses).length === 0));
+  assert.ok(r.actions.flatMap(a => a.impacts).some(i => i.statusApplications.some(s => s.status === 'poison' && s.applied)));
+  assert.ok(r.state.combatants.every(a => !a.statuses.paralysis && !a.statuses.confusion));
   assert.ok(executed(r).every(a => a.outcome === 'hit')); // Timing now measured; status resolution remains deferred.
 });
 test('a planned action can be cancelled before execution without changing its identity', () => {

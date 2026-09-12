@@ -3,6 +3,9 @@ import type { ActionKind, Ailment, SkillElement } from '@/types/battleSkill';
 import type { Encounter } from '@/types/encounter';
 import type { BattleRng } from './battleRng';
 import type { ExecutionOutcome, TimingClass } from './battleTiming';
+import type { AccuracyResolution } from './battleAccuracy';
+import type { BattleStatus, StatusSnapshot, StatusRecoveryResult, StatusApplicationResult } from './battleStatuses';
+import type { ConfusionResolution } from './battleConfusion';
 
 export type BattleSide = 'player' | 'enemy';
 export type BattleActionKind = ActionKind;
@@ -56,6 +59,7 @@ export interface ActionPolicy {
 }
 export interface BattleImpact {
   targetId: string; targetName: string; hpBefore: number; hpAfter: number;
+  baseDamage: number; poisonBonusDamage: number; statusApplications: StatusApplicationResult[];
   damage: number; healing: number; outcome: 'hit' | 'ko' | 'miss' | 'blocked' | 'invincible';
   appliedEffects: { source: 'legacy'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
   ko: boolean;
@@ -69,6 +73,8 @@ export interface BattleActionRecord {
   kind: BattleActionKind; source: BattleSkillSelection['source'];
   targetIntent: TargetIntent; effectiveTargetIds: string[]; impacts: BattleImpact[];
   reaction: ReactionContext | null; state: ActionState; reason?: string;
+  accuracy: AccuracyResolution | null; statusesBefore: StatusSnapshot; statusesAfterRecovery: StatusSnapshot;
+  statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution | null;
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
   timingDiagnostics: string[]; chainFromActionId: string | null;
   resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
@@ -89,7 +95,7 @@ export interface BattleRunResult {
   state: BattleState; diagnostics: string[];
   totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
-export type BattleTeamMember = TeamDigimon & { instanceId?: string };
+export type BattleTeamMember = TeamDigimon & { instanceId?: string; initialStatuses?: Partial<Record<BattleStatus, boolean>> };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }
 export interface BattleEngineOptions {
   rng?: BattleRng;

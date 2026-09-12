@@ -17,15 +17,21 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
           <span className="font-semibold text-digital-cyan">{action.actorName}</span> · {action.skillName}
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'miss' ? 'Miss' : 'Executed' : action.state}</Badge>
+          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'paralysis' ? 'Paralysis' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
       {action.chainFromActionId && <p className="text-xs text-muted-foreground">Shadow Scythe repeat</p>}
       {action.reaction && <p className="text-xs text-muted-foreground">Counter reaction (legacy compatibility)</p>}
+      {action.statusRecoveries.map(recovery => <p key={recovery.status} className="text-xs text-info">{recovery.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {recovery.recovered ? 'recovered' : 'remains'} · roll {recovery.roll}/3</p>)}
+      {action.confusion?.redirected && <p className="text-sm text-info">Confusion redirect: own side, including self{action.confusion.plannedSkillKey !== action.confusion.selectedSkillKey ? ' · technique reselected' : ''}</p>}
+      {action.accuracy?.hitThreshold128 !== undefined && <p className="text-xs text-muted-foreground">Accuracy: roll {action.accuracy.roll128} · Hit below {action.accuracy.hitThreshold128}/128{action.accuracy.referenceRule === 'average-effective-target-spd' ? ` · average target SPD ${action.accuracy.targetEffectiveSpd}` : ''}</p>}
+      {action.accuracy?.paralysisRoll !== undefined && <p className="text-xs text-muted-foreground">Paralysis check: {action.accuracy.paralysisRoll === 1 ? 'failed' : 'passed'}</p>}
       <ul className="space-y-1 text-sm">{action.impacts.map((impact, index) => <li key={`${impact.targetId}-${index}`} className="flex flex-wrap justify-between gap-2">
         <span>{impact.targetName} <span className="text-xs text-muted-foreground">({impact.targetId})</span></span>
-        <span><span className="text-destructive">{impact.damage} dmg</span> · {impact.hpBefore} → {impact.hpAfter} HP · {impact.ko ? 'KO' : impact.outcome}</span>
+        <span><span className="text-destructive">{impact.damage} dmg</span>{impact.poisonBonusDamage > 0 && <span className="text-info"> (Poison +{impact.poisonBonusDamage})</span>} · {impact.hpBefore} → {impact.hpAfter} HP · {impact.ko ? 'KO' : impact.outcome}
+          {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{status.status === 'poison' ? 'Poison' : status.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'} · roll {status.roll}/2</span>)}
+        </span>
       </li>)}</ul>
       {action.mpAccounting && <p className="text-xs text-muted-foreground">MP: {action.mpAccounting.before} → {action.mpAccounting.after} · Cost {action.mpAccounting.costCharged ?? 'unresolved'}</p>}
       {action.resourceAlerts.map((alert, index) => <p key={`${alert.kind}-${alert.combatantId}-${index}`} role="note" className="text-sm text-info">⚠ {resourceAlertText(alert)}</p>)}

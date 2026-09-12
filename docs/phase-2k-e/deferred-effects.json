@@ -1,0 +1,984 @@
+{
+  "cannotMiss": [
+    {
+      "id": 52,
+      "hex": "0x34",
+      "name": "Tusk Crusher",
+      "kind": "attack",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 164,
+      "hex": "0xA4",
+      "name": "Venom Infusion",
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 166,
+      "hex": "0xA6",
+      "name": "MP Magic",
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 167,
+      "hex": "0xA7",
+      "name": "Life Shield",
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 168,
+      "hex": "0xA8",
+      "name": "MP Destroyer",
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 180,
+      "hex": "0xB4",
+      "name": "Hyper Flashing",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 181,
+      "hex": "0xB5",
+      "name": "HP Recovery",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 182,
+      "hex": "0xB6",
+      "name": "Virus Attack",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 183,
+      "hex": "0xB7",
+      "name": "Crimson Flame",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 184,
+      "hex": "0xB8",
+      "name": "Full HP Cure",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 185,
+      "hex": "0xB9",
+      "name": "Fungus Cruncher",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 186,
+      "hex": "0xBA",
+      "name": "Rotten Rainballs",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 187,
+      "hex": "0xBB",
+      "name": "Banana Slip",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 188,
+      "hex": "0xBC",
+      "name": "Small HP Cure",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 189,
+      "hex": "0xBD",
+      "name": "Defensive Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 190,
+      "hex": "0xBE",
+      "name": "Parameter Patch",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 191,
+      "hex": "0xBF",
+      "name": "Zip Boom",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 192,
+      "hex": "0xC0",
+      "name": "Stun Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 193,
+      "hex": "0xC1",
+      "name": "Armor Coating",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 194,
+      "hex": "0xC2",
+      "name": "Mech Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 195,
+      "hex": "0xC3",
+      "name": "Blaze Blaster",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 196,
+      "hex": "0xC4",
+      "name": "Nature Hit Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 197,
+      "hex": "0xC5",
+      "name": "Invincibility",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 198,
+      "hex": "0xC6",
+      "name": "Re-Format",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 199,
+      "hex": "0xC7",
+      "name": "Recovery Power",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 200,
+      "hex": "0xC8",
+      "name": "AntiDote",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 201,
+      "hex": "0xC9",
+      "name": "AntiFreeze",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 202,
+      "hex": "0xCA",
+      "name": "AntiConfusion",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 203,
+      "hex": "0xCB",
+      "name": "Mega Heal",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 204,
+      "hex": "0xCC",
+      "name": "Zen Recovery",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 205,
+      "hex": "0xCD",
+      "name": "Full Recovery",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 206,
+      "hex": "0xCE",
+      "name": "Hung on Death",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 208,
+      "hex": "0xD0",
+      "name": "Invisibility",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 209,
+      "hex": "0xD1",
+      "name": "Water Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 210,
+      "hex": "0xD2",
+      "name": "Necro Magic",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 211,
+      "hex": "0xD3",
+      "name": "Darkness Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 212,
+      "hex": "0xD4",
+      "name": "Re-Initialize",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 213,
+      "hex": "0xD5",
+      "name": "Panic Wave",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 214,
+      "hex": "0xD6",
+      "name": "Heart Break Hit",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 215,
+      "hex": "0xD7",
+      "name": "Poison Wave",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 222,
+      "hex": "0xDE",
+      "name": "Kongou",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 227,
+      "hex": "0xE3",
+      "name": "Reset Status",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 230,
+      "hex": "0xE6",
+      "name": "abc? Unused?",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 231,
+      "hex": "0xE7",
+      "name": "Safety Sphere",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 234,
+      "hex": "0xEA",
+      "name": "Alias Fake (?)",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 239,
+      "hex": "0xEF",
+      "name": "Armor Aid",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 247,
+      "hex": "0xF7",
+      "name": "Reduction Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    },
+    {
+      "id": 249,
+      "hex": "0xF9",
+      "name": "Destablizer Ray",
+      "kind": "assist",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "cannot-miss",
+          "condition": "always",
+          "certainty": "uncertain",
+          "byte": 17,
+          "mask": 4,
+          "sourceRow": 5,
+          "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+        }
+      ]
+    }
+  ],
+  "increasedAccuracy": [
+    {
+      "id": 102,
+      "hex": "0x66",
+      "name": "Protect Grenade",
+      "kind": "attack",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "increased-accuracy",
+          "condition": "always",
+          "certainty": "documented",
+          "byte": 18,
+          "mask": 8,
+          "sourceRow": 13,
+          "sourceLabel": "Increased accuracy"
+        }
+      ]
+    }
+  ],
+  "counterEvasion": [
+    {
+      "id": 133,
+      "hex": "0x85",
+      "name": "Tail Blade",
+      "kind": "counter",
+      "effects": [
+        {
+          "kind": "accuracy-modifier",
+          "modifier": "increased-evasion",
+          "condition": "counter-triggered",
+          "certainty": "documented",
+          "byte": 17,
+          "mask": 16,
+          "sourceRow": 7,
+          "sourceLabel": "Increase your evasion while countering this turn"
+        }
+      ]
+    }
+  ],
+  "conditionalAilments": [
+    {
+      "id": 130,
+      "hex": "0x82",
+      "name": "Needle Spray",
+      "kind": "counter",
+      "effects": [
+        {
+          "kind": "status-application",
+          "status": "poison",
+          "chancePercent": 100,
+          "condition": "counter-triggered",
+          "byte": 25,
+          "mask": 4,
+          "sourceRow": 50,
+          "sourceLabel": "Poison w/ Counter"
+        }
+      ]
+    },
+    {
+      "id": 132,
+      "hex": "0x84",
+      "name": "Thunder Ball",
+      "kind": "counter",
+      "effects": [
+        {
+          "kind": "status-application",
+          "status": "paralysis",
+          "chancePercent": 100,
+          "condition": "counter-triggered",
+          "sourceAlias": "stun",
+          "byte": 25,
+          "mask": 64,
+          "sourceRow": 53,
+          "sourceLabel": "Stun w/ Counter"
+        }
+      ]
+    },
+    {
+      "id": 140,
+      "hex": "0x8C",
+      "name": "Buffalo Breath",
+      "kind": "counter",
+      "effects": [
+        {
+          "kind": "status-application",
+          "status": "confusion",
+          "chancePercent": 100,
+          "condition": "counter-triggered",
+          "byte": 26,
+          "mask": 4,
+          "sourceRow": 57,
+          "sourceLabel": "Confuse w/ Counter"
+        }
+      ]
+    },
+    {
+      "id": 237,
+      "hex": "0xED",
+      "name": "Stun Punch",
+      "kind": "counter",
+      "effects": [
+        {
+          "kind": "status-application",
+          "status": "paralysis",
+          "chancePercent": 100,
+          "condition": "counter-triggered",
+          "sourceAlias": "stun",
+          "byte": 25,
+          "mask": 64,
+          "sourceRow": 53,
+          "sourceLabel": "Stun w/ Counter"
+        }
+      ]
+    }
+  ]
+}

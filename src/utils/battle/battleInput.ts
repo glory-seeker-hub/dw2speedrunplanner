@@ -20,6 +20,11 @@ export function linkLegacySkill(tech: Tech & { canonicalSkillId?: number }): Bat
 }
 function createMember(member: BattleTeamMember, side: BattleSide, position: number, allowSynthetic: boolean): BattleCombatantState {
   const skills = member.techs.map(linkLegacySkill);
+  const initialStatuses: BattleCombatantState['statuses'] = {};
+  for (const [status, active] of Object.entries(member.initialStatuses ?? {})) {
+    if (!['poison', 'paralysis', 'confusion'].includes(status) || typeof active !== 'boolean') throw new BattleInputError('Invalid initial battle status.');
+    if (active) initialStatuses[status as 'poison' | 'paralysis' | 'confusion'] = true;
+  }
   const actor: BattleCombatantState = {
     id: member.instanceId ? `${side}-instance-${member.instanceId}` : `${side}-${position}`,
     sourceInstanceId: member.instanceId ?? null, name: member.digimon.name, side, position,
@@ -28,7 +33,7 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     maxMp: member.customStats.mp, currentMp: member.customStats.mp, isAlive: side === 'player' || member.customStats.hp > 0,
     parameterModifiers: {}, skills, plannedActionId: null,
     reaction: { counterUsed: false, isCountering: false }, legacy: { consecutiveTechCount: 0, damageTakenThisTurn: 0 },
-    statuses: {}, temporaryPowers: {},
+    statuses: initialStatuses, temporaryPowers: {},
   };
   validateCombatant(actor);
   if (!skills.some(s => s.legacyTech.ap > 0)) {

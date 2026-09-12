@@ -1,6 +1,7 @@
 import { getBattleSkillById } from '@/data/battleSkills';
 import type { BattleInput, BattleSkillSelection } from './battleTypes';
 import { createBattleState } from './battleInput';
+import { isDirectBattleStatus } from './battleStatuses';
 export type BattleSupportLevel = 'supported' | 'legacy-compatibility' | 'future-mechanic-unsupported' | 'canonical-data-incomplete' | 'unknown';
 export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleSupportLevel; reasons: string[] } {
   if (skill.source === 'synthetic-legacy-fallback') return { level: 'legacy-compatibility', reasons: ['Synthetic fallback is not DW2 skill data.'] };
@@ -13,6 +14,7 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
   if (canonical.actionKind === 'interrupt' || canonical.actionKind === 'assist') return { level: 'future-mechanic-unsupported', reasons: [`Authoritative ${canonical.actionKind} resolution is deferred.`] };
   const legacyEffect = skill.legacyTech.specialEffect?.type;
   const deferred = canonical.effects.filter(e => {
+    if (isDirectBattleStatus(e)) return false;
     if (e.kind === 'unresolved') return false; // Only deprecated entries reach here.
     if (e.kind === 'target-mode-modifier') return e.mode !== 'normal' && !(e.mode === 'all-on-counter' && ['counterTargetAll', 'counterApMultiplierAndTargetAll'].includes(legacyEffect ?? ''));
     if (e.kind === 'parameter-modifier') return !(legacyEffect === 'debuffStat' && e.direction === 'down' && e.subject === 'target' && e.stats.length === 1 && e.stats[0] === skill.legacyTech.specialEffect?.stat);
