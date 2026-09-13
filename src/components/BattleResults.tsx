@@ -21,6 +21,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
+      {action.interruptTiming && <p className="text-xs text-muted-foreground">Interrupt timing: {action.interruptTiming.totalFrames}f · {action.interruptTiming.preludeFrames}f interrupted-action prelude + {action.interruptTiming.executionFrames}f {action.outcome === 'miss' ? 'Miss execution' : 'Interrupt execution'}</p>}
       {action.kind === 'interrupt' && <p className="text-sm text-info">{action.reason === 'interrupt-no-eligible-target' ? 'Interrupt skipped — no eligible target' : 'Interrupt — ' + (action.outcome === 'hit' ? 'Hit' : action.accuracy?.cause === 'paralysis' ? 'Miss — Paralysis' : 'Miss — Accuracy')}</p>}
       {action.interrupt && <div className="text-xs text-info">
         <p>Interrupt target: {action.interrupt.targetActorName} / {action.interrupt.targetActionId}</p>

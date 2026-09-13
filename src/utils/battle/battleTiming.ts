@@ -9,19 +9,27 @@ export const ACTION_TIMING_PROFILE = Object.freeze({
   aoe: Object.freeze({ 1: 703, 2: 873, 3: 990 }),
   fieldAll: Object.freeze({ 2: 758, 3: 838, 4: 915, 5: 995, 6: 1071 }),
 });
-export type TimingClass = 'single-target' | 'aoe' | 'field-all' | 'unknown';
+/** Phase 2K-G1: the interrupted actor's partial start, not Interrupt animation. */
+export const INTERRUPT_PRELUDE_FRAMES = 76;
+export interface InterruptTiming { preludeFrames: number; executionFrames: number; totalFrames: number }
+export type TimingClass = 'single-target' | 'aoe' | 'field-all' | 'interrupt' | 'unknown';
 export type ExecutionOutcome = 'hit' | 'miss' | 'cancelled' | 'skipped' | 'unsupported' | 'invalid';
 export interface ActionTimingInput {
   actionKind: ActionKind | 'guard'; timingClass: TimingClass;
   effectiveTargetCount: number; outcome: ExecutionOutcome;
 }
-export function resolveActionTiming(input: ActionTimingInput): { durationFrames: number | null; diagnostics: string[] } {
+export function resolveActionTiming(input: ActionTimingInput): { durationFrames: number | null; diagnostics: string[]; interruptTiming?: InterruptTiming } {
   const unavailable = (reason: string) => ({ durationFrames: null, diagnostics: [reason] });
   if (input.actionKind === 'guard') return unavailable('Guard is excluded from simulation.');
   if (input.outcome !== 'hit' && input.outcome !== 'miss') return unavailable(`No measured timing for ${input.outcome} actions.`);
+  if (input.actionKind === 'interrupt' && input.timingClass === 'interrupt') {
+    const executionFrames = input.outcome === 'hit' ? ACTION_TIMING_PROFILE.singleTarget : ACTION_TIMING_PROFILE.miss;
+    const totalFrames = INTERRUPT_PRELUDE_FRAMES + executionFrames;
+    return { durationFrames: totalFrames, diagnostics: [], interruptTiming: { preludeFrames: INTERRUPT_PRELUDE_FRAMES, executionFrames, totalFrames } };
+  }
   // An explicitly classified full-action Miss; never inferred from impact count.
   if (input.outcome === 'miss') return { durationFrames: ACTION_TIMING_PROFILE.miss, diagnostics: [] };
-  if (input.actionKind === 'interrupt') return unavailable('Measured Interrupt Hit duration unavailable.');
+  if (input.actionKind === 'interrupt') return unavailable('Canonical Interrupt timing classification unavailable.');
   if (input.actionKind !== 'attack' && input.actionKind !== 'counter') return unavailable(`No proven measured timing for ${input.actionKind} execution.`);
   const count = input.effectiveTargetCount;
   if (!Number.isSafeInteger(count) || count < 1) return unavailable('Invalid effective target count for successful timing.');
@@ -33,6 +41,7 @@ export function resolveActionTiming(input: ActionTimingInput): { durationFrames:
 }
 export function classifySkillTiming(skill: BattleSkillSelection): TimingClass {
   const canonical = skill.canonicalSkillId === null ? undefined : getBattleSkillById(skill.canonicalSkillId);
+  if (canonical?.actionKind === 'interrupt') return 'interrupt';
   if (!canonical || canonical.actionKind !== 'attack') return 'unknown';
   // Current execution only proves opposing single/all targeting. Field and
   // random-target semantics need a future resolver before using FIELD_ALL.
