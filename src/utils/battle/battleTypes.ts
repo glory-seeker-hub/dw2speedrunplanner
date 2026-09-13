@@ -2,7 +2,7 @@ import type { DigimonStats, Tech, TeamDigimon } from '@/types/digimon';
 import type { ActionKind, Ailment, SkillElement } from '@/types/battleSkill';
 import type { Encounter } from '@/types/encounter';
 import type { BattleRng } from './battleRng';
-import type { ExecutionOutcome, TimingClass } from './battleTiming';
+import type { ExecutionOutcome, TimingClass, InterruptTiming } from './battleTiming';
 import type { AccuracyResolution } from './battleAccuracy';
 import type { BattleStatus, StatusSnapshot, StatusRecoveryResult, StatusApplicationResult } from './battleStatuses';
 import type { ConfusionResolution } from './battleConfusion';
@@ -113,6 +113,7 @@ export interface BattleActionRecord {
   accuracy: AccuracyResolution | null; statusesBefore: StatusSnapshot; statusesAfterRecovery: StatusSnapshot;
   statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution | null;
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
+  interruptTiming?: InterruptTiming;
   timingDiagnostics: string[]; chainFromActionId: string | null;
   resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
   mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete'; payerCombatantId: string | null; payerName: string | null; payerSide: BattleSide | null; paymentRule: 'own' | 'counter-triggering-actor' | 'shadow-scythe-free-repeat' | 'none-on-miss' | 'unknown' } | null;

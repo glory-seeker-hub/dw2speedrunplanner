@@ -181,6 +181,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         const timing = resolveActionTiming({ actionKind: action.kind, timingClass: entry.timingClass,
           effectiveTargetCount: entry.effectiveTargetIds.length, outcome: entry.outcome });
         entry.durationFrames = timing.durationFrames; entry.timingDiagnostics = timing.diagnostics;
+        if (timing.interruptTiming) entry.interruptTiming = timing.interruptTiming;
         if (action.skill.canonicalSkillId === SHADOW_SCYTHE_ID) scheduleShadowScytheRepeat(state, action, entry);
         // Promotion occurs after all impacts, ahead of any queued chain repeat.
         promoteCounters(state, action, entry, acted);

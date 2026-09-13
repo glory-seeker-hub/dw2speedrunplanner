@@ -34,7 +34,7 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
     return true;
   });
   if (deferred.length) return { level: 'future-mechanic-unsupported', reasons: ['Canonical effects are described but not executed by this resolver.'] };
-  if (canonical.actionKind === 'interrupt') return { level: 'canonical-data-incomplete', reasons: ['Authoritative Interrupt resolution; measured Interrupt Hit duration unavailable.'] };
+  if (canonical.actionKind === 'interrupt') return { level: 'supported', reasons: ['Authoritative Interrupt resolution and measured prelude/execution timing.'] };
   if (canonical.actionKind === 'counter') return { level: 'supported', reasons: ['Authoritative Counter resolution using the retained base damage formula.'] };
   return { level: 'legacy-compatibility', reasons: ['Legacy damage/targeting/effect path; unmeasured timing classes and full effects resolution remain deferred.'] };
 }

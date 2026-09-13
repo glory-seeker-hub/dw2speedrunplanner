@@ -27,7 +27,7 @@ const statusEffect=(status,condition='always')=>({kind:'status-application',stat
 test('Interrupt selection is waiting, outside SPD queue and has exactly one intention',()=>{const {state,actions}=prepare([unit()],[I('I',0xa1,{spd:999})]);assert.deepEqual(state.queue,[actions[0].id]);assert.equal(actions[1].state,'waiting');assert.equal(actions[1].interrupt.state,'waiting');assert.equal(actions[1].initiative,null);});
 test('zero-AP Interrupt is selectable by production policy without synthetic fallback',()=>{const r=run([unit()],[I('I',0xa4)],{actionPolicy:undefined});assert.equal(ints(r).length,1);assert.equal(r.state.combatants[1].skills.length,1);assert.equal(ints(r)[0].canonicalSkillId,0xa4);});
 for(const id of [0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8])for(const miss of [false,true])test(`canonical Interrupt ${id} ${miss?'Miss':'Hit'} accounting, single target and timing`,()=>{
- const random=rng({accuracy:[0,miss?127:0,0]});const r=run([unit()],[I('I',id)],{rng:random}),a=ints(r)[0];assert.ok(a);assert.deepEqual(a.effectiveTargetIds,['player-0']);assert.equal(a.accuracy.referenceRule,'single-target');assert.equal(a.accuracy.targetEffectiveSpd,40);assert.equal(a.accuracy.hitThreshold128,116);assert.equal(a.outcome,miss?'miss':'hit');assert.equal(a.durationFrames,miss?194:null);assert.equal(a.mpAccounting.costCharged,miss?0:data.getBattleSkillById(id).mpCost);assert.equal(a.statusRecoveries.length,0);assert.equal(r.state.plannedActions.filter(a=>a.actorId==='enemy-0').length,1);assert.equal(r.state.plannedActions.find(a=>a.actorId==='enemy-0').interrupt.state,'resolved');if(miss){assert.deepEqual(a.impacts,[]);assert.ok(!random.draws.some(d=>['interrupt-delete-action','interrupt-force-miss'].includes(d.category)));assert.equal(target(r).interrupt.restarted,true);}else assert.equal(r.timingCompleteness,'incomplete');
+ const random=rng({accuracy:[0,miss?127:0,0]});const r=run([unit()],[I('I',id)],{rng:random}),a=ints(r)[0];assert.ok(a);assert.deepEqual(a.effectiveTargetIds,['player-0']);assert.equal(a.accuracy.referenceRule,'single-target');assert.equal(a.accuracy.targetEffectiveSpd,40);assert.equal(a.accuracy.hitThreshold128,116);assert.equal(a.outcome,miss?'miss':'hit');assert.equal(a.durationFrames,miss?270:761);assert.equal(a.mpAccounting.costCharged,miss?0:data.getBattleSkillById(id).mpCost);assert.equal(a.statusRecoveries.length,0);assert.equal(r.state.plannedActions.filter(a=>a.actorId==='enemy-0').length,1);assert.equal(r.state.plannedActions.find(a=>a.actorId==='enemy-0').interrupt.state,'resolved');if(miss){assert.deepEqual(a.impacts,[]);assert.ok(!random.draws.some(d=>['interrupt-delete-action','interrupt-force-miss'].includes(d.category)));assert.equal(target(r).interrupt.restarted,true);}else assert.equal(r.timingCompleteness,'complete');
 });
 for(const [scenario,p,e,values] of [
  ['accuracy',[unit()],[I()],{accuracy:[127]}],
@@ -61,7 +61,7 @@ test('dead/promoted reservation invalidation preserves waiting executor and sele
 for(const status of ['paralysis','confusion'])test(`Interrupt user's ${status} remains; no recovery or Confusion behavior`,()=>{
  const random=rng({'paralysis-failure':[0]});const r=run([unit()],[I('I',0xa1,{}, {[status]:true})],{rng:random}),a=ints(r)[0];assert.equal(a.outcome,'hit');assert.equal(a.statusRecoveries.length,0);assert.equal(a.confusion.redirected,false);assert.equal(a.confusion.skipped,false);assert.equal(r.state.combatants[1].statuses[status],true);assert.ok(!random.draws.some(d=>d.category.startsWith('status-recovery')||d.category.startsWith('confusion-')));
 });
-test('Paralysed Interrupt fails without accuracy, effects or MP; target still restarts',()=>{const random=rng({'paralysis-failure':[1]});const r=run([unit()],[I('I',0xa4,{}, {paralysis:true})],{rng:random}),a=ints(r)[0];assert.equal(a.accuracy.cause,'paralysis');assert.equal(a.durationFrames,194);assert.equal(a.mpAccounting.costCharged,0);assert.equal(random.draws.filter(d=>d.category==='accuracy').length,2);assert.equal(target(r).interrupt.restarted,true);assert.ok(!random.draws.some(d=>d.category==='interrupt-delete-action'));});
+test('Paralysed Interrupt fails without accuracy, effects or MP; target still restarts',()=>{const random=rng({'paralysis-failure':[1]});const r=run([unit()],[I('I',0xa4,{}, {paralysis:true})],{rng:random}),a=ints(r)[0];assert.equal(a.accuracy.cause,'paralysis');assert.equal(a.durationFrames,270);assert.equal(a.mpAccounting.costCharged,0);assert.equal(random.draws.filter(d=>d.category==='accuracy').length,2);assert.equal(target(r).interrupt.restarted,true);assert.ok(!random.draws.some(d=>d.category==='interrupt-delete-action'));});
 for(const status of ['paralysis','confusion'])test(`target ${status} preparation occurs once, restart reuses finalized action`,()=>{
  const p=unit('A','Pepper Breath',{}, {[status]:true}),random=rng({[`status-recovery-${status}`]:[3],'paralysis-failure':[0,0]});const r=run([p],[I()],{rng:random}),a=target(r);assert.equal(a.statusRecoveries.length,1);assert.equal(random.draws.filter(d=>d.category===`status-recovery-${status}`).length,1);assert.equal(a.restart.recoverySuppressedOnRestart,true);if(status==='confusion'){assert.deepEqual(a.effectiveTargetIds,['player-0']);assert.equal(random.draws.filter(d=>d.category==='confusion-target').length,1);}
 });
@@ -130,7 +130,7 @@ test('Results renders Interrupt outcome, restart, cancellation, force, reduction
  const result=aggregateBattleRuns([]);result.fastestBattleHistory=runs.flatMap(r=>r.actions);const html=renderToStaticMarkup(React.createElement(BattleResults,{results:result}));
  for(const text of ['Interrupt — Hit','Interrupt — Miss — Accuracy','Interrupt target: A','Initial Hit → Interrupted → Restarted → Final miss','Natural recovery suppressed on restart','Action cancelled by Interrupt','Forced Miss by Interrupt','Damage reduced by Interrupt','Action sent to end of turn, after Counters','Boss immune to action deletion','Interrupt skipped — no eligible target','Confusion applied — effective next turn','by Interrupt; affects restarted action immediately'])assert.ok(html.includes(text),text);
 });
-test('all-successful Interrupt run retains known frame subtotal and null total; Interrupt Miss alone permits complete timing',()=>{const hit=run(),miss=run([unit()],[I()],{rng:rng({accuracy:[0,127,0]})});assert.equal(hit.totalFrames,null);assert.equal(hit.knownFrames,685);assert.equal(miss.totalFrames,879);assert.equal(miss.timingCompleteness,'complete');});
+test('Interrupt Hit and Miss both have complete prelude-inclusive timing',()=>{const hit=run(),miss=run([unit()],[I()],{rng:rng({accuracy:[0,127,0]})});assert.equal(hit.totalFrames,1446);assert.equal(hit.knownFrames,1446);assert.equal(miss.totalFrames,955);assert.equal(miss.timingCompleteness,'complete');});
 test('send-last restart uses current Paralysis but no extra recovery or target choice',()=>withEffects([statusEffect('paralysis')],()=>{
  const original=data.getBattleSkillById;data.getBattleSkillById=id=>{const s=original(id);return id===0xa5?{...s,effects:[...s.effects,statusEffect('paralysis')]}:s;};
  try{const random=rng({'paralysis-failure':[1]});const r=run([unit('Sent'),unit('Other','Rock Fist',{spd:30}),unit('Counter','Beast King Fist')],[I('I',0xa5)],{rng:random});const a=target(r);assert.equal(executed(r).at(-1).id,a.id);assert.equal(a.accuracy.cause,'paralysis');assert.equal(a.statusRecoveries.length,0);assert.equal(a.mpAccounting.costCharged,0);assert.equal(random.draws.filter(d=>d.category==='status-recovery-paralysis').length,0);}finally{data.getBattleSkillById=original;}
@@ -141,3 +141,40 @@ test('damage reduction follows Poison bonus before final HP loss and Counter act
 });
 test('canonical input with conflicting All targeting still produces Single Interrupt',()=>{const i=I();i.techs[0].target='All';const r=run([unit('A'),unit('B')],[i]);assert.equal(ints(r)[0].effectiveTargetIds.length,1);assert.equal(ints(r)[0].impacts.length,1);});
 for(const id of [0xa6,0xa8])test(`0x${id.toString(16)} ambiguous MP transfer remains diagnosed and does not drain guessed amount`,()=>{const r=run([unit()],[I('I',id)]);assert.equal(ints(r)[0].impacts[0].appliedEffects.length,0);assert.notEqual(assessBattleSkill(r.state.combatants[1].skills[0]).level,'supported');assert.equal(r.state.combatants[0].currentMp,92);});
+
+// Phase 2K-G1: only timing/audit expectations change; the scheduler/RNG fixtures remain unchanged.
+for(const [name,id,values,expected] of [
+ ['Hit then restarted Hit',0xa1,{},1446],
+ ['accuracy Miss then restarted Hit',0xa1,{accuracy:[0,127,0]},955],
+ ['Hit then forced Miss',0xa3,{},955],
+ ['Hit then deletion',0xa4,{},761],
+])test(`G1 sequence ${name}: ${expected} frames, one prelude`,()=>{
+ const r=run([unit()],[I('I',id)],{rng:rng(values)}),a=ints(r)[0];assert.equal(r.totalFrames,expected);assert.equal(r.knownFrames,expected);assert.equal(r.timingCompleteness,'complete');assert.equal(a.interruptTiming.preludeFrames,76);assert.equal(a.interruptTiming.executionFrames,a.outcome==='hit'?685:194);assert.equal(a.interruptTiming.totalFrames,a.durationFrames);assert.equal(r.actions.filter(a=>a.interruptTiming).length,1);assert.equal(target(r).interruptTiming,undefined);assert.ok(!r.timingDiagnostics.length);
+});
+test('G1 Paralysis Interrupt Miss = 76 + 194, restart retains 685 and Miss remains free',()=>{
+ const r=run([unit()],[I('I',0xa1,{}, {paralysis:true})],{rng:rng({'paralysis-failure':[1]})}),a=ints(r)[0];assert.deepEqual(a.interruptTiming,{preludeFrames:76,executionFrames:194,totalFrames:270});assert.equal(r.totalFrames,955);assert.equal(a.mpAccounting.costCharged,0);
+});
+test('G1 initial Miss has no Interrupt prelude or speculative original Hit duration',()=>{
+ const r=run([unit()],[I()],{rng:rng({accuracy:[127]})});assert.equal(r.totalFrames,194);assert.equal(r.actions[0].durationFrames,194);assert.ok(r.actions.every(a=>a.interruptTiming===undefined));assert.equal(ints(r).length,0);
+});
+test('G1 Interrupt enemy KO cancellation totals 761 without cancelled target duration',()=>{
+ const r=run([I()],[unit('E','Rock Fist',{hp:1})]);assert.equal(r.totalFrames,761);assert.equal(target(r).durationFrames,null);assert.equal(target(r).interrupt.cancellationReason,'actor-ko');assert.equal(ints(r)[0].durationFrames,761);
+});
+for(const count of [1,2,3])test(`G1 restarted AOE ${count} targets adds only measured AOE duration`,()=>{
+ const enemies=[I(),...Array.from({length:count-1},(_,i)=>I(`Waiting${i}`))];const r=run([unit('AOE','Triple Forces')],enemies);assert.equal(r.totalFrames,761+[703,873,990][count-1]);assert.equal(ints(r).length,1);assert.equal(target(r).durationFrames,[703,873,990][count-1]);
+});
+test('G1 send-last includes one 761-frame event and normal target timing at queue end',()=>{
+ const r=run([unit('Sent'),unit('Other','Rock Fist',{spd:30}),unit('Counter','Beast King Fist')],[I('Last',0xa5)]),rows=executed(r);assert.equal(rows[0].durationFrames,761);assert.equal(rows.at(-1).actorName,'Sent');assert.equal(rows.at(-1).durationFrames,685);assert.equal(r.totalFrames,761+3*685);assert.equal(rows.filter(a=>a.interruptTiming).length,1);
+});
+test('G1 multiple distinct Interrupt events each contribute exactly one prelude',()=>{
+ const r=run([unit('A'),unit('B')],[I('I0'),I('I1')]);assert.equal(ints(r).length,2);assert.equal(r.totalFrames,2*(761+685));assert.equal(r.actions.reduce((sum,a)=>sum+(a.interruptTiming?.preludeFrames??0),0),152);
+});
+test('G1 Results distinguishes target prelude from Hit/Miss execution',()=>{
+ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{BattleResults}=load('src/components/BattleResults.tsx');const result=aggregateBattleRuns([]);result.fastestBattleHistory=[...run().actions,...run([unit()],[I()],{rng:rng({accuracy:[0,127,0]})}).actions];const html=renderToStaticMarkup(React.createElement(BattleResults,{results:result}));for(const text of ['Interrupt timing: 761f','Interrupt timing: 270f','76f interrupted-action prelude','685f Interrupt execution','194f Miss execution'])assert.ok(html.includes(text),text);
+});
+test('G1 measured Interrupt does not fill unrelated unknown timing gaps',()=>{
+ const p=unit();p.techs[0]={...p.techs[0],id:'custom',name:'Unmeasured custom'};const r=run([p],[I()]);assert.equal(ints(r)[0].durationFrames,761);assert.equal(target(r).durationFrames,null);assert.equal(r.totalFrames,null);assert.equal(r.knownFrames,761);
+});
+test('G1 exported prelude and canonical-only timing classification',()=>{
+ const timing=load('src/utils/battle/battleTiming.ts');assert.equal(timing.INTERRUPT_PRELUDE_FRAMES,76);assert.equal(timing.classifySkillTiming(linkLegacySkill(I().techs[0])),'interrupt');assert.equal(timing.resolveActionTiming({actionKind:'interrupt',timingClass:'unknown',outcome:'hit',effectiveTargetCount:1}).durationFrames,null);for(const outcome of ['skipped','cancelled'])assert.equal(timing.resolveActionTiming({actionKind:'interrupt',timingClass:'interrupt',outcome,effectiveTargetCount:1}).interruptTiming,undefined);
+});

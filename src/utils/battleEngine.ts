@@ -2,7 +2,7 @@
 export { runLegacyBattleSimulation as runBattleSimulation } from '@/utils/battle/battleCompatibility';
 export { simulateBattleCore, BATTLE_ENGINE_VERSION, DEFAULT_MAX_ROUNDS } from '@/utils/battle/battleSimulation';
 export { assessBattleSkill, assessBattleScenario } from '@/utils/battle/battleSupport';
-export { resolveActionTiming, summarizeBattleTiming, ACTION_TIMING_PROFILE } from '@/utils/battle/battleTiming';
+export { resolveActionTiming, summarizeBattleTiming, ACTION_TIMING_PROFILE, INTERRUPT_PRELUDE_FRAMES } from '@/utils/battle/battleTiming';
 export { aggregateBattleRuns } from '@/utils/battle/battleCompatibility';
 export type { BattleEngineOptions, BattleRunResult, BattleCombatantState, PlannedAction, BattleActionRecord, BattleImpact, ActionPolicy } from '@/utils/battle/battleTypes';
 
