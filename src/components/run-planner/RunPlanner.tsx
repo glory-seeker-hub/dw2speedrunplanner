@@ -39,7 +39,7 @@ const Stats = ({ stats }: { stats: DigimonStats }) => (
 
 type Props = { planner: ReturnType<typeof useRunPlanner> };
 
-export const RunPlanner = ({ planner }: Props) => {
+export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAnalyze?: (runId: string, eventId: string) => void; analysisError?: string | null }) => {
   const [confirmReset, setConfirmReset] = useState<string | null>(null);
   const [routeDocument, setRouteDocument] = useState<RouteDocumentModel | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -193,7 +193,8 @@ export const RunPlanner = ({ planner }: Props) => {
           <a href="#run-roster" className="mb-2 inline-block rounded px-2 py-1 text-sm underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">Back to roster ↑</a>
           <BattleSelector key={`${run.id}/${planner.feedbackRevision}`} hasParticipants={run.digiline.length > 0} onRecord={planner.recordBattle} run={run} />
           </section>
-          <RunHistory key={run.id} run={run} onUndo={planner.undoAction} error={error} />
+          {analysisError && <p role="alert" className="text-sm text-destructive">{analysisError}</p>}
+          <RunHistory onAnalyze={onAnalyze} key={run.id} run={run} onUndo={planner.undoAction} error={error} />
         </>
       )}
       <AlertDialog open={confirmReset !== null} onOpenChange={(open) => { if (!open) setConfirmReset(null); }}>

@@ -1,3 +1,4 @@
+import type { PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import { toast } from 'sonner';
 
 interface BattleSimulationProps {
   savedTeams: TeamDigimon[][];
+  preset?: PlannerBattleAnalysisPreset; onClearPreset?: () => void;
   onSimulationComplete: (results: SimulationResult) => void;
 }
 
@@ -31,11 +33,13 @@ const floorSpecialties: FloorSpecialty[] = [
   { id: 'nature', name: 'Nature' }
 ];
 
-export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSimulationProps) => {
-  const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<number | null>(null);
-  const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>('encounter');
+export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete, preset, onClearPreset }: BattleSimulationProps) => {
+  const [imported, setImported] = useState(() => preset ? structuredClone(preset) : null);
+  const savedTeams = useMemo(() => imported ? [...manualTeams, imported.playerTeam, imported.enemyTeam] : manualTeams, [imported, manualTeams]);
+  const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<number | null>(preset ? manualTeams.length : null);
+  const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>(preset ? 'saved' : 'encounter');
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
-  const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(null);
+  const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(preset ? manualTeams.length + 1 : null);
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(1000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
@@ -107,6 +111,22 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
           <CardTitle>Battle Simulation Setup</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {imported && <section className="rounded border p-3 space-y-2" aria-label="Pre-battle Planner state">
+            <p className="font-semibold">Analyzing pre-battle state</p>
+            <p className="text-sm">{imported.selectedBattle.domainId} · {imported.selectedBattle.phase} · Floor {imported.selectedBattle.floor} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
+            <p className="text-sm text-muted-foreground">Run Planner does not track historical current HP/MP. This copy starts at full resources. Adjust below if needed; changes affect only this simulation.</p>
+            <p className="text-xs text-muted-foreground">Stats follow Planner expected growth, rounded down for simulation. Floor specialty is a local setting.</p>
+            {imported.playerTeam.map((member, index) => <div key={member.instanceId} className="flex flex-wrap items-center gap-3">
+              <span className="text-sm">Slot {index + 1}: {member.digimon.name} · Lv{member.level} · DP{member.dp}</span>
+              {(['hp', 'mp'] as const).map(resource => <Label key={resource} className="text-xs">Current {resource.toUpperCase()}
+                <Input className="w-24" type="number" min={0} max={member.customStats[resource]} value={resource === 'hp' ? member.currentHp ?? member.customStats.hp : member.currentMp ?? member.customStats.mp}
+                  onChange={e => { const value = Number(e.target.value); if (!Number.isFinite(value)) return; setImported(previous => previous ? { ...previous, playerTeam: previous.playerTeam.map((m, i) => i === index ? { ...m, [resource === 'hp' ? 'currentHp' : 'currentMp']: Math.max(0, Math.min(m.customStats[resource], value)) } : m) } : null); }} />
+              </Label>)}
+            </div>)}
+            <div className="flex gap-2"><Button variant="outline" size="sm" onClick={() => setImported(structuredClone(preset!))}>Reset imported team</Button><Button variant="outline" size="sm" onClick={onClearPreset}>Use manual setup</Button></div>
+            {imported.diagnostics.filter(d => d.code !== 'planner-resource-history-unavailable').map((d, i) => <p key={i} className="text-xs text-muted-foreground">{d.message}</p>)}
+          </section>}
+          {!imported && <>
           {/* Player Team Selection */}
           <div className="space-y-2">
             <Label htmlFor="player-team">Select Your Team</Label>
@@ -189,6 +209,7 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
             </Tabs>
           </div>
 
+          </>}
           {/* Floor Specialty */}
           <div className="space-y-2">
             <Label htmlFor="floor-specialty">Floor Specialty</Label>
@@ -254,7 +275,7 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
                   <div className="text-sm text-muted-foreground">
                     <p>HP: {digimon.customStats.hp} | MP: {digimon.customStats.mp}</p>
                     <p>ATK: {digimon.customStats.atk} | DEF: {digimon.customStats.def} | SPD: {digimon.customStats.spd}</p>
-                    <p>Techs: {digimon.techs.length}/3</p>
+                    <p>Techs: {digimon.techs.length}{imported ? ' recorded' : '/3'}</p>
                   </div>
                 </div>
               ))}
@@ -292,7 +313,7 @@ export const BattleSimulation = ({ savedTeams, onSimulationComplete }: BattleSim
                     <div className="text-sm text-muted-foreground">
                       <p>HP: {digimon.customStats.hp} | MP: {digimon.customStats.mp}</p>
                       <p>ATK: {digimon.customStats.atk} | DEF: {digimon.customStats.def} | SPD: {digimon.customStats.spd}</p>
-                      <p>Techs: {digimon.techs.length}/3</p>
+                      <p>Techs: {digimon.techs.length}{imported ? ' recorded' : '/3'}</p>
                     </div>
                   </div>
                 ))

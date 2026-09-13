@@ -1,8 +1,6 @@
 import { getBattleSkillById, getBattleSkillByName } from '@/data/battleSkills';
 import { LEGACY_TECH_IDENTITIES } from '@/data/legacyTechIdentities';
-import { DOMAIN_GROUPS } from '@/data/domainGroups';
-import { DIGIMONS } from '@/data/digimons';
-import { requireEncounterTechs } from '@/utils/encounterBattleSkills';
+import { encounterToBattleTeam } from './battleEncounter';
 import type { Tech } from '@/types/digimon';
 import type { Encounter } from '@/types/encounter';
 import type { BattleCombatantState, BattleInput, BattleSide, BattleSkillSelection, BattleState, BattleTeamMember } from './battleTypes';
@@ -48,6 +46,10 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     if (!Number.isFinite(member.currentHp) || member.currentHp < 0 || member.currentHp > actor.maxHp) throw new BattleInputError('Invalid current HP.');
     actor.currentHp = member.currentHp; actor.isAlive = side === 'player' || actor.currentHp > 0;
   }
+  if (member.currentMp !== undefined) {
+    if (!Number.isFinite(member.currentMp) || member.currentMp < 0 || member.currentMp > actor.maxMp) throw new BattleInputError('Invalid current MP.');
+    actor.currentMp = member.currentMp;
+  }
   validateCombatant(actor);
   if (!skills.some(s => s.legacyTech.ap > 0 || s.kind === 'interrupt' || s.kind === 'assist')) {
     if (!allowSynthetic || skills.some(s => s.source === 'legacy-custom-technique')) throw new BattleInputError(`No usable known technique for ${actor.name}.`, 'unsupported');
@@ -66,11 +68,7 @@ export function createBattleState(input: BattleInput, simulationIndex = 0): Batt
       const labels = (input.enemy as Encounter).digimons.flatMap(d => d.techs);
       const unknown = labels.filter(label => !getBattleSkillByName(label));
       if (unknown.length) throw new BattleInputError(`Unresolved authoritative encounter technique: ${unknown.join(', ')}.`);
-      enemy = (input.enemy as Encounter).digimons.map(d => {
-        const species = DIGIMONS.find(s => s.name === d.name);
-        const stats = { hp: d.hp, mp: d.mp, atk: d.atk, def: d.def, spd: d.spd };
-        return { isBoss: DOMAIN_GROUPS.some(group => group.encounterId === (input.enemy as Encounter).id && group.isBoss), digimon: species ?? { id: d.name, name: d.name, type: 'Data', specialty: 'None', baseStats: stats }, customStats: stats, techs: requireEncounterTechs(d.techs) };
-      });
+      enemy = encounterToBattleTeam(input.enemy as Encounter);
     } catch (error) { throw new BattleInputError(error instanceof Error ? error.message : 'Invalid encounter.'); }
   } else enemy = input.enemy as readonly BattleTeamMember[];
   if (!input.player.length) throw new BattleInputError('At least one player combatant is required.');

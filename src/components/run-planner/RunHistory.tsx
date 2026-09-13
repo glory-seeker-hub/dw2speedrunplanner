@@ -8,7 +8,7 @@ import { getDomainById } from '@/data/domains';
 import { getBattlePreview } from '@/utils/runBattleSelection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (eventId: string, runId: string) => boolean; error: string | null }) => {
+export const RunHistory = ({ run, onUndo, error, onAnalyze }: { onAnalyze?: (runId: string, eventId: string) => void; run: RunPlan; onUndo: (eventId: string, runId: string) => boolean; error: string | null }) => {
   const [confirmEventId, setConfirmEventId] = useState<string | null>(null);
   const [undoneAt, setUndoneAt] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(true);
@@ -72,6 +72,7 @@ export const RunHistory = ({ run, onUndo, error }: { run: RunPlan; onUndo: (even
                 {' '}Learned {choice.learned.join(', ') || 'none'} · Discarded {choice.discarded.join(', ') || 'none'}
               </p>)}
               <p className="text-xs text-muted-foreground">Encounter {event.encounterId}</p>
+              {onAnalyze && <Button size="sm" variant="outline" onClick={() => onAnalyze(run.id, event.id)}>Analyze Battle</Button>}
               {event.techniqueMisses?.map(miss => <p key={miss.instanceId}>
                 {event.preActionCheckpoint.roster.find(member => member.instanceId === miss.instanceId)?.name}: Missed techniques: {miss.missed.join(', ')}
               </p>)}

@@ -1,3 +1,4 @@
+import { buildPlannerBattleAnalysisPreset, type PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +12,18 @@ import { RunPlanner } from '@/components/run-planner/RunPlanner';
 import { useRunPlanner } from '@/hooks/useRunPlanner';
 const Index = () => {
   const planner = useRunPlanner();
+  const [analysis, setAnalysis] = useState<{ preset: PlannerBattleAnalysisPreset; revision: number } | null>(null);
+  const validAnalysis = analysis && planner.data.runs.some(run => run.id === analysis.preset.source.runId && run.history.some(event => event.id === analysis.preset.source.battleEventId)) ? analysis : null;
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const handleAnalyze = (runId: string, eventId: string) => {
+    try {
+      const run = planner.data.runs.find(r => r.id === runId);
+      if (!run) throw new Error('The source run no longer exists.');
+      const preset = buildPlannerBattleAnalysisPreset(run, eventId);
+      setAnalysis(old => ({ preset, revision: (old?.revision ?? 0) + 1 }));
+      setSimulationResults(null); setAnalysisError(null); setActiveTab('battle-simulation');
+    } catch (cause) { setAnalysisError(cause instanceof Error ? cause.message : 'Historical battle analysis unavailable.'); }
+  };
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
   const [activeTab, setActiveTab] = useState<string>('team-builder');
@@ -75,7 +88,7 @@ const Index = () => {
             </TabsList>
 
             <TabsContent value="run-planner" className="mt-6">
-              <RunPlanner planner={planner} />
+              <RunPlanner planner={planner} onAnalyze={handleAnalyze} analysisError={analysisError} />
             </TabsContent>
 
             <TabsContent value="team-builder" className="mt-6">
@@ -83,7 +96,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="battle-simulation" className="mt-6">
-              <BattleSimulation savedTeams={savedTeams} onSimulationComplete={handleSimulationComplete} />
+              <BattleSimulation key={validAnalysis?.revision ?? 'manual'} preset={validAnalysis?.preset} onClearPreset={() => setAnalysis(null)} savedTeams={savedTeams} onSimulationComplete={handleSimulationComplete} />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">

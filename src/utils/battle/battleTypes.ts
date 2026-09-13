@@ -142,7 +142,7 @@ export interface BattleRunResult {
   state: BattleState; diagnostics: string[];
   totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
-export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus | 'poison-body' | 'invincibility' | 'invisibility' | 'motivation-down', boolean>>; initialPowers?: Partial<Record<BattleStatus, boolean>>; initialElementalPower?: SkillElement; initialStages?: Partial<Record<'atk' | 'def' | 'spd', number>>; currentHp?: number };
+export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus | 'poison-body' | 'invincibility' | 'invisibility' | 'motivation-down', boolean>>; initialPowers?: Partial<Record<BattleStatus, boolean>>; initialElementalPower?: SkillElement; initialStages?: Partial<Record<'atk' | 'def' | 'spd', number>>; currentHp?: number; currentMp?: number };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }
 export interface BattleEngineOptions {
   rng?: BattleRng;

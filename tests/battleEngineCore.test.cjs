@@ -256,10 +256,10 @@ test('public UI can still complete a supported legacy simulation', async () => {
   const React = require('react'); const rngModule = load('src/utils/battle/battleRng.ts');
   const { BattleSimulation } = load('src/components/BattleSimulation.tsx');
   const original = { useState: React.useState, useMemo: React.useMemo, setTimeout: global.setTimeout, rng: rngModule.createProductionBattleRng };
-  const states = [0, 'encounter', 1, null, 'none', 1, '', false]; let cursor = 0, scheduled, completed;
+  const states = [null, 0, 'encounter', 1, null, 'none', 1, '', false]; let cursor = 0, scheduled, completed;
   const busy = [];
   try {
-    React.useState = initial => { const i = cursor++; return [states[i] ?? initial, value => { if (i === 7) busy.push(value); }]; };
+    React.useState = initial => { const i = cursor++; return [i in states ? states[i] : typeof initial === 'function' ? initial() : initial, value => { if (i === 8) busy.push(value); }]; };
     React.useMemo = fn => fn(); global.setTimeout = fn => { scheduled = fn; return 1; };
     rngModule.createProductionBattleRng = () => seeded(42);
     const tree = BattleSimulation({ savedTeams: [cases.single[0]], onSimulationComplete: result => { completed = result; } });
