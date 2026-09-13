@@ -28,7 +28,28 @@ export interface CounterRuntimeState {
   targetRule?: 'causal-attacker' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement';
   replacedByConfusion?: boolean;
 }
+export interface InterruptRuntimeState {
+  selected: true; state: 'waiting' | 'executing' | 'resolved' | 'skipped-no-opportunity';
+  selectedSkillId: number | null; targetActionId?: string; interruptedActorId?: string;
+}
+export interface InterruptResolution {
+  targetActionId: string; targetActorId: string; targetActorName: string; executorId: string;
+  targetPolicy: 'player-random' | 'enemy-first-attacker';
+  initialTargetOutcome: 'hit'; interruptOutcome?: 'hit' | 'miss';
+  restarted: boolean; cancelled: boolean; sentLast: boolean; cancellationReason?: 'action-deleted' | 'actor-ko';
+  deleteActionRoll?: number; deletionImmunity?: 'boss'; forcedMissRoll?: number;
+  forceMiss?: boolean; damageRetained?: { numerator: number; denominator: number };
+  confusionSuppressedForActionId?: string;
+}
+export interface PreparedActionContext {
+  targetIds: string[]; statusesBefore: StatusSnapshot; statusesAfterRecovery: StatusSnapshot;
+  statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution;
+  initialAccuracy: AccuracyResolution; interruptConsumed: boolean;
+  interruptedByActionId?: string; resolution?: InterruptResolution;
+}
 export interface BattleCombatantState {
+  isBoss: boolean;
+  confusionSuppressedForActionId?: string;
   id: string;
   sourceInstanceId: string | null;
   name: string;
@@ -57,8 +78,10 @@ export type TargetIntent =
 export interface ReactionContext { reactionToActionId: string; triggeredByActorId: string; counterActorId: string }
 interface PlannedActionBase {
   id: string; round: number; actorId: string; targetIntent: TargetIntent;
-  state: ActionState; initiative: number | null; priority: 'normal' | 'counter-last' | 'counter-promoted';
+  state: ActionState; initiative: number | null; priority: 'normal' | 'counter-last' | 'counter-promoted' | 'interrupt-waiting';
   counter: CounterRuntimeState | null;
+  interrupt?: InterruptRuntimeState;
+  prepared?: PreparedActionContext;
   reaction: ReactionContext | null;
   chainFromActionId: string | null;
 }
@@ -72,6 +95,7 @@ export interface BattleImpact {
   baseDamage: number; poisonBonusDamage: number; statusApplications: StatusApplicationResult[];
   damage: number; healing: number; outcome: 'hit' | 'ko' | 'miss' | 'blocked' | 'invincible';
   appliedEffects: { source: 'legacy'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
+  damageBeforeInterruptReduction?: number;
   ko: boolean;
 }
 export interface BattleResourceAlert {
@@ -83,6 +107,9 @@ export interface BattleActionRecord {
   kind: BattleActionKind; source: BattleSkillSelection['source'];
   targetIntent: TargetIntent; effectiveTargetIds: string[]; impacts: BattleImpact[];
   reaction: ReactionContext | null; counter: CounterRuntimeState | null; state: ActionState; reason?: string;
+  interrupt?: InterruptResolution;
+  restart?: { wasInterrupted: true; interruptedByActionId: string; initialAccuracyResolution: AccuracyResolution;
+    recoverySuppressedOnRestart: true; targetLocked: true; skillLocked: true; statusesAtRestart: StatusSnapshot };
   accuracy: AccuracyResolution | null; statusesBefore: StatusSnapshot; statusesAfterRecovery: StatusSnapshot;
   statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution | null;
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
@@ -105,7 +132,7 @@ export interface BattleRunResult {
   state: BattleState; diagnostics: string[];
   totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
-export type BattleTeamMember = TeamDigimon & { instanceId?: string; initialStatuses?: Partial<Record<BattleStatus, boolean>> };
+export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus, boolean>> };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }
 export interface BattleEngineOptions {
   rng?: BattleRng;

@@ -16,7 +16,7 @@ export function isConfusionUsableSkill(skill: BattleSkillSelection): boolean {
 export function prepareConfusionAction(state: BattleState, actor: BattleCombatantState, action: PlannedAction, policy: ActionPolicy, rng: BattleRng): ConfusionResolution {
   const audit: ConfusionResolution = { active: !!actor.statuses.confusion, redirected: false, skipped: false,
     plannedSkillKey: action.skill.key, selectedSkillKey: action.skill.key, eligibleSkillKeys: [], originalTargetIntent: structuredClone(action.targetIntent) };
-  if (!audit.active || action.kind === 'assist') return audit;
+  if (!audit.active || action.kind === 'assist' || action.kind === 'interrupt' || actor.confusionSuppressedForActionId === action.id) return audit;
   const eligible = actor.skills.filter(isConfusionUsableSkill);
   audit.eligibleSkillKeys = eligible.map(s => s.key);
   if (action.chainFromActionId) {

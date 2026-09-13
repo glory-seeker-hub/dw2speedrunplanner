@@ -1,0 +1,241 @@
+{
+  "single": [
+    {
+      "runs": 1,
+      "wallClockMs": 14.781099999999924,
+      "averageExecutedActions": 16,
+      "averageRecords": 16,
+      "totalRngDraws": 56,
+      "draws": {
+        "action-choice": 16,
+        "initiative": 8,
+        "target-choice": 8,
+        "accuracy": 24
+      },
+      "firstHistoryBytes": 31151,
+      "withoutInterruptAuditBytes": 23740,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "runs": 100,
+      "wallClockMs": 46.520200000000045,
+      "averageExecutedActions": 16.62,
+      "averageRecords": 16.86,
+      "totalRngDraws": 5853,
+      "draws": {
+        "action-choice": 1686,
+        "initiative": 843,
+        "target-choice": 843,
+        "accuracy": 2481
+      },
+      "firstHistoryBytes": 31151,
+      "withoutInterruptAuditBytes": 23740,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "runs": 1000,
+      "wallClockMs": 196.51480000000004,
+      "averageExecutedActions": 16.578,
+      "averageRecords": 16.776,
+      "totalRngDraws": 58320,
+      "draws": {
+        "action-choice": 16776,
+        "initiative": 8388,
+        "target-choice": 8388,
+        "accuracy": 24768
+      },
+      "firstHistoryBytes": 31151,
+      "withoutInterruptAuditBytes": 23740,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "multiple": [
+    {
+      "runs": 1,
+      "wallClockMs": 2.0327000000000908,
+      "averageExecutedActions": 39,
+      "averageRecords": 47,
+      "totalRngDraws": 155,
+      "draws": {
+        "action-choice": 47,
+        "initiative": 20,
+        "accuracy": 56,
+        "interrupt-user-choice": 17,
+        "interrupt-force-miss": 5,
+        "target-choice": 10
+      },
+      "firstHistoryBytes": 87083,
+      "withoutInterruptAuditBytes": 68238,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "runs": 100,
+      "wallClockMs": 71.81569999999999,
+      "averageExecutedActions": 46.9,
+      "averageRecords": 58.15,
+      "totalRngDraws": 18680,
+      "draws": {
+        "action-choice": 5815,
+        "initiative": 2454,
+        "accuracy": 6483,
+        "interrupt-user-choice": 2028,
+        "interrupt-force-miss": 711,
+        "target-choice": 1189
+      },
+      "firstHistoryBytes": 87083,
+      "withoutInterruptAuditBytes": 68238,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "runs": 1000,
+      "wallClockMs": 712.2176,
+      "averageExecutedActions": 46.641,
+      "averageRecords": 57.829,
+      "totalRngDraws": 185896,
+      "draws": {
+        "action-choice": 57829,
+        "initiative": 24434,
+        "accuracy": 64562,
+        "interrupt-user-choice": 20144,
+        "interrupt-force-miss": 7114,
+        "target-choice": 11813
+      },
+      "firstHistoryBytes": 87083,
+      "withoutInterruptAuditBytes": 68238,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "statusHeavy": [
+    {
+      "runs": 1,
+      "wallClockMs": 1.580199999999877,
+      "averageExecutedActions": 17,
+      "averageRecords": 20,
+      "totalRngDraws": 78,
+      "draws": {
+        "action-choice": 20,
+        "initiative": 10,
+        "status-recovery-paralysis": 4,
+        "target-choice": 10,
+        "paralysis-failure": 10,
+        "accuracy": 17,
+        "status-apply-poison": 7
+      },
+      "firstHistoryBytes": 32952,
+      "withoutInterruptAuditBytes": 26457,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "runs": 100,
+      "wallClockMs": 23.22330000000011,
+      "averageExecutedActions": 17.8,
+      "averageRecords": 19.6,
+      "totalRngDraws": 8227,
+      "draws": {
+        "action-choice": 1960,
+        "initiative": 980,
+        "status-recovery-paralysis": 411,
+        "target-choice": 980,
+        "paralysis-failure": 1256,
+        "accuracy": 1940,
+        "status-apply-poison": 700
+      },
+      "firstHistoryBytes": 32952,
+      "withoutInterruptAuditBytes": 26457,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "runs": 1000,
+      "wallClockMs": 167.0757000000001,
+      "averageExecutedActions": 17.541,
+      "averageRecords": 19.19,
+      "totalRngDraws": 81017,
+      "draws": {
+        "action-choice": 19190,
+        "initiative": 9595,
+        "status-recovery-paralysis": 3922,
+        "target-choice": 9595,
+        "paralysis-failure": 12308,
+        "accuracy": 19349,
+        "status-apply-poison": 7058
+      },
+      "firstHistoryBytes": 32952,
+      "withoutInterruptAuditBytes": 26457,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ],
+  "sendLast": [
+    {
+      "runs": 1,
+      "wallClockMs": 1.0941000000000258,
+      "averageExecutedActions": 12,
+      "averageRecords": 12,
+      "totalRngDraws": 42,
+      "draws": {
+        "action-choice": 12,
+        "initiative": 6,
+        "target-choice": 9,
+        "accuracy": 15
+      },
+      "firstHistoryBytes": 21173,
+      "withoutInterruptAuditBytes": 18398,
+      "outcomes": {
+        "player-win": 1
+      }
+    },
+    {
+      "runs": 100,
+      "wallClockMs": 20.06639999999993,
+      "averageExecutedActions": 12.4,
+      "averageRecords": 12.92,
+      "totalRngDraws": 4439,
+      "draws": {
+        "action-choice": 1292,
+        "initiative": 646,
+        "target-choice": 938,
+        "accuracy": 1563
+      },
+      "firstHistoryBytes": 21173,
+      "withoutInterruptAuditBytes": 18398,
+      "outcomes": {
+        "player-win": 100
+      }
+    },
+    {
+      "runs": 1000,
+      "wallClockMs": 139.7932000000003,
+      "averageExecutedActions": 12.438,
+      "averageRecords": 12.904,
+      "totalRngDraws": 44433,
+      "draws": {
+        "action-choice": 12904,
+        "initiative": 6452,
+        "target-choice": 9413,
+        "accuracy": 15664
+      },
+      "firstHistoryBytes": 21173,
+      "withoutInterruptAuditBytes": 18398,
+      "outcomes": {
+        "player-win": 1000
+      }
+    }
+  ]
+}

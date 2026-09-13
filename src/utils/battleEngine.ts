@@ -8,3 +8,7 @@ export type { BattleEngineOptions, BattleRunResult, BattleCombatantState, Planne
 
 export { canInterruptCounter } from '@/utils/battle/battleReactions';
 export type { CounterRuntimeState, CounterExecutionMode } from '@/utils/battle/battleTypes';
+
+export { getStatusImmunity } from '@/utils/battle/battleImmunity';
+export { potentiallyInterruptible } from '@/utils/battle/battleInterrupts';
+export type { InterruptRuntimeState, InterruptResolution, PreparedActionContext } from '@/utils/battle/battleTypes';

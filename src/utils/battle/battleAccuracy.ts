@@ -6,7 +6,7 @@ import type { BattleRng } from './battleRng';
 
 export interface AccuracyResolution {
   outcome: 'hit' | 'miss' | 'unsupported';
-  cause: 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated';
+  cause: 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
   hitThreshold128?: number; roll128?: number; paralysisRoll?: number; tailBladeRoll?: number;
   referenceTargetId: string | null;
   referenceRule?: 'single-target' | 'average-effective-target-spd';

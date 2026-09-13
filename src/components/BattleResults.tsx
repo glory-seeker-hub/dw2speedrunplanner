@@ -17,10 +17,21 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
           <span className="font-semibold text-digital-cyan">{action.actorName}</span> · {action.skillName}
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
+          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
+      {action.kind === 'interrupt' && <p className="text-sm text-info">{action.reason === 'interrupt-no-eligible-target' ? 'Interrupt skipped — no eligible target' : 'Interrupt — ' + (action.outcome === 'hit' ? 'Hit' : action.accuracy?.cause === 'paralysis' ? 'Miss — Paralysis' : 'Miss — Accuracy')}</p>}
+      {action.interrupt && <div className="text-xs text-info">
+        <p>Interrupt target: {action.interrupt.targetActorName} / {action.interrupt.targetActionId}</p>
+        {action.restart && <><p>Initial Hit → Interrupted → {action.interrupt.restarted ? 'Restarted' : 'Not restarted'} → Final {action.outcome}</p><p>Natural recovery suppressed on restart · Skill and targets locked</p></>}
+        {action.interrupt.cancelled && <p>Action cancelled by Interrupt{action.interrupt.cancellationReason === 'actor-ko' ? ' — actor KO' : ''}</p>}
+        {action.interrupt.sentLast && <p>Action sent to end of turn, after Counters</p>}
+        {action.interrupt.forceMiss && <p>Forced Miss by Interrupt</p>}
+        {action.interrupt.damageRetained && <p>Damage reduced by Interrupt · retained {action.interrupt.damageRetained.numerator}/{action.interrupt.damageRetained.denominator}</p>}
+        {action.interrupt.deletionImmunity && <p>Boss immune to action deletion</p>}
+        {action.interrupt.confusionSuppressedForActionId && <p>Confusion applied — effective next turn for this interrupted action</p>}
+      </div>}
       {action.chainFromActionId && <p className="text-xs text-muted-foreground">Shadow Scythe repeat</p>}
       {action.counter && <div className="text-xs text-muted-foreground">
         <p>{action.counter.executionMode === 'activated' ? 'Counter — Activated' : action.counter.executionMode === 'shared-trigger-promoted' ? 'Counter — Shared AOE follow-up' : action.counter.executionMode === 'untriggered-end-of-turn' ? 'Counter — Untriggered' : 'Counter — Waiting'}</p>
@@ -36,7 +47,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
       <ul className="space-y-1 text-sm">{action.impacts.map((impact, index) => <li key={`${impact.targetId}-${index}`} className="flex flex-wrap justify-between gap-2">
         <span>{impact.targetName} <span className="text-xs text-muted-foreground">({impact.targetId})</span></span>
         <span><span className="text-destructive">{impact.damage} dmg</span>{impact.poisonBonusDamage > 0 && <span className="text-info"> (Poison +{impact.poisonBonusDamage})</span>} · {impact.hpBefore} → {impact.hpAfter} HP · {impact.ko ? 'KO' : impact.outcome}
-          {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{status.status === 'poison' ? 'Poison' : status.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'}{status.condition === 'counter-activated' ? ' by activated Counter' : ` · roll ${status.roll}/2`}</span>)}
+          {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{status.status === 'poison' ? 'Poison' : status.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {status.result === 'immune' ? 'immune (Boss)' : status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'}{status.condition === 'interrupt-hit' ? ' by Interrupt; affects restarted action immediately' : status.condition === 'counter-activated' ? ' by activated Counter' : ` · roll ${status.roll}/2`}</span>)}
         </span>
       </li>)}</ul>
       {action.mpAccounting && <p className="text-xs text-muted-foreground">MP: {action.mpAccounting.before} → {action.mpAccounting.after} · Cost {action.mpAccounting.costCharged ?? 'unresolved'}{action.mpAccounting.paymentRule === 'counter-triggering-actor' ? ` · Payer: ${action.mpAccounting.payerName} (${action.mpAccounting.payerCombatantId}) · triggering actor` : ''}</p>}

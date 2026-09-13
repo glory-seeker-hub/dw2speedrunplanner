@@ -21,6 +21,7 @@ export function resolveActionTiming(input: ActionTimingInput): { durationFrames:
   if (input.outcome !== 'hit' && input.outcome !== 'miss') return unavailable(`No measured timing for ${input.outcome} actions.`);
   // An explicitly classified full-action Miss; never inferred from impact count.
   if (input.outcome === 'miss') return { durationFrames: ACTION_TIMING_PROFILE.miss, diagnostics: [] };
+  if (input.actionKind === 'interrupt') return unavailable('Measured Interrupt Hit duration unavailable.');
   if (input.actionKind !== 'attack' && input.actionKind !== 'counter') return unavailable(`No proven measured timing for ${input.actionKind} execution.`);
   const count = input.effectiveTargetCount;
   if (!Number.isSafeInteger(count) || count < 1) return unavailable('Invalid effective target count for successful timing.');

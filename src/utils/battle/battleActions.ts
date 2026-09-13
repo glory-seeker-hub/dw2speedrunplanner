@@ -3,7 +3,7 @@ import { BattleInputError } from './battleTypes';
 
 export const legacyActionPolicy: ActionPolicy = {
   chooseAction(actor, _context, rng) {
-    const skills = actor.skills.filter(s => s.legacyTech.ap > 0);
+    const skills = actor.skills.filter(s => s.legacyTech.ap > 0 || s.kind === 'interrupt');
     if (!skills.length) throw new BattleInputError(`No usable technique for ${actor.name}.`, 'unsupported');
     // The old synthetic fallback consumes no technique-choice draw.
     const skill = skills.length === 1 && skills[0].source === 'synthetic-legacy-fallback'
@@ -21,8 +21,9 @@ export function planAction(state: BattleState, actor: BattleCombatantState, choi
   const targetIntent: TargetIntent = choice.kind === 'skill' && choice.targetIntent ? structuredClone(choice.targetIntent) : {
     kind: 'opponents', side: actor.side === 'player' ? 'enemy' : 'player', selection: skill?.legacyTech.target === 'All' ? 'all' : 'random-at-execution',
   };
-  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill.kind === 'counter' ? 'counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };
+  const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill.kind === 'interrupt' ? 'interrupt-waiting' as const : skill.kind === 'counter' ? 'counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };
   const action: PlannedAction = { ...base, kind: skill.kind, skill, counter: skill.kind === 'counter' ? { selected: true, executionMode: 'waiting', activatedMechanics: false } : null };
+  if (skill.kind === 'interrupt') action.interrupt = { selected: true, state: 'waiting', selectedSkillId: skill.canonicalSkillId };
   actor.plannedActionId = action.id;
   state.plannedActions.push(action);
   return action;

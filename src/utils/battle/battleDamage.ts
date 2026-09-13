@@ -1,5 +1,5 @@
 import { counterDefinition, usesActivatedCounterMechanics } from './battleReactions';
-import type { PlannedAction } from './battleTypes';
+import type { BattleState, PlannedAction } from './battleTypes';
 import type { Tech } from '@/types/digimon';
 import { BattleCombatantState, BattleInputError } from './battleTypes';
 
@@ -82,14 +82,24 @@ export function calculateLegacyDamage(
 /** Counter descriptors modify damage output, not AP. Floor base formula first,
  * then each documented output multiplier; causal return replaces base damage.
  * Poison is added by the status resolver after this function. */
-export function calculateActionDamage(attacker: BattleCombatantState, defender: BattleCombatantState, action: PlannedAction, floorSpecialty: string): number {
+export function calculateActionDamage(attacker: BattleCombatantState, defender: BattleCombatantState, action: PlannedAction, floorSpecialty: string, state?: BattleState): number {
   const canonical = counterDefinition(action);
-  const tech = action.kind === 'counter' && canonical?.attackPower !== null && canonical?.attackPower !== undefined
+  const tech = (action.kind === 'counter' || action.kind === 'interrupt') && canonical?.attackPower !== null && canonical?.attackPower !== undefined
     ? { ...action.skill.legacyTech, ap: canonical.attackPower, specialEffect: undefined } : action.skill.legacyTech;
   let damage = calculateLegacyDamage(attacker, defender, tech, floorSpecialty);
   if (usesActivatedCounterMechanics(action)) for (const effect of canonical?.effects ?? []) {
     if (effect.kind !== 'damage-modifier' || effect.condition !== 'counter-triggered') continue;
     damage = Math.floor((effect.modifier === 'returned-damage' ? action.counter!.damageReceivedFromTrigger! : damage) * effect.multiplier);
+  }
+  const targetAction = state?.plannedActions.find(a => a.id === defender.plannedActionId);
+  const targetInterrupting = targetAction?.interrupt?.state === 'waiting' || targetAction?.interrupt?.state === 'executing';
+  const targetCountering = targetAction?.counter?.executionMode === 'waiting';
+  for (const effect of canonical?.effects ?? []) {
+    if (effect.kind !== 'damage-modifier' || effect.modifier !== 'multiplier') continue;
+    const applies = effect.condition === 'target-interrupting' && targetInterrupting
+      || effect.condition === 'target-countering-or-interrupting' && (targetCountering || targetInterrupting)
+      || effect.condition === 'user-interrupted' && !!action.prepared?.interruptedByActionId;
+    if (applies) damage = Math.floor(damage * effect.multiplier);
   }
   if (!Number.isFinite(damage) || damage < 0) throw new BattleInputError('Invalid Counter damage arithmetic.');
   return damage;

@@ -11,9 +11,12 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
     (e.kind === 'unresolved' && e.reason !== 'deprecated') ||
     (e.kind === 'accuracy-modifier' && e.certainty === 'uncertain') || e.kind === 'consecutive-power'
   )) return { level: 'canonical-data-incomplete', reasons: ['Canonical fields or effect interpretation remain unresolved.'] };
-  if (canonical.actionKind === 'interrupt' || canonical.actionKind === 'assist') return { level: 'future-mechanic-unsupported', reasons: [`Authoritative ${canonical.actionKind} resolution is deferred.`] };
+  if (canonical.actionKind === 'assist') return { level: 'future-mechanic-unsupported', reasons: [`Authoritative ${canonical.actionKind} resolution is deferred.`] };
   const legacyEffect = skill.legacyTech.specialEffect?.type;
   const deferred = canonical.effects.filter(e => {
+    if (canonical.actionKind === 'interrupt' && (e.kind === 'interrupt-modifier' || (e.kind === 'status-application' && e.condition === 'interrupt-triggered' && e.chancePercent === 100) || (e.kind === 'action-protection' && e.against === 'interrupt'))) return false;
+    if (e.kind === 'action-protection' && e.against === 'interrupt') return false;
+    if (e.kind === 'damage-modifier' && ['target-interrupting', 'target-countering-or-interrupting', 'user-interrupted'].includes(e.condition)) return false;
     if (canonical.actionKind === 'counter') {
       if (e.kind === 'damage-modifier' && e.condition === 'counter-triggered') return false;
       if (e.kind === 'status-application' && e.condition === 'counter-triggered' && e.chancePercent === 100 && ['poison', 'paralysis', 'confusion'].includes(e.status)) return false;
@@ -31,6 +34,7 @@ export function assessBattleSkill(skill: BattleSkillSelection): { level: BattleS
     return true;
   });
   if (deferred.length) return { level: 'future-mechanic-unsupported', reasons: ['Canonical effects are described but not executed by this resolver.'] };
+  if (canonical.actionKind === 'interrupt') return { level: 'canonical-data-incomplete', reasons: ['Authoritative Interrupt resolution; measured Interrupt Hit duration unavailable.'] };
   if (canonical.actionKind === 'counter') return { level: 'supported', reasons: ['Authoritative Counter resolution using the retained base damage formula.'] };
   return { level: 'legacy-compatibility', reasons: ['Legacy damage/targeting/effect path; unmeasured timing classes and full effects resolution remain deferred.'] };
 }

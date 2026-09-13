@@ -5,7 +5,8 @@ import { actorById, effectiveParameter } from './battleState';
 /** Base initiative only. Double-SPD and act-last WAZADATA flags remain deferred. */
 export function calculateActionOrder(state: BattleState, actions: PlannedAction[], rng: BattleRng): string[] {
   // Counters consume no initiative draw and retain stable party-position order.
-  const normal = actions.filter(a => a.priority !== 'counter-last');
+  const normal = actions.filter(a => a.priority === 'normal');
+  for (const action of actions.filter(a => a.kind === 'interrupt')) action.state = 'waiting';
   const counter = actions.filter(a => a.priority === 'counter-last');
   for (const action of normal) {
     action.initiative = effectiveParameter(actorById(state, action.actorId), 'spd') + rng.nextIntInclusive(0, 10, 'initiative');
