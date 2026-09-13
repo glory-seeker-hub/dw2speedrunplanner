@@ -181,10 +181,10 @@ test('policy-selected Assist keeps canonical kind but does not receive invented 
   const r = run([member('P', [assist], { spd: 100 })], cases.single[1], { actionPolicy: { chooseAction: actor => ({ kind: 'skill', skillKey: actor.skills[0].key }) } });
   assert.equal(r.outcome, 'unsupported'); assert.equal(r.actions[0].kind, 'assist'); assert.equal(r.actions[0].impacts.length, 0);
 });
-test('Interrupt retains canonical identity while only old offensive compatibility runs', () => {
+test('Interrupt canonical identity uses scheduled execution with unknown successful timing', () => {
   const r = run([member('P', [tech('Electro Shocker')], { spd: 100 })], cases.single[1]);
   const a = executed(r)[0]; assert.equal(a.kind, 'interrupt'); assert.equal(a.canonicalSkillId, 0xa0);
-  assert.equal(assessBattleSkill(r.state.combatants[0].skills[0]).level, 'future-mechanic-unsupported');
+  assert.equal(assessBattleSkill(r.state.combatants[0].skills[0]).level, 'canonical-data-incomplete'); assert.equal(a.interrupt.targetPolicy,'player-random'); assert.equal(a.durationFrames,null);
 });
 test('synthetic fallback is explicit, noncanonical and only for manual compatibility', () => {
   const r = run([member('P', [], { spd: 100 })], cases.single[1]); const a = executed(r)[0];

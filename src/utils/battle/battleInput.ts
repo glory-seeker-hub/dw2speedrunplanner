@@ -1,5 +1,6 @@
 import { getBattleSkillById, getBattleSkillByName } from '@/data/battleSkills';
 import { LEGACY_TECH_IDENTITIES } from '@/data/legacyTechIdentities';
+import { DOMAIN_GROUPS } from '@/data/domainGroups';
 import { DIGIMONS } from '@/data/digimons';
 import { requireEncounterTechs } from '@/utils/encounterBattleSkills';
 import type { Tech } from '@/types/digimon';
@@ -19,6 +20,7 @@ export function linkLegacySkill(tech: Tech & { canonicalSkillId?: number }): Bat
   return { key: tech.id, canonicalSkillId: canonical?.id ?? null, kind: canonical?.actionKind ?? (tech.isCounter ? 'counter' : 'attack'), source: canonical ? 'legacy-known-technique' : 'legacy-custom-technique', legacyTech: { ...tech, ...(tech.specialEffect ? { specialEffect: { ...tech.specialEffect } } : {}) } };
 }
 function createMember(member: BattleTeamMember, side: BattleSide, position: number, allowSynthetic: boolean): BattleCombatantState {
+  if (member.isBoss !== undefined && typeof member.isBoss !== 'boolean') throw new BattleInputError('Invalid isBoss metadata.');
   const skills = member.techs.map(linkLegacySkill);
   const initialStatuses: BattleCombatantState['statuses'] = {};
   for (const [status, active] of Object.entries(member.initialStatuses ?? {})) {
@@ -26,6 +28,7 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     if (active) initialStatuses[status as 'poison' | 'paralysis' | 'confusion'] = true;
   }
   const actor: BattleCombatantState = {
+    isBoss: member.isBoss ?? false,
     id: member.instanceId ? `${side}-instance-${member.instanceId}` : `${side}-${position}`,
     sourceInstanceId: member.instanceId ?? null, name: member.digimon.name, side, position,
     speciesId: member.digimon.id, type: member.digimon.type, specialty: member.digimon.specialty,
@@ -36,7 +39,7 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     statuses: initialStatuses, temporaryPowers: {},
   };
   validateCombatant(actor);
-  if (!skills.some(s => s.legacyTech.ap > 0)) {
+  if (!skills.some(s => s.legacyTech.ap > 0 || s.kind === 'interrupt')) {
     if (!allowSynthetic || skills.some(s => s.source === 'legacy-custom-technique')) throw new BattleInputError(`No usable known technique for ${actor.name}.`, 'unsupported');
     skills.push({ key: 'synthetic-basic-attack', canonicalSkillId: null, kind: 'attack', source: 'synthetic-legacy-fallback', legacyTech: { id: 'basic-attack', name: 'Basic Attack', ap: 10, element: 'None', target: 'Single', isCounter: false } });
   }
@@ -56,7 +59,7 @@ export function createBattleState(input: BattleInput, simulationIndex = 0): Batt
       enemy = (input.enemy as Encounter).digimons.map(d => {
         const species = DIGIMONS.find(s => s.name === d.name);
         const stats = { hp: d.hp, mp: d.mp, atk: d.atk, def: d.def, spd: d.spd };
-        return { digimon: species ?? { id: d.name, name: d.name, type: 'Data', specialty: 'None', baseStats: stats }, customStats: stats, techs: requireEncounterTechs(d.techs) };
+        return { isBoss: DOMAIN_GROUPS.some(group => group.encounterId === (input.enemy as Encounter).id && group.isBoss), digimon: species ?? { id: d.name, name: d.name, type: 'Data', specialty: 'None', baseStats: stats }, customStats: stats, techs: requireEncounterTechs(d.techs) };
       });
     } catch (error) { throw new BattleInputError(error instanceof Error ? error.message : 'Invalid encounter.'); }
   } else enemy = input.enemy as readonly BattleTeamMember[];

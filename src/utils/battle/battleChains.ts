@@ -13,7 +13,7 @@ export function scheduleShadowScytheRepeat(state: BattleState, action: PlannedAc
     || !state.combatants.some(a => a.side === 'enemy' && a.isAlive)) return null;
   const repeat: PlannedAction = { ...action, id: nextActionId(state), state: 'waiting',
     targetIntent: { kind: 'opponents', side: 'enemy', selection: 'random-at-execution' },
-    chainFromActionId: action.id, reaction: null };
+    chainFromActionId: action.id, reaction: null, prepared: undefined, interrupt: undefined };
   state.plannedActions.push(repeat); state.queue.unshift(repeat.id);
   return repeat;
 }

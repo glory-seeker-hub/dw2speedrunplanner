@@ -1,0 +1,10 @@
+const fs=require('node:fs');
+const {load}=require('../tests/helpers/loadTs.cjs'),{member,tech}=require('../tests/helpers/battleFixtures.cjs');
+const {simulateBattleCore}=load('src/utils/battleEngine.ts'),{createSeededBattleRng,createBattleRng}=load('src/utils/battle/battleRng.ts');
+const u=(name,skill,stats={},statuses={})=>({...member(name,[tech(skill)],{hp:150,mp:100,spd:30,...stats}),initialStatuses:statuses});
+const scenarios={single:[[u('P','Rock Fist',{spd:40})],[u('I','Wing Blade',{spd:20})]],multiple:[[u('P0','Triple Forces',{spd:50}),u('P1','Rock Fist',{spd:40})],[u('I0','Wing Blade'),u('I1','Electro Shocker'),u('I2','Giga Scissor Claw')]],statusHeavy:[[u('P','Poison Ivy',{spd:40},{paralysis:true,poison:true})],[u('I','Wing Blade',{spd:20},{paralysis:true,confusion:true})]],sendLast:[[u('P0','Rock Fist',{spd:50}),u('P1','Rock Fist',{spd:40}),u('C','Beast King Fist')],[u('I','Chrono Breaker')]]};
+const results={};for(const [name,[player,enemy]] of Object.entries(scenarios))results[name]=[1,100,1000].map(count=>{
+ const base=createSeededBattleRng(42),draws={},rng=createBattleRng(()=>base.nextFloat(),c=>draws[c]=(draws[c]??0)+1);let actions=0,records=0,historyBytes=0,withoutInterruptAuditBytes=0;const outcomes={},start=performance.now();
+ for(let i=0;i<count;i++){const r=simulateBattleCore({player,enemy,floorSpecialty:'None'},{rng,simulationIndex:i});actions+=r.actionCount;records+=r.actions.length;outcomes[r.outcome]=(outcomes[r.outcome]??0)+1;if(!i){historyBytes=Buffer.byteLength(JSON.stringify(r.actions));withoutInterruptAuditBytes=Buffer.byteLength(JSON.stringify(r.actions.map(({interrupt,restart,...a})=>a)));}}
+ return {runs:count,wallClockMs:performance.now()-start,averageExecutedActions:actions/count,averageRecords:records/count,totalRngDraws:Object.values(draws).reduce((a,b)=>a+b,0),draws,firstHistoryBytes:historyBytes,withoutInterruptAuditBytes,outcomes};
+});fs.mkdirSync('docs/phase-2k-g',{recursive:true});fs.writeFileSync('docs/phase-2k-g/performance.json',JSON.stringify(results,null,2)+'\n');console.log(JSON.stringify(results,null,2));

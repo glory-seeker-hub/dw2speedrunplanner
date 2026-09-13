@@ -9,7 +9,7 @@ export function beforeLegacyAction(actor: BattleCombatantState, action: PlannedA
 /** Ordinary compatibility effects only; Counter descriptors have their own resolver. */
 export function applyLegacyImpactEffects(actor: BattleCombatantState, target: BattleCombatantState, action: PlannedAction, damage: number): BattleImpact['appliedEffects'] {
   const applied: BattleImpact['appliedEffects'] = [];
-  if (action.kind === 'counter' && action.skill.canonicalSkillId !== null) return applied;
+  if ((action.kind === 'counter' || action.kind === 'interrupt') && action.skill.canonicalSkillId !== null) return applied;
   const effect = action.skill?.legacyTech.specialEffect;
   if (effect?.type === 'healOnDamage') {
     const before = actor.currentHp;
