@@ -76,7 +76,7 @@ for(const kind of ['attack','counter','interrupt','assist'])for(const outcome of
  assert.equal(promoted.length,kind==='attack'&&outcome==='hit'&&damage>0?1:0);
 });
 test('zero base damage plus Poison ten qualifies; zero damage plus on-hit DEF effect does not',()=>{
- for(const poison of [false,true]){const p=attack();p.techs=[{...tech('Scissor Claw'),ap:0}];const r=run([p],[unit('C',0x8b,{},poison?{poison:true}:{})]);const a=done(r)[0];assert.equal(a.impacts[0].baseDamage,0);assert.equal(a.impacts[0].damage,poison?10:0);assert.equal(a.impacts[0].appliedEffects[0].kind,'parameter-modifier');assert.equal(counters(r)[0].counter.executionMode,poison?'activated':'untriggered-end-of-turn');}
+ for(const poison of [false,true]){const p=attack();p.techs=[{...tech('Scissor Claw'),ap:0}];const r=run([p],[unit('C',0x8b,{},poison?{poison:true}:{})]);const a=done(r)[0];assert.equal(a.impacts[0].baseDamage,0);assert.equal(a.impacts[0].damage,poison?10:0);assert.equal(a.supportEvents[0].kind,'stage');assert.equal(a.supportEvents[0].stat,'def');assert.equal(counters(r)[0].counter.executionMode,poison?'activated':'untriggered-end-of-turn');}
 });
 test('causal Single target overrides unrelated explicit planned target without RNG',()=>{
  const {state,actions}=prepare([attack('Cause'),attack('Other')]);const c=actions[2];c.targetIntent={kind:'combatants',targetIds:['player-1']};promoteCounters(state,actions[0],{outcome:'hit',impacts:[{targetId:'enemy-0',damage:13}]},new Set());assert.deepEqual(resolveEffectiveTargets(state,c,createSequenceBattleRng([])),['player-0']);state.combatants[0].isAlive=false;assert.deepEqual(resolveEffectiveTargets(state,c,createSequenceBattleRng([])),[]);

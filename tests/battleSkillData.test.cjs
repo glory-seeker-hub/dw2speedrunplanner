@@ -200,7 +200,8 @@ test('encounter lookup cannot become fake AP10 and normalizes safe variants', ()
   assert.throws(() => requireEncounterTechs([]), /no technique data/);
   assert.throws(() => requireEncounterTech('No Such Skill'), /Unresolved authoritative/);
   assert.throws(() => requireEncounterTech('Alias Fake'), /Unresolved authoritative/);
-  assert.throws(() => requireEncounterTech('HP Recovery'), /not supported/);
+  assert.equal(requireEncounterTech('HP Recovery').canonicalSkillId, 0xb5);
+  assert.equal(requireEncounterTech('HP Recovery').ap, 0);
   assert.equal(requireEncounterTech('Rain Of Pollen').id, 'rain-of-pollen');
   assert.equal(requireEncounterTech('Trihorn Attack').id, 'tri-horn-attack');
 });

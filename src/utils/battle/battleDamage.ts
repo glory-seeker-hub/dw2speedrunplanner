@@ -1,3 +1,4 @@
+import { effectiveParameter } from './battleState';
 import { counterDefinition, usesActivatedCounterMechanics } from './battleReactions';
 import type { BattleState, PlannedAction } from './battleTypes';
 import type { Tech } from '@/types/digimon';
@@ -67,11 +68,11 @@ export function calculateLegacyDamage(
   const tileBonus = getTileBonus(tech.element, floorSpecialty);
 
   // Apply debuffs to stats
-  const attack = attacker.baseStats.atk * (attacker.parameterModifiers?.atk || 1);
-  const defense = defender.baseStats.def * (defender.parameterModifiers?.def || 1);
+  const attack = effectiveParameter(attacker, 'atk');
+  const defense = effectiveParameter(defender, 'def');
   const defenderBonus = getDefenderBonus(defender.specialty, floorSpecialty);
 
-  const baseDamage = Math.floor(typeBonus * specialtyBonus * attackPower * tileBonus);
+  const baseDamage = Math.floor(attackPower * Math.round(typeBonus * 5) * Math.round(specialtyBonus * 5) * Math.round(tileBonus * 5) / 125);
   const adjustedDefense = Math.floor(defense * defenderBonus);
   const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
 
@@ -86,7 +87,7 @@ export function calculateActionDamage(attacker: BattleCombatantState, defender: 
   const canonical = counterDefinition(action);
   const tech = (action.kind === 'counter' || action.kind === 'interrupt') && canonical?.attackPower !== null && canonical?.attackPower !== undefined
     ? { ...action.skill.legacyTech, ap: canonical.attackPower, specialEffect: undefined } : action.skill.legacyTech;
-  let damage = calculateLegacyDamage(attacker, defender, tech, floorSpecialty);
+  let damage = calculateLegacyDamage(attacker, defender, attacker.elementalPower ? { ...tech, element: attacker.elementalPower === 'Darkness' ? 'Dark' : attacker.elementalPower === 'Neutral' ? 'None' : attacker.elementalPower } : tech, floorSpecialty);
   if (usesActivatedCounterMechanics(action)) for (const effect of canonical?.effects ?? []) {
     if (effect.kind !== 'damage-modifier' || effect.condition !== 'counter-triggered') continue;
     damage = Math.floor((effect.modifier === 'returned-damage' ? action.counter!.damageReceivedFromTrigger! : damage) * effect.multiplier);

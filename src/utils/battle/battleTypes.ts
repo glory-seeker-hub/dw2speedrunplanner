@@ -63,6 +63,10 @@ export interface BattleCombatantState {
   currentHp: number;
   maxMp: number;
   currentMp: number;
+  atkStage: number; defStage: number; spdStage: number;
+  parametersSuppressed: boolean; revivedRound?: number;
+  elementalPower: SkillElement | null;
+  /** Custom legacy inputs only; canonical effects use discrete stages. */
   parameterModifiers: Partial<Record<'atk' | 'def' | 'spd', number>>;
   /** Scheduling/target eligibility: players remain active at zero HP; enemies KO. */
   isAlive: boolean;
@@ -82,6 +86,8 @@ interface PlannedActionBase {
   counter: CounterRuntimeState | null;
   interrupt?: InterruptRuntimeState;
   prepared?: PreparedActionContext;
+  assistTargetIds?: string[]; assistEligibleAtPlanning?: boolean; assistCandidateIds?: string[];
+  supportEvents?: import('./battleSupportEffects').SupportEvent[];
   reaction: ReactionContext | null;
   chainFromActionId: string | null;
 }
@@ -96,6 +102,7 @@ export interface BattleImpact {
   damage: number; healing: number; outcome: 'hit' | 'ko' | 'miss' | 'blocked' | 'invincible';
   appliedEffects: { source: 'legacy'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
   damageBeforeInterruptReduction?: number;
+  effectiveElement?: SkillElement; invincibilityPreventedDamage?: number;
   ko: boolean;
 }
 export interface BattleResourceAlert {
@@ -107,6 +114,7 @@ export interface BattleActionRecord {
   kind: BattleActionKind; source: BattleSkillSelection['source'];
   targetIntent: TargetIntent; effectiveTargetIds: string[]; impacts: BattleImpact[];
   reaction: ReactionContext | null; counter: CounterRuntimeState | null; state: ActionState; reason?: string;
+  supportEvents?: import('./battleSupportEffects').SupportEvent[];
   interrupt?: InterruptResolution;
   restart?: { wasInterrupted: true; interruptedByActionId: string; initialAccuracyResolution: AccuracyResolution;
     recoverySuppressedOnRestart: true; targetLocked: true; skillLocked: true; statusesAtRestart: StatusSnapshot };
@@ -114,6 +122,7 @@ export interface BattleActionRecord {
   statusRecoveries: StatusRecoveryResult[]; confusion: ConfusionResolution | null;
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
   interruptTiming?: InterruptTiming;
+  effectDiagnostics?: string[];
   timingDiagnostics: string[]; chainFromActionId: string | null;
   resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
   mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete'; payerCombatantId: string | null; payerName: string | null; payerSide: BattleSide | null; paymentRule: 'own' | 'counter-triggering-actor' | 'shadow-scythe-free-repeat' | 'none-on-miss' | 'unknown' } | null;
@@ -133,7 +142,7 @@ export interface BattleRunResult {
   state: BattleState; diagnostics: string[];
   totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
-export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus, boolean>> };
+export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus | 'poison-body' | 'invincibility' | 'invisibility' | 'motivation-down', boolean>>; initialPowers?: Partial<Record<BattleStatus, boolean>>; initialElementalPower?: SkillElement; initialStages?: Partial<Record<'atk' | 'def' | 'spd', number>>; currentHp?: number };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }
 export interface BattleEngineOptions {
   rng?: BattleRng;

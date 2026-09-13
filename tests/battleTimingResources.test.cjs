@@ -23,7 +23,7 @@ for(const [kind,count,frames] of [['single-target',1,685],['aoe',1,703],['aoe',2
 for(const kind of ['single-target','aoe','field-all','unknown']) for(const count of [0,1,3,7]) test(`explicit full ${kind} Miss against ${count} costs 194 once`,()=>assert.deepEqual(resolve(kind,count,'miss'),{durationFrames:194,diagnostics:[]}));
 for(const outcome of ['cancelled','skipped','unsupported','invalid']) test(`${outcome} is not a 194f Miss`,()=>{const r=resolve('single-target',1,outcome);assert.equal(r.durationFrames,null);assert.ok(r.diagnostics.length);});
 for(const [kind,count] of [['unknown',1],['aoe',4],['field-all',1],['field-all',7],['single-target',2],['single-target',0],['aoe',1.5],['aoe',NaN],['aoe',Infinity]]) test(`no interpolation: ${kind} / ${count}`,()=>{const r=resolve(kind,count);assert.equal(r.durationFrames,null);assert.ok(r.diagnostics.length);});
-for(const kind of ['interrupt','assist']) test(`no guessed ${kind} successful duration`,()=>assert.equal(resolve('single-target',1,'hit',kind).durationFrames,null));
+for(const kind of ['interrupt']) test(`no guessed ${kind} successful duration`,()=>assert.equal(resolve('single-target',1,'hit',kind).durationFrames,null));
 test('Guard has no timing even for an untyped purported Miss',()=>assert.equal(resolve('single-target',1,'miss','guard').durationFrames,null));
 for(const count of [1,2,3]) test(`AOE ${count} impacts charge exactly one action duration`,()=>{
  const r=run([member('P',[tech('Triple Forces')],{spd:100})],foes(count));const a=executed(r)[0];
@@ -46,9 +46,9 @@ test('AOE four targets remains incomplete with no fabricated total',()=>{
 test('ordinary AOE never maps to field-all from battlefield population',()=>{
  const r=run([member('P',[tech('Triple Forces')],{spd:100}),member('P2',[tech('Rock Fist')])],foes(3));assert.equal(executed(r)[0].timingClass,'aoe');assert.equal(executed(r)[0].durationFrames,990);
 });
-test('field skills remain unresolved until actual field execution exists',()=>{
+test('canonical Assist field skills use measured field class; other fields remain unresolved',()=>{
  const field=BATTLE_SKILLS.filter(s=>s.targetGroup==='field');assert.ok(field.length);
- for(const skill of field)assert.equal(classifySkillTiming(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:skill.id,target:'All'})),'unknown');
+ for(const skill of field)assert.equal(classifySkillTiming(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:skill.id,target:'All'})),skill.actionKind==='assist'&&skill.targetModes.every(m=>m==='normal')?'field-all':'unknown');
 });
 test('mismatched canonical target data does not acquire a measured class',()=>assert.equal(classifySkillTiming(linkLegacySkill(tech('Triple Forces',{target:'Single'}))),'unknown'));
 test('custom targeting allies does not claim measured opposing Attack timing',()=>{
@@ -234,3 +234,5 @@ test('Guard has no selection option in BattleSimulation UI or Team Builder',()=>
 });
 
 function unknownVictory() { return run([member('Custom',[{...tech('Rock Fist'),id:'custom',name:'Custom'}],{spd:100,atk:1000})],foes(1)); }
+
+test('authoritative Assist Single Hit uses measured 685f',()=>assert.equal(resolve('single-target',1,'hit','assist').durationFrames,685));
