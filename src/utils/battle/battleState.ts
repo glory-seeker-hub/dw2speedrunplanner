@@ -12,6 +12,7 @@ export function validateCombatant(actor: BattleCombatantState): void {
     if (value < 0) throw new BattleInputError(`Negative ${actor.id} ${stat}.`);
   }
   if (actor.baseStats.def <= 0) throw new BattleInputError(`DEF must be positive for ${actor.id}.`);
+  for (const stage of [actor.atkStage, actor.defStage, actor.spdStage]) if (!Number.isInteger(stage) || stage < -2 || stage > 2) throw new BattleInputError('Invalid stat stage.');
   for (const [stat, multiplier] of Object.entries(actor.parameterModifiers)) {
     finite(multiplier, `${actor.id} ${stat} multiplier`);
     if (multiplier <= 0) throw new BattleInputError(`Invalid ${stat} multiplier for ${actor.id}.`);
@@ -27,7 +28,7 @@ export function validateCombatant(actor: BattleCombatantState): void {
   }
 }
 export function effectiveParameter(actor: BattleCombatantState, stat: 'atk' | 'def' | 'spd'): number {
-  return finite(actor.baseStats[stat] * (actor.parameterModifiers[stat] ?? 1), `effective ${stat}`);
+  return finite(actor.baseStats[stat] * stageMultiplier(actor.parametersSuppressed ? 0 : actor[`${stat}Stage`]) * (actor.parameterModifiers[stat] ?? 1), `effective ${stat}`);
 }
 export const actorById = (state: BattleState, id: string): BattleCombatantState => {
   const actor = state.combatants.find(a => a.id === id);
@@ -38,3 +39,5 @@ export function completedOutcome(state: BattleState): 'player-win' | null {
   if (!state.combatants.some(a => a.side === 'enemy' && a.isAlive)) return 'player-win';
   return null;
 }
+
+export function stageMultiplier(stage: number): number { return [0.5, 1 / Math.SQRT2, 1, Math.SQRT2, 2][stage + 2]; }

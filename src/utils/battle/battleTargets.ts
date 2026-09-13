@@ -23,9 +23,12 @@ export function resolveEffectiveTargets(state: BattleState, action: PlannedActio
     action.counter.targetRule = 'base-single';
   }
   const intent = action.targetIntent;
-  const candidates = intent.kind === 'combatants'
+  let candidates = intent.kind === 'combatants'
     ? [...new Set(intent.targetIds)].map(id => state.combatants.find(a => a.id === id)).filter(a => a?.isAlive)
     : state.combatants.filter(a => a.side === intent.side && a.isAlive);
+  const actor = actorById(state, action.actorId);
+  const single = action.kind === 'counter' ? counterTargetForm(action) === 'single' : action.skill.legacyTech.target === 'Single';
+  if (!confused && single && actor.side === 'player' && intent.kind === 'opponents' && intent.side === 'enemy' && state.combatants.filter(a => a.side === 'enemy' && a.currentHp > 0).length > 1) candidates = candidates.filter(a => !a!.statuses.invisibility);
   if (!candidates.length) return [];
   if (action.kind === 'counter' && !confused && counterTargetForm(action) === 'single') return [candidates[rng.nextIntExclusive(candidates.length, 'target-choice')]!.id];
   if (intent.kind === 'combatants' || intent.selection === 'all') return candidates.map(a => a!.id);

@@ -1,3 +1,6 @@
+import { classifyEffect } from './battleEffectCoverage';
+import { getBattleSkillById } from '@/data/battleSkills';
+import { assistEligible, assistCandidateIds, chooseAssistTargets, assistTargetsAtExecution, isRevive, applySupportEffects } from './battleSupportEffects';
 import type { BattleActionRecord, BattleEngineOptions, BattleInput, BattleRunResult, BattleState, PlannedAction } from './battleTypes';
 import { BattleInputError } from './battleTypes';
 import { createProductionBattleRng } from './battleRng';
@@ -17,7 +20,7 @@ import { prepareConfusionAction } from './battleConfusion';
 import { claimInterrupt, refreshPlayerReservations, resolveInterruptEffects, reduceInterruptedDamage } from './battleInterrupts';
 import { resolveActionAccuracy } from './battleAccuracy';
 
-export const BATTLE_ENGINE_VERSION = '2k-g-authoritative-interrupts-v1';
+export const BATTLE_ENGINE_VERSION = '2k-h-authoritative-support-v1';
 export const DEFAULT_MAX_ROUNDS = 1000;
 export function simulateBattleCore(input: BattleInput, options: BattleEngineOptions = {}): BattleRunResult {
   const rng = options.rng ?? createProductionBattleRng();
@@ -41,6 +44,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
       timingClass: classifySkillTiming(action.skill), durationFrames: null, timingDiagnostics: [],
       chainFromActionId: action.chainFromActionId, resourceAlerts: [], resourceDiagnostics: [], mpAccounting: null,
       accuracy: null, statusesBefore: statusSnapshot(actor), statusesAfterRecovery: statusSnapshot(actor), statusRecoveries: [], confusion: null,
+      effectDiagnostics: getBattleSkillById(action.skill.canonicalSkillId ?? -1)?.effects.flatMap(e => { const coverage = classifyEffect(e, getBattleSkillById(action.skill.canonicalSkillId!)!); return coverage.status === 'deferred-unresolved' ? [coverage.boundary] : []; }) ?? [],
       ...(reason ? { reason } : {}),
     };
     if (action.prepared?.interruptedByActionId) {
@@ -53,7 +57,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
   };
   const finishUnusedInterrupts = () => {
     for (const action of state.plannedActions.filter(a => a.round === state.round && a.interrupt?.state === 'waiting')) {
-      action.interrupt!.state = 'skipped-no-opportunity'; action.state = 'skipped'; record(action, 'interrupt-no-eligible-target');
+      action.interrupt!.state = 'skipped-no-opportunity'; action.state = 'skipped'; record(action, actorById(state, action.actorId).revivedRound === state.round ? 'revived-this-round' : 'interrupt-no-eligible-target');
     }
   };
   const finishPending = () => {
@@ -75,11 +79,28 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
     if (outcome) return result(outcome);
     for (let round = 1; round <= maxRounds; round++) {
       state.round = round;
+      for (const actor of state.combatants) actor.parametersSuppressed = false;
       const eligible = state.combatants.filter(a => a.isAlive);
       const actions = eligible.map(actor => {
         validateCombatant(actor);
         return planAction(state, actor, policy.chooseAction(actor, { round, combatants: state.combatants }, rng));
       });
+      for (const action of actions) {
+        const actor = actorById(state, action.actorId);
+        if (action.kind === 'assist') {
+          action.assistEligibleAtPlanning = assistEligible(actor, action.skill, state.combatants);
+          if (action.assistEligibleAtPlanning) action.assistCandidateIds = assistCandidateIds(state, action);
+          if (!actor.statuses.confusion && action.assistEligibleAtPlanning) action.assistTargetIds = chooseAssistTargets(state, action, rng);
+        }
+      }
+      // Lock ordinary Single targets in visibility-sensitive rounds. Existing reaction
+      // causal locks and Confusion replacement remain authoritative at execution.
+      const visibilitySensitive = state.combatants.some(a => a.statuses.invisibility) || actions.some(a => getBattleSkillById(a.skill.canonicalSkillId ?? -1)?.effects.some(e => e.kind === 'special-state' && e.state === 'invisibility'));
+      if (visibilitySensitive) for (const action of actions) {
+        if (action.kind === 'attack' && action.skill.legacyTech.target === 'Single' && action.targetIntent.kind === 'opponents' && !actorById(state, action.actorId).statuses.confusion) {
+          action.targetIntent = { kind: 'combatants', targetIds: resolveEffectiveTargets(state, action, rng) };
+        }
+      }
       // beforeActionOrder: future priority/status flags attach here.
       state.queue = calculateActionOrder(state, actions, rng);
       const acted = new Set<string>();
@@ -109,14 +130,14 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           if (confusion.skipped) {
             action.state = 'skipped'; acted.add(actor.id); recordSkipped('confusion-no-eligible-skill'); completeCounter(action); continue;
           }
-          if (action.kind === 'assist') {
-            action.state = 'skipped'; const entry = recordSkipped('future-mechanic-unsupported'); entry.outcome = 'unsupported';
-            entry.accuracy = resolveActionAccuracy(actor, 'assist', [], rng); finishPending();
-            return result('unsupported', ['assist resolution is deferred.']);
+          if (action.kind === 'assist' && action.assistEligibleAtPlanning === false) {
+            action.state = 'skipped'; acted.add(actor.id); recordSkipped('assist-ineligible'); continue;
           }
-          const targetIds = action.interrupt ? [action.interrupt.interruptedActorId!] : resolveEffectiveTargets(state, action, rng, confusion.redirected);
+          const targetIds = action.kind === 'assist' ? assistTargetsAtExecution(state, action, rng)
+            : action.interrupt ? [action.interrupt.interruptedActorId!] : resolveEffectiveTargets(state, action, rng, confusion.redirected);
           if (!targetIds.length) { action.state = 'skipped'; recordSkipped('no-living-targets'); completeCounter(action); continue; }
-          const initialAccuracy = counterForcesMiss(action)
+          const assistLost = action.kind === 'assist' && !isRevive(action.skill) && targetIds.length === 1 && actorById(state, targetIds[0]).currentHp === 0;
+          const initialAccuracy = assistLost ? { outcome: 'miss' as const, cause: 'assist-target-lost' as const, referenceTargetId: targetIds[0] } : counterForcesMiss(action)
             ? { outcome: 'miss' as const, cause: 'counter-not-activated' as const, referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
                 targetIds.length === 1 && waitingTailBlade(state, targetIds[0]));
@@ -124,17 +145,18 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         }
         const prepared = action.prepared;
         if (!prepared.interruptConsumed && claimInterrupt(state, action, playerReservations, rng)) continue;
-        const targetIds = prepared.targetIds.filter(id => actorById(state, id).isAlive);
+        const targetIds = prepared.targetIds.filter(id => action.kind === 'assist' || actorById(state, id).isAlive);
         if (!targetIds.length) { action.state = 'skipped'; record(action, 'no-living-targets'); completeCounter(action); delete actor.confusionSuppressedForActionId; continue; }
         action.state = 'resolving';
         const entry = Object.assign(record(action), { statusesBefore: prepared.statusesBefore, statusesAfterRecovery: prepared.statusesAfterRecovery,
           statusRecoveries: prepared.statusRecoveries, confusion: prepared.confusion });
-        if (!action.counter && !prepared.confusion.redirected && targetIds.some(id => actorById(state, id).side === actor.side)) entry.timingClass = 'unknown';
+        if (action.kind !== 'assist' && !action.counter && !prepared.confusion.redirected && targetIds.some(id => actorById(state, id).side === actor.side)) entry.timingClass = 'unknown';
         if (action.kind === 'counter') {
           const form = counterTargetForm(action);
           entry.timingClass = counterDefinition(action)?.targetModes.includes('random-digimon') ? 'unknown'
             : form === 'single' ? 'single-target' : form === 'aoe' ? 'aoe' : 'unknown';
         }
+        entry.supportEvents = [];
         entry.effectiveTargetIds = [...targetIds];
         acted.add(actor.id); executionCount++;
         beforeLegacyAction(actor, action);
@@ -151,18 +173,31 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         // Full-action Miss retains target IDs but has no impacts or on-hit draws.
         for (let index = 0; entry.outcome === 'hit' && index < targetIds.length; index++) {
           const target = actorById(state, targetIds[index]);
+          if (action.kind === 'assist') {
+            const hpBefore = target.currentHp;
+            const events = [...applySupportEffects(state, actor, target, action, 'pre-damage'), ...applySupportEffects(state, actor, target, action, 'after-damage')];
+            entry.supportEvents.push(...events);
+            entry.impacts.push({ targetId: target.id, targetName: target.name, hpBefore, hpAfter: target.currentHp, baseDamage: 0, poisonBonusDamage: 0, statusApplications: [], damage: 0, healing: target.currentHp - hpBefore, outcome: 'hit', ko: false, appliedEffects: [] });
+            continue;
+          }
           if (!target.isAlive) continue;
+          entry.supportEvents.push(...applySupportEffects(state, actor, target, action, 'pre-damage'));
           const baseDamage = calculateActionDamage(actor, target, action, input.floorSpecialty, state);
-          const { damage: ordinaryDamage, poisonBonusDamage, statusApplications } = resolveImpactStatuses(target, action.skill, baseDamage, rng, usesActivatedCounterMechanics(action), action.kind === 'interrupt');
-          const damage = reduceInterruptedDamage(ordinaryDamage, prepared.resolution);
+          const { damage: ordinaryDamage, poisonBonusDamage, statusApplications } = resolveImpactStatuses(target, action.skill, baseDamage, rng, usesActivatedCounterMechanics(action), action.kind === 'interrupt', actor);
+          const beforeInvincibility = reduceInterruptedDamage(ordinaryDamage, prepared.resolution);
+          const damage = target.statuses.invincibility ? 0 : beforeInvincibility;
           const hpBefore = target.currentHp;
           target.currentHp = Math.max(0, hpBefore - damage);
           target.legacy.damageTakenThisTurn = damage;
           const appliedEffects = applyLegacyImpactEffects(actor, target, action, damage);
+          entry.supportEvents.push(...applySupportEffects(state, actor, target, action, 'after-damage'));
+          if (target.side !== actor.side && target.statuses['poison-body'] && !entry.supportEvents.some(e => e.kind === 'poison-body')) {
+            entry.supportEvents.push({ kind: 'poison-body', targetId: actor.id, holderId: target.id, alreadyActive: !!actor.statuses.poison }); actor.statuses.poison = true;
+          }
           target.isAlive = target.side === 'player' || target.currentHp > 0;
           entry.resourceAlerts.push(...depletionAlert(target, 'hp', hpBefore, target.currentHp));
           if (!entry.effectiveTargetIds.includes(target.id)) entry.effectiveTargetIds.push(target.id);
-          entry.impacts.push({ targetId: target.id, targetName: target.name, hpBefore, hpAfter: target.currentHp, baseDamage, poisonBonusDamage, statusApplications, damage, ...(prepared.resolution?.damageRetained ? { damageBeforeInterruptReduction: ordinaryDamage } : {}), healing: 0, outcome: target.isAlive ? 'hit' : 'ko', ko: !target.isAlive, appliedEffects });
+          entry.impacts.push({ targetId: target.id, targetName: target.name, hpBefore, hpAfter: target.currentHp, baseDamage, poisonBonusDamage, statusApplications, damage, ...(prepared.resolution?.damageRetained ? { damageBeforeInterruptReduction: ordinaryDamage } : {}), healing: 0, ...(actor.elementalPower ? { effectiveElement: actor.elementalPower } : {}), ...(target.statuses.invincibility ? { invincibilityPreventedDamage: beforeInvincibility } : {}), outcome: target.isAlive ? 'hit' : 'ko', ko: !target.isAlive, appliedEffects });
           // Preserve old generic chain only for Single-target compatibility inputs.
           if (action.skill.canonicalSkillId === null && action.skill.legacyTech.target === 'Single' && legacyChainContinues(action, !target.isAlive)) {
             const remaining = livingOpponents(state, actor.id);

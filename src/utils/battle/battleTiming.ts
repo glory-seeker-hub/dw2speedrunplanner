@@ -30,7 +30,7 @@ export function resolveActionTiming(input: ActionTimingInput): { durationFrames:
   // An explicitly classified full-action Miss; never inferred from impact count.
   if (input.outcome === 'miss') return { durationFrames: ACTION_TIMING_PROFILE.miss, diagnostics: [] };
   if (input.actionKind === 'interrupt') return unavailable('Canonical Interrupt timing classification unavailable.');
-  if (input.actionKind !== 'attack' && input.actionKind !== 'counter') return unavailable(`No proven measured timing for ${input.actionKind} execution.`);
+  if (input.actionKind !== 'attack' && input.actionKind !== 'counter' && input.actionKind !== 'assist') return unavailable(`No proven measured timing for ${input.actionKind} execution.`);
   const count = input.effectiveTargetCount;
   if (!Number.isSafeInteger(count) || count < 1) return unavailable('Invalid effective target count for successful timing.');
   let frames: number | undefined;
@@ -42,6 +42,12 @@ export function resolveActionTiming(input: ActionTimingInput): { durationFrames:
 export function classifySkillTiming(skill: BattleSkillSelection): TimingClass {
   const canonical = skill.canonicalSkillId === null ? undefined : getBattleSkillById(skill.canonicalSkillId);
   if (canonical?.actionKind === 'interrupt') return 'interrupt';
+  if (canonical?.actionKind === 'assist') {
+    if (canonical.targetModes.some(m => m !== 'normal')) return 'unknown';
+    if (['self', 'one-ally', 'one-enemy'].includes(canonical.targetGroup ?? '')) return 'single-target';
+    if (['all-allies', 'all-enemies'].includes(canonical.targetGroup ?? '')) return 'aoe';
+    if (canonical.targetGroup === 'field') return 'field-all';
+  }
   if (!canonical || canonical.actionKind !== 'attack') return 'unknown';
   // Current execution only proves opposing single/all targeting. Field and
   // random-target semantics need a future resolver before using FIELD_ALL.

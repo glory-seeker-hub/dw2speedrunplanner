@@ -15,7 +15,7 @@ export function linkLegacySkill(tech: Tech & { canonicalSkillId?: number }): Bat
   const byName = getBattleSkillByName(tech.name);
   // The reviewed 0x4D and 0x85 exceptions require a numeric or reviewed legacy identity.
   // A custom technique borrowing the display name cannot acquire the rule.
-  const canonical = explicit !== undefined ? getBattleSkillById(explicit) : getBattleSkillById(canonicalIds.get(tech.id) ?? -1) ?? ([0x4d, 0x85].includes(byName?.id ?? -1) ? undefined : byName);
+  const canonical = explicit !== undefined ? getBattleSkillById(explicit) : getBattleSkillById(canonicalIds.get(tech.id) ?? -1) ?? ([0x4d, 0x85, 0xbc, 0xb5, 0xcb, 0xcd, 0xb8, 0xb7, 0xce, 0xbe, 0xe3, 0xb9, 0xd0, 0xea].includes(byName?.id ?? -1) ? undefined : byName);
   if (explicit !== undefined && !canonical) throw new BattleInputError(`Unknown WAZADATA identity ${explicit}.`);
   return { key: tech.id, canonicalSkillId: canonical?.id ?? null, kind: canonical?.actionKind ?? (tech.isCounter ? 'counter' : 'attack'), source: canonical ? 'legacy-known-technique' : 'legacy-custom-technique', legacyTech: { ...tech, ...(tech.specialEffect ? { specialEffect: { ...tech.specialEffect } } : {}) } };
 }
@@ -24,7 +24,7 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
   const skills = member.techs.map(linkLegacySkill);
   const initialStatuses: BattleCombatantState['statuses'] = {};
   for (const [status, active] of Object.entries(member.initialStatuses ?? {})) {
-    if (!['poison', 'paralysis', 'confusion'].includes(status) || typeof active !== 'boolean') throw new BattleInputError('Invalid initial battle status.');
+    if (!['poison', 'paralysis', 'confusion', 'poison-body', 'invincibility', 'invisibility', 'motivation-down'].includes(status) || typeof active !== 'boolean') throw new BattleInputError('Invalid initial battle status.');
     if (active) initialStatuses[status as 'poison' | 'paralysis' | 'confusion'] = true;
   }
   const actor: BattleCombatantState = {
@@ -34,12 +34,22 @@ function createMember(member: BattleTeamMember, side: BattleSide, position: numb
     speciesId: member.digimon.id, type: member.digimon.type, specialty: member.digimon.specialty,
     baseStats: { ...member.customStats }, maxHp: member.customStats.hp, currentHp: member.customStats.hp,
     maxMp: member.customStats.mp, currentMp: member.customStats.mp, isAlive: side === 'player' || member.customStats.hp > 0,
+    atkStage: member.initialStages?.atk ?? 0, defStage: member.initialStages?.def ?? 0, spdStage: member.initialStages?.spd ?? 0, parametersSuppressed: false, elementalPower: member.initialElementalPower ?? null,
     parameterModifiers: {}, skills, plannedActionId: null,
     legacy: { consecutiveTechCount: 0, damageTakenThisTurn: 0 },
     statuses: initialStatuses, temporaryPowers: {},
   };
+  for (const [power, active] of Object.entries(member.initialPowers ?? {})) {
+    if (!['poison', 'paralysis', 'confusion'].includes(power) || typeof active !== 'boolean') throw new BattleInputError('Invalid initial power.');
+    if (active) actor.temporaryPowers[power as 'poison' | 'paralysis' | 'confusion'] = true;
+  }
+  if (actor.elementalPower !== null && !['Water', 'Fire', 'Nature', 'Machine', 'Darkness', 'Neutral'].includes(actor.elementalPower)) throw new BattleInputError('Invalid Elemental Power.');
+  if (member.currentHp !== undefined) {
+    if (!Number.isFinite(member.currentHp) || member.currentHp < 0 || member.currentHp > actor.maxHp) throw new BattleInputError('Invalid current HP.');
+    actor.currentHp = member.currentHp; actor.isAlive = side === 'player' || actor.currentHp > 0;
+  }
   validateCombatant(actor);
-  if (!skills.some(s => s.legacyTech.ap > 0 || s.kind === 'interrupt')) {
+  if (!skills.some(s => s.legacyTech.ap > 0 || s.kind === 'interrupt' || s.kind === 'assist')) {
     if (!allowSynthetic || skills.some(s => s.source === 'legacy-custom-technique')) throw new BattleInputError(`No usable known technique for ${actor.name}.`, 'unsupported');
     skills.push({ key: 'synthetic-basic-attack', canonicalSkillId: null, kind: 'attack', source: 'synthetic-legacy-fallback', legacyTech: { id: 'basic-attack', name: 'Basic Attack', ap: 10, element: 'None', target: 'Single', isCounter: false } });
   }

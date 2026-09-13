@@ -6,7 +6,7 @@ import type { BattleRng } from './battleRng';
 
 export interface AccuracyResolution {
   outcome: 'hit' | 'miss' | 'unsupported';
-  cause: 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
+  cause: 'invisibility' | 'assist-target-lost' | 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
   hitThreshold128?: number; roll128?: number; paralysisRoll?: number; tailBladeRoll?: number;
   referenceTargetId: string | null;
   referenceRule?: 'single-target' | 'average-effective-target-spd';
@@ -48,6 +48,9 @@ export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionK
     if (audit.paralysisRoll === 1) return { outcome: 'miss', cause: 'paralysis', referenceTargetId: null, ...audit };
   }
   if (!targets.length) return { outcome: 'unsupported', cause: 'no-effective-target', referenceTargetId: null, ...audit };
+  const livingTargets = targets.filter(t => t.currentHp > 0);
+  const visibleScope = livingTargets.length ? livingTargets : targets;
+  if (visibleScope.length === 1 && visibleScope[0].side !== actor.side && visibleScope[0].statuses.invisibility) return { outcome: 'miss', cause: 'invisibility', referenceTargetId: visibleScope[0].id, ...audit };
   if (kind === 'attack' && tailBladeEligible && targets.length === 1) {
     audit.tailBladeRoll = rng.nextIntExclusive(3, 'tail-blade-evasion');
     if (audit.tailBladeRoll === 0) return { outcome: 'miss', cause: 'tail-blade-evasion', referenceTargetId: targets[0].id, ...audit };

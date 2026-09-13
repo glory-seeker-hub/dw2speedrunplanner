@@ -1,0 +1,218 @@
+{
+  "node": "v24.20.0",
+  "seed": "mulberry32-v1, 42 + run index",
+  "maxRounds": 20,
+  "note": "Wall time includes history serialization; compare within this run, not as a cross-machine speed claim. Twenty-round support stress workloads intentionally include limit-reached outcomes.",
+  "rows": [
+    {
+      "scenario": "heal-heavy",
+      "runs": 1,
+      "wallMs": 11.02,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 150,
+      "averageHistoryBytes": 95060,
+      "averageHistoryWithoutSupportAuditBytes": 89703,
+      "supportAuditBytesPerRun": 5357,
+      "outcomes": {
+        "limit-reached": 1
+      }
+    },
+    {
+      "scenario": "heal-heavy",
+      "runs": 100,
+      "wallMs": 263.32,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 150,
+      "averageHistoryBytes": 94665.84,
+      "averageHistoryWithoutSupportAuditBytes": 89307.14,
+      "supportAuditBytesPerRun": 5358.7,
+      "outcomes": {
+        "limit-reached": 100
+      }
+    },
+    {
+      "scenario": "heal-heavy",
+      "runs": 1000,
+      "wallMs": 1897.22,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 150,
+      "averageHistoryBytes": 94652.536,
+      "averageHistoryWithoutSupportAuditBytes": 89293.614,
+      "supportAuditBytesPerRun": 5358.922,
+      "outcomes": {
+        "limit-reached": 1000
+      }
+    },
+    {
+      "scenario": "buff-debuff",
+      "runs": 1,
+      "wallMs": 7.25,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 133,
+      "averageHistoryBytes": 97861,
+      "averageHistoryWithoutSupportAuditBytes": 89178,
+      "supportAuditBytesPerRun": 8683,
+      "outcomes": {
+        "limit-reached": 1
+      }
+    },
+    {
+      "scenario": "buff-debuff",
+      "runs": 100,
+      "wallMs": 329.37,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 133,
+      "averageHistoryBytes": 97870.61,
+      "averageHistoryWithoutSupportAuditBytes": 89215.37,
+      "supportAuditBytesPerRun": 8655.24,
+      "outcomes": {
+        "limit-reached": 100
+      }
+    },
+    {
+      "scenario": "buff-debuff",
+      "runs": 1000,
+      "wallMs": 2618.35,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 133,
+      "averageHistoryBytes": 97850.461,
+      "averageHistoryWithoutSupportAuditBytes": 89200.837,
+      "supportAuditBytesPerRun": 8649.624,
+      "outcomes": {
+        "limit-reached": 1000
+      }
+    },
+    {
+      "scenario": "status-powers",
+      "runs": 1,
+      "wallMs": 9.24,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 234,
+      "averageHistoryBytes": 100035,
+      "averageHistoryWithoutSupportAuditBytes": 95702,
+      "supportAuditBytesPerRun": 4333,
+      "outcomes": {
+        "limit-reached": 1
+      }
+    },
+    {
+      "scenario": "status-powers",
+      "runs": 100,
+      "wallMs": 834.11,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 237.2,
+      "averageHistoryBytes": 99854.66,
+      "averageHistoryWithoutSupportAuditBytes": 95522.18,
+      "supportAuditBytesPerRun": 4332.48,
+      "outcomes": {
+        "limit-reached": 100
+      }
+    },
+    {
+      "scenario": "status-powers",
+      "runs": 1000,
+      "wallMs": 3236.49,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 233.549,
+      "averageHistoryBytes": 99505.177,
+      "averageHistoryWithoutSupportAuditBytes": 95172.386,
+      "supportAuditBytesPerRun": 4332.791,
+      "outcomes": {
+        "limit-reached": 1000
+      }
+    },
+    {
+      "scenario": "visibility-invincibility",
+      "runs": 1,
+      "wallMs": 5.93,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 162,
+      "averageHistoryBytes": 90358,
+      "averageHistoryWithoutSupportAuditBytes": 84310,
+      "supportAuditBytesPerRun": 6048,
+      "outcomes": {
+        "limit-reached": 1
+      }
+    },
+    {
+      "scenario": "visibility-invincibility",
+      "runs": 100,
+      "wallMs": 308.01,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 169.55,
+      "averageHistoryBytes": 91149.93,
+      "averageHistoryWithoutSupportAuditBytes": 85071.23,
+      "supportAuditBytesPerRun": 6078.7,
+      "outcomes": {
+        "limit-reached": 100
+      }
+    },
+    {
+      "scenario": "visibility-invincibility",
+      "runs": 1000,
+      "wallMs": 2820.45,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 170.415,
+      "averageHistoryBytes": 91239.365,
+      "averageHistoryWithoutSupportAuditBytes": 85161.581,
+      "supportAuditBytesPerRun": 6077.784,
+      "outcomes": {
+        "limit-reached": 1000
+      }
+    },
+    {
+      "scenario": "support-interrupt",
+      "runs": 1,
+      "wallMs": 16.48,
+      "averageActions": 60,
+      "averageRecords": 60,
+      "averageRngDraws": 168,
+      "averageHistoryBytes": 120460,
+      "averageHistoryWithoutSupportAuditBytes": 113301,
+      "supportAuditBytesPerRun": 7159,
+      "outcomes": {
+        "limit-reached": 1
+      }
+    },
+    {
+      "scenario": "support-interrupt",
+      "runs": 100,
+      "wallMs": 315.24,
+      "averageActions": 59.34,
+      "averageRecords": 60,
+      "averageRngDraws": 161.49,
+      "averageHistoryBytes": 117912.64,
+      "averageHistoryWithoutSupportAuditBytes": 111176.37,
+      "supportAuditBytesPerRun": 6736.27,
+      "outcomes": {
+        "limit-reached": 100
+      }
+    },
+    {
+      "scenario": "support-interrupt",
+      "runs": 1000,
+      "wallMs": 2506.05,
+      "averageActions": 59.292,
+      "averageRecords": 60,
+      "averageRngDraws": 161.652,
+      "averageHistoryBytes": 117913.506,
+      "averageHistoryWithoutSupportAuditBytes": 111156.582,
+      "supportAuditBytesPerRun": 6756.924,
+      "outcomes": {
+        "limit-reached": 1000
+      }
+    }
+  ]
+}

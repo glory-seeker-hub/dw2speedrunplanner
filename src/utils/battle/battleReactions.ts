@@ -34,7 +34,7 @@ export function promoteCounters(state: BattleState, cause: PlannedAction, entry:
   // Preserve explicit protection only for unidentified compatibility inputs.
   if (cause.skill.canonicalSkillId === null && cause.skill.legacyTech.specialEffect?.type === 'noTriggerCounter') return [];
   const eligible = state.plannedActions.filter(a => a.round === state.round && a.counter?.executionMode === 'waiting'
-    && a.state === 'waiting' && state.queue.includes(a.id) && !acted.has(a.actorId) && actorById(state, a.actorId).isAlive
+    && actorById(state, a.actorId).revivedRound !== state.round && a.state === 'waiting' && state.queue.includes(a.id) && !acted.has(a.actorId) && actorById(state, a.actorId).isAlive
     && entry.impacts.some(i => i.targetId === a.actorId && i.damage > 0));
   eligible.sort((a, b) => comparePartyPosition(state, a, b));
   eligible.forEach((action, index) => {

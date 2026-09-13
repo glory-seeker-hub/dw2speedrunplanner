@@ -7,6 +7,11 @@ export function requireEncounterTech(label: string): Tech {
   const tech = getTechByName(label);
   if (tech) return tech;
   const skill = getBattleSkillByName(label);
+  if (skill?.actionKind === 'assist' && skill.recordKind === 'technique' && skill.name) return {
+    id: 'waza-' + skill.id, canonicalSkillId: skill.id, name: skill.name, ap: 0,
+    element: skill.element === 'Darkness' ? 'Dark' : skill.element === 'Neutral' || !skill.element ? 'None' : skill.element,
+    target: ['all-allies', 'all-enemies', 'field'].includes(skill.targetGroup ?? '') ? 'All' : 'Single', isCounter: false,
+  } as Tech & { canonicalSkillId: number };
   throw new Error(skill
     ? `Technique "${label}" is not supported by the current simulator.`
     : `Unresolved authoritative encounter technique: "${label}".`);

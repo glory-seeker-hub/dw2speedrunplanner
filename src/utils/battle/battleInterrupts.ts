@@ -4,13 +4,13 @@ import { actorById } from './battleState';
 import { counterDefinition } from './battleReactions';
 
 export function potentiallyInterruptible(state: BattleState, action: PlannedAction): boolean {
-  if (!actorById(state, action.actorId).isAlive || !['planned', 'waiting'].includes(action.state)
+  if (actorById(state, action.actorId).revivedRound === state.round || !actorById(state, action.actorId).isAlive || !['planned', 'waiting'].includes(action.state)
     || action.prepared?.interruptConsumed || action.kind === 'interrupt' || action.kind === 'assist' || action.skill.canonicalSkillId === 0x4d) return false;
   if (action.counter && !['waiting', 'untriggered-end-of-turn'].includes(action.counter.executionMode)) return false;
   return !counterDefinition(action)?.effects.some(e => e.kind === 'action-protection' && e.against === 'interrupt');
 }
 const waitingUsers = (state: BattleState, side: BattleSide) => state.plannedActions.filter(a => a.round === state.round
-  && a.interrupt?.state === 'waiting' && actorById(state, a.actorId).side === side && actorById(state, a.actorId).isAlive);
+  && actorById(state, a.actorId).revivedRound !== state.round && a.interrupt?.state === 'waiting' && actorById(state, a.actorId).side === side && actorById(state, a.actorId).isAlive);
 
 /** Reservations belong to target opportunities, not to an executor. */
 export function refreshPlayerReservations(state: BattleState, reserved: Set<string>, rng: BattleRng): void {

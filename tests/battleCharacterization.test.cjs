@@ -12,6 +12,12 @@ const damageFields = row => ({ round: row.round, digimon: row.digimon, tech: row
 for (const [name, [player, enemy]] of Object.entries(cases)) test(`legacy damage characterization: ${name}`, () => {
   const result = simulateBattleCore({ player, enemy, floorSpecialty: 'None' }, { rng: createSequenceBattleRng(Array(10000).fill(0)) });
   const rows = result.actions.filter(a => a.state === 'resolved').flatMap(a => a.impacts.map(i => ({ round: a.round, digimon: a.actorName, tech: a.skillName, target: i.targetName, damage: i.damage, hpRemaining: i.hpAfter })));
+  if (name === 'debuff') {
+    // Phase H intentionally replaces post-hit approximate DEF stacks with same-hit stages.
+    assert.deepEqual(rows.filter(r=>r.digimon==='P').map(r=>r.damage),[28,40,40]);
+    assert.equal(result.state.combatants[1].defStage,-2);
+    assert.equal(result.outcome,'player-win'); return;
+  }
   const baseline = expected[name].fastestBattleHistory.map(damageFields);
   assert.deepEqual(rows.slice(0, baseline.length), baseline);
   assert.equal(result.outcome, 'player-win');

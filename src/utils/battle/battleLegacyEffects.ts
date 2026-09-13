@@ -16,7 +16,7 @@ export function applyLegacyImpactEffects(actor: BattleCombatantState, target: Ba
     actor.currentHp = Math.min(actor.maxHp, actor.currentHp + damage);
     applied.push({ source: 'legacy', kind: 'drain', combatantId: actor.id, amount: actor.currentHp - before });
   }
-  if (effect?.type === 'debuffStat' && effect.stat) {
+  if (effect?.type === 'debuffStat' && effect.stat && action.skill.canonicalSkillId === null) {
     const stat = effect.stat;
     const current = target.parameterModifiers[stat] || 1;
     const stacks = Math.round(Math.log2(1 / current));

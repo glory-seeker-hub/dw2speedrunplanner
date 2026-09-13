@@ -1,0 +1,5613 @@
+{
+  "schemaVersion": 1,
+  "descriptorOccurrences": 598,
+  "classifiedOccurrences": 598,
+  "descriptorGroups": 100,
+  "descriptors": [
+    {
+      "sourceByte": 17,
+      "mask": 1,
+      "canonicalLabel": "Can't be Countered",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "counter",
+        "scope": "skill",
+        "byte": 17,
+        "mask": 1,
+        "sourceRow": 2,
+        "sourceLabel": "Can't be Countered"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts / battleReactions",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 28,
+          "hexId": "0x1C",
+          "name": "Howling Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 104,
+          "hexId": "0x68",
+          "name": "Giga Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 220,
+          "hexId": "0xDC",
+          "name": "Chaos Cannon",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 2,
+      "canonicalLabel": "Can't be Interrupted",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "interrupt",
+        "scope": "skill",
+        "byte": 17,
+        "mask": 2,
+        "sourceRow": 3,
+        "sourceLabel": "Can't be Interrupted"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts / battleReactions",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 84,
+          "hexId": "0x54",
+          "name": "Trump Sword",
+          "recordKind": "technique"
+        },
+        {
+          "id": 104,
+          "hexId": "0x68",
+          "name": "Giga Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 160,
+          "hexId": "0xA0",
+          "name": "Electro Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 161,
+          "hexId": "0xA1",
+          "name": "Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 162,
+          "hexId": "0xA2",
+          "name": "Horn Buster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 163,
+          "hexId": "0xA3",
+          "name": "Giga Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 165,
+          "hexId": "0xA5",
+          "name": "Chrono Breaker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 166,
+          "hexId": "0xA6",
+          "name": "MP Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        },
+        {
+          "id": 187,
+          "hexId": "0xBB",
+          "name": "Banana Slip",
+          "recordKind": "technique"
+        },
+        {
+          "id": 220,
+          "hexId": "0xDC",
+          "name": "Chaos Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 251,
+          "hexId": "0xFB",
+          "name": "Shadow Scythe (0MP)",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 4,
+      "canonicalLabel": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "status": "authoritative",
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "boundary": "Project Assist guarantee; not a general interpretation of the uncertain bit.",
+      "techniques": [
+        {
+          "id": 180,
+          "hexId": "0xB4",
+          "name": "Hyper Flashing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 181,
+          "hexId": "0xB5",
+          "name": "HP Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 182,
+          "hexId": "0xB6",
+          "name": "Virus Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 183,
+          "hexId": "0xB7",
+          "name": "Crimson Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 184,
+          "hexId": "0xB8",
+          "name": "Full HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 185,
+          "hexId": "0xB9",
+          "name": "Fungus Cruncher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 186,
+          "hexId": "0xBA",
+          "name": "Rotten Rainballs",
+          "recordKind": "technique"
+        },
+        {
+          "id": 187,
+          "hexId": "0xBB",
+          "name": "Banana Slip",
+          "recordKind": "technique"
+        },
+        {
+          "id": 188,
+          "hexId": "0xBC",
+          "name": "Small HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 189,
+          "hexId": "0xBD",
+          "name": "Defensive Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 190,
+          "hexId": "0xBE",
+          "name": "Parameter Patch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 191,
+          "hexId": "0xBF",
+          "name": "Zip Boom",
+          "recordKind": "technique"
+        },
+        {
+          "id": 192,
+          "hexId": "0xC0",
+          "name": "Stun Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 193,
+          "hexId": "0xC1",
+          "name": "Armor Coating",
+          "recordKind": "technique"
+        },
+        {
+          "id": 194,
+          "hexId": "0xC2",
+          "name": "Mech Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 195,
+          "hexId": "0xC3",
+          "name": "Blaze Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 196,
+          "hexId": "0xC4",
+          "name": "Nature Hit Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 197,
+          "hexId": "0xC5",
+          "name": "Invincibility",
+          "recordKind": "technique"
+        },
+        {
+          "id": 198,
+          "hexId": "0xC6",
+          "name": "Re-Format",
+          "recordKind": "technique"
+        },
+        {
+          "id": 199,
+          "hexId": "0xC7",
+          "name": "Recovery Power",
+          "recordKind": "technique"
+        },
+        {
+          "id": 200,
+          "hexId": "0xC8",
+          "name": "AntiDote",
+          "recordKind": "technique"
+        },
+        {
+          "id": 201,
+          "hexId": "0xC9",
+          "name": "AntiFreeze",
+          "recordKind": "technique"
+        },
+        {
+          "id": 202,
+          "hexId": "0xCA",
+          "name": "AntiConfusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 203,
+          "hexId": "0xCB",
+          "name": "Mega Heal",
+          "recordKind": "technique"
+        },
+        {
+          "id": 204,
+          "hexId": "0xCC",
+          "name": "Zen Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 205,
+          "hexId": "0xCD",
+          "name": "Full Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        },
+        {
+          "id": 208,
+          "hexId": "0xD0",
+          "name": "Invisibility",
+          "recordKind": "technique"
+        },
+        {
+          "id": 209,
+          "hexId": "0xD1",
+          "name": "Water Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 210,
+          "hexId": "0xD2",
+          "name": "Necro Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 211,
+          "hexId": "0xD3",
+          "name": "Darkness Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 212,
+          "hexId": "0xD4",
+          "name": "Re-Initialize",
+          "recordKind": "technique"
+        },
+        {
+          "id": 213,
+          "hexId": "0xD5",
+          "name": "Panic Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 214,
+          "hexId": "0xD6",
+          "name": "Heart Break Hit",
+          "recordKind": "technique"
+        },
+        {
+          "id": 215,
+          "hexId": "0xD7",
+          "name": "Poison Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 222,
+          "hexId": "0xDE",
+          "name": "Kongou",
+          "recordKind": "technique"
+        },
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        },
+        {
+          "id": 231,
+          "hexId": "0xE7",
+          "name": "Safety Sphere",
+          "recordKind": "technique"
+        },
+        {
+          "id": 239,
+          "hexId": "0xEF",
+          "name": "Armor Aid",
+          "recordKind": "technique"
+        },
+        {
+          "id": 247,
+          "hexId": "0xF7",
+          "name": "Reduction Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 249,
+          "hexId": "0xF9",
+          "name": "Destablizer Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 4,
+      "canonicalLabel": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Increased Accuracy / general Cannot Miss arithmetic not established.",
+      "techniques": [
+        {
+          "id": 52,
+          "hexId": "0x34",
+          "name": "Tusk Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 166,
+          "hexId": "0xA6",
+          "name": "MP Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 4,
+      "canonicalLabel": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 230,
+          "hexId": "0xE6",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 234,
+          "hexId": "0xEA",
+          "name": "Alias Fake (?)",
+          "recordKind": "unresolved"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 8,
+      "canonicalLabel": "Double your SPD this turn",
+      "descriptor": {
+        "kind": "initiative-modifier",
+        "modifier": "double-speed",
+        "subject": "user",
+        "byte": 17,
+        "mask": 8,
+        "sourceRow": 6,
+        "sourceLabel": "Double your SPD this turn"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Double-speed / act-last skill modifiers not implemented.",
+      "techniques": [
+        {
+          "id": 110,
+          "hexId": "0x6E",
+          "name": "Slamming Tusk",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 16,
+      "canonicalLabel": "Increase your evasion while countering this turn",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "increased-evasion",
+        "condition": "counter-triggered",
+        "certainty": "documented",
+        "byte": 17,
+        "mask": 16,
+        "sourceRow": 7,
+        "sourceLabel": "Increase your evasion while countering this turn"
+      },
+      "status": "authoritative",
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "boundary": "Reviewed Tail Blade 1/3 evasion.",
+      "techniques": [
+        {
+          "id": 133,
+          "hexId": "0x85",
+          "name": "Tail Blade",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 32,
+      "canonicalLabel": "Delays user's turn to the end",
+      "descriptor": {
+        "kind": "initiative-modifier",
+        "modifier": "act-last",
+        "subject": "user",
+        "byte": 17,
+        "mask": 32,
+        "sourceRow": 8,
+        "sourceLabel": "Delays user's turn to the end"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Double-speed / act-last skill modifiers not implemented.",
+      "techniques": [
+        {
+          "id": 238,
+          "hexId": "0xEE",
+          "name": "Rail Cannon",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 17,
+      "mask": 64,
+      "canonicalLabel": "Your DEF is halved this turn",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "user",
+        "multiplier": 0.5,
+        "duration": "this-turn",
+        "byte": 17,
+        "mask": 64,
+        "sourceRow": 9,
+        "sourceLabel": "Your DEF is halved this turn"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Temporary raw-stat multipliers are not persistent stages.",
+      "techniques": [
+        {
+          "id": 21,
+          "hexId": "0x15",
+          "name": "Trick Or Treat",
+          "recordKind": "technique"
+        },
+        {
+          "id": 61,
+          "hexId": "0x3D",
+          "name": "Black Pearl Shot",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 1,
+      "canonicalLabel": "Deal 1.5 damage back when countering",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "returned-damage",
+        "multiplier": 1.5,
+        "condition": "counter-triggered",
+        "byte": 18,
+        "mask": 1,
+        "sourceRow": 10,
+        "sourceLabel": "Deal 1.5 damage back when countering"
+      },
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 139,
+          "hexId": "0x8B",
+          "name": "Beast King Fist",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 2,
+      "canonicalLabel": "Heal strong digimon/ damage weak/neutral digimon",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "attribute-dependent-heal-or-damage",
+        "byte": 18,
+        "mask": 2,
+        "sourceRow": 11,
+        "sourceLabel": "Heal strong digimon/ damage weak/neutral digimon"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "techniques": [
+        {
+          "id": 80,
+          "hexId": "0x50",
+          "name": "Musical Fist",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 4,
+      "canonicalLabel": "Miss if counter not triggered",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "miss-unless-counter",
+        "condition": "counter-triggered",
+        "certainty": "documented",
+        "byte": 18,
+        "mask": 4,
+        "sourceRow": 12,
+        "sourceLabel": "Miss if counter not triggered"
+      },
+      "status": "authoritative",
+      "handler": "battleReactions.counterForcesMiss",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 242,
+          "hexId": "0xF2",
+          "name": "GAIA Gear",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 8,
+      "canonicalLabel": "Increased accuracy",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "increased-accuracy",
+        "condition": "always",
+        "certainty": "documented",
+        "byte": 18,
+        "mask": 8,
+        "sourceRow": 13,
+        "sourceLabel": "Increased accuracy"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Increased Accuracy / general Cannot Miss arithmetic not established.",
+      "techniques": [
+        {
+          "id": 102,
+          "hexId": "0x66",
+          "name": "Protect Grenade",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 16,
+      "canonicalLabel": "Increase tech power by 5 each consecutive use (Caps at 70)",
+      "descriptor": {
+        "kind": "consecutive-power",
+        "displayedIncrement": 2.5,
+        "documentedDisplayedCap": 35,
+        "capMeaning": "unresolved-total-or-bonus",
+        "byte": 18,
+        "mask": 16,
+        "sourceRow": 14,
+        "sourceLabel": "Increase tech power by 5 each consecutive use (Caps at 70)"
+      },
+      "status": "compatibility-only",
+      "handler": "battleDamage.calculateLegacyDamage",
+      "boundary": "Legacy +2.5 bonus, cap25 retained; source cap35 total-or-bonus unresolved.",
+      "techniques": [
+        {
+          "id": 96,
+          "hexId": "0x60",
+          "name": "SubZero Ice Punch",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 32,
+      "canonicalLabel": "1.5x Damage output when Countering",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "counter-triggered",
+        "byte": 18,
+        "mask": 32,
+        "sourceRow": 15,
+        "sourceLabel": "1.5x Damage output when Countering"
+      },
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 134,
+          "hexId": "0x86",
+          "name": "Smiley Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 136,
+          "hexId": "0x88",
+          "name": "Smiley Warhead",
+          "recordKind": "technique"
+        },
+        {
+          "id": 138,
+          "hexId": "0x8A",
+          "name": "Ninja Knife Throw",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 64,
+      "canonicalLabel": "1.5x Damage output when poisoned",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "user-poisoned",
+        "byte": 18,
+        "mask": 64,
+        "sourceRow": 16,
+        "sourceLabel": "1.5x Damage output when poisoned"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Condition/arithmetic not promoted by this phase.",
+      "techniques": [
+        {
+          "id": 64,
+          "hexId": "0x40",
+          "name": "Party Time",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 18,
+      "mask": 128,
+      "canonicalLabel": "1.5x Damage vs Interrupting target",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "target-interrupting",
+        "byte": 18,
+        "mask": 128,
+        "sourceRow": 17,
+        "sourceLabel": "1.5x Damage vs Interrupting target"
+      },
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 38,
+          "hexId": "0x26",
+          "name": "Spinning Needle",
+          "recordKind": "technique"
+        },
+        {
+          "id": 228,
+          "hexId": "0xE4",
+          "name": "Transcend Sword",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 1,
+      "canonicalLabel": "1.5x Damage vs Countering target",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "target-countering",
+        "byte": 19,
+        "mask": 1,
+        "sourceRow": 18,
+        "sourceLabel": "1.5x Damage vs Countering target"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Condition/arithmetic not promoted by this phase.",
+      "techniques": [
+        {
+          "id": 37,
+          "hexId": "0x25",
+          "name": "V-Nova Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 228,
+          "hexId": "0xE4",
+          "name": "Transcend Sword",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 2,
+      "canonicalLabel": "1.5x Damage vs Countering and Interrupting target",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "target-countering-or-interrupting",
+        "byte": 19,
+        "mask": 2,
+        "sourceRow": 19,
+        "sourceLabel": "1.5x Damage vs Countering and Interrupting target"
+      },
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 49,
+          "hexId": "0x31",
+          "name": "V-Wing Blade",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 4,
+      "canonicalLabel": "1.5x Damage output if Interrupted",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "user-interrupted",
+        "byte": 19,
+        "mask": 4,
+        "sourceRow": 20,
+        "sourceLabel": "1.5x Damage output if Interrupted"
+      },
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 52,
+          "hexId": "0x34",
+          "name": "Tusk Crusher",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 8,
+      "canonicalLabel": "Steal HP",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "hp",
+        "mode": "damage",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 8,
+        "sourceRow": 21,
+        "sourceLabel": "Steal HP"
+      },
+      "status": "compatibility-only",
+      "handler": "battleLegacyEffects.applyLegacyImpactEffects",
+      "boundary": "Legacy full damage HP drain; amount remains unspecified in source.",
+      "techniques": [
+        {
+          "id": 71,
+          "hexId": "0x47",
+          "name": "Twig Tap",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 16,
+      "canonicalLabel": "Use enemy MP when countering",
+      "descriptor": {
+        "kind": "counter-payment",
+        "payer": "enemy",
+        "byte": 19,
+        "mask": 16,
+        "sourceRow": 22,
+        "sourceLabel": "Use enemy MP when countering"
+      },
+      "status": "authoritative",
+      "handler": "battleResources.accountActionMp",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 137,
+          "hexId": "0x89",
+          "name": "Pummel Whack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 32,
+      "canonicalLabel": "Steal MP from a target that is dead and has MP to steal",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "mp",
+        "mode": "dead-target-remaining-mp",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 32,
+        "sourceRow": 23,
+        "sourceLabel": "Steal MP from a target that is dead and has MP to steal"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "MP transfer amount/payer/order unresolved.",
+      "techniques": [
+        {
+          "id": 210,
+          "hexId": "0xD2",
+          "name": "Necro Magic",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 19,
+      "mask": 64,
+      "canonicalLabel": "Steal MP equivalent to amount used by Interrupted tech",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "mp",
+        "mode": "interrupted-tech-cost",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 64,
+        "sourceRow": 24,
+        "sourceLabel": "Steal MP equivalent to amount used by Interrupted tech"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "MP transfer amount/payer/order unresolved.",
+      "techniques": [
+        {
+          "id": 166,
+          "hexId": "0xA6",
+          "name": "MP Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 1,
+      "canonicalLabel": "Deprecated",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source marks this bit deprecated; no damage semantics inferred.",
+        "byte": 21,
+        "mask": 1,
+        "sourceRow": 25,
+        "sourceLabel": "Deprecated"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 1,
+          "hexId": "0x01",
+          "name": "Poison Ivy",
+          "recordKind": "technique"
+        },
+        {
+          "id": 2,
+          "hexId": "0x02",
+          "name": "Rain of Pollen",
+          "recordKind": "technique"
+        },
+        {
+          "id": 3,
+          "hexId": "0x03",
+          "name": "Boom Bubble",
+          "recordKind": "technique"
+        },
+        {
+          "id": 4,
+          "hexId": "0x04",
+          "name": "Flame Bomber",
+          "recordKind": "technique"
+        },
+        {
+          "id": 5,
+          "hexId": "0x05",
+          "name": "Scissor Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 6,
+          "hexId": "0x06",
+          "name": "Rock Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 7,
+          "hexId": "0x07",
+          "name": "S-Thunder Smack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 8,
+          "hexId": "0x08",
+          "name": "Blue Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 9,
+          "hexId": "0x09",
+          "name": "Pummel Peck",
+          "recordKind": "technique"
+        },
+        {
+          "id": 10,
+          "hexId": "0x0A",
+          "name": "Fireball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 11,
+          "hexId": "0x0B",
+          "name": "Fossil Bite",
+          "recordKind": "technique"
+        },
+        {
+          "id": 12,
+          "hexId": "0x0C",
+          "name": "Hydro Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 13,
+          "hexId": "0x0D",
+          "name": "Volcanic Strike",
+          "recordKind": "technique"
+        },
+        {
+          "id": 14,
+          "hexId": "0x0E",
+          "name": "Blaze Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 15,
+          "hexId": "0x0F",
+          "name": "Stun Flame Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 16,
+          "hexId": "0x10",
+          "name": "Iron Drill Spin",
+          "recordKind": "technique"
+        },
+        {
+          "id": 17,
+          "hexId": "0x11",
+          "name": "Solar Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 18,
+          "hexId": "0x12",
+          "name": "Flower Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 19,
+          "hexId": "0x13",
+          "name": "Royal Smasher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 20,
+          "hexId": "0x14",
+          "name": "Ninja Flower",
+          "recordKind": "technique"
+        },
+        {
+          "id": 21,
+          "hexId": "0x15",
+          "name": "Trick Or Treat",
+          "recordKind": "technique"
+        },
+        {
+          "id": 22,
+          "hexId": "0x16",
+          "name": "Metal Fireball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 23,
+          "hexId": "0x17",
+          "name": "Lightning Spear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 24,
+          "hexId": "0x18",
+          "name": "Tri-Horn Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 25,
+          "hexId": "0x19",
+          "name": "Magical Tail",
+          "recordKind": "technique"
+        },
+        {
+          "id": 26,
+          "hexId": "0x1A",
+          "name": "Tomahawk Crunch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 27,
+          "hexId": "0x1B",
+          "name": "Energy Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 28,
+          "hexId": "0x1C",
+          "name": "Howling Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 29,
+          "hexId": "0x1D",
+          "name": "Legendary Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 30,
+          "hexId": "0x1E",
+          "name": "Freeze Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 31,
+          "hexId": "0x1F",
+          "name": "Pepper Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 32,
+          "hexId": "0x20",
+          "name": "Spiral Twister",
+          "recordKind": "technique"
+        },
+        {
+          "id": 33,
+          "hexId": "0x21",
+          "name": "Super Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 34,
+          "hexId": "0x22",
+          "name": "Waking Dream",
+          "recordKind": "technique"
+        },
+        {
+          "id": 35,
+          "hexId": "0x23",
+          "name": "Marching Fishes",
+          "recordKind": "technique"
+        },
+        {
+          "id": 36,
+          "hexId": "0x24",
+          "name": "Nova Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 37,
+          "hexId": "0x25",
+          "name": "V-Nova Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 38,
+          "hexId": "0x26",
+          "name": "Spinning Needle",
+          "recordKind": "technique"
+        },
+        {
+          "id": 39,
+          "hexId": "0x27",
+          "name": "Meteor Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 40,
+          "hexId": "0x28",
+          "name": "Fist Of Fate",
+          "recordKind": "technique"
+        },
+        {
+          "id": 41,
+          "hexId": "0x29",
+          "name": "Air Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 42,
+          "hexId": "0x2A",
+          "name": "Howling Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 43,
+          "hexId": "0x2B",
+          "name": "Wolf Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 44,
+          "hexId": "0x2C",
+          "name": "Icicle Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 45,
+          "hexId": "0x2D",
+          "name": "Strong Carapace",
+          "recordKind": "technique"
+        },
+        {
+          "id": 46,
+          "hexId": "0x2E",
+          "name": "Harpoon Torpedo",
+          "recordKind": "technique"
+        },
+        {
+          "id": 47,
+          "hexId": "0x2F",
+          "name": "Pulse Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 48,
+          "hexId": "0x30",
+          "name": "Giga Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 49,
+          "hexId": "0x31",
+          "name": "V-Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 50,
+          "hexId": "0x32",
+          "name": "Lightning Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 51,
+          "hexId": "0x33",
+          "name": "Mega Bone Stick",
+          "recordKind": "technique"
+        },
+        {
+          "id": 52,
+          "hexId": "0x34",
+          "name": "Tusk Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 53,
+          "hexId": "0x35",
+          "name": "Vulcan's Hammer",
+          "recordKind": "technique"
+        },
+        {
+          "id": 54,
+          "hexId": "0x36",
+          "name": "Tidal Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 55,
+          "hexId": "0x37",
+          "name": "Big Bang Boom",
+          "recordKind": "technique"
+        },
+        {
+          "id": 56,
+          "hexId": "0x38",
+          "name": "Terra Force",
+          "recordKind": "technique"
+        },
+        {
+          "id": 57,
+          "hexId": "0x39",
+          "name": "S-bone Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 59,
+          "hexId": "0x3B",
+          "name": "Electric Shock",
+          "recordKind": "technique"
+        },
+        {
+          "id": 60,
+          "hexId": "0x3C",
+          "name": "Demi Dart",
+          "recordKind": "technique"
+        },
+        {
+          "id": 61,
+          "hexId": "0x3D",
+          "name": "Black Pearl Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 62,
+          "hexId": "0x3E",
+          "name": "Stun Bubble",
+          "recordKind": "technique"
+        },
+        {
+          "id": 63,
+          "hexId": "0x3F",
+          "name": "Electro Thread",
+          "recordKind": "technique"
+        },
+        {
+          "id": 64,
+          "hexId": "0x40",
+          "name": "Party Time",
+          "recordKind": "technique"
+        },
+        {
+          "id": 65,
+          "hexId": "0x41",
+          "name": "Evil Touch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 66,
+          "hexId": "0x42",
+          "name": "Evil Charm",
+          "recordKind": "technique"
+        },
+        {
+          "id": 67,
+          "hexId": "0x43",
+          "name": "Coral Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 68,
+          "hexId": "0x44",
+          "name": "Spurting Ink",
+          "recordKind": "technique"
+        },
+        {
+          "id": 69,
+          "hexId": "0x45",
+          "name": "Sonic Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 70,
+          "hexId": "0x46",
+          "name": "Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 71,
+          "hexId": "0x47",
+          "name": "Twig Tap",
+          "recordKind": "technique"
+        },
+        {
+          "id": 72,
+          "hexId": "0x48",
+          "name": "Alien Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 74,
+          "hexId": "0x4A",
+          "name": "Dark Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 75,
+          "hexId": "0x4B",
+          "name": "Darkside Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 76,
+          "hexId": "0x4C",
+          "name": "Grisly Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 77,
+          "hexId": "0x4D",
+          "name": "Shadow Scythe",
+          "recordKind": "technique"
+        },
+        {
+          "id": 78,
+          "hexId": "0x4E",
+          "name": "Evil Wind",
+          "recordKind": "technique"
+        },
+        {
+          "id": 79,
+          "hexId": "0x4F",
+          "name": "Tentacle Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 80,
+          "hexId": "0x50",
+          "name": "Musical Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 81,
+          "hexId": "0x51",
+          "name": "Duo Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 82,
+          "hexId": "0x52",
+          "name": "Pit Pelter",
+          "recordKind": "technique"
+        },
+        {
+          "id": 83,
+          "hexId": "0x53",
+          "name": "Junk Chunker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 84,
+          "hexId": "0x54",
+          "name": "Trump Sword",
+          "recordKind": "technique"
+        },
+        {
+          "id": 85,
+          "hexId": "0x55",
+          "name": "Needle Squall",
+          "recordKind": "technique"
+        },
+        {
+          "id": 86,
+          "hexId": "0x56",
+          "name": "X-Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 87,
+          "hexId": "0x57",
+          "name": "Puppet Pummel",
+          "recordKind": "technique"
+        },
+        {
+          "id": 88,
+          "hexId": "0x58",
+          "name": "Toy Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 89,
+          "hexId": "0x59",
+          "name": "Super Slap",
+          "recordKind": "technique"
+        },
+        {
+          "id": 90,
+          "hexId": "0x5A",
+          "name": "Hail Storm",
+          "recordKind": "technique"
+        },
+        {
+          "id": 91,
+          "hexId": "0x5B",
+          "name": "Ice Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 92,
+          "hexId": "0x5C",
+          "name": "Hyper Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 93,
+          "hexId": "0x5D",
+          "name": "Thunder Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 94,
+          "hexId": "0x5E",
+          "name": "Sad Water Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 95,
+          "hexId": "0x5F",
+          "name": "Rose Spear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 96,
+          "hexId": "0x60",
+          "name": "SubZero Ice Punch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 97,
+          "hexId": "0x61",
+          "name": "Lightning Paw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 98,
+          "hexId": "0x62",
+          "name": "Heaven's Arrow",
+          "recordKind": "technique"
+        },
+        {
+          "id": 99,
+          "hexId": "0x63",
+          "name": "Fire Tornado",
+          "recordKind": "technique"
+        },
+        {
+          "id": 100,
+          "hexId": "0x64",
+          "name": "Darkness Gear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 101,
+          "hexId": "0x65",
+          "name": "Bolt Strike",
+          "recordKind": "technique"
+        },
+        {
+          "id": 102,
+          "hexId": "0x66",
+          "name": "Protect Grenade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 103,
+          "hexId": "0x67",
+          "name": "GigaByte Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 104,
+          "hexId": "0x68",
+          "name": "Giga Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 105,
+          "hexId": "0x69",
+          "name": "E-Stun Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 106,
+          "hexId": "0x6A",
+          "name": "Spiral Saw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 107,
+          "hexId": "0x6B",
+          "name": "Brown Stinger",
+          "recordKind": "technique"
+        },
+        {
+          "id": 108,
+          "hexId": "0x6C",
+          "name": "Hyper Heat",
+          "recordKind": "technique"
+        },
+        {
+          "id": 109,
+          "hexId": "0x6D",
+          "name": "Triple Forces",
+          "recordKind": "technique"
+        },
+        {
+          "id": 110,
+          "hexId": "0x6E",
+          "name": "Slamming Tusk",
+          "recordKind": "technique"
+        },
+        {
+          "id": 111,
+          "hexId": "0x6F",
+          "name": "Fire Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 112,
+          "hexId": "0x70",
+          "name": "Crimson Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 113,
+          "hexId": "0x71",
+          "name": "Digital Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 114,
+          "hexId": "0x72",
+          "name": "Fire Blast II",
+          "recordKind": "technique"
+        },
+        {
+          "id": 115,
+          "hexId": "0x73",
+          "name": "Pretty Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 130,
+          "hexId": "0x82",
+          "name": "Needle Spray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 131,
+          "hexId": "0x83",
+          "name": "Meteor Stream",
+          "recordKind": "technique"
+        },
+        {
+          "id": 132,
+          "hexId": "0x84",
+          "name": "Thunder Ball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 134,
+          "hexId": "0x86",
+          "name": "Smiley Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 135,
+          "hexId": "0x87",
+          "name": "Energetic Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 136,
+          "hexId": "0x88",
+          "name": "Smiley Warhead",
+          "recordKind": "technique"
+        },
+        {
+          "id": 137,
+          "hexId": "0x89",
+          "name": "Pummel Whack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 138,
+          "hexId": "0x8A",
+          "name": "Ninja Knife Throw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 139,
+          "hexId": "0x8B",
+          "name": "Beast King Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 140,
+          "hexId": "0x8C",
+          "name": "Buffalo Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 160,
+          "hexId": "0xA0",
+          "name": "Electro Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 161,
+          "hexId": "0xA1",
+          "name": "Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 162,
+          "hexId": "0xA2",
+          "name": "Horn Buster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 163,
+          "hexId": "0xA3",
+          "name": "Giga Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 165,
+          "hexId": "0xA5",
+          "name": "Chrono Breaker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 181,
+          "hexId": "0xB5",
+          "name": "HP Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 188,
+          "hexId": "0xBC",
+          "name": "Small HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 203,
+          "hexId": "0xCB",
+          "name": "Mega Heal",
+          "recordKind": "technique"
+        },
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        },
+        {
+          "id": 207,
+          "hexId": "0xCF",
+          "name": "Friendly Fire",
+          "recordKind": "technique"
+        },
+        {
+          "id": 216,
+          "hexId": "0xD8",
+          "name": "Vee Head Butt",
+          "recordKind": "technique"
+        },
+        {
+          "id": 217,
+          "hexId": "0xD9",
+          "name": "Flaming Rocket",
+          "recordKind": "technique"
+        },
+        {
+          "id": 218,
+          "hexId": "0xDA",
+          "name": "Lightning Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 219,
+          "hexId": "0xDB",
+          "name": "Mega Fire",
+          "recordKind": "technique"
+        },
+        {
+          "id": 220,
+          "hexId": "0xDC",
+          "name": "Chaos Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 221,
+          "hexId": "0xDD",
+          "name": "Blind Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 228,
+          "hexId": "0xE4",
+          "name": "Transcend Sword",
+          "recordKind": "technique"
+        },
+        {
+          "id": 229,
+          "hexId": "0xE5",
+          "name": "Garuru Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 232,
+          "hexId": "0xE8",
+          "name": "Karate Sweep",
+          "recordKind": "technique"
+        },
+        {
+          "id": 235,
+          "hexId": "0xEB",
+          "name": "Inferno Missile",
+          "recordKind": "technique"
+        },
+        {
+          "id": 237,
+          "hexId": "0xED",
+          "name": "Stun Punch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 238,
+          "hexId": "0xEE",
+          "name": "Rail Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 240,
+          "hexId": "0xF0",
+          "name": "Titan Laser",
+          "recordKind": "technique"
+        },
+        {
+          "id": 241,
+          "hexId": "0xF1",
+          "name": "Fantasmic Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 242,
+          "hexId": "0xF2",
+          "name": "GAIA Gear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 243,
+          "hexId": "0xF3",
+          "name": "Light Gun",
+          "recordKind": "technique"
+        },
+        {
+          "id": 244,
+          "hexId": "0xF4",
+          "name": "Fantasmic Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 245,
+          "hexId": "0xF5",
+          "name": "Tubular Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 246,
+          "hexId": "0xF6",
+          "name": "Left Hand",
+          "recordKind": "technique"
+        },
+        {
+          "id": 248,
+          "hexId": "0xF8",
+          "name": "Right Hand",
+          "recordKind": "technique"
+        },
+        {
+          "id": 251,
+          "hexId": "0xFB",
+          "name": "Shadow Scythe (0MP)",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 1,
+      "canonicalLabel": "Deprecated",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source marks this bit deprecated; no damage semantics inferred.",
+        "byte": 21,
+        "mask": 1,
+        "sourceRow": 25,
+        "sourceLabel": "Deprecated"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 223,
+          "hexId": "0xDF",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 224,
+          "hexId": "0xE0",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 230,
+          "hexId": "0xE6",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 233,
+          "hexId": "0xE9",
+          "name": "Energy Blast (?)",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 236,
+          "hexId": "0xEC",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 253,
+          "hexId": "0xFD",
+          "name": "HP Disk 40 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 254,
+          "hexId": "0xFE",
+          "name": "HP Disk 80 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 255,
+          "hexId": "0xFF",
+          "name": "HP Disk 160 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 263,
+          "hexId": "0x107",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 264,
+          "hexId": "0x108",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 265,
+          "hexId": "0x109",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 292,
+          "hexId": "0x124",
+          "name": "Z cannon Single Target",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 293,
+          "hexId": "0x125",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 294,
+          "hexId": "0x126",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 295,
+          "hexId": "0x127",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 296,
+          "hexId": "0x128",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 297,
+          "hexId": "0x129",
+          "name": "Z cannon AoE",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 298,
+          "hexId": "0x12A",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 299,
+          "hexId": "0x12B",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 300,
+          "hexId": "0x12C",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 301,
+          "hexId": "0x12D",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 2,
+      "canonicalLabel": "Deals damage equal to 50% of target's current HP",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "half-current-hp",
+        "byte": 21,
+        "mask": 2,
+        "sourceRow": 26,
+        "sourceLabel": "Deals damage equal to 50% of target's current HP"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "techniques": [
+        {
+          "id": 225,
+          "hexId": "0xE1",
+          "name": "HP Zapper",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 4,
+      "canonicalLabel": "Heal target to full HP",
+      "descriptor": {
+        "kind": "recovery",
+        "mode": "full-heal",
+        "byte": 21,
+        "mask": 4,
+        "sourceRow": 27,
+        "sourceLabel": "Heal target to full HP"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 183,
+          "hexId": "0xB7",
+          "name": "Crimson Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 184,
+          "hexId": "0xB8",
+          "name": "Full HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 205,
+          "hexId": "0xCD",
+          "name": "Full Recovery",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 8,
+      "canonicalLabel": "Eliminates target if its HP is less than 60",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "execute-below-hp",
+        "threshold": 60,
+        "byte": 21,
+        "mask": 8,
+        "sourceRow": 28,
+        "sourceLabel": "Eliminates target if its HP is less than 60"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "techniques": [
+        {
+          "id": 226,
+          "hexId": "0xE2",
+          "name": "Critical Blow",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 32,
+      "canonicalLabel": "Deals additional random MP damage in range of 4-7 points",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "additional-mp-damage",
+        "range": [
+          4,
+          7
+        ],
+        "byte": 21,
+        "mask": 32,
+        "sourceRow": 30,
+        "sourceLabel": "Deals additional random MP damage in range of 4-7 points"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "techniques": [
+        {
+          "id": 60,
+          "hexId": "0x3C",
+          "name": "Demi Dart",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 64,
+      "canonicalLabel": "Deals additional random MP damage in range of 13-20 points",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "additional-mp-damage",
+        "range": [
+          13,
+          20
+        ],
+        "byte": 21,
+        "mask": 64,
+        "sourceRow": 31,
+        "sourceLabel": "Deals additional random MP damage in range of 13-20 points"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "techniques": [
+        {
+          "id": 65,
+          "hexId": "0x41",
+          "name": "Evil Touch",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 21,
+      "mask": 128,
+      "canonicalLabel": "(Deprecated)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source marks this bit deprecated.",
+        "byte": 21,
+        "mask": 128,
+        "sourceRow": 32,
+        "sourceLabel": "(Deprecated)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 210,
+          "hexId": "0xD2",
+          "name": "Necro Magic",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 1,
+      "canonicalLabel": "Unknown bit",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 22,
+        "mask": 1
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "No documented interpretation.",
+      "techniques": [
+        {
+          "id": 137,
+          "hexId": "0x89",
+          "name": "Pummel Whack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 2,
+      "canonicalLabel": "Pass on your status to target",
+      "descriptor": {
+        "kind": "status-transfer",
+        "byte": 22,
+        "mask": 2,
+        "sourceRow": 33,
+        "sourceLabel": "Pass on your status to target"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Status transfer semantics not implemented.",
+      "techniques": [
+        {
+          "id": 112,
+          "hexId": "0x70",
+          "name": "Crimson Claw",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 4,
+      "canonicalLabel": "Reduce ATK of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "atk"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "byte": 22,
+        "mask": 4,
+        "sourceRow": 34,
+        "sourceLabel": "Reduce ATK of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 47,
+          "hexId": "0x2F",
+          "name": "Pulse Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 54,
+          "hexId": "0x36",
+          "name": "Tidal Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 247,
+          "hexId": "0xF7",
+          "name": "Reduction Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 8,
+      "canonicalLabel": "Increase ATK of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "atk"
+        ],
+        "direction": "up",
+        "subject": "target",
+        "byte": 22,
+        "mask": 8,
+        "sourceRow": 35,
+        "sourceLabel": "Increase ATK of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 193,
+          "hexId": "0xC1",
+          "name": "Armor Coating",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 16,
+      "canonicalLabel": "Reduce DEF of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "byte": 22,
+        "mask": 16,
+        "sourceRow": 36,
+        "sourceLabel": "Reduce DEF of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 70,
+          "hexId": "0x46",
+          "name": "Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 81,
+          "hexId": "0x51",
+          "name": "Duo Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 249,
+          "hexId": "0xF9",
+          "name": "Destablizer Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 32,
+      "canonicalLabel": "Increase DEF of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "up",
+        "subject": "target",
+        "byte": 22,
+        "mask": 32,
+        "sourceRow": 37,
+        "sourceLabel": "Increase DEF of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 189,
+          "hexId": "0xBD",
+          "name": "Defensive Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 231,
+          "hexId": "0xE7",
+          "name": "Safety Sphere",
+          "recordKind": "technique"
+        },
+        {
+          "id": 239,
+          "hexId": "0xEF",
+          "name": "Armor Aid",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 64,
+      "canonicalLabel": "Reduce SPD of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "spd"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "byte": 22,
+        "mask": 64,
+        "sourceRow": 38,
+        "sourceLabel": "Reduce SPD of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 67,
+          "hexId": "0x43",
+          "name": "Coral Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 78,
+          "hexId": "0x4E",
+          "name": "Evil Wind",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 22,
+      "mask": 128,
+      "canonicalLabel": "Increase SPD of target",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "spd"
+        ],
+        "direction": "up",
+        "subject": "target",
+        "byte": 22,
+        "mask": 128,
+        "sourceRow": 39,
+        "sourceLabel": "Increase SPD of target"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 191,
+          "hexId": "0xBF",
+          "name": "Zip Boom",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 1,
+      "canonicalLabel": "(Deprecated) (Armor Aid)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Armor Aid legacy flag.",
+        "byte": 23,
+        "mask": 1,
+        "sourceRow": 40,
+        "sourceLabel": "(Deprecated) (Armor Aid)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 239,
+          "hexId": "0xEF",
+          "name": "Armor Aid",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 2,
+      "canonicalLabel": "(Deprecated) (Safety Sphere)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Safety Sphere legacy flag.",
+        "byte": 23,
+        "mask": 2,
+        "sourceRow": 41,
+        "sourceLabel": "(Deprecated) (Safety Sphere)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 231,
+          "hexId": "0xE7",
+          "name": "Safety Sphere",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 4,
+      "canonicalLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 4,
+        "sourceRow": 42,
+        "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Reviewed Parameter Patch numeric exception; raw uncertainty preserved.",
+      "techniques": [
+        {
+          "id": 190,
+          "hexId": "0xBE",
+          "name": "Parameter Patch",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 4,
+      "canonicalLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 4,
+        "sourceRow": 42,
+        "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "techniques": [
+        {
+          "id": 204,
+          "hexId": "0xCC",
+          "name": "Zen Recovery",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 8,
+      "canonicalLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 8,
+        "sourceRow": 43,
+        "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "techniques": [
+        {
+          "id": 198,
+          "hexId": "0xC6",
+          "name": "Re-Format",
+          "recordKind": "technique"
+        },
+        {
+          "id": 212,
+          "hexId": "0xD4",
+          "name": "Re-Initialize",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 12,
+      "canonicalLabel": "Remove all parameter changes for sure",
+      "descriptor": {
+        "kind": "parameter-reset",
+        "scope": "all",
+        "byte": 23,
+        "mask": 12,
+        "sourceRow": 44,
+        "sourceLabel": "Remove all parameter changes for sure"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Round suppression, not erasure or implicit cure.",
+      "techniques": [
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 16,
+      "canonicalLabel": "Lower ATK+DEF of Vaccine Digimon",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "atk",
+          "def"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "attribute": "Vaccine",
+        "byte": 23,
+        "mask": 16,
+        "sourceRow": 45,
+        "sourceLabel": "Lower ATK+DEF of Vaccine Digimon"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 180,
+          "hexId": "0xB4",
+          "name": "Hyper Flashing",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 32,
+      "canonicalLabel": "Lower ATK+DEF of Virus Digimon",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "atk",
+          "def"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "attribute": "Virus",
+        "byte": 23,
+        "mask": 32,
+        "sourceRow": 46,
+        "sourceLabel": "Lower ATK+DEF of Virus Digimon"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 182,
+          "hexId": "0xB6",
+          "name": "Virus Attack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 23,
+      "mask": 64,
+      "canonicalLabel": "Lower ATK+DEF of Data Digimon",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "atk",
+          "def"
+        ],
+        "direction": "down",
+        "subject": "target",
+        "attribute": "Data",
+        "byte": 23,
+        "mask": 64,
+        "sourceRow": 47,
+        "sourceLabel": "Lower ATK+DEF of Data Digimon"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "DEF Down precedes this impact; other stages follow damage.",
+      "techniques": [
+        {
+          "id": 214,
+          "hexId": "0xD6",
+          "name": "Heart Break Hit",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 1,
+      "canonicalLabel": "33% Poison",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 33,
+        "condition": "always",
+        "byte": 25,
+        "mask": 1,
+        "sourceRow": 48,
+        "sourceLabel": "33% Poison"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 1,
+          "hexId": "0x01",
+          "name": "Poison Ivy",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 2,
+      "canonicalLabel": "66% Poison",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 25,
+        "mask": 2,
+        "sourceRow": 49,
+        "sourceLabel": "66% Poison"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 107,
+          "hexId": "0x6B",
+          "name": "Brown Stinger",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 2,
+      "canonicalLabel": "66% Poison",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 25,
+        "mask": 2,
+        "sourceRow": 49,
+        "sourceLabel": "66% Poison"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Direct probabilistic ailment on Assist is not specified; supported temporary states execute independently.",
+      "techniques": [
+        {
+          "id": 215,
+          "hexId": "0xD7",
+          "name": "Poison Wave",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 4,
+      "canonicalLabel": "Poison w/ Counter",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "byte": 25,
+        "mask": 4,
+        "sourceRow": 50,
+        "sourceLabel": "Poison w/ Counter"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 130,
+          "hexId": "0x82",
+          "name": "Needle Spray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 16,
+      "canonicalLabel": "33% Stun",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 33,
+        "condition": "always",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 16,
+        "sourceRow": 51,
+        "sourceLabel": "33% Stun"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 105,
+          "hexId": "0x69",
+          "name": "E-Stun Blast",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 32,
+      "canonicalLabel": "66% Stun",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 66,
+        "condition": "always",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 32,
+        "sourceRow": 52,
+        "sourceLabel": "66% Stun"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 15,
+          "hexId": "0x0F",
+          "name": "Stun Flame Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 228,
+          "hexId": "0xE4",
+          "name": "Transcend Sword",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 25,
+      "mask": 64,
+      "canonicalLabel": "Stun w/ Counter",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 64,
+        "sourceRow": 53,
+        "sourceLabel": "Stun w/ Counter"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 132,
+          "hexId": "0x84",
+          "name": "Thunder Ball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 237,
+          "hexId": "0xED",
+          "name": "Stun Punch",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 26,
+      "mask": 1,
+      "canonicalLabel": "33% Confuse",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 33,
+        "condition": "always",
+        "byte": 26,
+        "mask": 1,
+        "sourceRow": 55,
+        "sourceLabel": "33% Confuse"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 62,
+          "hexId": "0x3E",
+          "name": "Stun Bubble",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 26,
+      "mask": 2,
+      "canonicalLabel": "66% Confuse",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 26,
+        "mask": 2,
+        "sourceRow": 56,
+        "sourceLabel": "66% Confuse"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 66,
+          "hexId": "0x42",
+          "name": "Evil Charm",
+          "recordKind": "technique"
+        },
+        {
+          "id": 69,
+          "hexId": "0x45",
+          "name": "Sonic Crusher",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 26,
+      "mask": 4,
+      "canonicalLabel": "Confuse w/ Counter",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "byte": 26,
+        "mask": 4,
+        "sourceRow": 57,
+        "sourceLabel": "Confuse w/ Counter"
+      },
+      "status": "authoritative",
+      "handler": "battleStatuses.resolveImpactStatuses",
+      "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees.",
+      "techniques": [
+        {
+          "id": 140,
+          "hexId": "0x8C",
+          "name": "Buffalo Breath",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 26,
+      "mask": 16,
+      "canonicalLabel": "Motivation Down",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Enemy immunity in battleImmunity; exact Player behavior unresolved.",
+      "techniques": [
+        {
+          "id": 58,
+          "hexId": "0x3A",
+          "name": "Ocean Love",
+          "recordKind": "technique"
+        },
+        {
+          "id": 73,
+          "hexId": "0x49",
+          "name": "Concert Crush",
+          "recordKind": "technique"
+        },
+        {
+          "id": 115,
+          "hexId": "0x73",
+          "name": "Pretty Attack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 26,
+      "mask": 128,
+      "canonicalLabel": "Target's body becomes poisonous",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison-body",
+        "condition": "always",
+        "byte": 26,
+        "mask": 128,
+        "sourceRow": 60,
+        "sourceLabel": "Target's body becomes poisonous"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleSimulation",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 185,
+          "hexId": "0xB9",
+          "name": "Fungus Cruncher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 215,
+          "hexId": "0xD7",
+          "name": "Poison Wave",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 1,
+      "canonicalLabel": "Add Poison effect to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "poison",
+        "byte": 27,
+        "mask": 1,
+        "sourceRow": 61,
+        "sourceLabel": "Add Poison effect to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 186,
+          "hexId": "0xBA",
+          "name": "Rotten Rainballs",
+          "recordKind": "technique"
+        },
+        {
+          "id": 215,
+          "hexId": "0xD7",
+          "name": "Poison Wave",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 2,
+      "canonicalLabel": "Add Fire specialty to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "Fire",
+        "byte": 27,
+        "mask": 2,
+        "sourceRow": 62,
+        "sourceLabel": "Add Fire specialty to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 195,
+          "hexId": "0xC3",
+          "name": "Blaze Blaster",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 4,
+      "canonicalLabel": "Add Water specialty to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "Water",
+        "byte": 27,
+        "mask": 4,
+        "sourceRow": 63,
+        "sourceLabel": "Add Water specialty to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 209,
+          "hexId": "0xD1",
+          "name": "Water Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 8,
+      "canonicalLabel": "Add Stun effect to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "paralysis",
+        "byte": 27,
+        "mask": 8,
+        "sourceRow": 64,
+        "sourceLabel": "Add Stun effect to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 192,
+          "hexId": "0xC0",
+          "name": "Stun Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 16,
+      "canonicalLabel": "Add Confusion effect to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "confusion",
+        "byte": 27,
+        "mask": 16,
+        "sourceRow": 65,
+        "sourceLabel": "Add Confusion effect to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 213,
+          "hexId": "0xD5",
+          "name": "Panic Wave",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 32,
+      "canonicalLabel": "Add Nature specialty to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "Nature",
+        "byte": 27,
+        "mask": 32,
+        "sourceRow": 66,
+        "sourceLabel": "Add Nature specialty to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 196,
+          "hexId": "0xC4",
+          "name": "Nature Hit Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 64,
+      "canonicalLabel": "Add Machine specialty to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "Machine",
+        "byte": 27,
+        "mask": 64,
+        "sourceRow": 67,
+        "sourceLabel": "Add Machine specialty to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 194,
+          "hexId": "0xC2",
+          "name": "Mech Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 27,
+      "mask": 128,
+      "canonicalLabel": "Add Darkness specialty to target’s attack",
+      "descriptor": {
+        "kind": "temporary-attack-power",
+        "power": "Darkness",
+        "byte": 27,
+        "mask": 128,
+        "sourceRow": 68,
+        "sourceLabel": "Add Darkness specialty to target’s attack"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleDamage",
+      "boundary": "25% recovery; status Powers coexist, Elemental Power replaces.",
+      "techniques": [
+        {
+          "id": 211,
+          "hexId": "0xD3",
+          "name": "Darkness Ray",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 28,
+      "mask": 1,
+      "canonicalLabel": "Apply Zombie Status",
+      "descriptor": {
+        "kind": "special-state",
+        "state": "zombie",
+        "byte": 28,
+        "mask": 1,
+        "sourceRow": 69,
+        "sourceLabel": "Apply Zombie Status"
+      },
+      "status": "ignored-by-project",
+      "handler": "none",
+      "boundary": "Zombie deliberately excluded.",
+      "techniques": [
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 28,
+      "mask": 2,
+      "canonicalLabel": "Apply Invisibility Status",
+      "descriptor": {
+        "kind": "special-state",
+        "state": "invisibility",
+        "byte": 28,
+        "mask": 2,
+        "sourceRow": 70,
+        "sourceLabel": "Apply Invisibility Status"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleAccuracy / battleSimulation",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 208,
+          "hexId": "0xD0",
+          "name": "Invisibility",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 28,
+      "mask": 2,
+      "canonicalLabel": "Apply Invisibility Status",
+      "descriptor": {
+        "kind": "special-state",
+        "state": "invisibility",
+        "byte": 28,
+        "mask": 2,
+        "sourceRow": 70,
+        "sourceLabel": "Apply Invisibility Status"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 234,
+          "hexId": "0xEA",
+          "name": "Alias Fake (?)",
+          "recordKind": "unresolved"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 1,
+      "canonicalLabel": "Cure Poison",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "poison",
+        "byte": 29,
+        "mask": 1,
+        "sourceRow": 71,
+        "sourceLabel": "Cure Poison"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Explicit cure is independent from parameter suppression.",
+      "techniques": [
+        {
+          "id": 199,
+          "hexId": "0xC7",
+          "name": "Recovery Power",
+          "recordKind": "technique"
+        },
+        {
+          "id": 200,
+          "hexId": "0xC8",
+          "name": "AntiDote",
+          "recordKind": "technique"
+        },
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 1,
+      "canonicalLabel": "Cure Poison",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "poison",
+        "byte": 29,
+        "mask": 1,
+        "sourceRow": 71,
+        "sourceLabel": "Cure Poison"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 259,
+          "hexId": "0x103",
+          "name": "Antidote",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 262,
+          "hexId": "0x106",
+          "name": "Cure All",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 269,
+          "hexId": "0x10D",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 2,
+      "canonicalLabel": "Cure Stun",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "paralysis",
+        "sourceAlias": "stun",
+        "byte": 29,
+        "mask": 2,
+        "sourceRow": 72,
+        "sourceLabel": "Cure Stun"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Explicit cure is independent from parameter suppression.",
+      "techniques": [
+        {
+          "id": 199,
+          "hexId": "0xC7",
+          "name": "Recovery Power",
+          "recordKind": "technique"
+        },
+        {
+          "id": 201,
+          "hexId": "0xC9",
+          "name": "AntiFreeze",
+          "recordKind": "technique"
+        },
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 2,
+      "canonicalLabel": "Cure Stun",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "paralysis",
+        "sourceAlias": "stun",
+        "byte": 29,
+        "mask": 2,
+        "sourceRow": 72,
+        "sourceLabel": "Cure Stun"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 260,
+          "hexId": "0x104",
+          "name": "Cure Stun",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 262,
+          "hexId": "0x106",
+          "name": "Cure All",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 269,
+          "hexId": "0x10D",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 4,
+      "canonicalLabel": "Cure Confusion",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "confusion",
+        "byte": 29,
+        "mask": 4,
+        "sourceRow": 73,
+        "sourceLabel": "Cure Confusion"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Explicit cure is independent from parameter suppression.",
+      "techniques": [
+        {
+          "id": 199,
+          "hexId": "0xC7",
+          "name": "Recovery Power",
+          "recordKind": "technique"
+        },
+        {
+          "id": 202,
+          "hexId": "0xCA",
+          "name": "AntiConfusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 207,
+          "hexId": "0xCF",
+          "name": "Friendly Fire",
+          "recordKind": "technique"
+        },
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 4,
+      "canonicalLabel": "Cure Confusion",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "confusion",
+        "byte": 29,
+        "mask": 4,
+        "sourceRow": 73,
+        "sourceLabel": "Cure Confusion"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 261,
+          "hexId": "0x105",
+          "name": "AntiMIXUP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 262,
+          "hexId": "0x106",
+          "name": "Cure All",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 269,
+          "hexId": "0x10D",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 29,
+      "mask": 8,
+      "canonicalLabel": "Cures Demotivation (used by Interferon)",
+      "descriptor": {
+        "kind": "status-cure",
+        "status": "motivation-down",
+        "byte": 29,
+        "mask": 8,
+        "sourceRow": 75,
+        "sourceLabel": "Cures Demotivation (used by Interferon)"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Explicit cure is independent from parameter suppression.",
+      "techniques": [
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 2,
+      "canonicalLabel": "Revive and full heal digimon",
+      "descriptor": {
+        "kind": "recovery",
+        "mode": "revive-full-heal",
+        "byte": 31,
+        "mask": 2,
+        "sourceRow": 76,
+        "sourceLabel": "Revive and full heal digimon"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 183,
+          "hexId": "0xB7",
+          "name": "Crimson Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 2,
+      "canonicalLabel": "Revive and full heal digimon",
+      "descriptor": {
+        "kind": "recovery",
+        "mode": "revive-full-heal",
+        "byte": 31,
+        "mask": 2,
+        "sourceRow": 76,
+        "sourceLabel": "Revive and full heal digimon"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 273,
+          "hexId": "0x111",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 276,
+          "hexId": "0x114",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 279,
+          "hexId": "0x117",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 4,
+      "canonicalLabel": "Unknown bit",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 31,
+        "mask": 4
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "No documented interpretation.",
+      "techniques": [
+        {
+          "id": 61,
+          "hexId": "0x3D",
+          "name": "Black Pearl Shot",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 8,
+      "canonicalLabel": "Can’t Recover HP",
+      "descriptor": {
+        "kind": "recovery-restriction",
+        "resource": "hp",
+        "byte": 31,
+        "mask": 8,
+        "sourceRow": 77,
+        "sourceLabel": "Can’t Recover HP"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Recovery restriction duration/scope not established.",
+      "techniques": [
+        {
+          "id": 75,
+          "hexId": "0x4B",
+          "name": "Darkside Attack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 16,
+      "canonicalLabel": "Can’t Recover Status",
+      "descriptor": {
+        "kind": "recovery-restriction",
+        "resource": "status",
+        "byte": 31,
+        "mask": 16,
+        "sourceRow": 78,
+        "sourceLabel": "Can’t Recover Status"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Recovery restriction duration/scope not established.",
+      "techniques": [
+        {
+          "id": 103,
+          "hexId": "0x67",
+          "name": "GigaByte Wing",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 32,
+      "canonicalLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "counter",
+        "scope": "turn",
+        "byte": 31,
+        "mask": 32,
+        "sourceRow": 79,
+        "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Turn-wide support protection not specified; broken Interrupt flag retained.",
+      "techniques": [
+        {
+          "id": 187,
+          "hexId": "0xBB",
+          "name": "Banana Slip",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 32,
+      "canonicalLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "interrupt",
+        "scope": "turn",
+        "caveat": "Source explicitly says interrupt prevention is broken.",
+        "byte": 31,
+        "mask": 32,
+        "sourceRow": 79,
+        "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Turn-wide support protection not specified; broken Interrupt flag retained.",
+      "techniques": [
+        {
+          "id": 187,
+          "hexId": "0xBB",
+          "name": "Banana Slip",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 64,
+      "canonicalLabel": "Apply Invincible Status",
+      "descriptor": {
+        "kind": "special-state",
+        "state": "invincibility",
+        "byte": 31,
+        "mask": 64,
+        "sourceRow": 80,
+        "sourceLabel": "Apply Invincible Status"
+      },
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses / battleAccuracy / battleSimulation",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 197,
+          "hexId": "0xC5",
+          "name": "Invincibility",
+          "recordKind": "technique"
+        },
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        },
+        {
+          "id": 222,
+          "hexId": "0xDE",
+          "name": "Kongou",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 31,
+      "mask": 128,
+      "canonicalLabel": "87.5% chance to delete target's turn (Works only if user is Interrupting)(No effect on bosses)",
+      "descriptor": {
+        "kind": "interrupt-modifier",
+        "modifier": "cancel-action",
+        "chancePercent": 87.5,
+        "excludesBosses": true,
+        "condition": "interrupt-triggered",
+        "byte": 31,
+        "mask": 128,
+        "sourceRow": 81,
+        "sourceLabel": "87.5% chance to delete target's turn (Works only if user is Interrupting)(No effect on bosses)"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts.resolveInterruptEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 1,
+      "canonicalLabel": "Deprecated (Wing Blade, MP Destroyer have this on)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source: Wing Blade / MP Destroyer legacy flag.",
+        "byte": 32,
+        "mask": 1,
+        "sourceRow": 82,
+        "sourceLabel": "Deprecated (Wing Blade, MP Destroyer have this on)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 161,
+          "hexId": "0xA1",
+          "name": "Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 2,
+      "canonicalLabel": "Lower target’s atk damage by 70.3125%",
+      "descriptor": {
+        "kind": "interrupt-modifier",
+        "modifier": "reduce-action-damage",
+        "reductionPercent": 70.3125,
+        "condition": "unspecified",
+        "byte": 32,
+        "mask": 2,
+        "sourceRow": 83,
+        "sourceLabel": "Lower target’s atk damage by 70.3125%"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts.resolveInterruptEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 162,
+          "hexId": "0xA2",
+          "name": "Horn Buster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 4,
+      "canonicalLabel": "Lower target's atk damage by 39.84375%",
+      "descriptor": {
+        "kind": "interrupt-modifier",
+        "modifier": "reduce-action-damage",
+        "reductionPercent": 39.84375,
+        "condition": "unspecified",
+        "byte": 32,
+        "mask": 4,
+        "sourceRow": 84,
+        "sourceLabel": "Lower target's atk damage by 39.84375%"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts.resolveInterruptEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 160,
+          "hexId": "0xA0",
+          "name": "Electro Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 8,
+      "canonicalLabel": "66% chance to cause target's attack to miss (User must be Interrupting)",
+      "descriptor": {
+        "kind": "interrupt-modifier",
+        "modifier": "force-miss",
+        "chancePercent": 66,
+        "condition": "interrupt-triggered",
+        "byte": 32,
+        "mask": 8,
+        "sourceRow": 85,
+        "sourceLabel": "66% chance to cause target's attack to miss (User must be Interrupting)"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts.resolveInterruptEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 163,
+          "hexId": "0xA3",
+          "name": "Giga Scissor Claw",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 16,
+      "canonicalLabel": "Deprecated (It was enabled for Venom Infusion but is not used)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source: unused Venom Infusion flag.",
+        "byte": 32,
+        "mask": 16,
+        "sourceRow": 86,
+        "sourceLabel": "Deprecated (It was enabled for Venom Infusion but is not used)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 32,
+      "canonicalLabel": "Target attacks last this turn (User must be Interrupting)",
+      "descriptor": {
+        "kind": "interrupt-modifier",
+        "modifier": "target-acts-last",
+        "condition": "interrupt-triggered",
+        "byte": 32,
+        "mask": 32,
+        "sourceRow": 87,
+        "sourceLabel": "Target attacks last this turn (User must be Interrupting)"
+      },
+      "status": "authoritative",
+      "handler": "battleInterrupts.resolveInterruptEffects",
+      "boundary": "",
+      "techniques": [
+        {
+          "id": 165,
+          "hexId": "0xA5",
+          "name": "Chrono Breaker",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 32,
+      "mask": 64,
+      "canonicalLabel": "Deprecated (Life Shield)",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "deprecated",
+        "note": "Source: Life Shield legacy flag.",
+        "byte": 32,
+        "mask": 64,
+        "sourceRow": 88,
+        "sourceLabel": "Deprecated (Life Shield)"
+      },
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Retained raw flag; no behavior inferred.",
+      "techniques": [
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 1,
+      "canonicalLabel": "Hit target(s)",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "normal",
+        "byte": 33,
+        "mask": 1,
+        "sourceRow": 89,
+        "sourceLabel": "Hit target(s)"
+      },
+      "status": "authoritative",
+      "handler": "battleTargets / battleSupportEffects",
+      "boundary": "Canonical normal targets and activated Counter expansion.",
+      "techniques": [
+        {
+          "id": 1,
+          "hexId": "0x01",
+          "name": "Poison Ivy",
+          "recordKind": "technique"
+        },
+        {
+          "id": 2,
+          "hexId": "0x02",
+          "name": "Rain of Pollen",
+          "recordKind": "technique"
+        },
+        {
+          "id": 3,
+          "hexId": "0x03",
+          "name": "Boom Bubble",
+          "recordKind": "technique"
+        },
+        {
+          "id": 4,
+          "hexId": "0x04",
+          "name": "Flame Bomber",
+          "recordKind": "technique"
+        },
+        {
+          "id": 5,
+          "hexId": "0x05",
+          "name": "Scissor Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 6,
+          "hexId": "0x06",
+          "name": "Rock Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 8,
+          "hexId": "0x08",
+          "name": "Blue Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 9,
+          "hexId": "0x09",
+          "name": "Pummel Peck",
+          "recordKind": "technique"
+        },
+        {
+          "id": 10,
+          "hexId": "0x0A",
+          "name": "Fireball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 11,
+          "hexId": "0x0B",
+          "name": "Fossil Bite",
+          "recordKind": "technique"
+        },
+        {
+          "id": 12,
+          "hexId": "0x0C",
+          "name": "Hydro Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 13,
+          "hexId": "0x0D",
+          "name": "Volcanic Strike",
+          "recordKind": "technique"
+        },
+        {
+          "id": 14,
+          "hexId": "0x0E",
+          "name": "Blaze Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 15,
+          "hexId": "0x0F",
+          "name": "Stun Flame Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 16,
+          "hexId": "0x10",
+          "name": "Iron Drill Spin",
+          "recordKind": "technique"
+        },
+        {
+          "id": 17,
+          "hexId": "0x11",
+          "name": "Solar Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 18,
+          "hexId": "0x12",
+          "name": "Flower Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 19,
+          "hexId": "0x13",
+          "name": "Royal Smasher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 20,
+          "hexId": "0x14",
+          "name": "Ninja Flower",
+          "recordKind": "technique"
+        },
+        {
+          "id": 21,
+          "hexId": "0x15",
+          "name": "Trick Or Treat",
+          "recordKind": "technique"
+        },
+        {
+          "id": 22,
+          "hexId": "0x16",
+          "name": "Metal Fireball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 23,
+          "hexId": "0x17",
+          "name": "Lightning Spear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 24,
+          "hexId": "0x18",
+          "name": "Tri-Horn Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 25,
+          "hexId": "0x19",
+          "name": "Magical Tail",
+          "recordKind": "technique"
+        },
+        {
+          "id": 26,
+          "hexId": "0x1A",
+          "name": "Tomahawk Crunch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 27,
+          "hexId": "0x1B",
+          "name": "Energy Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 28,
+          "hexId": "0x1C",
+          "name": "Howling Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 29,
+          "hexId": "0x1D",
+          "name": "Legendary Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 30,
+          "hexId": "0x1E",
+          "name": "Freeze Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 31,
+          "hexId": "0x1F",
+          "name": "Pepper Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 32,
+          "hexId": "0x20",
+          "name": "Spiral Twister",
+          "recordKind": "technique"
+        },
+        {
+          "id": 34,
+          "hexId": "0x22",
+          "name": "Waking Dream",
+          "recordKind": "technique"
+        },
+        {
+          "id": 35,
+          "hexId": "0x23",
+          "name": "Marching Fishes",
+          "recordKind": "technique"
+        },
+        {
+          "id": 36,
+          "hexId": "0x24",
+          "name": "Nova Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 37,
+          "hexId": "0x25",
+          "name": "V-Nova Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 38,
+          "hexId": "0x26",
+          "name": "Spinning Needle",
+          "recordKind": "technique"
+        },
+        {
+          "id": 39,
+          "hexId": "0x27",
+          "name": "Meteor Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 40,
+          "hexId": "0x28",
+          "name": "Fist Of Fate",
+          "recordKind": "technique"
+        },
+        {
+          "id": 41,
+          "hexId": "0x29",
+          "name": "Air Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 42,
+          "hexId": "0x2A",
+          "name": "Howling Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 43,
+          "hexId": "0x2B",
+          "name": "Wolf Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 44,
+          "hexId": "0x2C",
+          "name": "Icicle Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 45,
+          "hexId": "0x2D",
+          "name": "Strong Carapace",
+          "recordKind": "technique"
+        },
+        {
+          "id": 46,
+          "hexId": "0x2E",
+          "name": "Harpoon Torpedo",
+          "recordKind": "technique"
+        },
+        {
+          "id": 47,
+          "hexId": "0x2F",
+          "name": "Pulse Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 48,
+          "hexId": "0x30",
+          "name": "Giga Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 49,
+          "hexId": "0x31",
+          "name": "V-Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 50,
+          "hexId": "0x32",
+          "name": "Lightning Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 51,
+          "hexId": "0x33",
+          "name": "Mega Bone Stick",
+          "recordKind": "technique"
+        },
+        {
+          "id": 52,
+          "hexId": "0x34",
+          "name": "Tusk Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 53,
+          "hexId": "0x35",
+          "name": "Vulcan's Hammer",
+          "recordKind": "technique"
+        },
+        {
+          "id": 54,
+          "hexId": "0x36",
+          "name": "Tidal Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 55,
+          "hexId": "0x37",
+          "name": "Big Bang Boom",
+          "recordKind": "technique"
+        },
+        {
+          "id": 56,
+          "hexId": "0x38",
+          "name": "Terra Force",
+          "recordKind": "technique"
+        },
+        {
+          "id": 57,
+          "hexId": "0x39",
+          "name": "S-bone Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 59,
+          "hexId": "0x3B",
+          "name": "Electric Shock",
+          "recordKind": "technique"
+        },
+        {
+          "id": 60,
+          "hexId": "0x3C",
+          "name": "Demi Dart",
+          "recordKind": "technique"
+        },
+        {
+          "id": 61,
+          "hexId": "0x3D",
+          "name": "Black Pearl Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 62,
+          "hexId": "0x3E",
+          "name": "Stun Bubble",
+          "recordKind": "technique"
+        },
+        {
+          "id": 63,
+          "hexId": "0x3F",
+          "name": "Electro Thread",
+          "recordKind": "technique"
+        },
+        {
+          "id": 64,
+          "hexId": "0x40",
+          "name": "Party Time",
+          "recordKind": "technique"
+        },
+        {
+          "id": 65,
+          "hexId": "0x41",
+          "name": "Evil Touch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 66,
+          "hexId": "0x42",
+          "name": "Evil Charm",
+          "recordKind": "technique"
+        },
+        {
+          "id": 67,
+          "hexId": "0x43",
+          "name": "Coral Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 68,
+          "hexId": "0x44",
+          "name": "Spurting Ink",
+          "recordKind": "technique"
+        },
+        {
+          "id": 69,
+          "hexId": "0x45",
+          "name": "Sonic Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 70,
+          "hexId": "0x46",
+          "name": "Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 71,
+          "hexId": "0x47",
+          "name": "Twig Tap",
+          "recordKind": "technique"
+        },
+        {
+          "id": 72,
+          "hexId": "0x48",
+          "name": "Alien Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 73,
+          "hexId": "0x49",
+          "name": "Concert Crush",
+          "recordKind": "technique"
+        },
+        {
+          "id": 75,
+          "hexId": "0x4B",
+          "name": "Darkside Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 76,
+          "hexId": "0x4C",
+          "name": "Grisly Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 77,
+          "hexId": "0x4D",
+          "name": "Shadow Scythe",
+          "recordKind": "technique"
+        },
+        {
+          "id": 78,
+          "hexId": "0x4E",
+          "name": "Evil Wind",
+          "recordKind": "technique"
+        },
+        {
+          "id": 79,
+          "hexId": "0x4F",
+          "name": "Tentacle Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 81,
+          "hexId": "0x51",
+          "name": "Duo Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 82,
+          "hexId": "0x52",
+          "name": "Pit Pelter",
+          "recordKind": "technique"
+        },
+        {
+          "id": 83,
+          "hexId": "0x53",
+          "name": "Junk Chunker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 84,
+          "hexId": "0x54",
+          "name": "Trump Sword",
+          "recordKind": "technique"
+        },
+        {
+          "id": 85,
+          "hexId": "0x55",
+          "name": "Needle Squall",
+          "recordKind": "technique"
+        },
+        {
+          "id": 86,
+          "hexId": "0x56",
+          "name": "X-Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 87,
+          "hexId": "0x57",
+          "name": "Puppet Pummel",
+          "recordKind": "technique"
+        },
+        {
+          "id": 88,
+          "hexId": "0x58",
+          "name": "Toy Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 89,
+          "hexId": "0x59",
+          "name": "Super Slap",
+          "recordKind": "technique"
+        },
+        {
+          "id": 90,
+          "hexId": "0x5A",
+          "name": "Hail Storm",
+          "recordKind": "technique"
+        },
+        {
+          "id": 91,
+          "hexId": "0x5B",
+          "name": "Ice Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 92,
+          "hexId": "0x5C",
+          "name": "Hyper Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 93,
+          "hexId": "0x5D",
+          "name": "Thunder Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 94,
+          "hexId": "0x5E",
+          "name": "Sad Water Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 95,
+          "hexId": "0x5F",
+          "name": "Rose Spear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 96,
+          "hexId": "0x60",
+          "name": "SubZero Ice Punch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 97,
+          "hexId": "0x61",
+          "name": "Lightning Paw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 98,
+          "hexId": "0x62",
+          "name": "Heaven's Arrow",
+          "recordKind": "technique"
+        },
+        {
+          "id": 99,
+          "hexId": "0x63",
+          "name": "Fire Tornado",
+          "recordKind": "technique"
+        },
+        {
+          "id": 100,
+          "hexId": "0x64",
+          "name": "Darkness Gear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 101,
+          "hexId": "0x65",
+          "name": "Bolt Strike",
+          "recordKind": "technique"
+        },
+        {
+          "id": 102,
+          "hexId": "0x66",
+          "name": "Protect Grenade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 103,
+          "hexId": "0x67",
+          "name": "GigaByte Wing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 105,
+          "hexId": "0x69",
+          "name": "E-Stun Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 106,
+          "hexId": "0x6A",
+          "name": "Spiral Saw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 107,
+          "hexId": "0x6B",
+          "name": "Brown Stinger",
+          "recordKind": "technique"
+        },
+        {
+          "id": 108,
+          "hexId": "0x6C",
+          "name": "Hyper Heat",
+          "recordKind": "technique"
+        },
+        {
+          "id": 109,
+          "hexId": "0x6D",
+          "name": "Triple Forces",
+          "recordKind": "technique"
+        },
+        {
+          "id": 110,
+          "hexId": "0x6E",
+          "name": "Slamming Tusk",
+          "recordKind": "technique"
+        },
+        {
+          "id": 111,
+          "hexId": "0x6F",
+          "name": "Fire Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 112,
+          "hexId": "0x70",
+          "name": "Crimson Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 113,
+          "hexId": "0x71",
+          "name": "Digital Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 114,
+          "hexId": "0x72",
+          "name": "Fire Blast II",
+          "recordKind": "technique"
+        },
+        {
+          "id": 115,
+          "hexId": "0x73",
+          "name": "Pretty Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 130,
+          "hexId": "0x82",
+          "name": "Needle Spray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 134,
+          "hexId": "0x86",
+          "name": "Smiley Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 137,
+          "hexId": "0x89",
+          "name": "Pummel Whack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 138,
+          "hexId": "0x8A",
+          "name": "Ninja Knife Throw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 139,
+          "hexId": "0x8B",
+          "name": "Beast King Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 140,
+          "hexId": "0x8C",
+          "name": "Buffalo Breath",
+          "recordKind": "technique"
+        },
+        {
+          "id": 160,
+          "hexId": "0xA0",
+          "name": "Electro Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 161,
+          "hexId": "0xA1",
+          "name": "Wing Blade",
+          "recordKind": "technique"
+        },
+        {
+          "id": 162,
+          "hexId": "0xA2",
+          "name": "Horn Buster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 163,
+          "hexId": "0xA3",
+          "name": "Giga Scissor Claw",
+          "recordKind": "technique"
+        },
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 165,
+          "hexId": "0xA5",
+          "name": "Chrono Breaker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 166,
+          "hexId": "0xA6",
+          "name": "MP Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        },
+        {
+          "id": 180,
+          "hexId": "0xB4",
+          "name": "Hyper Flashing",
+          "recordKind": "technique"
+        },
+        {
+          "id": 181,
+          "hexId": "0xB5",
+          "name": "HP Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 182,
+          "hexId": "0xB6",
+          "name": "Virus Attack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 183,
+          "hexId": "0xB7",
+          "name": "Crimson Flame",
+          "recordKind": "technique"
+        },
+        {
+          "id": 184,
+          "hexId": "0xB8",
+          "name": "Full HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 185,
+          "hexId": "0xB9",
+          "name": "Fungus Cruncher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 186,
+          "hexId": "0xBA",
+          "name": "Rotten Rainballs",
+          "recordKind": "technique"
+        },
+        {
+          "id": 187,
+          "hexId": "0xBB",
+          "name": "Banana Slip",
+          "recordKind": "technique"
+        },
+        {
+          "id": 188,
+          "hexId": "0xBC",
+          "name": "Small HP Cure",
+          "recordKind": "technique"
+        },
+        {
+          "id": 189,
+          "hexId": "0xBD",
+          "name": "Defensive Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 190,
+          "hexId": "0xBE",
+          "name": "Parameter Patch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 191,
+          "hexId": "0xBF",
+          "name": "Zip Boom",
+          "recordKind": "technique"
+        },
+        {
+          "id": 192,
+          "hexId": "0xC0",
+          "name": "Stun Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 193,
+          "hexId": "0xC1",
+          "name": "Armor Coating",
+          "recordKind": "technique"
+        },
+        {
+          "id": 194,
+          "hexId": "0xC2",
+          "name": "Mech Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 195,
+          "hexId": "0xC3",
+          "name": "Blaze Blaster",
+          "recordKind": "technique"
+        },
+        {
+          "id": 196,
+          "hexId": "0xC4",
+          "name": "Nature Hit Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 197,
+          "hexId": "0xC5",
+          "name": "Invincibility",
+          "recordKind": "technique"
+        },
+        {
+          "id": 198,
+          "hexId": "0xC6",
+          "name": "Re-Format",
+          "recordKind": "technique"
+        },
+        {
+          "id": 199,
+          "hexId": "0xC7",
+          "name": "Recovery Power",
+          "recordKind": "technique"
+        },
+        {
+          "id": 200,
+          "hexId": "0xC8",
+          "name": "AntiDote",
+          "recordKind": "technique"
+        },
+        {
+          "id": 201,
+          "hexId": "0xC9",
+          "name": "AntiFreeze",
+          "recordKind": "technique"
+        },
+        {
+          "id": 202,
+          "hexId": "0xCA",
+          "name": "AntiConfusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 203,
+          "hexId": "0xCB",
+          "name": "Mega Heal",
+          "recordKind": "technique"
+        },
+        {
+          "id": 204,
+          "hexId": "0xCC",
+          "name": "Zen Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 205,
+          "hexId": "0xCD",
+          "name": "Full Recovery",
+          "recordKind": "technique"
+        },
+        {
+          "id": 206,
+          "hexId": "0xCE",
+          "name": "Hung on Death",
+          "recordKind": "technique"
+        },
+        {
+          "id": 207,
+          "hexId": "0xCF",
+          "name": "Friendly Fire",
+          "recordKind": "technique"
+        },
+        {
+          "id": 208,
+          "hexId": "0xD0",
+          "name": "Invisibility",
+          "recordKind": "technique"
+        },
+        {
+          "id": 209,
+          "hexId": "0xD1",
+          "name": "Water Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 211,
+          "hexId": "0xD3",
+          "name": "Darkness Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 212,
+          "hexId": "0xD4",
+          "name": "Re-Initialize",
+          "recordKind": "technique"
+        },
+        {
+          "id": 213,
+          "hexId": "0xD5",
+          "name": "Panic Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 214,
+          "hexId": "0xD6",
+          "name": "Heart Break Hit",
+          "recordKind": "technique"
+        },
+        {
+          "id": 215,
+          "hexId": "0xD7",
+          "name": "Poison Wave",
+          "recordKind": "technique"
+        },
+        {
+          "id": 216,
+          "hexId": "0xD8",
+          "name": "Vee Head Butt",
+          "recordKind": "technique"
+        },
+        {
+          "id": 217,
+          "hexId": "0xD9",
+          "name": "Flaming Rocket",
+          "recordKind": "technique"
+        },
+        {
+          "id": 218,
+          "hexId": "0xDA",
+          "name": "Lightning Blast",
+          "recordKind": "technique"
+        },
+        {
+          "id": 219,
+          "hexId": "0xDB",
+          "name": "Mega Fire",
+          "recordKind": "technique"
+        },
+        {
+          "id": 222,
+          "hexId": "0xDE",
+          "name": "Kongou",
+          "recordKind": "technique"
+        },
+        {
+          "id": 225,
+          "hexId": "0xE1",
+          "name": "HP Zapper",
+          "recordKind": "technique"
+        },
+        {
+          "id": 226,
+          "hexId": "0xE2",
+          "name": "Critical Blow",
+          "recordKind": "technique"
+        },
+        {
+          "id": 227,
+          "hexId": "0xE3",
+          "name": "Reset Status",
+          "recordKind": "technique"
+        },
+        {
+          "id": 228,
+          "hexId": "0xE4",
+          "name": "Transcend Sword",
+          "recordKind": "technique"
+        },
+        {
+          "id": 229,
+          "hexId": "0xE5",
+          "name": "Garuru Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 231,
+          "hexId": "0xE7",
+          "name": "Safety Sphere",
+          "recordKind": "technique"
+        },
+        {
+          "id": 232,
+          "hexId": "0xE8",
+          "name": "Karate Sweep",
+          "recordKind": "technique"
+        },
+        {
+          "id": 235,
+          "hexId": "0xEB",
+          "name": "Inferno Missile",
+          "recordKind": "technique"
+        },
+        {
+          "id": 237,
+          "hexId": "0xED",
+          "name": "Stun Punch",
+          "recordKind": "technique"
+        },
+        {
+          "id": 238,
+          "hexId": "0xEE",
+          "name": "Rail Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 239,
+          "hexId": "0xEF",
+          "name": "Armor Aid",
+          "recordKind": "technique"
+        },
+        {
+          "id": 240,
+          "hexId": "0xF0",
+          "name": "Titan Laser",
+          "recordKind": "technique"
+        },
+        {
+          "id": 241,
+          "hexId": "0xF1",
+          "name": "Fantasmic Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 242,
+          "hexId": "0xF2",
+          "name": "GAIA Gear",
+          "recordKind": "technique"
+        },
+        {
+          "id": 243,
+          "hexId": "0xF3",
+          "name": "Light Gun",
+          "recordKind": "technique"
+        },
+        {
+          "id": 244,
+          "hexId": "0xF4",
+          "name": "Fantasmic Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 246,
+          "hexId": "0xF6",
+          "name": "Left Hand",
+          "recordKind": "technique"
+        },
+        {
+          "id": 247,
+          "hexId": "0xF7",
+          "name": "Reduction Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 248,
+          "hexId": "0xF8",
+          "name": "Right Hand",
+          "recordKind": "technique"
+        },
+        {
+          "id": 249,
+          "hexId": "0xF9",
+          "name": "Destablizer Ray",
+          "recordKind": "technique"
+        },
+        {
+          "id": 251,
+          "hexId": "0xFB",
+          "name": "Shadow Scythe (0MP)",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 1,
+      "canonicalLabel": "Hit target(s)",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "normal",
+        "byte": 33,
+        "mask": 1,
+        "sourceRow": 89,
+        "sourceLabel": "Hit target(s)"
+      },
+      "status": "not-applicable",
+      "handler": "none",
+      "boundary": "Item/system record; not a simulated technique.",
+      "techniques": [
+        {
+          "id": 223,
+          "hexId": "0xDF",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 224,
+          "hexId": "0xE0",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 230,
+          "hexId": "0xE6",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 233,
+          "hexId": "0xE9",
+          "name": "Energy Blast (?)",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 234,
+          "hexId": "0xEA",
+          "name": "Alias Fake (?)",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 236,
+          "hexId": "0xEC",
+          "name": "abc? Unused?",
+          "recordKind": "unresolved"
+        },
+        {
+          "id": 253,
+          "hexId": "0xFD",
+          "name": "HP Disk 40 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 254,
+          "hexId": "0xFE",
+          "name": "HP Disk 80 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 255,
+          "hexId": "0xFF",
+          "name": "HP Disk 160 HP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 259,
+          "hexId": "0x103",
+          "name": "Antidote",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 260,
+          "hexId": "0x104",
+          "name": "Cure Stun",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 261,
+          "hexId": "0x105",
+          "name": "AntiMIXUP",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 262,
+          "hexId": "0x106",
+          "name": "Cure All",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 263,
+          "hexId": "0x107",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 264,
+          "hexId": "0x108",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 265,
+          "hexId": "0x109",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 269,
+          "hexId": "0x10D",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 292,
+          "hexId": "0x124",
+          "name": "Z cannon Single Target",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 293,
+          "hexId": "0x125",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 294,
+          "hexId": "0x126",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 295,
+          "hexId": "0x127",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 296,
+          "hexId": "0x128",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 297,
+          "hexId": "0x129",
+          "name": "Z cannon AoE",
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 298,
+          "hexId": "0x12A",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 299,
+          "hexId": "0x12B",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 300,
+          "hexId": "0x12C",
+          "name": null,
+          "recordKind": "item-or-system"
+        },
+        {
+          "id": 301,
+          "hexId": "0x12D",
+          "name": null,
+          "recordKind": "item-or-system"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 2,
+      "canonicalLabel": "Hit random digimon",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "Random-Digimon semantics remain unresolved; ordinary compatibility targeting only.",
+      "techniques": [
+        {
+          "id": 7,
+          "hexId": "0x07",
+          "name": "S-Thunder Smack",
+          "recordKind": "technique"
+        },
+        {
+          "id": 33,
+          "hexId": "0x21",
+          "name": "Super Shocker",
+          "recordKind": "technique"
+        },
+        {
+          "id": 58,
+          "hexId": "0x3A",
+          "name": "Ocean Love",
+          "recordKind": "technique"
+        },
+        {
+          "id": 74,
+          "hexId": "0x4A",
+          "name": "Dark Shot",
+          "recordKind": "technique"
+        },
+        {
+          "id": 80,
+          "hexId": "0x50",
+          "name": "Musical Fist",
+          "recordKind": "technique"
+        },
+        {
+          "id": 104,
+          "hexId": "0x68",
+          "name": "Giga Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 132,
+          "hexId": "0x84",
+          "name": "Thunder Ball",
+          "recordKind": "technique"
+        },
+        {
+          "id": 220,
+          "hexId": "0xDC",
+          "name": "Chaos Cannon",
+          "recordKind": "technique"
+        },
+        {
+          "id": 221,
+          "hexId": "0xDD",
+          "name": "Blind Attack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 4,
+      "canonicalLabel": "Hit target but hit all targets on counter",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "all-on-counter",
+        "byte": 33,
+        "mask": 4,
+        "sourceRow": 91,
+        "sourceLabel": "Hit target but hit all targets on counter"
+      },
+      "status": "authoritative",
+      "handler": "battleTargets / battleSupportEffects",
+      "boundary": "Canonical normal targets and activated Counter expansion.",
+      "techniques": [
+        {
+          "id": 131,
+          "hexId": "0x83",
+          "name": "Meteor Stream",
+          "recordKind": "technique"
+        },
+        {
+          "id": 135,
+          "hexId": "0x87",
+          "name": "Energetic Bomb",
+          "recordKind": "technique"
+        },
+        {
+          "id": 136,
+          "hexId": "0x88",
+          "name": "Smiley Warhead",
+          "recordKind": "technique"
+        },
+        {
+          "id": 245,
+          "hexId": "0xF5",
+          "name": "Tubular Attack",
+          "recordKind": "technique"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 8,
+      "canonicalLabel": "Unknown bit",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 33,
+        "mask": 8
+      },
+      "status": "deferred-unresolved",
+      "handler": "none",
+      "boundary": "No documented interpretation.",
+      "techniques": [
+        {
+          "id": 210,
+          "hexId": "0xD2",
+          "name": "Necro Magic",
+          "recordKind": "technique"
+        }
+      ]
+    }
+  ],
+  "unusedSourceRows": [
+    {
+      "row": 4,
+      "byte": 17,
+      "mask": 3,
+      "sourceValue": "3",
+      "label": "Can't be either of the above",
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Dictionary row has no decoded record occurrence; not silently executed."
+    },
+    {
+      "row": 29,
+      "byte": 21,
+      "mask": 16,
+      "sourceValue": "10",
+      "label": "Eliminates target if hit by this 3 times",
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Dictionary row has no decoded record occurrence; not silently executed."
+    },
+    {
+      "row": 54,
+      "byte": 25,
+      "mask": 128,
+      "sourceValue": "80",
+      "label": "Stun w/ Interrupt",
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Dictionary row has no decoded record occurrence; not silently executed."
+    },
+    {
+      "row": 59,
+      "byte": 26,
+      "mask": 64,
+      "sourceValue": "40",
+      "label": "Unknown Status Effect Flag",
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Dictionary row has no decoded record occurrence; not silently executed."
+    },
+    {
+      "row": 74,
+      "byte": 29,
+      "mask": 7,
+      "sourceValue": "7",
+      "label": "Cure Poison, Confusion & Stun",
+      "status": "data-only",
+      "handler": "none",
+      "boundary": "Dictionary row has no decoded record occurrence; not silently executed."
+    }
+  ],
+  "projectRules": [
+    {
+      "rule": "Assist vs Interrupt",
+      "status": "deferred-unresolved",
+      "boundary": "Existing exclusion preserved; no new scheduling eligibility inferred."
+    },
+    {
+      "rule": "Fixed heal values",
+      "status": "authoritative",
+      "handler": "battleSupportEffects.FIXED_HEALS",
+      "ids": [
+        188,
+        181,
+        203
+      ]
+    },
+    {
+      "rule": "Custom legacy debuff/drain/chain",
+      "status": "compatibility-only",
+      "handler": "battleLegacyEffects",
+      "boundary": "Only custom unidentified debuffs retain approximate stacks; canonical stages never execute twice."
+    }
+  ]
+}

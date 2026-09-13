@@ -1,10 +1,11 @@
+import { assistEligible } from './battleSupportEffects';
 import type { ActionChoice, ActionPolicy, BattleCombatantState, BattleState, PlannedAction, TargetIntent } from './battleTypes';
 import { BattleInputError } from './battleTypes';
 
 export const legacyActionPolicy: ActionPolicy = {
-  chooseAction(actor, _context, rng) {
-    const skills = actor.skills.filter(s => s.legacyTech.ap > 0 || s.kind === 'interrupt');
-    if (!skills.length) throw new BattleInputError(`No usable technique for ${actor.name}.`, 'unsupported');
+  chooseAction(actor, context, rng) {
+    const skills = actor.skills.filter(s => s.kind === 'assist' ? assistEligible(actor, s, context.combatants) : s.legacyTech.ap > 0 || s.kind === 'interrupt');
+    if (!skills.length) return { kind: 'skill', skillKey: actor.skills[0].key }; // Explicit ineligible Assist is skipped, without inventing an Attack.
     // The old synthetic fallback consumes no technique-choice draw.
     const skill = skills.length === 1 && skills[0].source === 'synthetic-legacy-fallback'
       ? skills[0] : skills[rng.nextIntExclusive(skills.length, 'action-choice')];
@@ -32,5 +33,5 @@ export function planAction(state: BattleState, actor: BattleCombatantState, choi
 export function revalidateAction(state: BattleState, action: PlannedAction): string | null {
   if (action.state === 'cancelled' || action.state === 'skipped') return action.state;
   const actor = state.combatants.find(a => a.id === action.actorId);
-  return actor?.isAlive ? null : 'actor-ko';
+  return actor?.revivedRound === state.round ? 'revived-this-round' : actor?.isAlive ? null : 'actor-ko';
 }

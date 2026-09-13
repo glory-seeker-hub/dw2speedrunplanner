@@ -176,10 +176,10 @@ test('Guard is rejected before planning and has no MP/DEF behavior', () => {
   assert.deepEqual(r.actions, []); assert.deepEqual(r.state.plannedActions, []);
   assert.ok(r.state.combatants.every(a => a.currentMp === a.maxMp && Object.keys(a.parameterModifiers).length === 0));
 });
-test('policy-selected Assist keeps canonical kind but does not receive invented resolution', () => {
+test('policy-selected Assist keeps canonical kind and applies authoritative support', () => {
   const assist = { id: 'assist-test', name: 'Armor Coating', ap: 0, element: 'None', target: 'Single', isCounter: false };
   const r = run([member('P', [assist], { spd: 100 })], cases.single[1], { actionPolicy: { chooseAction: actor => ({ kind: 'skill', skillKey: actor.skills[0].key }) } });
-  assert.equal(r.outcome, 'unsupported'); assert.equal(r.actions[0].kind, 'assist'); assert.equal(r.actions[0].impacts.length, 0);
+  assert.equal(r.outcome, 'limit-reached'); assert.equal(r.actions[0].kind, 'assist'); assert.equal(r.actions[0].impacts.length, 1); assert.equal(r.actions[0].supportEvents[0].kind,'stage');
 });
 test('Interrupt canonical identity uses scheduled execution with measured prelude-inclusive timing', () => {
   const r = run([member('P', [tech('Electro Shocker')], { spd: 100 })], cases.single[1]);
@@ -238,10 +238,10 @@ test('a planned action can be cancelled before execution without changing its id
   assert.equal(load('src/utils/battle/battleActions.ts').revalidateAction(state, actions[0]), 'cancelled');
   assert.equal(actions[0].id, id);
 });
-test('debuff implementation and cap remain the characterized legacy values', () => {
+test('canonical debuff uses discrete stages clamped to minus two', () => {
   const r = run([member('P', [tech('Scissor Claw')], { hp: 1000, spd: 100 })], [member('E', [tech('Rock Fist')], { hp: 1000 })], { maxRounds: 8 });
-  const multiplier = r.state.combatants[1].parameterModifiers.def;
-  assert.ok(Math.abs(multiplier - 0.3535533905932737) < 1e-12);
+  assert.equal(r.state.combatants[1].defStage, -2);
+  assert.equal(r.state.combatants[1].parameterModifiers.def, undefined);
 });
 test('missing numeric stats are rejected before initiative', () => {
   const m = member('P', [tech('Rock Fist')]); delete m.customStats.spd;

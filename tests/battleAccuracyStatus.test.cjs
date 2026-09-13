@@ -34,9 +34,9 @@ test('independent recovery order is paralysis then confusion, Poison never rolls
 test('Assist accuracy guarantees Hit, skips failure/accuracy and does not clear remaining paralysis',()=>{
  const s=prep(unit('P','Pepper Breath',{}, {paralysis:true}));const rng=sequence([0.75]);recoverStatuses(s.combatants[0],rng);assert.equal(resolveActionAccuracy(s.combatants[0],'assist',[],rng).cause,'guaranteed');assert.equal(s.combatants[0].statuses.paralysis,true);assert.equal(rng.consumed,1);
 });
-test('production Assist remains unsupported after recovery without speculative effects',()=>{
+test('production Assist executes after recovery with authoritative stages',()=>{
  const p=unit();p.techs=[{...tech('Pepper Breath'),canonicalSkillId:0xc1,ap:0}];p.initialStatuses={paralysis:true};const rng=choices({'status-recovery-paralysis':[3]});
- const r=run([p],[unit('E')],{rng,actionPolicy:{chooseAction:a=>({kind:'skill',skillKey:a.skills[0].key})}});const a=r.actions[0];assert.equal(r.outcome,'unsupported');assert.equal(a.accuracy.cause,'guaranteed');assert.equal(a.mpAccounting,null);assert.equal(a.statusesAfterRecovery.paralysis,true);assert.ok(!rng.draws.some(d=>['accuracy','paralysis-failure'].includes(d.category)));
+ const r=run([p],[unit('E')],{rng,actionPolicy:{chooseAction:a=>({kind:'skill',skillKey:a.skills[0].key})}});const a=r.actions[0];assert.equal(r.outcome,'limit-reached');assert.equal(a.accuracy.cause,'guaranteed');assert.ok(a.mpAccounting.costCharged>0);assert.equal(a.statusesAfterRecovery.paralysis,true);assert.ok(!rng.draws.some(d=>d.category==='paralysis-failure'));assert.equal(rng.draws.filter(d=>d.category==='accuracy').length,1);
 });
 for(const status of ['poison','paralysis','confusion'])for(const chance of [33,66])for(const roll of [0,1,2])test(`${status} ${chance}% direct flag rolls ${roll}/2`,()=>{
  const s=prep();const effect={kind:'status-application',status,chancePercent:chance,condition:'always',byte:25,mask:1};const rng=sequence([roll/3]);const result=applyDirectStatuses(s.combatants[1],[effect],rng)[0];assert.equal(result.applied,roll<(chance===33?1:2));assert.equal(!!s.combatants[1].statuses[status],result.applied);assert.equal(rng.draws[0].category,`status-apply-${status}`);
@@ -108,8 +108,8 @@ test('confused Enemy AOE includes self/living allies but excludes KO enemy allie
 for(const [skill,status] of [['Brown Stinger','poison'],['Stun Flame Shot','paralysis'],['Evil Charm','confusion']])test(`confused self-Hit preserves canonical ${status} application`,()=>{
  const r=run([unit('P',skill,{spd:100},{confusion:true})],[unit('E')],{rng:choices({'status-recovery-confusion':[3]})});const a=executed(r)[0];assert.equal(a.impacts[0].targetId,'player-0');assert.ok(a.impacts[0].statusApplications.some(s=>s.status===status&&s.applied));assert.ok(r.state.combatants[0].statuses[status]);
 });
-test('confused self-Hit preserves supported parameter effect path including supplied legacy DEF down',()=>{
- const p=unit('P','Pepper Breath',{spd:100},{confusion:true});p.techs[0].specialEffect={type:'debuffStat',stat:'def'};const r=run([p],[unit('E')],{rng:choices({'status-recovery-confusion':[3]})});const a=executed(r)[0];assert.ok(a.impacts[0].appliedEffects.some(e=>e.kind==='parameter-modifier'&&e.stat==='def'&&e.combatantId==='player-0'));
+test('confused self-Hit does not inject an unencoded legacy DEF effect into canonical skill',()=>{
+ const p=unit('P','Pepper Breath',{spd:100},{confusion:true});p.techs[0].specialEffect={type:'debuffStat',stat:'def'};const r=run([p],[unit('E')],{rng:choices({'status-recovery-confusion':[3]})});const a=executed(r)[0];assert.ok(!a.impacts[0].appliedEffects.some(e=>e.kind==='parameter-modifier'));
 });
 for(const statuses of [{poison:true,paralysis:true},{poison:true,confusion:true},{paralysis:true,confusion:true},{poison:true,paralysis:true,confusion:true}])test(`multiple status snapshot ${Object.keys(statuses).join('+')}`,()=>{
  const p=unit('P','Pepper Breath',{spd:100},statuses);const r=run([p],[unit('E')],{rng:choices({'status-recovery-paralysis':[3],'status-recovery-confusion':[3]})});const a=executed(r)[0];for(const key of Object.keys(statuses)){assert.equal(a.statusesBefore[key],true);assert.equal(a.statusesAfterRecovery[key],true);}assert.equal(Object.values(a.statusesBefore).filter(Boolean).length,Object.keys(statuses).length);
