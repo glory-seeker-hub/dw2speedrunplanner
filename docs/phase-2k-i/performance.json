@@ -1,0 +1,33 @@
+{
+  "method": "Five warm measurements, median; real recorded Boot Domain battles, fixture generation excluded; selected last event excluded; no cache",
+  "node": "v24.20.0",
+  "samples": [
+    {
+      "eventCount": 10,
+      "replayedEvents": 9,
+      "replayMs": 1.733,
+      "playerMappingMs": 0.1,
+      "enemyMappingMs": 0.059,
+      "totalWallMs": 2.284,
+      "presetBytes": 2130
+    },
+    {
+      "eventCount": 100,
+      "replayedEvents": 99,
+      "replayMs": 6.222,
+      "playerMappingMs": 0.093,
+      "enemyMappingMs": 0.135,
+      "totalWallMs": 8.209,
+      "presetBytes": 2134
+    },
+    {
+      "eventCount": 500,
+      "replayedEvents": 499,
+      "replayMs": 18.255,
+      "playerMappingMs": 0.085,
+      "enemyMappingMs": 0.084,
+      "totalWallMs": 16.63,
+      "presetBytes": 2137
+    }
+  ]
+}

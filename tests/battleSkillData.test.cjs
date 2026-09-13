@@ -216,10 +216,10 @@ test('existing simulator UI releases busy state and reports async data rejection
   const { toast } = require('sonner');
   const { BattleSimulation } = load('src/components/BattleSimulation.tsx');
   const original = { useState: React.useState, useMemo: React.useMemo, setTimeout: global.setTimeout, error: console.error, toast: toast.error };
-  const states = [0, 'encounter', 149, null, 'none', 1, '', false];
+  const states = [null, 0, 'encounter', 149, null, 'none', 1, '', false];
   const busy = []; const messages = []; let cursor = 0; let scheduled;
   try {
-    React.useState = initial => { const index = cursor++; return [states[index] ?? initial, value => { if (index === 7) busy.push(value); }]; };
+    React.useState = initial => { const index = cursor++; return [index in states ? states[index] : typeof initial === 'function' ? initial() : initial, value => { if (index === 8) busy.push(value); }]; };
     React.useMemo = fn => fn();
     global.setTimeout = fn => { scheduled = fn; return 1; };
     console.error = () => {};
