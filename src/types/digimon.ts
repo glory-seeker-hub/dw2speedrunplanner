@@ -91,6 +91,7 @@ export interface BattleDigimon {
 }
 
 export interface SimulationResult {
+  search?: import('@/utils/battle/battleSimulationSearch').SimulationSearchMetadata;
   winRate: number;
   totalSimulations: number;
   completedSuccesses: number;

@@ -1,0 +1,23 @@
+import type { SearchProgress } from '@/utils/battle/battleSimulationSearch';
+import { Button } from '@/components/ui/button';
+const searchNumber = (n: number | null) => n === null ? '—' : n.toLocaleString('en-US', { maximumFractionDigits: 1 });
+export function SimulationSearchProgress({ progress, requested, cancelling, onCancel }: { progress: SearchProgress | null; requested: number; cancelling: boolean; onCancel: () => void }) {
+  const completed = progress?.completedSimulations ?? 0;
+  const total = progress?.requestedSimulations ?? requested;
+  const percent = Math.max(0, Math.min(100, completed / total * 100));
+  return <section aria-label="Simulation progress" className="rounded border p-3 space-y-2">
+    <progress aria-label="Simulations completed" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={completed} max={total} value={completed} className="w-full" />
+    <p>{searchNumber(completed)} / {searchNumber(total)} simulations · {percent.toFixed(1)}%</p>
+    <div className="grid gap-1 text-sm sm:grid-cols-2">
+      <p>Successful victories: {searchNumber(progress?.successfulVictories ?? 0)}</p>
+      <p>Best so far: {searchNumber(progress?.bestFrames ?? null)}{progress?.bestFrames !== null && progress?.bestFrames !== undefined ? ' f' : ''}</p>
+      <p>Best found at: {searchNumber(progress?.bestFoundAtSimulation ?? null)}</p>
+      <p>Best occurrences: {searchNumber(progress?.bestOccurrenceCount ?? 0)}</p>
+      <p>No improvement for: {searchNumber(progress?.simulationsSinceLastImprovement ?? null)}</p>
+      <p>Speed: {searchNumber(progress?.simulationsPerSecond ?? null)} simulations/s</p>
+      <p>Elapsed: {searchNumber((progress?.elapsedMs ?? 0) / 1000)} s</p>
+      <p>ETA: {searchNumber(progress?.etaMs == null ? null : progress.etaMs / 1000)} s</p>
+    </div>
+    <Button onClick={onCancel} disabled={cancelling}>{cancelling ? 'Cancelling…' : 'Cancel Simulation'}</Button>
+  </section>;
+}

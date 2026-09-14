@@ -1,11 +1,12 @@
+// Frozen committed Phase 2K-I aggregation/continuous loop for equivalence tests.
 import type { SimulationResult } from '@/types/digimon';
 import type { Encounter } from '@/types/encounter';
-import type { BattleEngineOptions, BattleRunResult, BattleTeamMember } from './battleTypes';
-import { createProductionBattleRng } from './battleRng';
-import { simulateBattleCore } from './battleSimulation';
+import type { BattleEngineOptions, BattleRunResult, BattleTeamMember } from '@/utils/battle/battleTypes';
+import { createProductionBattleRng } from '@/utils/battle/battleRng';
+import { simulateBattleCore } from '@/utils/battle/battleSimulation';
 
 /** Aggregate streaming runs without retaining every canonical history in a batch. */
-export function createBattleAccumulator() {
+export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): SimulationResult {
   const result: SimulationResult = {
     winRate: 0, totalSimulations: 0, completedSuccesses: 0, timedSuccesses: 0, incompleteTimingSuccesses: 0,
     outcomeCounts: { 'player-win': 0, 'enemy-win': 0, 'limit-reached': 0, invalid: 0, unsupported: 0 },
@@ -14,8 +15,7 @@ export function createBattleAccumulator() {
   };
   const timingDiagnostics = new Set<string>(), resourceDiagnostics = new Set<string>();
   let turns = 0, frames = 0;
-  let bestFoundAtSimulation: number | null = null, bestOccurrenceCount = 0;
-  const add = (run: BattleRunResult) => {
+  for (const run of runs) {
     result.totalSimulations++; result.outcomeCounts[run.outcome]++;
     if (run.actions.some(a => a.resourceAlerts.length)) result.runsWithResourceAlerts++;
     // Deduplicate action-level messages rather than storing one ID per batch run.
@@ -23,34 +23,24 @@ export function createBattleAccumulator() {
       action.timingDiagnostics.forEach(d => timingDiagnostics.add(d));
       action.resourceDiagnostics.forEach(d => resourceDiagnostics.add(d));
     }
-    if (run.outcome !== 'player-win') return;
+    if (run.outcome !== 'player-win') continue;
     result.completedSuccesses++; turns += run.actionCount;
     if (result.minTurns === null || run.actionCount < result.minTurns) {
       result.minTurns = run.actionCount; result.fastestBattleHistory = run.actions;
     }
     result.maxTurns = Math.max(result.maxTurns ?? 0, run.actionCount);
-    if (run.timingCompleteness !== 'complete' || run.totalFrames === null) { result.incompleteTimingSuccesses++; return; }
+    if (run.timingCompleteness !== 'complete' || run.totalFrames === null) { result.incompleteTimingSuccesses++; continue; }
     result.timedSuccesses++; frames += run.totalFrames;
     if (result.minFrames === null || run.totalFrames < result.minFrames) {
       result.minFrames = run.totalFrames; result.fastestBattleByFrames = run.actions;
-      bestFoundAtSimulation = result.totalSimulations; bestOccurrenceCount = 1;
     }
-    else if (run.totalFrames === result.minFrames) bestOccurrenceCount++;
     result.maxFrames = Math.max(result.maxFrames ?? 0, run.totalFrames);
   }
-  const snapshot = (): SimulationResult => {
   result.winRate = result.totalSimulations ? result.completedSuccesses / result.totalSimulations * 100 : 0;
   result.avgTurns = result.completedSuccesses ? turns / result.completedSuccesses : null;
   result.avgFrames = result.timedSuccesses ? frames / result.timedSuccesses : null;
   result.timingDiagnostics = [...timingDiagnostics]; result.resourceDiagnostics = [...resourceDiagnostics];
-  return { ...result, outcomeCounts: { ...result.outcomeCounts } };
-  };
-  return { add, snapshot, convergence: () => ({ bestFoundAtSimulation, bestOccurrenceCount, simulationsSinceLastImprovement: bestFoundAtSimulation === null ? null : result.totalSimulations - bestFoundAtSimulation }) };
-}
-export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): SimulationResult {
-  const accumulator = createBattleAccumulator();
-  for (const run of runs) accumulator.add(run);
-  return accumulator.snapshot();
+  return result;
 }
 /** Retain the existing UI input/callback boundary. Seconds are deliberately removed. */
 export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], enemy: readonly BattleTeamMember[] | Encounter, floorSpecialty: string, simulationCount: number, options: BattleEngineOptions = {}): SimulationResult {

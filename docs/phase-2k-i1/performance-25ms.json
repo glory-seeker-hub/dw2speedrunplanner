@@ -1,0 +1,178 @@
+{
+  "node": "v24.20.0",
+  "fixture": "cases.single: canonical single-target attack, player/enemy with ordinary accuracy and resource accounting",
+  "policy": {
+    "batchBudgetMs": 25,
+    "maxBatchSize": 1000,
+    "progressIntervalMs": 150,
+    "yield": "setTimeout(0)"
+  },
+  "samples": [
+    {
+      "requested": 10000,
+      "totalWallMs": 2608.3894999999998,
+      "simulationsPerSecond": 3833.7832597470588,
+      "progressMessages": 17,
+      "maxProgressBytes": 373,
+      "batchCount": 80,
+      "retainedHeapDelta": -210960,
+      "resultBytes": 29481,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 10000,
+        "successes": 10000,
+        "minFrames": 4201,
+        "avgFrames": 6074.0446,
+        "maxFrames": 8802,
+        "recoveryRuns": 6942,
+        "bestFound": 2231,
+        "occurrences": 2
+      }
+    },
+    {
+      "requested": 100000,
+      "totalWallMs": 17410.3898,
+      "simulationsPerSecond": 5743.696789603183,
+      "progressMessages": 113,
+      "maxProgressBytes": 377,
+      "batchCount": 560,
+      "retainedHeapDelta": 114080,
+      "resultBytes": 29494,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 100000,
+        "successes": 100000,
+        "minFrames": 4201,
+        "avgFrames": 6080.49544,
+        "maxFrames": 9681,
+        "recoveryRuns": 70393,
+        "bestFound": 2231,
+        "occurrences": 5
+      }
+    },
+    {
+      "requested": 1000000,
+      "totalWallMs": 284885.8527,
+      "simulationsPerSecond": 3510.1778151583167,
+      "progressMessages": 1759,
+      "maxProgressBytes": 384,
+      "batchCount": 8605,
+      "retainedHeapDelta": -1690424,
+      "resultBytes": 29509,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 1000000,
+        "successes": 1000000,
+        "minFrames": 4201,
+        "avgFrames": 6080.448179,
+        "maxFrames": 9681,
+        "recoveryRuns": 702795,
+        "bestFound": 2231,
+        "occurrences": 76
+      }
+    }
+  ],
+  "continuous10kMs": 2162.7334,
+  "cancellationLatencyMs": 5.449000000022352,
+  "batched10kOverheadPercent": 20.60615053154493,
+  "warmOverheadComparison": {
+    "method": "10k simulations, one warmup per mode, three interleaved samples per mode; structured-clone proxy for Worker transport, no UI rendering",
+    "samples": {
+      "continuous": [
+        {
+          "wallMs": 1204.8049,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 962.0887000000002,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 882.3894,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ],
+      "yield-only": [
+        {
+          "wallMs": 1221.4229999999998,
+          "messages": 2,
+          "messageProcessingMs": 0.33140000000094005,
+          "yieldWaitMs": 249.97769999999764,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1321.341199999999,
+          "messages": 2,
+          "messageProcessingMs": 0.37329999999928987,
+          "yieldWaitMs": 265.9246000000021,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1159.0882000000001,
+          "messages": 2,
+          "messageProcessingMs": 0.3580000000001746,
+          "yieldWaitMs": 209.26920000000064,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ],
+      "progress": [
+        {
+          "wallMs": 1146.0104000000001,
+          "messages": 9,
+          "messageProcessingMs": 0.43839999999727297,
+          "yieldWaitMs": 223.86909999999807,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1323.1319999999996,
+          "messages": 10,
+          "messageProcessingMs": 0.576600000000326,
+          "yieldWaitMs": 280.0918000000074,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1488.1935999999987,
+          "messages": 10,
+          "messageProcessingMs": 0.6375000000007276,
+          "yieldWaitMs": 281.83260000000155,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ]
+    },
+    "medianMs": {
+      "continuous": 962.0887000000002,
+      "yield-only": 1221.4229999999998,
+      "progress": 1323.1319999999996
+    },
+    "yieldOverheadPercent": 26.95534205941712,
+    "incrementalProgressOverheadPercent": 8.327090614799282,
+    "totalOverheadPercent": 37.52702843303317
+  }
+}

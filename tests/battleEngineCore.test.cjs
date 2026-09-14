@@ -252,26 +252,4 @@ test('defense arithmetic overflow is invalid, not silently zero damage', () => {
   state.combatants[1].baseStats.def = Number.MAX_VALUE; state.combatants[1].specialty = 'Fire';
   assert.throws(() => calculateLegacyDamage(...state.combatants, tech('Rock Fist'), 'Fire'), /arithmetic/);
 });
-test('public UI can still complete a supported legacy simulation', async () => {
-  const React = require('react'); const rngModule = load('src/utils/battle/battleRng.ts');
-  const { BattleSimulation } = load('src/components/BattleSimulation.tsx');
-  const original = { useState: React.useState, useMemo: React.useMemo, setTimeout: global.setTimeout, rng: rngModule.createProductionBattleRng };
-  const states = [null, 0, 'encounter', 1, null, 'none', 1, '', false]; let cursor = 0, scheduled, completed;
-  const busy = [];
-  try {
-    React.useState = initial => { const i = cursor++; return [i in states ? states[i] : typeof initial === 'function' ? initial() : initial, value => { if (i === 8) busy.push(value); }]; };
-    React.useMemo = fn => fn(); global.setTimeout = fn => { scheduled = fn; return 1; };
-    rngModule.createProductionBattleRng = () => seeded(42);
-    const tree = BattleSimulation({ savedTeams: [cases.single[0]], onSimulationComplete: result => { completed = result; } });
-    const find = node => {
-      if (!node || typeof node !== 'object') return;
-      if (node.props?.onClick) return node.props.onClick;
-      for (const child of [node.props?.children].flat(Infinity)) { const fn = find(child); if (fn) return fn; }
-    };
-    await find(tree)(); scheduled();
-    assert.deepEqual(busy, [true, false]); assert.equal(completed.totalSimulations, 1);
-    assert.ok(completed.fastestBattleHistory.length > 0);
-  } finally {
-    React.useState = original.useState; React.useMemo = original.useMemo; global.setTimeout = original.setTimeout; rngModule.createProductionBattleRng = original.rng;
-  }
-});
+test('public UI can still complete a supported legacy simulation',()=>{const {host,nodes}=require('./helpers/componentHost.cjs');let request,completed;const render=host('src/components/BattleSimulation.tsx','BattleSimulation',{'@/hooks/useBattleSimulationWorker':{useBattleSimulationWorker:done=>({running:false,error:null,start:r=>{request=r;done(load('src/utils/battle/battleCompatibility.ts').runLegacyBattleSimulation(r.input.player,r.input.enemy,r.input.floorSpecialty,1,{rng:load('src/utils/battle/battleRng.ts').createSeededBattleRng(42)}));},cancel(){}})}});const props={savedTeams:[cases.single[0]],onSimulationComplete:r=>completed=r};let tree=render(props);let selects=nodes(tree).filter(n=>typeof n.props?.onValueChange==='function');selects[0].props.onValueChange('0');selects.find(n=>n.props.value==='').props.onValueChange('0');selects[2].props.onValueChange('1');tree=render(props);const start=nodes(tree).find(n=>n.props?.children==='Start Simulation');assert.ok(start);start.props.onClick();assert.ok(request);assert.equal(completed.totalSimulations,1);assert.ok(completed.fastestBattleHistory.length);});

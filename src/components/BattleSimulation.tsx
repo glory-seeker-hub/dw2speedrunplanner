@@ -9,9 +9,10 @@ import { TeamDigimon, SimulationResult } from '@/types/digimon';
 import { encounters } from '@/data/encounters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { runBattleSimulation } from '@/utils/battleEngine';
+import { useBattleSimulationWorker } from '@/hooks/useBattleSimulationWorker';
+import { SimulationSearchProgress } from '@/components/SimulationSearchProgress';
 import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+
 
 interface BattleSimulationProps {
   savedTeams: TeamDigimon[][];
@@ -43,42 +44,15 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(1000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
-  const [isSimulating, setIsSimulating] = useState<boolean>(false);
-
-  const handleSimulate = async () => {
-    if (selectedPlayerTeam === null) return;
-    
-    setIsSimulating(true);
-    
-    try {
-      const playerTeam = savedTeams[selectedPlayerTeam];
-      let enemyTeam;
-      
-      if (selectedEnemyTeam === 'encounter' && selectedEncounter !== null) {
-        enemyTeam = encounters.find(e => e.id === selectedEncounter);
-      } else if (selectedEnemyTeam === 'saved' && selectedEnemySaved !== null) {
-        enemyTeam = savedTeams[selectedEnemySaved];
-      }
-      
-      if (!enemyTeam) return;
-      
-      // Run simulation in a setTimeout to allow UI to update
-      setTimeout(() => {
-        // Source validation can reject incomplete encounter data asynchronously.
-        try {
-          const results = runBattleSimulation(playerTeam, enemyTeam, floorSpecialty, simulationCount);
-          onSimulationComplete(results);
-        } catch (error) {
-          console.error('Simulation error:', error);
-          toast.error('Simulation unavailable', { description: error instanceof Error ? error.message : 'Could not validate battle data.' });
-        } finally {
-          setIsSimulating(false);
-        }
-      }, 100);
-    } catch (error) {
-      console.error('Simulation error:', error);
-      setIsSimulating(false);
-    }
+  const search = useBattleSimulationWorker(onSimulationComplete);
+  const isSimulating = search.running;
+  const validCount = Number.isSafeInteger(simulationCount) && simulationCount > 0;
+  const handleSimulate = () => {
+    if (selectedPlayerTeam === null || !validCount || isSimulating) return;
+    const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
+      : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
+    if (!enemy) return;
+    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -111,6 +85,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           <CardTitle>Battle Simulation Setup</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          <fieldset disabled={isSimulating} className="space-y-6 min-w-0">
           {imported && <section className="rounded border p-3 space-y-2" aria-label="Pre-battle Planner state">
             <p className="font-semibold">Analyzing pre-battle state</p>
             <p className="text-sm">{imported.selectedBattle.domainId} · {imported.selectedBattle.phase} · Floor {imported.selectedBattle.floor} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
@@ -133,7 +108,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             {savedTeams.length === 0 ? (
               <p className="text-sm text-muted-foreground">No saved teams available. Create a team first.</p>
             ) : (
-              <Select value={selectedPlayerTeam?.toString() || ''} onValueChange={(value) => setSelectedPlayerTeam(parseInt(value))}>
+              <Select disabled={isSimulating} value={selectedPlayerTeam?.toString() || ''} onValueChange={(value) => setSelectedPlayerTeam(parseInt(value))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose your team" />
                 </SelectTrigger>
@@ -153,8 +128,8 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             <Label>Select Enemy Team</Label>
             <Tabs value={selectedEnemyTeam} onValueChange={(value) => setSelectedEnemyTeam(value as 'encounter' | 'saved')}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="encounter">Enemy Encounters</TabsTrigger>
-                <TabsTrigger value="saved">Saved Teams</TabsTrigger>
+                <TabsTrigger disabled={isSimulating} value="encounter">Enemy Encounters</TabsTrigger>
+                <TabsTrigger disabled={isSimulating} value="saved">Saved Teams</TabsTrigger>
               </TabsList>
               
               <TabsContent value="encounter" className="space-y-2">
@@ -164,7 +139,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
                     value={encounterSearch}
                     onChange={(e) => setEncounterSearch(e.target.value)}
                   />
-                  <Select value={selectedEncounter?.toString() || ''} onValueChange={(value) => setSelectedEncounter(parseInt(value))}>
+                  <Select disabled={isSimulating} value={selectedEncounter?.toString() || ''} onValueChange={(value) => setSelectedEncounter(parseInt(value))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose enemy encounter" />
                     </SelectTrigger>
@@ -192,7 +167,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
                 {savedTeams.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No saved teams available.</p>
                 ) : (
-                  <Select value={selectedEnemySaved?.toString() || ''} onValueChange={(value) => setSelectedEnemySaved(parseInt(value))}>
+                  <Select disabled={isSimulating} value={selectedEnemySaved?.toString() || ''} onValueChange={(value) => setSelectedEnemySaved(parseInt(value))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose enemy team" />
                     </SelectTrigger>
@@ -213,7 +188,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Floor Specialty */}
           <div className="space-y-2">
             <Label htmlFor="floor-specialty">Floor Specialty</Label>
-            <Select value={floorSpecialty} onValueChange={setFloorSpecialty}>
+            <Select disabled={isSimulating} value={floorSpecialty} onValueChange={setFloorSpecialty}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -234,16 +209,25 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
               id="simulation-count"
               type="number"
               min="1"
-              max="1000000"
+              max={Number.MAX_SAFE_INTEGER}
               value={simulationCount}
-              onChange={(e) => setSimulationCount(parseInt(e.target.value) || 1)}
+              onChange={(e) => setSimulationCount(Number(e.target.value))}
             />
           </div>
 
+          <div className="flex flex-wrap gap-2" aria-label="Simulation count presets">
+            {([['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const).map(([label, count]) => <Button key={label} variant="outline" aria-pressed={simulationCount === count} onClick={() => setSimulationCount(count)}>{label} · {count.toLocaleString()}</Button>)}
+            <Button variant="outline" aria-pressed={![10000, 100000, 1000000].includes(simulationCount)} onClick={() => document.getElementById('simulation-count')?.focus()}>Custom</Button>
+          </div>
+          <p className="text-sm text-muted-foreground">Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.</p>
+          {!validCount && <p role="alert">Enter a positive safe integer number of simulations.</p>}
+          </fieldset>
+          {search.error && <p role="alert">Simulation unavailable: {search.error}</p>}
+          {isSimulating && <SimulationSearchProgress progress={search.progress} requested={simulationCount} cancelling={search.cancelling} onCancel={search.cancel} />}
           {/* Simulate Button */}
           <Button 
             onClick={handleSimulate} 
-            disabled={!canSimulate || isSimulating}
+            disabled={!canSimulate || !validCount || isSimulating}
             className="w-full"
             size="lg"
           >

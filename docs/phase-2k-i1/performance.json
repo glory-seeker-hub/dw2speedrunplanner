@@ -1,0 +1,198 @@
+{
+  "node": "v24.20.0",
+  "fixture": "cases.single: canonical single-target attack, player/enemy with ordinary accuracy and resource accounting",
+  "policy": {
+    "batchBudgetMs": 50,
+    "maxBatchSize": 1000,
+    "progressIntervalMs": 150,
+    "yield": "setTimeout(0)"
+  },
+  "samples": [
+    {
+      "requested": 10000,
+      "totalWallMs": 1213.3987000000002,
+      "simulationsPerSecond": 8241.314252273385,
+      "progressMessages": 9,
+      "maxProgressBytes": 371,
+      "batchCount": 22,
+      "retainedHeapDelta": -213848,
+      "resultBytes": 29481,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 10000,
+        "successes": 10000,
+        "minFrames": 4201,
+        "avgFrames": 6074.0446,
+        "maxFrames": 8802,
+        "recoveryRuns": 6942,
+        "bestFound": 2231,
+        "occurrences": 2
+      }
+    },
+    {
+      "requested": 100000,
+      "totalWallMs": 11996.0132,
+      "simulationsPerSecond": 8336.102864575041,
+      "progressMessages": 74,
+      "maxProgressBytes": 378,
+      "batchCount": 218,
+      "retainedHeapDelta": 70416,
+      "resultBytes": 29494,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 100000,
+        "successes": 100000,
+        "minFrames": 4201,
+        "avgFrames": 6080.49544,
+        "maxFrames": 9681,
+        "recoveryRuns": 70393,
+        "bestFound": 2231,
+        "occurrences": 5
+      }
+    },
+    {
+      "requested": 1000000,
+      "totalWallMs": 125733.24779999998,
+      "simulationsPerSecond": 7953.345813437265,
+      "progressMessages": 753,
+      "maxProgressBytes": 384,
+      "batchCount": 2256,
+      "retainedHeapDelta": 171584,
+      "resultBytes": 29508,
+      "retainedHistories": [
+        10,
+        10
+      ],
+      "semantic": {
+        "total": 1000000,
+        "successes": 1000000,
+        "minFrames": 4201,
+        "avgFrames": 6080.448179,
+        "maxFrames": 9681,
+        "recoveryRuns": 702795,
+        "bestFound": 2231,
+        "occurrences": 76
+      }
+    }
+  ],
+  "continuous10kMs": 1321.4551000000001,
+  "cancellationLatencyMs": 11.591799999994691,
+  "batched10kOverheadPercent": -8.177076920736837,
+  "warmOverheadComparison": {
+    "method": "10k simulations, one warmup per mode, three interleaved samples per mode; structured-clone proxy for Worker transport, no UI rendering",
+    "samples": {
+      "continuous": [
+        {
+          "wallMs": 1025.9933,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1403.1671000000006,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 929.4598999999998,
+          "messages": 0,
+          "messageProcessingMs": 0,
+          "yieldWaitMs": 0,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ],
+      "yield-only": [
+        {
+          "wallMs": 1148.5084000000006,
+          "messages": 2,
+          "messageProcessingMs": 0.7756000000008498,
+          "yieldWaitMs": 76.65989999999874,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1027.6274999999987,
+          "messages": 2,
+          "messageProcessingMs": 0.3356000000003405,
+          "yieldWaitMs": 71.88110000000052,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1033.6952,
+          "messages": 2,
+          "messageProcessingMs": 0.3220999999994092,
+          "yieldWaitMs": 121.47780000000057,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ],
+      "progress": [
+        {
+          "wallMs": 1726.8104000000003,
+          "messages": 12,
+          "messageProcessingMs": 1.1389999999973952,
+          "yieldWaitMs": 194.3688000000011,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1273.1512000000002,
+          "messages": 9,
+          "messageProcessingMs": 0.6174000000046362,
+          "yieldWaitMs": 152.93539999999666,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        },
+        {
+          "wallMs": 1140.4763999999996,
+          "messages": 8,
+          "messageProcessingMs": 0.45499999999992724,
+          "yieldWaitMs": 163.86519999999837,
+          "minFrames": 4201,
+          "avgFrames": 6074.0446
+        }
+      ]
+    },
+    "medianMs": {
+      "continuous": 1025.9933,
+      "yield-only": 1033.6952,
+      "progress": 1273.1512000000002
+    },
+    "yieldOverheadPercent": 0.7506774167043817,
+    "incrementalProgressOverheadPercent": 23.16504903960086,
+    "totalOverheadPercent": 24.089621248014016
+  },
+  "crossThreadCancellation": {
+    "method": "Node worker thread running the production host; main thread posts CANCEL 10 ms after first progress to exercise a busy compute batch; includes IPC and terminal result cloning",
+    "samples": [
+      {
+        "latencyMs": 52.19789999999921,
+        "completed": 256,
+        "requested": 1000000
+      },
+      {
+        "latencyMs": 51.59149999999863,
+        "completed": 362,
+        "requested": 1000000
+      },
+      {
+        "latencyMs": 41.29579999999987,
+        "completed": 420,
+        "requested": 1000000
+      }
+    ]
+  }
+}

@@ -211,35 +211,8 @@ test('actual simulator rejects unresolved and empty encounter techniques before 
     assert.throws(() => runBattleSimulation([], { digimons: [{ name: 'Agumon', hp: 50, mp: 10, atk: 10, def: 10, spd: 10, techs }] }, 'None', 1), /technique/i);
   }
 });
-test('existing simulator UI releases busy state and reports async data rejection', async () => {
-  const React = require('react');
-  const { toast } = require('sonner');
-  const { BattleSimulation } = load('src/components/BattleSimulation.tsx');
-  const original = { useState: React.useState, useMemo: React.useMemo, setTimeout: global.setTimeout, error: console.error, toast: toast.error };
-  const states = [null, 0, 'encounter', 149, null, 'none', 1, '', false];
-  const busy = []; const messages = []; let cursor = 0; let scheduled;
-  try {
-    React.useState = initial => { const index = cursor++; return [index in states ? states[index] : typeof initial === 'function' ? initial() : initial, value => { if (index === 8) busy.push(value); }]; };
-    React.useMemo = fn => fn();
-    global.setTimeout = fn => { scheduled = fn; return 1; };
-    console.error = () => {};
-    toast.error = (...args) => messages.push(args);
-    const tree = BattleSimulation({ savedTeams: [[]], onSimulationComplete: () => assert.fail('Incomplete simulation must not return results') });
-    const find = node => {
-      if (!node || typeof node !== 'object') return undefined;
-      if (node.props?.onClick) return node.props.onClick;
-      const children = node.props?.children;
-      for (const child of Array.isArray(children) ? children.flat(Infinity) : [children]) { const found = find(child); if (found) return found; }
-    };
-    await find(tree)();
-    assert.equal(typeof scheduled, 'function'); scheduled();
-    assert.deepEqual(busy, [true, false]);
-    assert.equal(messages[0][0], 'Simulation unavailable');
-  } finally {
-    React.useState = original.useState; React.useMemo = original.useMemo;
-    global.setTimeout = original.setTimeout; console.error = original.error; toast.error = original.toast;
-  }
-});
+test('existing simulator UI releases busy state and reports async data rejection',()=>{const {host,nodes}=require('./helpers/componentHost.cjs');let request,completed;const render=host('src/components/BattleSimulation.tsx','BattleSimulation',{'@/hooks/useBattleSimulationWorker':{useBattleSimulationWorker:done=>({running:false,error:'Unresolved authoritative encounter technique',start:r=>{request=r;},cancel(){}})}});const props={savedTeams:[[]],onSimulationComplete:r=>completed=r};let tree=render(props);let selects=nodes(tree).filter(n=>typeof n.props?.onValueChange==='function');selects[0].props.onValueChange('0');selects.find(n=>n.props.value==='').props.onValueChange('0');selects[2].props.onValueChange('149');tree=render(props);const start=nodes(tree).find(n=>n.props?.children==='Start Simulation');assert.ok(start);start.props.onClick();assert.ok(request);assert.equal(completed,undefined);assert.ok(nodes(tree).some(n=>n.props?.role==='alert'));});
+
 test('138 legacy UI identities preserved; mechanics derive from canonical bytes', () => {
   assert.equal(TECHS.length, 138); assert.equal(new Set(TECHS.map(t => t.id)).size, 138);
   for (const t of TECHS) {
