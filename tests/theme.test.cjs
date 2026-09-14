@@ -11,7 +11,7 @@ function load(file) {
   if (cache.has(file)) return cache.get(file).exports;
   const mod = { exports: {} };
   cache.set(file, mod);
-  const source = fs.readFileSync(file, 'utf8').replaceAll('import.meta.env.DEV', 'false');
+  const source = fs.readFileSync(file, 'utf8').replaceAll('import.meta.env.DEV', 'false').replaceAll('import.meta.url', JSON.stringify(require('node:url').pathToFileURL(file).href));
   const js = ts.transpileModule(source, { compilerOptions: {
     module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX,
   } }).outputText;

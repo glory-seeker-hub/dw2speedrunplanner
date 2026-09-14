@@ -79,6 +79,15 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
     ['Completed Successes', `${results.completedSuccesses.toLocaleString()} / ${results.totalSimulations.toLocaleString()}`],
   ];
   return <div className="space-y-6">
+    {results.search && <Card><CardHeader><CardTitle>{results.search.status === 'cancelled' ? 'Partial results — simulation cancelled' : 'Search completed'}</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
+      <p>{number(results.search.completedSimulations)} / {number(results.search.requestedSimulations)} simulations completed</p>
+      <p>Best found at simulation: {number(results.search.bestFoundAtSimulation)}</p>
+      <p>Best occurred: {number(results.search.bestOccurrenceCount)} times</p>
+      <p>No improvement in final: {number(results.search.simulationsSinceLastImprovement)} simulations</p>
+      <p>Elapsed: {number(results.search.elapsedMs / 1000)} s · Speed: {number(results.search.simulationsPerSecond)} simulations/s</p>
+      {!results.timedSuccesses && <p>No complete-timing victory found in completed simulations.</p>}
+      <p>Monte Carlo search does not prove the global optimum. Recurrence and time since improvement are search heuristics.</p>
+    </CardContent></Card>}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">{stats.map(([label, value]) => <Card key={label} className="bg-gradient-card border-border">
       <CardContent className="pt-6 space-y-2"><p className="text-sm text-muted-foreground">{label}</p><p className="text-2xl font-bold text-info">{value}</p></CardContent>
     </Card>)}</div>
