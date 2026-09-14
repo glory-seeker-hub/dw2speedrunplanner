@@ -92,6 +92,8 @@ export interface BattleDigimon {
 
 export interface SimulationResult {
   optimized?: import('@/utils/battle/battleOptimizedSearch').OptimizedSearchResult;
+  rngPolicy?: import('@/utils/battle/battleRngPolicy').BattleRngPolicy;
+  rngOverrideCounts?: import('@/utils/battle/battleRngAudit').RngOverrideCounts;
   accuracyMode?: import('@/utils/battle/battleSimulationRules').AccuracyMode;
   search?: import('@/utils/battle/battleSimulationSearch').SimulationSearchMetadata;
   winRate: number;

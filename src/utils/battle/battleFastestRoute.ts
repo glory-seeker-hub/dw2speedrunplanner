@@ -1,8 +1,10 @@
+import { collectRngRequirements, type TasRngRequirement } from './battleRngAudit';
 import type { BattleRunResult } from './battleTypes';
 import type { PlayerRoundPlan } from './battleActionPlans';
 import { playerDecisionTraceKey } from './battlePlayerDecisionTrace';
 
 export interface FastestRoute {
+  rngRequirements?: TasRngRequirement[];
   totalFrames: number; sourcePrefixKey: string; seed: number; sampleIndex: number;
   decisionTrace: PlayerRoundPlan[]; decisionTraceKey: string; actions: BattleRunResult['actions'];
 }
@@ -17,7 +19,11 @@ export function createFastestRouteTracker() {
         decisionTrace, decisionTraceKey: playerDecisionTraceKey(decisionTrace), actions: result.actions };
       const lexical = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
       if (!best || (next.totalFrames - best.totalFrames || lexical(next.decisionTraceKey, best.decisionTraceKey)
-        || lexical(next.sourcePrefixKey, best.sourcePrefixKey) || next.sampleIndex - best.sampleIndex || next.seed - best.seed) < 0) best = next;
+        || lexical(next.sourcePrefixKey, best.sourcePrefixKey) || next.sampleIndex - best.sampleIndex || next.seed - best.seed) < 0) {
+        const requirements = collectRngRequirements(result.actions);
+        if (requirements.length) next.rngRequirements = requirements;
+        best = next;
+      }
     },
   };
 }

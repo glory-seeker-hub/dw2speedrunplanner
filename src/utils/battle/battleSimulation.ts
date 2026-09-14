@@ -125,7 +125,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         if (!action.prepared) {
           if (action.counter?.executionMode === 'waiting') action.counter.executionMode = 'untriggered-end-of-turn';
           const statusesBefore = statusSnapshot(actor);
-          const statusRecoveries = action.chainFromActionId || action.kind === 'interrupt' ? [] : recoverStatuses(actor, rng);
+          const statusRecoveries = action.chainFromActionId || action.kind === 'interrupt' ? [] : recoverStatuses(actor, rng, rules.rngPolicy);
           const statusesAfterRecovery = statusSnapshot(actor);
           const confusion = prepareConfusionAction(state, actor, action, policy, rng);
           if (action.counter && (confusion.redirected || confusion.skipped)) {
@@ -147,7 +147,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           const initialAccuracy = assistLost ? { outcome: 'miss' as const, cause: 'assist-target-lost' as const, referenceTargetId: targetIds[0] } : counterForcesMiss(action)
             ? { outcome: 'miss' as const, cause: 'counter-not-activated' as const, referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
-                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode);
+                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode, rules.rngPolicy);
           action.prepared = { targetIds, statusesBefore, statusesAfterRecovery, statusRecoveries, confusion, initialAccuracy, interruptConsumed: false };
         }
         const prepared = action.prepared;
@@ -172,7 +172,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           entry.accuracy = prepared.resolution!.forceMiss
             ? { outcome: 'miss', cause: 'interrupt-forced-miss', referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
-                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode);
+                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode, rules.rngPolicy);
         } else entry.accuracy = prepared.initialAccuracy;
         if (entry.accuracy.outcome === 'unsupported') throw new BattleInputError('Accuracy has no effective target.', 'unsupported');
         entry.outcome = entry.accuracy.outcome;
@@ -190,7 +190,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           if (!target.isAlive) continue;
           entry.supportEvents.push(...applySupportEffects(state, actor, target, action, 'pre-damage'));
           const baseDamage = calculateActionDamage(actor, target, action, input.floorSpecialty, state);
-          const { damage: ordinaryDamage, poisonBonusDamage, statusApplications } = resolveImpactStatuses(target, action.skill, baseDamage, rng, usesActivatedCounterMechanics(action), action.kind === 'interrupt', actor);
+          const { damage: ordinaryDamage, poisonBonusDamage, statusApplications } = resolveImpactStatuses(target, action.skill, baseDamage, rng, usesActivatedCounterMechanics(action), action.kind === 'interrupt', actor, rules.rngPolicy);
           const beforeInvincibility = reduceInterruptedDamage(ordinaryDamage, prepared.resolution);
           const damage = target.statuses.invincibility ? 0 : beforeInvincibility;
           const hpBefore = target.currentHp;

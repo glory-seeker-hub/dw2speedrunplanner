@@ -1,0 +1,1242 @@
+{
+  "strategy": {
+    "winRate": 100,
+    "totalSimulations": 64,
+    "completedSuccesses": 64,
+    "timedSuccesses": 64,
+    "incompleteTimingSuccesses": 0,
+    "outcomeCounts": {
+      "player-win": 64,
+      "enemy-win": 0,
+      "limit-reached": 0,
+      "invalid": 0,
+      "unsupported": 0
+    },
+    "minTurns": 1,
+    "avgTurns": 1,
+    "maxTurns": 1,
+    "minFrames": 685,
+    "avgFrames": 685,
+    "maxFrames": 685,
+    "fastestBattleHistory": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "combatants",
+          "targetIds": [
+            "enemy-0"
+          ]
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 10,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 100,
+          "costCharged": 8,
+          "after": 92,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "strategy-accuracy-bypass",
+          "mode": "strategy",
+          "standardRollSkipped": true,
+          "referenceTargetId": "enemy-0"
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "waza-6",
+          "selectedSkillKey": "waza-6",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "combatants",
+            "targetIds": [
+              "enemy-0"
+            ]
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "fastestBattleByFrames": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "combatants",
+          "targetIds": [
+            "enemy-0"
+          ]
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 10,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 100,
+          "costCharged": 8,
+          "after": 92,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "strategy-accuracy-bypass",
+          "mode": "strategy",
+          "standardRollSkipped": true,
+          "referenceTargetId": "enemy-0"
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "waza-6",
+          "selectedSkillKey": "waza-6",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "combatants",
+            "targetIds": [
+              "enemy-0"
+            ]
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "timingDiagnostics": [],
+    "resourceDiagnostics": [],
+    "runsWithResourceAlerts": 0,
+    "accuracyMode": "strategy",
+    "search": {
+      "completedSimulations": 64,
+      "requestedSimulations": 100,
+      "successfulVictories": 64,
+      "completeTimingVictories": 64,
+      "bestFrames": 685,
+      "bestFoundAtSimulation": null,
+      "bestOccurrenceCount": 0,
+      "simulationsSinceLastImprovement": null,
+      "elapsedMs": 100,
+      "simulationsPerSecond": 640,
+      "etaMs": null,
+      "optimized": {
+        "searchMethod": "optimized-action-search",
+        "objective": "fastest-potential",
+        "phase": "finalizing",
+        "depth": 1,
+        "maxDepth": 2,
+        "rootPlanCount": 1,
+        "candidateCount": 1,
+        "candidatesEvaluated": 1,
+        "beamSize": 1,
+        "evaluations": 64,
+        "rolloutBudget": 100,
+        "bestStats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 43840,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 685,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      "accuracyMode": "strategy",
+      "status": "completed"
+    },
+    "optimized": {
+      "searchMethod": "optimized-action-search",
+      "objective": "fastest-potential",
+      "phase": "finalizing",
+      "depth": 1,
+      "maxDepth": 2,
+      "rootPlanCount": 1,
+      "candidateCount": 1,
+      "candidatesEvaluated": 1,
+      "beamSize": 1,
+      "evaluations": 64,
+      "rolloutBudget": 100,
+      "bestStats": {
+        "evaluations": 64,
+        "validExecutions": 64,
+        "victories": 64,
+        "completeTimingVictories": 64,
+        "diverged": 0,
+        "sumFrames": 43840,
+        "fastestFrames": 685,
+        "averageVictoryFrames": 685,
+        "successRate": 1,
+        "divergenceRate": 0
+      },
+      "status": "completed",
+      "rootSeed": 42,
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      },
+      "primaryRecommendation": "fastest-route",
+      "fastestRoute": {
+        "totalFrames": 685,
+        "sourcePrefixKey": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "sampleIndex": 0,
+        "seed": 1077743045,
+        "decisionTrace": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-6",
+                "canonicalSkillId": 6,
+                "skillName": "Rock Fist",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",6,\"waza-6\",[\"combatants\",[\"enemy-0\"]]]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",6,\\\"waza-6\\\",[\\\"combatants\\\",[\\\"enemy-0\\\"]]]\"]]"
+          }
+        ],
+        "decisionTraceKey": "[[1,[\"[\\\"player-0\\\",6,\\\"waza-6\\\",[\\\"combatants\\\",[\\\"enemy-0\\\"]]]\"]]]",
+        "actions": [
+          {
+            "id": "s0-r1-a1",
+            "round": 1,
+            "sequence": 1,
+            "actorId": "player-0",
+            "actorName": "P",
+            "skillKey": "waza-6",
+            "skillName": "Rock Fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "effectiveTargetIds": [
+              "enemy-0"
+            ],
+            "impacts": [
+              {
+                "targetId": "enemy-0",
+                "targetName": "E",
+                "hpBefore": 10,
+                "hpAfter": 0,
+                "baseDamage": 20,
+                "poisonBonusDamage": 0,
+                "statusApplications": [],
+                "damage": 20,
+                "healing": 0,
+                "outcome": "ko",
+                "ko": true,
+                "appliedEffects": []
+              }
+            ],
+            "counter": null,
+            "reaction": null,
+            "state": "resolved",
+            "outcome": "hit",
+            "timingClass": "single-target",
+            "durationFrames": 685,
+            "timingDiagnostics": [],
+            "chainFromActionId": null,
+            "resourceAlerts": [],
+            "resourceDiagnostics": [],
+            "mpAccounting": {
+              "before": 100,
+              "costCharged": 8,
+              "after": 92,
+              "completeness": "complete",
+              "payerCombatantId": "player-0",
+              "payerName": "P",
+              "payerSide": "player",
+              "paymentRule": "own"
+            },
+            "accuracy": {
+              "outcome": "hit",
+              "cause": "strategy-accuracy-bypass",
+              "mode": "strategy",
+              "standardRollSkipped": true,
+              "referenceTargetId": "enemy-0"
+            },
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "waza-6",
+              "selectedSkillKey": "waza-6",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "combatants",
+                "targetIds": [
+                  "enemy-0"
+                ]
+              }
+            },
+            "effectDiagnostics": [],
+            "supportEvents": []
+          },
+          {
+            "id": "s0-r1-a2",
+            "round": 1,
+            "sequence": 2,
+            "actorId": "enemy-0",
+            "actorName": "E",
+            "skillKey": "waza-6",
+            "skillName": "Rock Fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "targetIntent": {
+              "kind": "opponents",
+              "side": "player",
+              "selection": "random-at-execution"
+            },
+            "effectiveTargetIds": [],
+            "impacts": [],
+            "counter": null,
+            "reaction": null,
+            "state": "skipped",
+            "outcome": "skipped",
+            "timingClass": "single-target",
+            "durationFrames": null,
+            "timingDiagnostics": [],
+            "chainFromActionId": null,
+            "resourceAlerts": [],
+            "resourceDiagnostics": [],
+            "mpAccounting": null,
+            "accuracy": null,
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": null,
+            "effectDiagnostics": [],
+            "reason": "battle-ended"
+          }
+        ]
+      },
+      "recommendedPrefix": [
+        {
+          "round": 1,
+          "orders": [
+            {
+              "actorId": "player-0",
+              "actorName": "P",
+              "skillKey": "waza-6",
+              "canonicalSkillId": 6,
+              "skillName": "Rock Fist",
+              "targetIntent": {
+                "kind": "combatants",
+                "targetIds": [
+                  "enemy-0"
+                ]
+              },
+              "targetLabel": "E",
+              "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+            }
+          ],
+          "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+        }
+      ],
+      "recommendedStats": {
+        "evaluations": 64,
+        "validExecutions": 64,
+        "victories": 64,
+        "completeTimingVictories": 64,
+        "diverged": 0,
+        "sumFrames": 43840,
+        "fastestFrames": 685,
+        "averageVictoryFrames": 685,
+        "successRate": 1,
+        "divergenceRate": 0
+      },
+      "topCandidates": [
+        {
+          "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+          "plans": [
+            {
+              "round": 1,
+              "orders": [
+                {
+                  "actorId": "player-0",
+                  "actorName": "P",
+                  "skillKey": "waza-6",
+                  "canonicalSkillId": 6,
+                  "skillName": "Rock Fist",
+                  "targetIntent": {
+                    "kind": "combatants",
+                    "targetIds": [
+                      "enemy-0"
+                    ]
+                  },
+                  "targetLabel": "E",
+                  "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+                }
+              ],
+              "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+            }
+          ],
+          "stats": {
+            "evaluations": 64,
+            "validExecutions": 64,
+            "victories": 64,
+            "completeTimingVictories": 64,
+            "diverged": 0,
+            "sumFrames": 43840,
+            "fastestFrames": 685,
+            "averageVictoryFrames": 685,
+            "successRate": 1,
+            "divergenceRate": 0
+          }
+        }
+      ],
+      "diagnostics": [],
+      "fairStageEvaluations": 64
+    }
+  },
+  "game-accurate": {
+    "winRate": 100,
+    "totalSimulations": 64,
+    "completedSuccesses": 64,
+    "timedSuccesses": 64,
+    "incompleteTimingSuccesses": 0,
+    "outcomeCounts": {
+      "player-win": 64,
+      "enemy-win": 0,
+      "limit-reached": 0,
+      "invalid": 0,
+      "unsupported": 0
+    },
+    "minTurns": 1,
+    "avgTurns": 1.03125,
+    "maxTurns": 3,
+    "minFrames": 685,
+    "avgFrames": 698.734375,
+    "maxFrames": 1564,
+    "fastestBattleHistory": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "combatants",
+          "targetIds": [
+            "enemy-0"
+          ]
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 10,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 100,
+          "costCharged": 8,
+          "after": 92,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 126,
+          "roll128": 69,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "waza-6",
+          "selectedSkillKey": "waza-6",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "combatants",
+            "targetIds": [
+              "enemy-0"
+            ]
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "fastestBattleByFrames": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "combatants",
+          "targetIds": [
+            "enemy-0"
+          ]
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 10,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 100,
+          "costCharged": 8,
+          "after": 92,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 126,
+          "roll128": 69,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "waza-6",
+          "selectedSkillKey": "waza-6",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "combatants",
+            "targetIds": [
+              "enemy-0"
+            ]
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "waza-6",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "timingDiagnostics": [],
+    "resourceDiagnostics": [],
+    "runsWithResourceAlerts": 0,
+    "accuracyMode": "game-accurate",
+    "search": {
+      "completedSimulations": 64,
+      "requestedSimulations": 100,
+      "successfulVictories": 64,
+      "completeTimingVictories": 64,
+      "bestFrames": 685,
+      "bestFoundAtSimulation": null,
+      "bestOccurrenceCount": 0,
+      "simulationsSinceLastImprovement": null,
+      "elapsedMs": 100,
+      "simulationsPerSecond": 640,
+      "etaMs": null,
+      "optimized": {
+        "searchMethod": "optimized-action-search",
+        "objective": "fastest-potential",
+        "phase": "finalizing",
+        "depth": 1,
+        "maxDepth": 2,
+        "rootPlanCount": 1,
+        "candidateCount": 1,
+        "candidatesEvaluated": 1,
+        "beamSize": 1,
+        "evaluations": 64,
+        "rolloutBudget": 100,
+        "bestStats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 44719,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 698.734375,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      "accuracyMode": "game-accurate",
+      "status": "completed"
+    },
+    "optimized": {
+      "searchMethod": "optimized-action-search",
+      "objective": "fastest-potential",
+      "phase": "finalizing",
+      "depth": 1,
+      "maxDepth": 2,
+      "rootPlanCount": 1,
+      "candidateCount": 1,
+      "candidatesEvaluated": 1,
+      "beamSize": 1,
+      "evaluations": 64,
+      "rolloutBudget": 100,
+      "bestStats": {
+        "evaluations": 64,
+        "validExecutions": 64,
+        "victories": 64,
+        "completeTimingVictories": 64,
+        "diverged": 0,
+        "sumFrames": 44719,
+        "fastestFrames": 685,
+        "averageVictoryFrames": 698.734375,
+        "successRate": 1,
+        "divergenceRate": 0
+      },
+      "status": "completed",
+      "rootSeed": 42,
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      },
+      "primaryRecommendation": "fastest-route",
+      "fastestRoute": {
+        "totalFrames": 685,
+        "sourcePrefixKey": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "sampleIndex": 0,
+        "seed": 1077743045,
+        "decisionTrace": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-6",
+                "canonicalSkillId": 6,
+                "skillName": "Rock Fist",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",6,\"waza-6\",[\"combatants\",[\"enemy-0\"]]]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",6,\\\"waza-6\\\",[\\\"combatants\\\",[\\\"enemy-0\\\"]]]\"]]"
+          }
+        ],
+        "decisionTraceKey": "[[1,[\"[\\\"player-0\\\",6,\\\"waza-6\\\",[\\\"combatants\\\",[\\\"enemy-0\\\"]]]\"]]]",
+        "actions": [
+          {
+            "id": "s0-r1-a1",
+            "round": 1,
+            "sequence": 1,
+            "actorId": "player-0",
+            "actorName": "P",
+            "skillKey": "waza-6",
+            "skillName": "Rock Fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "effectiveTargetIds": [
+              "enemy-0"
+            ],
+            "impacts": [
+              {
+                "targetId": "enemy-0",
+                "targetName": "E",
+                "hpBefore": 10,
+                "hpAfter": 0,
+                "baseDamage": 20,
+                "poisonBonusDamage": 0,
+                "statusApplications": [],
+                "damage": 20,
+                "healing": 0,
+                "outcome": "ko",
+                "ko": true,
+                "appliedEffects": []
+              }
+            ],
+            "counter": null,
+            "reaction": null,
+            "state": "resolved",
+            "outcome": "hit",
+            "timingClass": "single-target",
+            "durationFrames": 685,
+            "timingDiagnostics": [],
+            "chainFromActionId": null,
+            "resourceAlerts": [],
+            "resourceDiagnostics": [],
+            "mpAccounting": {
+              "before": 100,
+              "costCharged": 8,
+              "after": 92,
+              "completeness": "complete",
+              "payerCombatantId": "player-0",
+              "payerName": "P",
+              "payerSide": "player",
+              "paymentRule": "own"
+            },
+            "accuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 126,
+              "roll128": 69,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 40
+            },
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "waza-6",
+              "selectedSkillKey": "waza-6",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "combatants",
+                "targetIds": [
+                  "enemy-0"
+                ]
+              }
+            },
+            "effectDiagnostics": [],
+            "supportEvents": []
+          },
+          {
+            "id": "s0-r1-a2",
+            "round": 1,
+            "sequence": 2,
+            "actorId": "enemy-0",
+            "actorName": "E",
+            "skillKey": "waza-6",
+            "skillName": "Rock Fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "targetIntent": {
+              "kind": "opponents",
+              "side": "player",
+              "selection": "random-at-execution"
+            },
+            "effectiveTargetIds": [],
+            "impacts": [],
+            "counter": null,
+            "reaction": null,
+            "state": "skipped",
+            "outcome": "skipped",
+            "timingClass": "single-target",
+            "durationFrames": null,
+            "timingDiagnostics": [],
+            "chainFromActionId": null,
+            "resourceAlerts": [],
+            "resourceDiagnostics": [],
+            "mpAccounting": null,
+            "accuracy": null,
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": null,
+            "effectDiagnostics": [],
+            "reason": "battle-ended"
+          }
+        ]
+      },
+      "recommendedPrefix": [
+        {
+          "round": 1,
+          "orders": [
+            {
+              "actorId": "player-0",
+              "actorName": "P",
+              "skillKey": "waza-6",
+              "canonicalSkillId": 6,
+              "skillName": "Rock Fist",
+              "targetIntent": {
+                "kind": "combatants",
+                "targetIds": [
+                  "enemy-0"
+                ]
+              },
+              "targetLabel": "E",
+              "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+            }
+          ],
+          "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+        }
+      ],
+      "recommendedStats": {
+        "evaluations": 64,
+        "validExecutions": 64,
+        "victories": 64,
+        "completeTimingVictories": 64,
+        "diverged": 0,
+        "sumFrames": 44719,
+        "fastestFrames": 685,
+        "averageVictoryFrames": 698.734375,
+        "successRate": 1,
+        "divergenceRate": 0
+      },
+      "topCandidates": [
+        {
+          "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+          "plans": [
+            {
+              "round": 1,
+              "orders": [
+                {
+                  "actorId": "player-0",
+                  "actorName": "P",
+                  "skillKey": "waza-6",
+                  "canonicalSkillId": 6,
+                  "skillName": "Rock Fist",
+                  "targetIntent": {
+                    "kind": "combatants",
+                    "targetIds": [
+                      "enemy-0"
+                    ]
+                  },
+                  "targetLabel": "E",
+                  "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+                }
+              ],
+              "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+            }
+          ],
+          "stats": {
+            "evaluations": 64,
+            "validExecutions": 64,
+            "victories": 64,
+            "completeTimingVictories": 64,
+            "diverged": 0,
+            "sumFrames": 44719,
+            "fastestFrames": 685,
+            "averageVictoryFrames": 698.734375,
+            "successRate": 1,
+            "divergenceRate": 0
+          }
+        }
+      ],
+      "diagnostics": [],
+      "fairStageEvaluations": 64
+    }
+  }
+}

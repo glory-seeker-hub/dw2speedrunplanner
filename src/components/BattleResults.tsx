@@ -1,3 +1,4 @@
+import { RNG_POLICY_LABELS } from '@/utils/battle/battleRngPolicy';
 import { OptimizedSearchResults } from './OptimizedSearchResults';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,16 +44,17 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
         {!action.counter.activatedMechanics && <p>Using non-activated skill effects</p>}
         {action.counter.replacedByConfusion && <p>Confusion replacement attack · Counter effects removed</p>}
       </div>}
-      {action.statusRecoveries.map(recovery => <p key={recovery.status} className="text-xs text-info">{stateLabel(recovery.status)} {recovery.recovered ? 'recovered' : 'remains'} · roll {recovery.roll}/3</p>)}
+      {action.statusRecoveries.map(recovery => <p key={recovery.status} className="text-xs text-info">{stateLabel(recovery.status)} {recovery.recovered ? 'recovered' : 'remains'}{recovery.rngResolution ? ' — TAS Favorable RNG' : ` · roll ${recovery.roll}/3`}</p>)}
       {action.confusion?.redirected && <p className="text-sm text-info">Confusion redirect: own side, including self{action.confusion.plannedSkillKey !== action.confusion.selectedSkillKey ? ' · technique reselected' : ''}</p>}
       {action.accuracy?.standardRollSkipped && <p className="text-xs text-info">Standard accuracy bypassed — Strategy mode</p>}
       {action.accuracy?.hitThreshold128 !== undefined && <p className="text-xs text-muted-foreground">Accuracy: roll {action.accuracy.roll128} · Hit below {action.accuracy.hitThreshold128}/128{action.accuracy.referenceRule === 'average-effective-target-spd' ? ` · average target SPD ${action.accuracy.targetEffectiveSpd}` : ''}</p>}
+      {action.accuracy?.rngResolution && <p>TAS Favorable RNG: {action.accuracy.rngResolution.affectedSide === 'enemy' ? 'Enemy paralysis action failure forced' : 'Player paralysis failure prevented'}</p>}
       {action.accuracy?.paralysisRoll !== undefined && <p className="text-xs text-muted-foreground">Paralysis check: {action.accuracy.paralysisRoll === 1 ? 'failed' : 'passed'}</p>}
       <ul className="space-y-1 text-sm">{action.impacts.map((impact, index) => <li key={`${impact.targetId}-${index}`} className="flex flex-wrap justify-between gap-2">
         <span>{impact.targetName} <span className="text-xs text-muted-foreground">({impact.targetId})</span></span>
         <span><span className="text-destructive">{impact.damage} dmg</span>{impact.poisonBonusDamage > 0 && <span className="text-info"> (Poison +{impact.poisonBonusDamage})</span>} · {impact.hpBefore} → {impact.hpAfter} HP · {impact.ko ? 'KO' : impact.outcome}
           {impact.effectiveElement && <span className="block text-xs text-info">Effective element: {impact.effectiveElement}</span>}
-          {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{status.status === 'poison' ? 'Poison' : status.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {status.result === 'immune' ? 'immune (Boss)' : status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'}{status.condition === 'interrupt-hit' ? ' by Interrupt; affects restarted action immediately' : status.condition === 'counter-activated' ? ' by activated Counter' : status.condition?.endsWith('-power') ? ` by ${stateLabel(status.condition)}` : ` · roll ${status.roll}/2`}</span>)}
+          {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{status.status === 'poison' ? 'Poison' : status.status === 'paralysis' ? 'Paralysis' : 'Confusion'} {status.result === 'immune' ? 'immune (Boss)' : status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'}{status.condition === 'interrupt-hit' ? ' by Interrupt; affects restarted action immediately' : status.condition === 'counter-activated' ? ' by activated Counter' : status.condition?.endsWith('-power') ? ` by ${stateLabel(status.condition)}` : status.rngResolution ? ' — TAS Favorable RNG' : ` · roll ${status.roll}/2`}</span>)}
         </span>
       </li>)}</ul>
       {(action.supportEvents ?? []).map((event, index) => <p key={index} className="text-xs text-info">
@@ -74,6 +76,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
 }
 
 export const BattleResults = ({ results }: { results: SimulationResult }) => {
+  const rngPolicy = results.search?.rngPolicy ?? results.rngPolicy ?? 'natural';
   const stats = [
     ['Fastest Victory', frames(results.minFrames)],
     ['Average Victory', frames(results.avgFrames)],
@@ -83,6 +86,9 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
   return <div className="space-y-6">
     {results.optimized ? <OptimizedSearchResults result={results.optimized} /> : <p>Search method: Random Monte Carlo</p>}
     <p className="font-semibold">Accuracy mode: {(results.search?.accuracyMode ?? results.accuracyMode) === 'strategy' ? 'Strategy' : 'Game-accurate'}</p>
+    <p className="font-semibold">RNG Policy: {RNG_POLICY_LABELS[rngPolicy]}</p>
+    {rngPolicy === 'tas-favorable' && <p role="note">Manipulated RNG assumptions: averages and success rates are conditional on TAS Favorable policy, not natural probability. Ordinary Hit Rate still follows Accuracy Mode.</p>}
+    {results.rngOverrideCounts && <p>TAS overrides across completed valid rollouts: direct status gates {results.rngOverrideCounts.directStatus}; Enemy recoveries prevented {results.rngOverrideCounts.enemyRecoveryPrevented}; Player recoveries forced {results.rngOverrideCounts.playerRecoveryForced}; Enemy paralysis misses forced {results.rngOverrideCounts.enemyParalysisMiss}; Player paralysis failures prevented {results.rngOverrideCounts.playerParalysisPass}.</p>}
     {results.search && !results.optimized && <Card><CardHeader><CardTitle>{results.search.status === 'cancelled' ? 'Partial results — simulation cancelled' : 'Search completed'}</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
       <p>{number(results.search.completedSimulations)} / {number(results.search.requestedSimulations)} simulations completed</p>
       <p>Best found at simulation: {number(results.search.bestFoundAtSimulation)}</p>

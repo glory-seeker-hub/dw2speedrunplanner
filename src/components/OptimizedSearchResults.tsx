@@ -1,7 +1,9 @@
+import { rngRequirementText } from '@/utils/battle/battleRngAudit';
 import type { OptimizedSearchResult } from '@/utils/battle/battleOptimizedSearch';
 import { OBJECTIVE_LABELS } from '@/utils/battle/battleSearchObjectives';
 const value = (n: number | null) => n === null ? 'Unavailable' : n.toLocaleString('en-US', { maximumFractionDigits: 1 });
 export function OptimizedSearchResults({ result }: { result: OptimizedSearchResult }) {
+  const tas = result.rngPolicy === 'tas-favorable';
   const fastest = result.objective === 'fastest-potential', route = result.fastestRoute, stats = result.recommendedStats;
   const orders = (plans: OptimizedSearchResult['recommendedPrefix']) => plans.map(plan => <div key={plan.key}><h4>Round {plan.round}</h4><ul>{plan.orders.map(o => <li key={o.key}>{o.actorName} — {o.skillName} → {o.targetLabel}</li>)}</ul></div>);
   const events = [...new Set((route?.actions ?? []).flatMap(a => [
@@ -17,13 +19,15 @@ export function OptimizedSearchResults({ result }: { result: OptimizedSearchResu
     <p>Root Player plans: {value(result.rootPlanCount)} · Candidate plans evaluated: {value(result.candidatesEvaluated)}</p>
     <p>Screened-prefix statistics use the last completed fair comparison stage ({value(result.fairStageEvaluations)} evaluations). In-progress samples do not affect that ranking.</p>
     {result.diagnostics.map(d => <p key={d} role="status">{d}</p>)}
-    {fastest && <div><h3 className="font-semibold">Fastest route found</h3>
+    {fastest && <div><h3 className="font-semibold">{tas ? 'Fastest TAS route found under supported favorable RNG assumptions' : 'Fastest route found'}</h3>
       {route ? <><p>Observed frames: {value(route.totalFrames)}</p>{orders(route.decisionTrace)}
+        {tas && <div><h4>TAS RNG requirements</h4>{(route.rngRequirements ?? []).map((r, i) => <p key={i}>Round {r.round} · {r.actorName} / {r.skillName} · {rngRequirementText(r)}</p>)}</div>}
         <p>Rollout seed: {route.seed} · Sample index: {route.sampleIndex}</p>
         <details><summary>Source candidate/prefix</summary><code className="break-all">{route.sourcePrefixKey}</code></details>
         <p>Observed mechanical events: {events.join('; ') || 'None recorded'}.</p></> : <p>No eligible complete Player victory observed.</p>}
     </div>}
     <h3 className="font-semibold">{fastest ? 'Best screened prefix' : result.objective === 'average-victory' ? 'Best average strategy' : 'Highest-success strategy'}</h3>
+    {tas && <p>Average under TAS Favorable policy. Success rate under the selected TAS policy is not natural probability.</p>}
     {stats && <div>
       {result.objective === 'success-rate' ? <p>Success rate: {value(stats.successRate * 100)}%</p> : <p>Average victory frames: {value(stats.averageVictoryFrames)}</p>}
       <p>Fastest fair-stage sample: {value(stats.fastestFrames)}f · Average victory frames: {value(stats.averageVictoryFrames)} · Success rate: {value(stats.successRate * 100)}% · Divergence: {value(stats.divergenceRate * 100)}% · Rollouts: {value(stats.evaluations)}</p>

@@ -1,3 +1,4 @@
+import { type BattleRngPolicy } from '@/utils/battle/battleRngPolicy';
 import { rootPlanInfo } from '@/utils/battle/battleActionPlans';
 import { OBJECTIVE_LABELS, type BattleSearchMethod, type OptimizationObjective } from '@/utils/battle/battleSearchObjectives';
 import { optimizedConfigForBudget } from '@/utils/battle/battleOptimizedSearch';
@@ -48,6 +49,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(100000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
+  const [rngPolicy, setRngPolicy] = useState<BattleRngPolicy>('natural');
   const [accuracyMode, setAccuracyMode] = useState<AccuracyMode>('strategy');
   const [searchMethod, setSearchMethod] = useState<BattleSearchMethod>('optimized-action-search');
   const [objective, setObjective] = useState<OptimizationObjective>('fastest-potential');
@@ -59,7 +61,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
-    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
+    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -216,6 +218,16 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             <div className="flex gap-2">
               <Button variant={accuracyMode === 'strategy' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'strategy'} disabled={isSimulating} onClick={() => setAccuracyMode('strategy')}>Strategy</Button>
               <Button variant={accuracyMode === 'game-accurate' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'game-accurate'} disabled={isSimulating} onClick={() => setAccuracyMode('game-accurate')}>Game-accurate</Button>
+            </div>
+            <div className="space-y-2"><Label>RNG Policy</Label><div className="flex gap-2">
+              <Button variant={rngPolicy === 'natural' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'natural'} disabled={isSimulating} onClick={() => setRngPolicy('natural')}>Natural</Button>
+              <Button variant={rngPolicy === 'tas-favorable' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'tas-favorable'} disabled={isSimulating} onClick={() => setRngPolicy('tas-favorable')}>TAS Favorable</Button>
+            </div>
+            {rngPolicy === 'natural' ? <p>Uses the game's implemented RNG normally.</p> : <>
+              <p>Forces supported negative-status RNG against Enemies and protects Players. Enemy Paralysis/Confusion recovery fails; Paralyzed Enemies miss. Other RNG remains natural.</p>
+              <p role="note" className="font-semibold text-amber-600">TAS Favorable uses manipulated RNG assumptions and is not representative of normal real-time speedrun probability.</p>
+              <p>Standard accuracy is controlled separately by Accuracy Mode.</p>
+            </>}
             </div>
             <p className="text-sm text-muted-foreground">{accuracyMode === 'strategy' ? 'Standard Hit Rate misses are disabled. Misses caused by Paralysis, Invisibility and other battle mechanics still occur.' : "Uses Digimon World 2's normal Hit Rate RNG."}</p>
           </div>
