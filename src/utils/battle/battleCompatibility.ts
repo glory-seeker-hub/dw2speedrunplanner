@@ -64,5 +64,6 @@ export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], e
       yield result;
     }
   }
-  return aggregateBattleRuns(runs());
+  const result = aggregateBattleRuns(runs());
+  return options.simulationRules ? { ...result, accuracyMode: options.simulationRules.accuracyMode } : result;
 }

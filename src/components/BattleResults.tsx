@@ -44,6 +44,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
       </div>}
       {action.statusRecoveries.map(recovery => <p key={recovery.status} className="text-xs text-info">{stateLabel(recovery.status)} {recovery.recovered ? 'recovered' : 'remains'} · roll {recovery.roll}/3</p>)}
       {action.confusion?.redirected && <p className="text-sm text-info">Confusion redirect: own side, including self{action.confusion.plannedSkillKey !== action.confusion.selectedSkillKey ? ' · technique reselected' : ''}</p>}
+      {action.accuracy?.standardRollSkipped && <p className="text-xs text-info">Standard accuracy bypassed — Strategy mode</p>}
       {action.accuracy?.hitThreshold128 !== undefined && <p className="text-xs text-muted-foreground">Accuracy: roll {action.accuracy.roll128} · Hit below {action.accuracy.hitThreshold128}/128{action.accuracy.referenceRule === 'average-effective-target-spd' ? ` · average target SPD ${action.accuracy.targetEffectiveSpd}` : ''}</p>}
       {action.accuracy?.paralysisRoll !== undefined && <p className="text-xs text-muted-foreground">Paralysis check: {action.accuracy.paralysisRoll === 1 ? 'failed' : 'passed'}</p>}
       <ul className="space-y-1 text-sm">{action.impacts.map((impact, index) => <li key={`${impact.targetId}-${index}`} className="flex flex-wrap justify-between gap-2">
@@ -79,6 +80,7 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
     ['Completed Successes', `${results.completedSuccesses.toLocaleString()} / ${results.totalSimulations.toLocaleString()}`],
   ];
   return <div className="space-y-6">
+    <p className="font-semibold">Accuracy mode: {(results.search?.accuracyMode ?? results.accuracyMode) === 'strategy' ? 'Strategy' : 'Game-accurate'}</p>
     {results.search && <Card><CardHeader><CardTitle>{results.search.status === 'cancelled' ? 'Partial results — simulation cancelled' : 'Search completed'}</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
       <p>{number(results.search.completedSimulations)} / {number(results.search.requestedSimulations)} simulations completed</p>
       <p>Best found at simulation: {number(results.search.bestFoundAtSimulation)}</p>

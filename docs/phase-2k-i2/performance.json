@@ -1,0 +1,100 @@
+{
+  "node": "v24.20.0",
+  "fixture": "cases.single",
+  "seed": 42,
+  "environment": "Node worker host, actual task yields and cloned messages; not browser end-to-end",
+  "policy": {
+    "batchBudgetMs": 50,
+    "maxBatchSize": 1000,
+    "progressIntervalMs": 150
+  },
+  "rngSamples": [
+    {
+      "accuracyMode": "strategy",
+      "simulations": 1000,
+      "draws": {
+        "action-choice": 10000,
+        "initiative": 10000,
+        "target-choice": 9000
+      }
+    },
+    {
+      "accuracyMode": "game-accurate",
+      "simulations": 1000,
+      "draws": {
+        "action-choice": 10228,
+        "initiative": 10228,
+        "target-choice": 9228,
+        "accuracy": 9228
+      }
+    }
+  ],
+  "samples": [
+    {
+      "accuracyMode": "strategy",
+      "requested": 10000,
+      "wallMs": 1529.9256999999998,
+      "simulationsPerSecond": 6536.2651271234945,
+      "progressMessages": 10,
+      "resultBytes": 29657,
+      "bestFrames": 6165,
+      "bestOccurrenceCount": 10000,
+      "successfulVictories": 10000
+    },
+    {
+      "accuracyMode": "game-accurate",
+      "requested": 10000,
+      "wallMs": 1213.7914,
+      "simulationsPerSecond": 8238.64792582976,
+      "progressMessages": 8,
+      "resultBytes": 29511,
+      "bestFrames": 4201,
+      "bestOccurrenceCount": 2,
+      "successfulVictories": 10000
+    },
+    {
+      "accuracyMode": "strategy",
+      "requested": 100000,
+      "wallMs": 11045.7085,
+      "simulationsPerSecond": 9053.289791234307,
+      "progressMessages": 65,
+      "resultBytes": 29669,
+      "bestFrames": 6165,
+      "bestOccurrenceCount": 100000,
+      "successfulVictories": 100000
+    },
+    {
+      "accuracyMode": "game-accurate",
+      "requested": 100000,
+      "wallMs": 17053.2967,
+      "simulationsPerSecond": 5863.968812552239,
+      "progressMessages": 98,
+      "resultBytes": 29525,
+      "bestFrames": 4201,
+      "bestOccurrenceCount": 5,
+      "successfulVictories": 100000
+    },
+    {
+      "accuracyMode": "strategy",
+      "requested": 1000000,
+      "wallMs": 129241.98960000002,
+      "simulationsPerSecond": 7737.423441831632,
+      "progressMessages": 728,
+      "resultBytes": 29681,
+      "bestFrames": 6165,
+      "bestOccurrenceCount": 1000000,
+      "successfulVictories": 1000000
+    },
+    {
+      "accuracyMode": "game-accurate",
+      "requested": 1000000,
+      "wallMs": 136574.2199,
+      "simulationsPerSecond": 7322.026080267584,
+      "progressMessages": 775,
+      "resultBytes": 29546,
+      "bestFrames": 4201,
+      "bestOccurrenceCount": 76,
+      "successfulVictories": 1000000
+    }
+  ]
+}

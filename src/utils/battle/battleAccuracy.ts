@@ -1,3 +1,4 @@
+import type { AccuracyMode } from './battleSimulationRules';
 import type { ActionKind } from '@/types/battleSkill';
 import type { BattleCombatantState } from './battleTypes';
 import { BattleInputError } from './battleTypes';
@@ -6,7 +7,8 @@ import type { BattleRng } from './battleRng';
 
 export interface AccuracyResolution {
   outcome: 'hit' | 'miss' | 'unsupported';
-  cause: 'invisibility' | 'assist-target-lost' | 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
+  mode?: 'strategy'; standardRollSkipped?: true;
+  cause: 'strategy-accuracy-bypass' | 'invisibility' | 'assist-target-lost' | 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
   hitThreshold128?: number; roll128?: number; paralysisRoll?: number; tailBladeRoll?: number;
   referenceTargetId: string | null;
   referenceRule?: 'single-target' | 'average-effective-target-spd';
@@ -24,9 +26,12 @@ function ratio(value: number): [bigint, bigint] {
 export function hitThreshold128(attackerSpd: number, targetSpd: number): number {
   return thresholdForTargetSpds(attackerSpd, [targetSpd]);
 }
-function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[]): number {
+function validateAccuracySpds(attackerSpd: number, targets: readonly number[]): void {
   if (!Number.isFinite(attackerSpd) || attackerSpd <= 0 || !targets.length || targets.some(spd => !Number.isFinite(spd) || spd < 0))
     throw new BattleInputError('Accuracy requires positive finite attacker effective SPD and nonnegative finite target effective SPD.');
+}
+function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[]): number {
+  validateAccuracySpds(attackerSpd, targets);
   const [an, ad] = ratio(attackerSpd);
   let sumNumerator = 0n, denominator = 1n;
   for (const spd of targets) {
@@ -40,7 +45,7 @@ function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[])
 }
 /** One resolution per action. User-confirmed Phase 2K-E clarification:
  * multi-target accuracy uses the average of valid targets' effective SPD. */
-export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false): AccuracyResolution {
+export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false, accuracyMode: AccuracyMode = 'game-accurate'): AccuracyResolution {
   if (kind === 'assist') return { outcome: 'hit', cause: 'guaranteed', referenceTargetId: null };
   const audit: { paralysisRoll?: number; tailBladeRoll?: number } = {};
   if (actor.statuses.paralysis) {
@@ -54,6 +59,14 @@ export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionK
   if (kind === 'attack' && tailBladeEligible && targets.length === 1) {
     audit.tailBladeRoll = rng.nextIntExclusive(3, 'tail-blade-evasion');
     if (audit.tailBladeRoll === 0) return { outcome: 'miss', cause: 'tail-blade-evasion', referenceTargetId: targets[0].id, ...audit };
+  }
+  // All earlier mechanical Miss gates remain authoritative in both modes.
+  // Do not calculate a threshold or consume/discard an accuracy draw here.
+  if (accuracyMode === 'strategy') {
+    // Preserve invalid-input rejection even though the Hit Rate arithmetic is skipped.
+    validateAccuracySpds(effectiveParameter(actor, 'spd'), targets.map(target => effectiveParameter(target, 'spd')));
+    return { outcome: 'hit', cause: 'strategy-accuracy-bypass', mode: 'strategy', standardRollSkipped: true,
+      referenceTargetId: targets.length === 1 ? targets[0].id : null, ...audit };
   }
   const targetSpds = targets.map(target => effectiveParameter(target, 'spd'));
   const threshold = thresholdForTargetSpds(effectiveParameter(actor, 'spd'), targetSpds);

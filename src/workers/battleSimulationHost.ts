@@ -13,6 +13,7 @@ export function createSimulationWorkerHost(post: (message: SearchResponse) => vo
     const started = scheduling.now(); let lastProgress = started, emitted = false;
     try {
       const search = createSimulationSearch(message.input, message.requestedSimulations, {
+        simulationRules: message.simulationRules,
         ...(message.seed === undefined ? {} : { rng: createSeededBattleRng(message.seed) }),
         ...(message.maxRounds === undefined ? {} : { maxRounds: message.maxRounds }),
       });
