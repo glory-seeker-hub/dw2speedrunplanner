@@ -1,3 +1,6 @@
+import { rootPlanInfo } from '@/utils/battle/battleActionPlans';
+import { OBJECTIVE_LABELS, type BattleSearchMethod, type OptimizationObjective } from '@/utils/battle/battleSearchObjectives';
+import { optimizedConfigForBudget } from '@/utils/battle/battleOptimizedSearch';
 import type { PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
 import type { AccuracyMode } from '@/utils/battle/battleSimulationRules';
 import { useState, useMemo } from 'react';
@@ -43,9 +46,11 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
   const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(preset ? manualTeams.length + 1 : null);
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
-  const [simulationCount, setSimulationCount] = useState<number>(1000);
+  const [simulationCount, setSimulationCount] = useState<number>(100000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
   const [accuracyMode, setAccuracyMode] = useState<AccuracyMode>('strategy');
+  const [searchMethod, setSearchMethod] = useState<BattleSearchMethod>('optimized-action-search');
+  const [objective, setObjective] = useState<OptimizationObjective>('fastest-potential');
   const search = useBattleSimulationWorker(onSimulationComplete);
   const isSimulating = search.running;
   const validCount = Number.isSafeInteger(simulationCount) && simulationCount > 0;
@@ -53,8 +58,8 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     if (selectedPlayerTeam === null || !validCount || isSimulating) return;
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
-    if (!enemy) return;
-    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode } });
+    if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
+    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -80,6 +85,12 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     return null;
   }, [selectedEnemyTeam, selectedEncounter, selectedEnemySaved, savedTeams]);
 
+  const root = useMemo(() => {
+    if (selectedPlayerTeam === null || !selectedEnemyData) return null;
+    try { const { count, minimumBudget } = rootPlanInfo({ player: savedTeams[selectedPlayerTeam], enemy: selectedEnemyData, floorSpecialty }); return { count, minimumBudget, error: '' }; }
+    catch (cause) { return { count: 0, minimumBudget: 0, error: cause instanceof Error ? cause.message : 'Invalid battle input.' }; }
+  }, [savedTeams, selectedPlayerTeam, selectedEnemyData, floorSpecialty]);
+  const rootDiagnostic = root?.error || (root?.count === 0 ? 'No complete legal Player round plan is available.' : root && simulationCount < root.minimumBudget ? 'Search budget too small. Minimum required for current first-round action space: ' + root.minimumBudget.toLocaleString() + '.' : '');
   return (
     <div className="space-y-6">
       <Card className="bg-gradient-card border-border">
@@ -187,6 +198,19 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           </div>
 
           </>}
+          <div className="space-y-2" role="group" aria-label="Search Method">
+            <Label>Search Method</Label>
+            <div className="flex flex-wrap gap-2">{([['optimized-action-search', 'Optimized Action Search'], ['random-monte-carlo', 'Random Monte Carlo']] as const).map(([method, label]) => <Button key={method} disabled={isSimulating} variant={searchMethod === method ? 'default' : 'outline'} aria-pressed={searchMethod === method} onClick={() => setSearchMethod(method)}>{label}</Button>)}</div>
+          </div>
+          {searchMethod === 'optimized-action-search' && <section aria-label="Optimized search settings" className="space-y-2">
+            <Label>Optimization Objective</Label>
+            <div className="flex flex-wrap gap-2">{Object.entries(OBJECTIVE_LABELS).map(([value, label]) => <Button key={value} disabled={isSimulating} variant={objective === value ? 'default' : 'outline'} aria-pressed={objective === value} onClick={() => setObjective(value as OptimizationObjective)}>{label}</Button>)}</div>
+            {objective === 'fastest-potential' && <p className="text-sm text-muted-foreground">Fastest Potential searches for the fastest complete valid battle route observed anywhere in the search. It may depend on favorable remaining RNG.</p>}
+            <p>First-round Player plans: {root?.count.toLocaleString() ?? '—'}</p>
+            <p>Minimum screening evaluations: {root?.minimumBudget.toLocaleString() ?? '—'}</p>
+            {root && root.count > 10000 && <p>Large action space — optimized search may take longer.</p>}
+            {rootDiagnostic && <p role="alert">{rootDiagnostic}</p>}
+          </section>}
           <div className="space-y-2" role="group" aria-label="Accuracy Mode">
             <Label>Accuracy Mode</Label>
             <div className="flex gap-2">
@@ -214,7 +238,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
 
           {/* Simulation Count */}
           <div className="space-y-2">
-            <Label htmlFor="simulation-count">Number of Simulations</Label>
+            <Label htmlFor="simulation-count">{searchMethod === 'optimized-action-search' ? 'Search Quality / Rollout Budget' : 'Number of Simulations'}</Label>
             <Input
               id="simulation-count"
               type="number"
@@ -229,7 +253,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             {([['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const).map(([label, count]) => <Button key={label} variant="outline" aria-pressed={simulationCount === count} onClick={() => setSimulationCount(count)}>{label} · {count.toLocaleString()}</Button>)}
             <Button variant="outline" aria-pressed={![10000, 100000, 1000000].includes(simulationCount)} onClick={() => document.getElementById('simulation-count')?.focus()}>Custom</Button>
           </div>
-          <p className="text-sm text-muted-foreground">Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.</p>
+          <p className="text-sm text-muted-foreground">{searchMethod === 'optimized-action-search' ? 'Every legal Player plan is screened at expanded states. Beam pruning and stochastic rollouts do not prove a global optimum.' : 'Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.'}</p>
           {!validCount && <p role="alert">Enter a positive safe integer number of simulations.</p>}
           </fieldset>
           {search.error && <p role="alert">Simulation unavailable: {search.error}</p>}
@@ -237,7 +261,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Simulate Button */}
           <Button 
             onClick={handleSimulate} 
-            disabled={!canSimulate || !validCount || isSimulating}
+            disabled={!canSimulate || !validCount || isSimulating || (searchMethod === 'optimized-action-search' && !!rootDiagnostic)}
             className="w-full"
             size="lg"
           >

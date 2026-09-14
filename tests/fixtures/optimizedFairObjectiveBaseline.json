@@ -1,0 +1,416 @@
+{
+  "average-victory": {
+    "recommendedPrefix": [
+      {
+        "round": 1,
+        "orders": [
+          {
+            "actorId": "player-0",
+            "actorName": "P0",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          },
+          {
+            "actorId": "player-1",
+            "actorName": "P1",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          },
+          {
+            "actorId": "player-2",
+            "actorName": "P2",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-2\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          }
+        ],
+        "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+      }
+    ],
+    "recommendedStats": {
+      "evaluations": 64,
+      "validExecutions": 64,
+      "victories": 64,
+      "completeTimingVictories": 64,
+      "diverged": 0,
+      "sumFrames": 43840,
+      "fastestFrames": 685,
+      "averageVictoryFrames": 685,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "topCandidates": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-1\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-2\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P0",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-1",
+                "actorName": "P1",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-2",
+                "actorName": "P2",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-2\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 43840,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 685,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-1\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-2\\\\\\\",2,{\\\\\\\"ap\\\\\\\":15,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P0",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-1",
+                "actorName": "P1",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-2",
+                "actorName": "P2",
+                "skillKey": "waza-2",
+                "canonicalSkillId": 2,
+                "skillName": "Rain of Pollen",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-2\",2,{\"ap\":15,\"element\":\"Nature\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",2,{\\\"ap\\\":15,\\\"element\\\":\\\"Nature\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 43840,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 685,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ],
+    "evaluations": 980,
+    "depth": 1
+  },
+  "success-rate": {
+    "recommendedPrefix": [
+      {
+        "round": 1,
+        "orders": [
+          {
+            "actorId": "player-0",
+            "actorName": "P0",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          },
+          {
+            "actorId": "player-1",
+            "actorName": "P1",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          },
+          {
+            "actorId": "player-2",
+            "actorName": "P2",
+            "skillKey": "waza-15",
+            "canonicalSkillId": 15,
+            "skillName": "Stun Flame Shot",
+            "targetIntent": {
+              "kind": "combatants",
+              "targetIds": [
+                "enemy-0"
+              ]
+            },
+            "targetLabel": "E0",
+            "key": "[\"player-2\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+          }
+        ],
+        "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+      }
+    ],
+    "recommendedStats": {
+      "evaluations": 64,
+      "validExecutions": 64,
+      "victories": 64,
+      "completeTimingVictories": 64,
+      "diverged": 0,
+      "sumFrames": 43840,
+      "fastestFrames": 685,
+      "averageVictoryFrames": 685,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "topCandidates": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-1\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-2\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P0",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-1",
+                "actorName": "P1",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-2",
+                "actorName": "P2",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-2\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 43840,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 685,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-1\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\",\\\"[\\\\\\\"player-2\\\\\\\",2,{\\\\\\\"ap\\\\\\\":15,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P0",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-1",
+                "actorName": "P1",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-1\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              },
+              {
+                "actorId": "player-2",
+                "actorName": "P2",
+                "skillKey": "waza-2",
+                "canonicalSkillId": 2,
+                "skillName": "Rain of Pollen",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E0",
+                "key": "[\"player-2\",2,{\"ap\":15,\"element\":\"Nature\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-1\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\",\"[\\\"player-2\\\",2,{\\\"ap\\\":15,\\\"element\\\":\\\"Nature\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 43840,
+          "fastestFrames": 685,
+          "averageVictoryFrames": 685,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ],
+    "evaluations": 980,
+    "depth": 1
+  }
+}

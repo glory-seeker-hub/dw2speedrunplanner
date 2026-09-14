@@ -7,6 +7,13 @@ export function livingOpponents(state: BattleState, actorId: string) {
   const actor = actorById(state, actorId);
   return state.combatants.filter(a => a.side !== actor.side && a.isAlive);
 }
+/** Shared Player selection restriction; execution of an explicit lock remains separate. */
+export function selectableSingleOpponents(state: BattleState, actorId: string) {
+  const actor = actorById(state, actorId);
+  const candidates = livingOpponents(state, actorId);
+  return actor.side === 'player' && state.combatants.filter(a => a.side === 'enemy' && a.currentHp > 0).length > 1
+    ? candidates.filter(a => !a.statuses.invisibility) : candidates;
+}
 /** Resolve IDs against current state, never a stored mutable target reference. */
 export function resolveEffectiveTargets(state: BattleState, action: PlannedAction, rng: BattleRng, confused = false): string[] {
   if (action.kind === 'counter' && action.counter && !confused) {
@@ -28,7 +35,10 @@ export function resolveEffectiveTargets(state: BattleState, action: PlannedActio
     : state.combatants.filter(a => a.side === intent.side && a.isAlive);
   const actor = actorById(state, action.actorId);
   const single = action.kind === 'counter' ? counterTargetForm(action) === 'single' : action.skill.legacyTech.target === 'Single';
-  if (!confused && single && actor.side === 'player' && intent.kind === 'opponents' && intent.side === 'enemy' && state.combatants.filter(a => a.side === 'enemy' && a.currentHp > 0).length > 1) candidates = candidates.filter(a => !a!.statuses.invisibility);
+  if (!confused && single && actor.side === 'player' && intent.kind === 'opponents' && intent.side === 'enemy') {
+    const selectable = new Set(selectableSingleOpponents(state, actor.id).map(a => a.id));
+    candidates = candidates.filter(a => selectable.has(a!.id));
+  }
   if (!candidates.length) return [];
   if (action.kind === 'counter' && !confused && counterTargetForm(action) === 'single') return [candidates[rng.nextIntExclusive(candidates.length, 'target-choice')]!.id];
   if (intent.kind === 'combatants' || intent.selection === 'all') return candidates.map(a => a!.id);

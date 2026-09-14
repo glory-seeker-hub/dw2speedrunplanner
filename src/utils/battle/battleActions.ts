@@ -2,9 +2,12 @@ import { assistEligible } from './battleSupportEffects';
 import type { ActionChoice, ActionPolicy, BattleCombatantState, BattleState, PlannedAction, TargetIntent } from './battleTypes';
 import { BattleInputError } from './battleTypes';
 
+export function selectableSkills(actor: BattleCombatantState, combatants: readonly BattleCombatantState[]) {
+  return actor.skills.filter(s => s.kind === 'assist' ? assistEligible(actor, s, combatants) : s.legacyTech.ap > 0 || s.kind === 'interrupt');
+}
 export const legacyActionPolicy: ActionPolicy = {
   chooseAction(actor, context, rng) {
-    const skills = actor.skills.filter(s => s.kind === 'assist' ? assistEligible(actor, s, context.combatants) : s.legacyTech.ap > 0 || s.kind === 'interrupt');
+    const skills = selectableSkills(actor, context.combatants);
     if (!skills.length) return { kind: 'skill', skillKey: actor.skills[0].key }; // Explicit ineligible Assist is skipped, without inventing an Attack.
     // The old synthetic fallback consumes no technique-choice draw.
     const skill = skills.length === 1 && skills[0].source === 'synthetic-legacy-fallback'

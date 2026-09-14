@@ -6,6 +6,7 @@ import { simulateBattleCore } from './battleSimulation';
 import { createProductionBattleRng } from './battleRng';
 
 export interface SearchProgress {
+  optimized?: import('./battleOptimizedSearch').OptimizedProgress;
   completedSimulations: number; requestedSimulations: number; successfulVictories: number;
   completeTimingVictories: number; bestFrames: number | null; bestFoundAtSimulation: number | null;
   bestOccurrenceCount: number; simulationsSinceLastImprovement: number | null;
