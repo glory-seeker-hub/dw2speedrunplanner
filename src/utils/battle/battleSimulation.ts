@@ -18,6 +18,7 @@ import { scheduleShadowScytheRepeat, SHADOW_SCYTHE_ID } from './battleChains';
 import { recoverStatuses, statusSnapshot, resolveImpactStatuses } from './battleStatuses';
 import { prepareConfusionAction } from './battleConfusion';
 import { claimInterrupt, refreshPlayerReservations, resolveInterruptEffects, reduceInterruptedDamage } from './battleInterrupts';
+import { resolveSimulationRules } from './battleSimulationRules';
 import { resolveActionAccuracy } from './battleAccuracy';
 
 export const BATTLE_ENGINE_VERSION = '2k-h-authoritative-support-v1';
@@ -71,6 +72,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
     finishUnusedInterrupts();
   };
   try {
+    const rules = resolveSimulationRules(options.simulationRules);
     const maxRounds = options.maxRounds ?? DEFAULT_MAX_ROUNDS;
     if (!Number.isSafeInteger(maxRounds) || maxRounds < 1) throw new BattleInputError('maxRounds must be a positive safe integer.');
     if (!Number.isSafeInteger(state.simulationIndex) || state.simulationIndex < 0) throw new BattleInputError('Invalid simulation index.');
@@ -140,7 +142,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           const initialAccuracy = assistLost ? { outcome: 'miss' as const, cause: 'assist-target-lost' as const, referenceTargetId: targetIds[0] } : counterForcesMiss(action)
             ? { outcome: 'miss' as const, cause: 'counter-not-activated' as const, referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
-                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]));
+                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode);
           action.prepared = { targetIds, statusesBefore, statusesAfterRecovery, statusRecoveries, confusion, initialAccuracy, interruptConsumed: false };
         }
         const prepared = action.prepared;
@@ -165,7 +167,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           entry.accuracy = prepared.resolution!.forceMiss
             ? { outcome: 'miss', cause: 'interrupt-forced-miss', referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
-                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]));
+                targetIds.length === 1 && waitingTailBlade(state, targetIds[0]), rules.accuracyMode);
         } else entry.accuracy = prepared.initialAccuracy;
         if (entry.accuracy.outcome === 'unsupported') throw new BattleInputError('Accuracy has no effective target.', 'unsupported');
         entry.outcome = entry.accuracy.outcome;

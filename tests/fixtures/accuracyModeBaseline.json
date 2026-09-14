@@ -1,0 +1,3380 @@
+{
+  "source": "Committed Phase 2K-I1 before accuracy-mode changes; cases.single seed42",
+  "core": {
+    "engineVersion": "2k-h-authoritative-support-v1",
+    "outcome": "player-win",
+    "winner": "player",
+    "rounds": 5,
+    "actionCount": 9,
+    "actions": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 80,
+            "hpAfter": 63,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 67,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 80,
+            "hpAfter": 60,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 79,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r2-a3",
+        "round": 2,
+        "sequence": 3,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 63,
+            "hpAfter": 46,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "costCharged": 8,
+          "after": 34,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 39,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r2-a4",
+        "round": 2,
+        "sequence": 4,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 60,
+            "hpAfter": 40,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "costCharged": 8,
+          "after": 34,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 64,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r3-a5",
+        "round": 3,
+        "sequence": 5,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 46,
+            "hpAfter": 29,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 34,
+          "costCharged": 8,
+          "after": 26,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 6,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r3-a6",
+        "round": 3,
+        "sequence": 6,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 40,
+            "hpAfter": 20,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 34,
+          "costCharged": 8,
+          "after": 26,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 4,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r4-a7",
+        "round": 4,
+        "sequence": 7,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 29,
+            "hpAfter": 12,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 26,
+          "costCharged": 8,
+          "after": 18,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 3,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r4-a8",
+        "round": 4,
+        "sequence": 8,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 20,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [
+          {
+            "kind": "player-hp-depleted",
+            "combatantId": "player-0",
+            "combatantName": "P"
+          }
+        ],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 26,
+          "costCharged": 8,
+          "after": 18,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 107,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r5-a9",
+        "round": 5,
+        "sequence": 9,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 12,
+            "hpAfter": 0,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 18,
+          "costCharged": 8,
+          "after": 10,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 6,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r5-a10",
+        "round": 5,
+        "sequence": 10,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "state": {
+      "combatants": [
+        {
+          "isBoss": false,
+          "id": "player-0",
+          "sourceInstanceId": null,
+          "name": "P",
+          "side": "player",
+          "position": 0,
+          "speciesId": "P",
+          "type": "Data",
+          "specialty": "None",
+          "baseStats": {
+            "hp": 80,
+            "mp": 50,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "maxHp": 80,
+          "currentHp": 0,
+          "maxMp": 50,
+          "currentMp": 10,
+          "isAlive": true,
+          "atkStage": 0,
+          "defStage": 0,
+          "spdStage": 0,
+          "parametersSuppressed": false,
+          "elementalPower": null,
+          "parameterModifiers": {},
+          "skills": [
+            {
+              "key": "pepper-breath",
+              "canonicalSkillId": 31,
+              "kind": "attack",
+              "source": "legacy-known-technique",
+              "legacyTech": {
+                "id": "pepper-breath",
+                "name": "Pepper Breath",
+                "ap": 17.5,
+                "element": "Fire",
+                "target": "Single",
+                "isCounter": false
+              }
+            }
+          ],
+          "plannedActionId": "s0-r5-a9",
+          "legacy": {
+            "consecutiveTechCount": 5,
+            "damageTakenThisTurn": 0,
+            "lastTechUsed": "Pepper Breath"
+          },
+          "statuses": {},
+          "temporaryPowers": {}
+        },
+        {
+          "isBoss": false,
+          "id": "enemy-0",
+          "sourceInstanceId": null,
+          "name": "E",
+          "side": "enemy",
+          "position": 0,
+          "speciesId": "E",
+          "type": "Data",
+          "specialty": "None",
+          "baseStats": {
+            "hp": 80,
+            "mp": 50,
+            "atk": 20,
+            "def": 20,
+            "spd": 20
+          },
+          "maxHp": 80,
+          "currentHp": 0,
+          "maxMp": 50,
+          "currentMp": 18,
+          "isAlive": false,
+          "atkStage": 0,
+          "defStage": 0,
+          "spdStage": 0,
+          "parametersSuppressed": false,
+          "elementalPower": null,
+          "parameterModifiers": {},
+          "skills": [
+            {
+              "key": "rock-fist",
+              "canonicalSkillId": 6,
+              "kind": "attack",
+              "source": "legacy-known-technique",
+              "legacyTech": {
+                "id": "rock-fist",
+                "name": "Rock Fist",
+                "ap": 20,
+                "element": "None",
+                "target": "Single",
+                "isCounter": false
+              }
+            }
+          ],
+          "plannedActionId": "s0-r5-a10",
+          "legacy": {
+            "consecutiveTechCount": 4,
+            "damageTakenThisTurn": 17,
+            "lastTechUsed": "Rock Fist"
+          },
+          "statuses": {},
+          "temporaryPowers": {}
+        }
+      ],
+      "plannedActions": [
+        {
+          "id": "s0-r1-a1",
+          "round": 1,
+          "actorId": "player-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 49,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "pepper-breath",
+            "canonicalSkillId": 31,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "pepper-breath",
+              "name": "Pepper Breath",
+              "ap": 17.5,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "enemy-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "pepper-breath",
+              "selectedSkillKey": "pepper-breath",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "enemy",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 125,
+              "roll128": 67,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 20
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r1-a2",
+          "round": 1,
+          "actorId": "enemy-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 27,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "rock-fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "rock-fist",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "player-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "rock-fist",
+              "selectedSkillKey": "rock-fist",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "player",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 116,
+              "roll128": 79,
+              "referenceTargetId": "player-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 40
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r2-a3",
+          "round": 2,
+          "actorId": "player-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 42,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "pepper-breath",
+            "canonicalSkillId": 31,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "pepper-breath",
+              "name": "Pepper Breath",
+              "ap": 17.5,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "enemy-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "pepper-breath",
+              "selectedSkillKey": "pepper-breath",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "enemy",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 125,
+              "roll128": 39,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 20
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r2-a4",
+          "round": 2,
+          "actorId": "enemy-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 29,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "rock-fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "rock-fist",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "player-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "rock-fist",
+              "selectedSkillKey": "rock-fist",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "player",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 116,
+              "roll128": 64,
+              "referenceTargetId": "player-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 40
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r3-a5",
+          "round": 3,
+          "actorId": "player-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 40,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "pepper-breath",
+            "canonicalSkillId": 31,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "pepper-breath",
+              "name": "Pepper Breath",
+              "ap": 17.5,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "enemy-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "pepper-breath",
+              "selectedSkillKey": "pepper-breath",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "enemy",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 125,
+              "roll128": 6,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 20
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r3-a6",
+          "round": 3,
+          "actorId": "enemy-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 25,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "rock-fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "rock-fist",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "player-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "rock-fist",
+              "selectedSkillKey": "rock-fist",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "player",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 116,
+              "roll128": 4,
+              "referenceTargetId": "player-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 40
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r4-a7",
+          "round": 4,
+          "actorId": "player-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 42,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "pepper-breath",
+            "canonicalSkillId": 31,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "pepper-breath",
+              "name": "Pepper Breath",
+              "ap": 17.5,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "enemy-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "pepper-breath",
+              "selectedSkillKey": "pepper-breath",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "enemy",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 125,
+              "roll128": 3,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 20
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r4-a8",
+          "round": 4,
+          "actorId": "enemy-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 28,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "rock-fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "rock-fist",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "player-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "rock-fist",
+              "selectedSkillKey": "rock-fist",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "player",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 116,
+              "roll128": 107,
+              "referenceTargetId": "player-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 40
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r5-a9",
+          "round": 5,
+          "actorId": "player-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          },
+          "state": "resolved",
+          "initiative": 43,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "pepper-breath",
+            "canonicalSkillId": 31,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "pepper-breath",
+              "name": "Pepper Breath",
+              "ap": 17.5,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null,
+          "prepared": {
+            "targetIds": [
+              "enemy-0"
+            ],
+            "statusesBefore": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusesAfterRecovery": {
+              "poison": false,
+              "paralysis": false,
+              "confusion": false
+            },
+            "statusRecoveries": [],
+            "confusion": {
+              "active": false,
+              "redirected": false,
+              "skipped": false,
+              "plannedSkillKey": "pepper-breath",
+              "selectedSkillKey": "pepper-breath",
+              "eligibleSkillKeys": [],
+              "originalTargetIntent": {
+                "kind": "opponents",
+                "side": "enemy",
+                "selection": "random-at-execution"
+              }
+            },
+            "initialAccuracy": {
+              "outcome": "hit",
+              "cause": "normal-accuracy",
+              "hitThreshold128": 125,
+              "roll128": 6,
+              "referenceTargetId": "enemy-0",
+              "referenceRule": "single-target",
+              "targetEffectiveSpd": 20
+            },
+            "interruptConsumed": false
+          }
+        },
+        {
+          "id": "s0-r5-a10",
+          "round": 5,
+          "actorId": "enemy-0",
+          "targetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          },
+          "state": "skipped",
+          "initiative": 24,
+          "priority": "normal",
+          "reaction": null,
+          "chainFromActionId": null,
+          "kind": "attack",
+          "skill": {
+            "key": "rock-fist",
+            "canonicalSkillId": 6,
+            "kind": "attack",
+            "source": "legacy-known-technique",
+            "legacyTech": {
+              "id": "rock-fist",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false
+            }
+          },
+          "counter": null
+        }
+      ],
+      "queue": [],
+      "round": 5,
+      "nextActionNumber": 11,
+      "simulationIndex": 0
+    },
+    "diagnostics": [],
+    "totalFrames": 6165,
+    "knownFrames": 6165,
+    "timingCompleteness": "complete",
+    "timingDiagnostics": []
+  },
+  "search": {
+    "winRate": 100,
+    "totalSimulations": 1000,
+    "completedSuccesses": 1000,
+    "timedSuccesses": 1000,
+    "incompleteTimingSuccesses": 0,
+    "outcomeCounts": {
+      "player-win": 1000,
+      "enemy-win": 0,
+      "limit-reached": 0,
+      "invalid": 0,
+      "unsupported": 0
+    },
+    "minTurns": 9,
+    "avgTurns": 9.228,
+    "maxTurns": 13,
+    "minFrames": 4692,
+    "avgFrames": 6053.094,
+    "maxFrames": 7923,
+    "fastestBattleHistory": [
+      {
+        "id": "s0-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 80,
+            "hpAfter": 63,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 67,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 80,
+            "hpAfter": 60,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 79,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r2-a3",
+        "round": 2,
+        "sequence": 3,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 63,
+            "hpAfter": 46,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "costCharged": 8,
+          "after": 34,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 39,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r2-a4",
+        "round": 2,
+        "sequence": 4,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 60,
+            "hpAfter": 40,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "costCharged": 8,
+          "after": 34,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 64,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r3-a5",
+        "round": 3,
+        "sequence": 5,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 46,
+            "hpAfter": 29,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 34,
+          "costCharged": 8,
+          "after": 26,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 6,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r3-a6",
+        "round": 3,
+        "sequence": 6,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 40,
+            "hpAfter": 20,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 34,
+          "costCharged": 8,
+          "after": 26,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 4,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r4-a7",
+        "round": 4,
+        "sequence": 7,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 29,
+            "hpAfter": 12,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 26,
+          "costCharged": 8,
+          "after": 18,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 3,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r4-a8",
+        "round": 4,
+        "sequence": 8,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 20,
+            "hpAfter": 0,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [
+          {
+            "kind": "player-hp-depleted",
+            "combatantId": "player-0",
+            "combatantName": "P"
+          }
+        ],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 26,
+          "costCharged": 8,
+          "after": 18,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 107,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r5-a9",
+        "round": 5,
+        "sequence": 9,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 12,
+            "hpAfter": 0,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 18,
+          "costCharged": 8,
+          "after": 10,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 6,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s0-r5-a10",
+        "round": 5,
+        "sequence": 10,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "fastestBattleByFrames": [
+      {
+        "id": "s7-r1-a1",
+        "round": 1,
+        "sequence": 1,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 80,
+            "hpAfter": 63,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 85,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r1-a2",
+        "round": 1,
+        "sequence": 2,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "miss",
+        "timingClass": "single-target",
+        "durationFrames": 194,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "after": 50,
+          "costCharged": 0,
+          "completeness": "complete",
+          "payerCombatantId": null,
+          "payerName": null,
+          "payerSide": null,
+          "paymentRule": "none-on-miss"
+        },
+        "accuracy": {
+          "outcome": "miss",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 125,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r2-a3",
+        "round": 2,
+        "sequence": 3,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 63,
+            "hpAfter": 46,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "costCharged": 8,
+          "after": 34,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 68,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r2-a4",
+        "round": 2,
+        "sequence": 4,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "miss",
+        "timingClass": "single-target",
+        "durationFrames": 194,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "after": 50,
+          "costCharged": 0,
+          "completeness": "complete",
+          "payerCombatantId": null,
+          "payerName": null,
+          "payerSide": null,
+          "paymentRule": "none-on-miss"
+        },
+        "accuracy": {
+          "outcome": "miss",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 120,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r3-a5",
+        "round": 3,
+        "sequence": 5,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 46,
+            "hpAfter": 29,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 34,
+          "costCharged": 8,
+          "after": 26,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 87,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r3-a6",
+        "round": 3,
+        "sequence": 6,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "player-0",
+            "targetName": "P",
+            "hpBefore": 80,
+            "hpAfter": 60,
+            "baseDamage": 20,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 20,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 50,
+          "costCharged": 8,
+          "after": 42,
+          "completeness": "complete",
+          "payerCombatantId": "enemy-0",
+          "payerName": "E",
+          "payerSide": "enemy",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 103,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r4-a7",
+        "round": 4,
+        "sequence": 7,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 29,
+            "hpAfter": 12,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "hit",
+            "ko": false,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 26,
+          "costCharged": 8,
+          "after": 18,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 70,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r4-a8",
+        "round": 4,
+        "sequence": 8,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "player-0"
+        ],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "miss",
+        "timingClass": "single-target",
+        "durationFrames": 194,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 42,
+          "after": 42,
+          "costCharged": 0,
+          "completeness": "complete",
+          "payerCombatantId": null,
+          "payerName": null,
+          "payerSide": null,
+          "paymentRule": "none-on-miss"
+        },
+        "accuracy": {
+          "outcome": "miss",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 116,
+          "roll128": 123,
+          "referenceTargetId": "player-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 40
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "rock-fist",
+          "selectedSkillKey": "rock-fist",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "player",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r5-a9",
+        "round": 5,
+        "sequence": 9,
+        "actorId": "player-0",
+        "actorName": "P",
+        "skillKey": "pepper-breath",
+        "skillName": "Pepper Breath",
+        "canonicalSkillId": 31,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "enemy",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [
+          "enemy-0"
+        ],
+        "impacts": [
+          {
+            "targetId": "enemy-0",
+            "targetName": "E",
+            "hpBefore": 12,
+            "hpAfter": 0,
+            "baseDamage": 17,
+            "poisonBonusDamage": 0,
+            "statusApplications": [],
+            "damage": 17,
+            "healing": 0,
+            "outcome": "ko",
+            "ko": true,
+            "appliedEffects": []
+          }
+        ],
+        "counter": null,
+        "reaction": null,
+        "state": "resolved",
+        "outcome": "hit",
+        "timingClass": "single-target",
+        "durationFrames": 685,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": {
+          "before": 18,
+          "costCharged": 8,
+          "after": 10,
+          "completeness": "complete",
+          "payerCombatantId": "player-0",
+          "payerName": "P",
+          "payerSide": "player",
+          "paymentRule": "own"
+        },
+        "accuracy": {
+          "outcome": "hit",
+          "cause": "normal-accuracy",
+          "hitThreshold128": 125,
+          "roll128": 110,
+          "referenceTargetId": "enemy-0",
+          "referenceRule": "single-target",
+          "targetEffectiveSpd": 20
+        },
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": {
+          "active": false,
+          "redirected": false,
+          "skipped": false,
+          "plannedSkillKey": "pepper-breath",
+          "selectedSkillKey": "pepper-breath",
+          "eligibleSkillKeys": [],
+          "originalTargetIntent": {
+            "kind": "opponents",
+            "side": "enemy",
+            "selection": "random-at-execution"
+          }
+        },
+        "effectDiagnostics": [],
+        "supportEvents": []
+      },
+      {
+        "id": "s7-r5-a10",
+        "round": 5,
+        "sequence": 10,
+        "actorId": "enemy-0",
+        "actorName": "E",
+        "skillKey": "rock-fist",
+        "skillName": "Rock Fist",
+        "canonicalSkillId": 6,
+        "kind": "attack",
+        "source": "legacy-known-technique",
+        "targetIntent": {
+          "kind": "opponents",
+          "side": "player",
+          "selection": "random-at-execution"
+        },
+        "effectiveTargetIds": [],
+        "impacts": [],
+        "counter": null,
+        "reaction": null,
+        "state": "skipped",
+        "outcome": "skipped",
+        "timingClass": "single-target",
+        "durationFrames": null,
+        "timingDiagnostics": [],
+        "chainFromActionId": null,
+        "resourceAlerts": [],
+        "resourceDiagnostics": [],
+        "mpAccounting": null,
+        "accuracy": null,
+        "statusesBefore": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusesAfterRecovery": {
+          "poison": false,
+          "paralysis": false,
+          "confusion": false
+        },
+        "statusRecoveries": [],
+        "confusion": null,
+        "effectDiagnostics": [],
+        "reason": "battle-ended"
+      }
+    ],
+    "timingDiagnostics": [],
+    "resourceDiagnostics": [],
+    "runsWithResourceAlerts": 662
+  }
+}

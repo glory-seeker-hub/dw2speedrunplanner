@@ -145,6 +145,7 @@ export interface BattleRunResult {
 export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus | 'poison-body' | 'invincibility' | 'invisibility' | 'motivation-down', boolean>>; initialPowers?: Partial<Record<BattleStatus, boolean>>; initialElementalPower?: SkillElement; initialStages?: Partial<Record<'atk' | 'def' | 'spd', number>>; currentHp?: number; currentMp?: number };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }
 export interface BattleEngineOptions {
+  simulationRules?: import('./battleSimulationRules').BattleSimulationRules;
   rng?: BattleRng;
   /** Operational safety only, not a DW2 rule. Default 1000. */
   maxRounds?: number;

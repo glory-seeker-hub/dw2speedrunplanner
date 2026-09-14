@@ -1,4 +1,5 @@
 import type { PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
+import type { AccuracyMode } from '@/utils/battle/battleSimulationRules';
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
   const [simulationCount, setSimulationCount] = useState<number>(1000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
+  const [accuracyMode, setAccuracyMode] = useState<AccuracyMode>('strategy');
   const search = useBattleSimulationWorker(onSimulationComplete);
   const isSimulating = search.running;
   const validCount = Number.isSafeInteger(simulationCount) && simulationCount > 0;
@@ -52,7 +54,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy) return;
-    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount });
+    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode } });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -185,6 +187,14 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           </div>
 
           </>}
+          <div className="space-y-2" role="group" aria-label="Accuracy Mode">
+            <Label>Accuracy Mode</Label>
+            <div className="flex gap-2">
+              <Button variant={accuracyMode === 'strategy' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'strategy'} disabled={isSimulating} onClick={() => setAccuracyMode('strategy')}>Strategy</Button>
+              <Button variant={accuracyMode === 'game-accurate' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'game-accurate'} disabled={isSimulating} onClick={() => setAccuracyMode('game-accurate')}>Game-accurate</Button>
+            </div>
+            <p className="text-sm text-muted-foreground">{accuracyMode === 'strategy' ? 'Standard Hit Rate misses are disabled. Misses caused by Paralysis, Invisibility and other battle mechanics still occur.' : "Uses Digimon World 2's normal Hit Rate RNG."}</p>
+          </div>
           {/* Floor Specialty */}
           <div className="space-y-2">
             <Label htmlFor="floor-specialty">Floor Specialty</Label>
