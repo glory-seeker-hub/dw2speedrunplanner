@@ -12,7 +12,7 @@ export interface SearchProgress {
   bestOccurrenceCount: number; simulationsSinceLastImprovement: number | null;
   elapsedMs: number; simulationsPerSecond: number | null; etaMs: number | null;
 }
-export interface SimulationSearchMetadata extends SearchProgress { accuracyMode: AccuracyMode; status: 'completed' | 'cancelled' }
+export interface SimulationSearchMetadata extends SearchProgress { rngPolicy?: import('./battleRngPolicy').BattleRngPolicy; accuracyMode: AccuracyMode; status: 'completed' | 'cancelled' }
 /** One continuous RNG and one accumulator per search; stepping never reseeds. */
 export function createSimulationSearch(input: BattleInput, requested: number, options: BattleEngineOptions = {}) {
   if (!Number.isSafeInteger(requested) || requested < 1) throw new Error('Number of simulations must be a positive safe integer.');
@@ -38,7 +38,7 @@ export function createSimulationSearch(input: BattleInput, requested: number, op
         elapsedMs, simulationsPerSecond: speed, etaMs: speed ? (requested - completed) / speed * 1000 : null };
     },
     result(status: SimulationSearchMetadata['status'], elapsedMs: number): SimulationResult {
-      return { ...accumulator.snapshot(), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, status } };
+      return { ...accumulator.snapshot(), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, ...(simulationRules.rngPolicy === 'tas-favorable' ? { rngPolicy: simulationRules.rngPolicy } : {}), status } };
     },
   };
 }

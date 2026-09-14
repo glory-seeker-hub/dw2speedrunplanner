@@ -32,6 +32,7 @@ export interface OptimizedProgress {
   evaluations: number; rolloutBudget: number; bestStats: OptimizedCandidateStats | null;
 }
 export interface OptimizedSearchResult extends OptimizedProgress {
+  rngPolicy?: import('./battleRngPolicy').BattleRngPolicy;
   status: 'completed' | 'cancelled'; rootSeed: number; config: OptimizedSearchConfig;
   primaryRecommendation: 'fastest-route' | 'fair-prefix'; fastestRoute: FastestRoute | null;
   /** Fair-stage prefix; Fastest Potential primary is fastestRoute. */
@@ -206,14 +207,14 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
           if (coverage.status === 'deferred-unresolved') diagnostics.add(order.skillName + ': ' + coverage.boundary);
         }
       }
-      const optimized: OptimizedSearchResult = { ...details(), status, rootSeed, config,
+      const optimized: OptimizedSearchResult = { ...details(), status, rootSeed, config, ...(rules.rngPolicy === 'tas-favorable' ? { rngPolicy: rules.rngPolicy } : {}),
         primaryRecommendation: objective === 'fastest-potential' ? 'fastest-route' : 'fair-prefix', fastestRoute: fastest.best,
         recommendedPrefix: fair[0]?.plans ?? [], recommendedStats: fair[0]?.stats ?? null,
         topCandidates: fair.slice(0, 5).map(({ key, plans, stats }) => ({ key, plans, stats })),
         diagnostics: [...diagnostics], fairStageEvaluations };
       const observed = accumulator.snapshot();
       return { ...observed, timingDiagnostics: [...observed.timingDiagnostics].sort(), resourceDiagnostics: [...observed.resourceDiagnostics].sort(), fastestBattleByFrames: fastest.best?.actions ?? [], fastestBattleHistory: bestTurnsSample?.actions ?? [], accuracyMode: rules.accuracyMode,
-        search: { ...this.progress(elapsedMs), accuracyMode: rules.accuracyMode, status }, optimized };
+        search: { ...this.progress(elapsedMs), accuracyMode: rules.accuracyMode, ...(rules.rngPolicy === 'tas-favorable' ? { rngPolicy: rules.rngPolicy } : {}), status }, optimized };
     },
   };
 }

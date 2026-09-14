@@ -1,0 +1,103 @@
+{
+  "runtime": "v24.20.0",
+  "seed": 42,
+  "accuracyMode": "strategy",
+  "searchMethod": "optimized-action-search",
+  "objective": "fastest-potential",
+  "budget": 1000,
+  "beamWidth": 2,
+  "maxDepth": 3,
+  "method": "Single descriptive Worker-host measurements with real task yields and structured-cloned final results; not browser end-to-end or controlled speed claims.",
+  "results": [
+    {
+      "fixture": "simple",
+      "rngPolicy": "natural",
+      "rootPlans": 1,
+      "evaluations": 64,
+      "depth": 1,
+      "wallMs": 72.23250000000007,
+      "evaluationsPerSecond": 886.0277575883423,
+      "fastestRouteFrames": 685,
+      "fastestRouteOverrides": 0,
+      "aggregateOverrideCounts": null,
+      "resultBytes": 11363
+    },
+    {
+      "fixture": "simple",
+      "rngPolicy": "tas-favorable",
+      "rootPlans": 1,
+      "evaluations": 64,
+      "depth": 1,
+      "wallMs": 17.95119999999997,
+      "evaluationsPerSecond": 3565.2212665448606,
+      "fastestRouteFrames": 685,
+      "fastestRouteOverrides": 0,
+      "aggregateOverrideCounts": null,
+      "resultBytes": 11432
+    },
+    {
+      "fixture": "paralysis",
+      "rngPolicy": "natural",
+      "rootPlans": 1,
+      "evaluations": 192,
+      "depth": 3,
+      "wallMs": 344.6796999999999,
+      "evaluationsPerSecond": 557.0388972718731,
+      "fastestRouteFrames": 15058,
+      "fastestRouteOverrides": 0,
+      "aggregateOverrideCounts": null,
+      "resultBytes": 138794
+    },
+    {
+      "fixture": "paralysis",
+      "rngPolicy": "tas-favorable",
+      "rootPlans": 1,
+      "evaluations": 192,
+      "depth": 3,
+      "wallMs": 187.39609999999993,
+      "evaluationsPerSecond": 1024.5677471409495,
+      "fastestRouteFrames": 12112,
+      "fastestRouteOverrides": 40,
+      "aggregateOverrideCounts": {
+        "directStatus": 2688,
+        "enemyRecoveryPrevented": 2496,
+        "playerRecoveryForced": 0,
+        "enemyParalysisMiss": 2496,
+        "playerParalysisPass": 0
+      },
+      "resultBytes": 171148
+    },
+    {
+      "fixture": "double-e-stun",
+      "rngPolicy": "natural",
+      "rootPlans": 4,
+      "evaluations": 440,
+      "depth": 3,
+      "wallMs": 1166.8192,
+      "evaluationsPerSecond": 377.0935548540854,
+      "fastestRouteFrames": 66586,
+      "fastestRouteOverrides": 0,
+      "aggregateOverrideCounts": null,
+      "resultBytes": 559077
+    },
+    {
+      "fixture": "double-e-stun",
+      "rngPolicy": "tas-favorable",
+      "rootPlans": 4,
+      "evaluations": 440,
+      "depth": 3,
+      "wallMs": 1119.1345999999999,
+      "evaluationsPerSecond": 393.16092988278626,
+      "fastestRouteFrames": 56124,
+      "fastestRouteOverrides": 126,
+      "aggregateOverrideCounts": {
+        "directStatus": 19086,
+        "enemyRecoveryPrevented": 17861,
+        "playerRecoveryForced": 0,
+        "enemyParalysisMiss": 17861,
+        "playerParalysisPass": 0
+      },
+      "resultBytes": 660393
+    }
+  ]
+}

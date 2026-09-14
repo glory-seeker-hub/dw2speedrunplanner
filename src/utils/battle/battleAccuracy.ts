@@ -1,3 +1,4 @@
+import { resolveParalysisFailure, type BattleRngPolicy, type RngResolution } from './battleRngPolicy';
 import type { AccuracyMode } from './battleSimulationRules';
 import type { ActionKind } from '@/types/battleSkill';
 import type { BattleCombatantState } from './battleTypes';
@@ -6,6 +7,7 @@ import { effectiveParameter } from './battleState';
 import type { BattleRng } from './battleRng';
 
 export interface AccuracyResolution {
+  rngResolution?: RngResolution;
   outcome: 'hit' | 'miss' | 'unsupported';
   mode?: 'strategy'; standardRollSkipped?: true;
   cause: 'strategy-accuracy-bypass' | 'invisibility' | 'assist-target-lost' | 'normal-accuracy' | 'paralysis' | 'guaranteed' | 'no-effective-target' | 'tail-blade-evasion' | 'counter-not-activated' | 'interrupt-forced-miss';
@@ -45,12 +47,14 @@ function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[])
 }
 /** One resolution per action. User-confirmed Phase 2K-E clarification:
  * multi-target accuracy uses the average of valid targets' effective SPD. */
-export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false, accuracyMode: AccuracyMode = 'game-accurate'): AccuracyResolution {
+export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false, accuracyMode: AccuracyMode = 'game-accurate', policy: BattleRngPolicy = 'natural'): AccuracyResolution {
   if (kind === 'assist') return { outcome: 'hit', cause: 'guaranteed', referenceTargetId: null };
-  const audit: { paralysisRoll?: number; tailBladeRoll?: number } = {};
+  const audit: { paralysisRoll?: number; tailBladeRoll?: number; rngResolution?: RngResolution } = {};
   if (actor.statuses.paralysis) {
-    audit.paralysisRoll = rng.nextIntExclusive(2, 'paralysis-failure');
-    if (audit.paralysisRoll === 1) return { outcome: 'miss', cause: 'paralysis', referenceTargetId: null, ...audit };
+    const resolved = resolveParalysisFailure(policy, actor.side, rng);
+    if (resolved.rngResolution) audit.rngResolution = resolved.rngResolution;
+    else audit.paralysisRoll = resolved.roll!;
+    if (resolved.succeeds) return { outcome: 'miss', cause: 'paralysis', referenceTargetId: null, ...audit };
   }
   if (!targets.length) return { outcome: 'unsupported', cause: 'no-effective-target', referenceTargetId: null, ...audit };
   const livingTargets = targets.filter(t => t.currentHp > 0);

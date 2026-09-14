@@ -1,3 +1,4 @@
+import { collectRngRequirements, emptyRngOverrideCounts, addRngOverrideCounts } from './battleRngAudit';
 import type { SimulationResult } from '@/types/digimon';
 import type { Encounter } from '@/types/encounter';
 import type { BattleEngineOptions, BattleRunResult, BattleTeamMember } from './battleTypes';
@@ -16,6 +17,11 @@ export function createBattleAccumulator() {
   let turns = 0, frames = 0;
   let bestFoundAtSimulation: number | null = null, bestOccurrenceCount = 0;
   const add = (run: BattleRunResult) => {
+    const requirements = collectRngRequirements(run.actions);
+    if (requirements.length) {
+      result.rngOverrideCounts ??= emptyRngOverrideCounts();
+      addRngOverrideCounts(result.rngOverrideCounts, requirements);
+    }
     result.totalSimulations++; result.outcomeCounts[run.outcome]++;
     if (run.actions.some(a => a.resourceAlerts.length)) result.runsWithResourceAlerts++;
     // Deduplicate action-level messages rather than storing one ID per batch run.
@@ -43,7 +49,7 @@ export function createBattleAccumulator() {
   result.avgTurns = result.completedSuccesses ? turns / result.completedSuccesses : null;
   result.avgFrames = result.timedSuccesses ? frames / result.timedSuccesses : null;
   result.timingDiagnostics = [...timingDiagnostics]; result.resourceDiagnostics = [...resourceDiagnostics];
-  return { ...result, outcomeCounts: { ...result.outcomeCounts } };
+  return { ...result, ...(result.rngOverrideCounts ? { rngOverrideCounts: { ...result.rngOverrideCounts } } : {}), outcomeCounts: { ...result.outcomeCounts } };
   };
   return { add, snapshot, convergence: () => ({ bestFoundAtSimulation, bestOccurrenceCount, simulationsSinceLastImprovement: bestFoundAtSimulation === null ? null : result.totalSimulations - bestFoundAtSimulation }) };
 }
@@ -65,5 +71,5 @@ export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], e
     }
   }
   const result = aggregateBattleRuns(runs());
-  return options.simulationRules ? { ...result, accuracyMode: options.simulationRules.accuracyMode } : result;
+  return options.simulationRules ? { ...result, ...(options.simulationRules.rngPolicy === 'tas-favorable' ? { rngPolicy: options.simulationRules.rngPolicy } : {}), accuracyMode: options.simulationRules.accuracyMode } : result;
 }
