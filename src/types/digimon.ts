@@ -91,6 +91,7 @@ export interface BattleDigimon {
 }
 
 export interface SimulationResult {
+  optimized?: import('@/utils/battle/battleOptimizedSearch').OptimizedSearchResult;
   accuracyMode?: import('@/utils/battle/battleSimulationRules').AccuracyMode;
   search?: import('@/utils/battle/battleSimulationSearch').SimulationSearchMetadata;
   winRate: number;

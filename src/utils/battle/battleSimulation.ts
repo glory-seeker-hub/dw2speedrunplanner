@@ -82,10 +82,13 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
     for (let round = 1; round <= maxRounds; round++) {
       state.round = round;
       for (const actor of state.combatants) actor.parametersSuppressed = false;
+      options.playerDecisions?.beforeRound(state);
       const eligible = state.combatants.filter(a => a.isAlive);
       const actions = eligible.map(actor => {
         validateCombatant(actor);
-        return planAction(state, actor, policy.chooseAction(actor, { round, combatants: state.combatants }, rng));
+        const action = planAction(state, actor, (actor.side === 'player' ? options.playerDecisions?.chooseAction(actor, state) : undefined) ?? policy.chooseAction(actor, { round, combatants: state.combatants }, rng));
+        if (actor.side === 'player') options.playerDecisionObserver?.planned(state, action);
+        return action;
       });
       for (const action of actions) {
         const actor = actorById(state, action.actorId);
@@ -101,6 +104,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
       if (visibilitySensitive) for (const action of actions) {
         if (action.kind === 'attack' && action.skill.legacyTech.target === 'Single' && action.targetIntent.kind === 'opponents' && !actorById(state, action.actorId).statuses.confusion) {
           action.targetIntent = { kind: 'combatants', targetIds: resolveEffectiveTargets(state, action, rng) };
+          if (actorById(state, action.actorId).side === 'player') options.playerDecisionObserver?.selectedTargets(state, action, action.targetIntent.targetIds);
         }
       }
       // beforeActionOrder: future priority/status flags attach here.
@@ -137,6 +141,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           }
           const targetIds = action.kind === 'assist' ? assistTargetsAtExecution(state, action, rng)
             : action.interrupt ? [action.interrupt.interruptedActorId!] : resolveEffectiveTargets(state, action, rng, confusion.redirected);
+          if (actor.side === 'player' && action.kind === 'attack' && !confusion.redirected) options.playerDecisionObserver?.selectedTargets(state, action, targetIds);
           if (!targetIds.length) { action.state = 'skipped'; recordSkipped('no-living-targets'); completeCounter(action); continue; }
           const assistLost = action.kind === 'assist' && !isRevive(action.skill) && targetIds.length === 1 && actorById(state, targetIds[0]).currentHp === 0;
           const initialAccuracy = assistLost ? { outcome: 'miss' as const, cause: 'assist-target-lost' as const, referenceTargetId: targetIds[0] } : counterForcesMiss(action)

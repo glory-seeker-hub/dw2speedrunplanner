@@ -1,3 +1,4 @@
+import { createOptimizedSearch } from '@/utils/battle/battleOptimizedSearch';
 import type { SearchRequest, SearchResponse } from './battleSimulationProtocol';
 import { createSimulationSearch } from '@/utils/battle/battleSimulationSearch';
 import { createSeededBattleRng } from '@/utils/battle/battleRng';
@@ -12,7 +13,10 @@ export function createSimulationWorkerHost(post: (message: SearchResponse) => vo
     const job = active = { jobId: message.jobId, cancelled: false };
     const started = scheduling.now(); let lastProgress = started, emitted = false;
     try {
-      const search = createSimulationSearch(message.input, message.requestedSimulations, {
+      if (message.searchMethod && !['random-monte-carlo', 'optimized-action-search'].includes(message.searchMethod)) throw new Error('Unknown search method.');
+      const search = message.searchMethod === 'optimized-action-search' ? createOptimizedSearch(message.input, message.requestedSimulations, {
+        seed: message.seed, objective: message.optimizationObjective, config: message.optimizedConfig, simulationRules: message.simulationRules, maxRounds: message.maxRounds,
+      }) : createSimulationSearch(message.input, message.requestedSimulations, {
         simulationRules: message.simulationRules,
         ...(message.seed === undefined ? {} : { rng: createSeededBattleRng(message.seed) }),
         ...(message.maxRounds === undefined ? {} : { maxRounds: message.maxRounds }),
