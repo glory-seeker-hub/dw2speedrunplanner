@@ -92,6 +92,7 @@ export interface BattleDigimon {
 
 export interface SimulationResult {
   optimized?: import('@/utils/battle/battleOptimizedSearch').OptimizedSearchResult;
+  playerStatProvenance?: import('@/utils/battle/battleStatOverrides').PlayerStatProvenance;
   rngPolicy?: import('@/utils/battle/battleRngPolicy').BattleRngPolicy;
   rngOverrideCounts?: import('@/utils/battle/battleRngAudit').RngOverrideCounts;
   accuracyMode?: import('@/utils/battle/battleSimulationRules').AccuracyMode;

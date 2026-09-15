@@ -1,3 +1,4 @@
+import { STAT_LABELS } from '@/utils/battle/battleStatOverrides';
 import { RNG_POLICY_LABELS } from '@/utils/battle/battleRngPolicy';
 import { OptimizedSearchResults } from './OptimizedSearchResults';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,6 +85,14 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
     ['Completed Successes', `${results.completedSuccesses.toLocaleString()} / ${results.totalSimulations.toLocaleString()}`],
   ];
   return <div className="space-y-6">
+    {results.playerStatProvenance && <section aria-label="Player stat provenance" className="rounded border p-3 space-y-1">
+      <p className="font-semibold">Player stat source: {results.playerStatProvenance.source === 'custom-simulation-stats' ? 'Custom simulation stats' : 'Planner baseline'}</p>
+      {results.playerStatProvenance.players.map(p => <div key={p.instanceId}>
+        <p>Slot {p.slot} {p.name} <span className="text-xs">({p.instanceId})</span></p>
+        {p.changes.map(c => <p key={c.stat}>{STAT_LABELS[c.stat]}: Planner baseline {c.planner} → Simulation {c.simulation}</p>)}
+        <p className="text-sm">Simulation-start resources: HP {p.currentHp} / {p.maxHp} · MP {p.currentMp} / {p.maxMp}</p>
+      </div>)}
+    </section>}
     {results.optimized ? <OptimizedSearchResults result={results.optimized} /> : <p>Search method: Random Monte Carlo</p>}
     <p className="font-semibold">Accuracy mode: {(results.search?.accuracyMode ?? results.accuracyMode) === 'strategy' ? 'Strategy' : 'Game-accurate'}</p>
     <p className="font-semibold">RNG Policy: {RNG_POLICY_LABELS[rngPolicy]}</p>

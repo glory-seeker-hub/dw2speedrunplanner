@@ -1,0 +1,49 @@
+{
+  "runtime": "v24.20.0",
+  "searchMethod": "optimized-action-search",
+  "accuracyMode": "strategy",
+  "rngPolicy": "natural",
+  "objective": "fastest-potential",
+  "seed": 42,
+  "budget": 1000,
+  "beamWidth": 2,
+  "maxDepth": 3,
+  "method": "Single descriptive measurements through the real controller and Worker host with task yields and cloned responses; includes draft/provenance construction. Not browser end-to-end or statistically controlled overhead measurement.",
+  "results": [
+    {
+      "mode": "planner-baseline",
+      "changes": [],
+      "rootPlans": 2,
+      "evaluations": 400,
+      "depth": 3,
+      "wallMs": 599.8611999999998,
+      "evaluationsPerSecond": 666.820924573885,
+      "fastestFrames": 21920,
+      "resultBytes": 174188,
+      "provenanceBytes": 165
+    },
+    {
+      "mode": "custom-simulation-stats",
+      "changes": [
+        {
+          "stat": "atk",
+          "planner": 28,
+          "simulation": 30
+        },
+        {
+          "stat": "spd",
+          "planner": 9,
+          "simulation": 10
+        }
+      ],
+      "rootPlans": 2,
+      "evaluations": 400,
+      "depth": 3,
+      "wallMs": 455.99940000000015,
+      "evaluationsPerSecond": 877.1941366589514,
+      "fastestFrames": 19865,
+      "resultBytes": 158769,
+      "provenanceBytes": 258
+    }
+  ]
+}
