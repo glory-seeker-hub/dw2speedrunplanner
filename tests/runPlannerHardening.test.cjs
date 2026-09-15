@@ -244,8 +244,8 @@ for(const action of ['battle','dna','trade'])test('2H stale load callback retain
 test('2H old Battle and reset callbacks cannot act on another active run',()=>{
   const a=createRunPlan('gold-hawk','A'),b=createRunPlan('blue-falcon','B');storage.saveRunPlannerData({schemaVersion:7,runs:[a,b],activeRunId:a.id});
   const render=plannerHost(),old=render();old.loadRun(b.id);const committed=render().data;
-  assert.equal(old.recordBattle(battle),null);assert.equal(old.resetRun(a.id),false);assert.deepEqual(render().data,committed);
-  assert.equal(render().resetRun(a.id),false);assert.deepEqual(storage.loadRunPlannerData(),committed);
+  assert.equal(old.recordBattle(battle),null);assert.equal(old.deleteRun(a.id),false);assert.deepEqual(render().data,committed);
+  assert.equal(render().deleteRun(a.id),false);assert.deepEqual(storage.loadRunPlannerData(),committed);
 });
 
 test('2H old ordinary Battle requires review after same-run progression or Digiline changes',()=>{
@@ -257,7 +257,7 @@ test('2H old ordinary Battle requires review after same-run progression or Digil
 
 test('2H old create/select/reset callbacks always derive writes from latest envelope',()=>{
   const render=plannerHost();render().setStarterId('gold-hawk');const creator=render();assert.equal(creator.startRun(),true);
-  const first=render().activeRun;assert.equal(creator.startRun(),false);assert.equal(render().resetRun(first.id),true);
+  const first=render().activeRun;assert.equal(creator.startRun(),false);assert.equal(render().deleteRun(first.id),true);
   render().setStarterId('blue-falcon');assert.equal(render().startRun(),true);const second=render().activeRun;
   creator.loadRun(first.id);assert.equal(render().activeRun.id,second.id);assert.equal(creator.startRun(),false);
 });
@@ -265,7 +265,7 @@ test('2H old create/select/reset callbacks always derive writes from latest enve
 test('2H reset and selection preserve newer changes to other saved runs',()=>{
   const a=createRunPlan('gold-hawk','A'),b=createRunPlan('blue-falcon','B');storage.saveRunPlannerData({schemaVersion:7,runs:[a,b],activeRunId:a.id});
   const render=plannerHost(),old=render();old.loadRun(b.id);assert.ok(render().recordBattle(battle));const latestB=render().activeRun;
-  old.loadRun(a.id);assert.equal(old.resetRun(a.id),true);assert.deepEqual(render().data.runs,[latestB]);
+  old.loadRun(a.id);assert.equal(old.deleteRun(a.id),true);assert.deepEqual(render().data.runs,[latestB]);
 });
 
 test('2H strict graph retains evolution/DNA/Trade stale member guards and learning snapshot protection',()=>{

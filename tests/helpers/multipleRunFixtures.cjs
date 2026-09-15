@@ -1,0 +1,6 @@
+const {load}=require('./loadTs.cjs'),{host,find,button,nodes}=require('./componentHost.cjs');
+const storage=load('src/utils/runPlannerStorage.ts');
+const {route,record,safe}=require('./plannerAnalysisFixtures.cjs');
+function fixture(runs=[],active=runs[0]?.id??null){let raw=JSON.stringify({schemaVersion:7,runs,activeRunId:active}),writes=0,failure=null;const memory={getItem:()=>raw,setItem:(key,value)=>{if(failure)throw Object.assign(new Error('storage failure'),{name:failure});raw=value;writes++;},removeItem:()=>{throw Error('delete must use validated envelope transaction');}};global.localStorage=memory;const hook=host('src/hooks/useRunPlanner.ts','useRunPlanner'),component=host('src/components/run-planner/RunPlanner.tsx','RunPlanner');const h={render:()=>hook({}),ui:()=>component({planner:hook({})}),raw:()=>raw,writes:()=>writes,fail:v=>{failure=v},reload:()=>storage.loadRunPlannerDataResult()};h.create=(starter='gold-hawk',name='Route')=>{h.render().setStarterId(starter);h.render().setName(name);return h.render().startRun();};return h;}
+function triple(){return ['gold-hawk','blue-falcon','black-sword'].map((starter,i)=>({...route(i*2+1,starter),name:['A','B','C'][i]}));}
+module.exports={load,host,find,button,nodes,storage,fixture,triple,record,safe};

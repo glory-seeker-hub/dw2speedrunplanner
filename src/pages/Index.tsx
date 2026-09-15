@@ -13,12 +13,12 @@ import { useRunPlanner } from '@/hooks/useRunPlanner';
 const Index = () => {
   const planner = useRunPlanner();
   const [analysis, setAnalysis] = useState<{ preset: PlannerBattleAnalysisPreset; revision: number } | null>(null);
-  const validAnalysis = analysis && planner.data.runs.some(run => run.id === analysis.preset.source.runId && run.history.some(event => event.id === analysis.preset.source.battleEventId)) ? analysis : null;
+  const validAnalysis = analysis && analysis.preset.source.runId === planner.data.activeRunId && planner.data.runs.some(run => run.id === analysis.preset.source.runId && run.history.some(event => event.id === analysis.preset.source.battleEventId)) ? analysis : null;
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const handleAnalyze = (runId: string, eventId: string) => {
     try {
       const run = planner.data.runs.find(r => r.id === runId);
-      if (!run) throw new Error('The source run no longer exists.');
+      if (!run || run.id !== planner.data.activeRunId) throw new Error('The selected run has changed. Review Analyze Battle again.');
       const preset = buildPlannerBattleAnalysisPreset(run, eventId);
       setAnalysis(old => ({ preset, revision: (old?.revision ?? 0) + 1 }));
       setSimulationResults(null); setAnalysisError(null); setActiveTab('battle-simulation');
@@ -27,6 +27,15 @@ const Index = () => {
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
   const [activeTab, setActiveTab] = useState<string>('team-builder');
+  const [resultSource, setResultSource] = useState<PlannerBattleAnalysisPreset['source'] | null>(null);
+  const staleResult = resultSource && (resultSource.runId !== planner.data.activeRunId || !planner.data.runs.some(run => run.id === resultSource.runId && run.history.some(event => event.id === resultSource.battleEventId)));
+  // Clear stale local analysis during the state transition, before it can be shown for another route.
+  if ((analysis && !validAnalysis) || staleResult) {
+    if (analysis && !validAnalysis) setAnalysis(null);
+    setSimulationResults(null); setResultSource(null); setAnalysisError(null);
+    if (activeTab === 'results') setActiveTab('run-planner');
+  }
+  const visibleResults = staleResult || (analysis && !validAnalysis) ? null : simulationResults;
   const handleSaveTeam = (team: TeamDigimon[]) => {
     if (team.length > 0) {
       setSavedTeams([...savedTeams, team]);
@@ -36,6 +45,7 @@ const Index = () => {
   };
   const handleSimulationComplete = (results: SimulationResult) => {
     setSimulationResults(results);
+    setResultSource(validAnalysis?.preset.source ?? null);
     setActiveTab('results');
   };
   return <div className="min-h-screen bg-background">
@@ -80,7 +90,7 @@ const Index = () => {
                 <Zap className="h-4 w-4 mr-2" />
                 Battle Simulation
               </TabsTrigger>
-              <TabsTrigger value="results" disabled={!simulationResults}>
+              <TabsTrigger value="results" disabled={!visibleResults}>
                 <Trophy className="h-4 w-4 mr-2" />
                 Results
               </TabsTrigger>
@@ -100,7 +110,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
-              {simulationResults ? <BattleResults results={simulationResults} /> : <Card className="bg-gradient-card border-border">
+              {visibleResults ? <BattleResults results={visibleResults} /> : <Card className="bg-gradient-card border-border">
                   <CardHeader>
                     <CardTitle>Battle Results</CardTitle>
                   </CardHeader>
