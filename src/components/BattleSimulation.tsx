@@ -1,3 +1,4 @@
+import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
 import { type BattleRngPolicy } from '@/utils/battle/battleRngPolicy';
 import { rootPlanInfo } from '@/utils/battle/battleActionPlans';
 import { OBJECTIVE_LABELS, type BattleSearchMethod, type OptimizationObjective } from '@/utils/battle/battleSearchObjectives';
@@ -41,7 +42,10 @@ const floorSpecialties: FloorSpecialty[] = [
 
 export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete, preset, onClearPreset }: BattleSimulationProps) => {
   const [imported, setImported] = useState(() => preset ? structuredClone(preset) : null);
-  const savedTeams = useMemo(() => imported ? [...manualTeams, imported.playerTeam, imported.enemyTeam] : manualTeams, [imported, manualTeams]);
+  const [statDrafts, setStatDrafts] = useState(() => createPlayerStatDrafts(preset?.playerTeam ?? []));
+  const localStats = useMemo(() => imported ? resolvePlayerStatDrafts(imported.playerTeam, statDrafts) : null, [imported, statDrafts]);
+  const provenance = imported && localStats ? playerStatProvenance(imported.playerTeam, localStats.team) : undefined;
+  const savedTeams = useMemo(() => imported ? [...manualTeams, localStats!.team, imported.enemyTeam] : manualTeams, [imported, localStats, manualTeams]);
   const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<number | null>(preset ? manualTeams.length : null);
   const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>(preset ? 'saved' : 'encounter');
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
@@ -57,11 +61,11 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const isSimulating = search.running;
   const validCount = Number.isSafeInteger(simulationCount) && simulationCount > 0;
   const handleSimulate = () => {
-    if (selectedPlayerTeam === null || !validCount || isSimulating) return;
+    if (selectedPlayerTeam === null || !validCount || isSimulating || localStats?.valid === false) return;
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
-    search.start({ input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
+    search.start({ ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -106,14 +110,30 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             <p className="text-sm">{imported.selectedBattle.domainId} · {imported.selectedBattle.phase} · Floor {imported.selectedBattle.floor} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
             <p className="text-sm text-muted-foreground">Run Planner does not track historical current HP/MP. This copy starts at full resources. Adjust below if needed; changes affect only this simulation.</p>
             <p className="text-xs text-muted-foreground">Stats follow Planner expected growth, rounded down for simulation. Floor specialty is a local setting.</p>
-            {imported.playerTeam.map((member, index) => <div key={member.instanceId} className="flex flex-wrap items-center gap-3">
-              <span className="text-sm">Slot {index + 1}: {member.digimon.name} · Lv{member.level} · DP{member.dp}</span>
-              {(['hp', 'mp'] as const).map(resource => <Label key={resource} className="text-xs">Current {resource.toUpperCase()}
-                <Input className="w-24" type="number" min={0} max={member.customStats[resource]} value={resource === 'hp' ? member.currentHp ?? member.customStats.hp : member.currentMp ?? member.customStats.mp}
-                  onChange={e => { const value = Number(e.target.value); if (!Number.isFinite(value)) return; setImported(previous => previous ? { ...previous, playerTeam: previous.playerTeam.map((m, i) => i === index ? { ...m, [resource === 'hp' ? 'currentHp' : 'currentMp']: Math.max(0, Math.min(m.customStats[resource], value)) } : m) } : null); }} />
-              </Label>)}
+            <p className="text-sm">Planner stats use expected growth. If you know the Digimon's actual in-game stats, you can override them for this simulation.</p>
+            <p className="font-semibold">{provenance?.source === 'custom-simulation-stats' ? 'Custom simulation stats' : 'Using Planner stats'}</p>
+            {imported.playerTeam.map((member, index) => <div key={member.plannerDigimonInstanceId} className="space-y-1">
+              <p className="text-sm">Slot {index + 1}: {member.digimon.name} · Lv{member.level} · DP{member.dp}</p>
+              <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr><th className="text-left">Stat</th><th className="text-left">Planner baseline</th><th className="text-left">Simulation value</th></tr></thead><tbody>
+              {SIMULATION_FIELDS.map(field => {
+                const id = member.plannerDigimonInstanceId, inputId = `stat-${index}-${field}`, error = localStats?.errors[id]?.[field];
+                const baseline = field === 'currentHp' || field === 'currentMp' ? null : member.customStats[field];
+                const draft = statDrafts[id][field];
+                return <tr key={field}><td><Label htmlFor={inputId}>{STAT_LABELS[field]}</Label></td><td>{baseline ?? 'Not tracked'}</td><td className="py-1">
+                  <Input id={inputId} className="w-28" type="text" inputMode="numeric" value={draft} disabled={isSimulating}
+                    aria-label={`Slot ${index + 1} ${member.digimon.name} Simulation ${STAT_LABELS[field]}`} aria-invalid={!!error} aria-describedby={error ? `${inputId}-error` : undefined}
+                    onChange={e => { const value = e.target.value; if (!isSimulating) setStatDrafts(previous => ({ ...previous, [id]: { ...previous[id], [field]: value } })); }} />
+                  {baseline !== null && draft !== String(baseline) && <span className="text-xs">Planner {baseline} → Simulation {draft || '(empty)'}</span>}
+                  {error && <p id={`${inputId}-error`} role="alert" className="text-xs text-destructive">{error}</p>}
+                </td></tr>;
+              })}
+              </tbody></table></div>
             </div>)}
-            <div className="flex gap-2"><Button variant="outline" size="sm" onClick={() => setImported(structuredClone(preset!))}>Reset imported team</Button><Button variant="outline" size="sm" onClick={onClearPreset}>Use manual setup</Button></div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) setStatDrafts(resetPlayerStatDrafts(imported.playerTeam, statDrafts)); }}>Reset stats to Planner values</Button>
+              <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) { setImported(structuredClone(preset!)); setStatDrafts(createPlayerStatDrafts(preset!.playerTeam)); } }}>Reset imported team</Button>
+              <Button variant="outline" size="sm" disabled={isSimulating} onClick={onClearPreset}>Use manual setup</Button>
+            </div>
             {imported.diagnostics.filter(d => d.code !== 'planner-resource-history-unavailable').map((d, i) => <p key={i} className="text-xs text-muted-foreground">{d.message}</p>)}
           </section>}
           {!imported && <>
@@ -273,7 +293,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Simulate Button */}
           <Button 
             onClick={handleSimulate} 
-            disabled={!canSimulate || !validCount || isSimulating || (searchMethod === 'optimized-action-search' && !!rootDiagnostic)}
+            disabled={!canSimulate || !validCount || isSimulating || localStats?.valid === false || (searchMethod === 'optimized-action-search' && !!rootDiagnostic)}
             className="w-full"
             size="lg"
           >
