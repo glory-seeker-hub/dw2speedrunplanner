@@ -107,6 +107,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           <fieldset disabled={isSimulating} className="space-y-6 min-w-0">
           {imported && <section className="rounded border p-3 space-y-2" aria-label="Pre-battle Planner state">
             <p className="font-semibold">Analyzing pre-battle state</p>
+            <p className="text-sm">Run: {imported.source.runName ?? imported.source.runId}</p>
             <p className="text-sm">{imported.selectedBattle.domainId} · {imported.selectedBattle.phase} · Floor {imported.selectedBattle.floor} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
             <p className="text-sm text-muted-foreground">Run Planner does not track historical current HP/MP. This copy starts at full resources. Adjust below if needed; changes affect only this simulation.</p>
             <p className="text-xs text-muted-foreground">Stats follow Planner expected growth, rounded down for simulation. Floor specialty is a local setting.</p>

@@ -71,9 +71,9 @@ test('theme selected techniques retain native checked/new/required states and or
 });
 test('theme reset is destructive while regular confirmation remains primary',()=>{
  const {AlertDialog,AlertDialogAction}=load('src/components/ui/alert-dialog.tsx');
- const html=renderToStaticMarkup(React.createElement(AlertDialog,null,React.createElement(AlertDialogAction,{variant:'destructive'},'Discard Run'),React.createElement(AlertDialogAction,null,'Confirm DNA')));
- assert.match(html,/<button[^>]*bg-destructive[^>]*>Discard Run/);assert.match(html,/<button[^>]*bg-primary[^>]*>Confirm DNA/);
- const source=fs.readFileSync(path.join(root,'src/components/run-planner/RunPlanner.tsx'),'utf8');assert.match(source,/<AlertDialogAction variant="destructive"[^>]*[\s\S]*?Discard Run/);
+ const html=renderToStaticMarkup(React.createElement(AlertDialog,null,React.createElement(AlertDialogAction,{variant:'destructive'},'Delete Run'),React.createElement(AlertDialogAction,null,'Confirm DNA')));
+ assert.match(html,/<button[^>]*bg-destructive[^>]*>Delete Run/);assert.match(html,/<button[^>]*bg-primary[^>]*>Confirm DNA/);
+ const source=fs.readFileSync(path.join(root,'src/components/run-planner/RunPlanner.tsx'),'utf8');assert.match(source,/<AlertDialogAction variant="destructive"[^>]*[\s\S]*?Delete Run/);
 });
 test('theme collapsed management panels keep accessible disclosure buttons and labelled hidden content',()=>{
  const html=render(load('src/components/run-planner/ActionDisclosure.tsx').ActionDisclosure,{title:'Trading Center',id:'test-trade',active:false,compact:true,onCancel:()=>{},children:React.createElement('input',{'aria-label':'Trade fixture'})});

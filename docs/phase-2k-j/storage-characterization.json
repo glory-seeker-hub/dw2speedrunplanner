@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 7,
+  "methodology": "Twenty synthetic recorded battles per route, with production rewards, progression and undo checkpoints; starters cycle Gold Hawk, Blue Falcon, Black Sword. Insertion-order envelopes activate their last run.",
+  "limitation": "UTF-8 JSON serialization only. This does not measure browser localStorage quota, encoding overhead, capacity or write latency. No compression or event payload changes.",
+  "samples": [
+    {
+      "runs": 1,
+      "eventsPerRun": [
+        20
+      ],
+      "totalEvents": 20,
+      "serializedUtf8Bytes": 18767,
+      "valid": true
+    },
+    {
+      "runs": 3,
+      "eventsPerRun": [
+        20,
+        20,
+        20
+      ],
+      "totalEvents": 60,
+      "serializedUtf8Bytes": 56145,
+      "valid": true
+    },
+    {
+      "runs": 5,
+      "eventsPerRun": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "totalEvents": 100,
+      "serializedUtf8Bytes": 93457,
+      "valid": true
+    }
+  ]
+}

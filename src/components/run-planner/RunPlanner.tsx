@@ -40,7 +40,8 @@ const Stats = ({ stats }: { stats: DigimonStats }) => (
 type Props = { planner: ReturnType<typeof useRunPlanner> };
 
 export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAnalyze?: (runId: string, eventId: string) => void; analysisError?: string | null }) => {
-  const [confirmReset, setConfirmReset] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
   const [routeDocument, setRouteDocument] = useState<RouteDocumentModel | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const { data, activeRun: run, error, starterId, setStarterId, name, setName } = planner;
@@ -53,27 +54,28 @@ export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAn
           <h2 className="text-2xl font-bold">Run Planner</h2>
           <p className="text-sm text-muted-foreground">Choose your starter and keep your run saved in this browser.</p>
         </div>
-        {run && <Button variant="outline" onClick={() => setConfirmReset(run.id)}>New Run</Button>}
+        {run && <div className="flex gap-2"><Button variant="outline" onClick={() => { setCreating(true); setStarterId(''); setName(''); }}>New Run</Button>
+          <Button variant="destructive" onClick={() => setConfirmDelete({ id: run.id, name: run.name })}>Delete Run</Button></div>}
       </div>
       {planner.storageWarning && <Alert><AlertDescription>{planner.storageWarning}</AlertDescription></Alert>}
       {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
       {data.runs.length > 0 && (
         <div className="max-w-sm space-y-2">
           <Label htmlFor="saved-run">Saved runs</Label>
-          <Select value={run?.id ?? ''} onValueChange={planner.loadRun}>
+          <Select value={run?.id ?? ''} onValueChange={id => { if (planner.loadRun(id)) { setCreating(false); setRouteDocument(null); setExportError(null); } }}>
             <SelectTrigger id="saved-run"><SelectValue placeholder="Load a saved run" /></SelectTrigger>
-            <SelectContent>{data.runs.map((saved) => <SelectItem key={saved.id} value={saved.id}>{saved.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{data.runs.map((saved, index) => <SelectItem key={saved.id} value={saved.id}>{saved.name} · {STARTERS.find(s => s.id === saved.starterDefinitionId)?.name ?? 'Starter'} · Route {index + 1}</SelectItem>)}</SelectContent>
           </Select>
         </div>
       )}
-      {!run ? (
+      {(!run || creating) && (
         <Card className="bg-gradient-card border-border shadow-card">
           <CardHeader>
-            <CardTitle>No active run</CardTitle>
+            <CardTitle>{run ? 'Create another saved route' : 'No active run'}</CardTitle>
             <CardDescription>Choose one starter to begin. Your starter will join both your roster and your active Digiline.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6" onSubmit={(event) => { event.preventDefault(); planner.startRun(); }}>
+            <form className="space-y-6" onSubmit={(event) => { event.preventDefault(); if (planner.startRun()) { setCreating(false); setRouteDocument(null); setExportError(null); } }}>
               <div className="max-w-md space-y-2">
                 <Label htmlFor="run-name">Run name (optional)</Label>
                 <Input id="run-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={100} placeholder="My speedrun" />
@@ -94,12 +96,13 @@ export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAn
                   ))}
                 </RadioGroup>
               </fieldset>
-              <Button type="submit" disabled={!starterId}>Start Run</Button>
+              <div className="flex gap-2"><Button type="submit" disabled={!starterId}>Start Run</Button>{run && <Button type="button" variant="outline" onClick={() => setCreating(false)}>Cancel new run</Button>}</div>
             </form>
           </CardContent>
         </Card>
-      ) : (
-        <>
+      )}
+      {run && (
+        <div hidden={creating}>
           <section aria-label="Run summary" className="run-status status-panel flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
             <div><h3 className="font-semibold">{run.name}</h3><p className="text-xs text-muted-foreground">{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</p></div>
             <dl className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
@@ -195,14 +198,14 @@ export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAn
           </section>
           {analysisError && <p role="alert" className="text-sm text-destructive">{analysisError}</p>}
           <RunHistory onAnalyze={onAnalyze} key={run.id} run={run} onUndo={planner.undoAction} error={error} />
-        </>
+        </div>
       )}
-      <AlertDialog open={confirmReset !== null} onOpenChange={(open) => { if (!open) setConfirmReset(null); }}>
+      <AlertDialog open={confirmDelete !== null} onOpenChange={(open) => { if (!open) setConfirmDelete(null); }}>
         <AlertDialogContent>
-          <AlertDialogHeader><AlertDialogTitle>Discard this run and start again?</AlertDialogTitle>
-            <AlertDialogDescription>This permanently removes {run?.name ?? 'the current run'}, including its roster and progress, from this browser. Other saved runs are kept. You will return to starter selection.</AlertDialogDescription>
+          <AlertDialogHeader><AlertDialogTitle>Delete “{confirmDelete?.name}”?</AlertDialogTitle>
+            <AlertDialogDescription>This permanently removes only this saved route, including its roster and progress. Other saved runs will not be affected.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={(event) => { if (!planner.resetRun(confirmReset ?? '')) event.preventDefault(); }}>Discard Run</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={(event) => { if (!planner.deleteRun(confirmDelete?.id ?? '')) event.preventDefault(); else { setConfirmDelete(null); setCreating(false); setRouteDocument(null); setExportError(null); } }}>Delete Run</AlertDialogAction></AlertDialogFooter>
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         </AlertDialogContent>
       </AlertDialog>

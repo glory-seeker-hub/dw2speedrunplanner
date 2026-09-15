@@ -9,7 +9,7 @@ import { undoLastAction } from '@/utils/runActionUndo';
 import { addToDigiline, removeFromDigiline, moveDigilineMember, DigilineDirection } from '@/utils/runDigiline';
 import { PersistedRunPlannerData, RosterDigimon, RunPlan } from '@/types/runPlanner';
 import { createRunPlan } from '@/utils/runPlanCreation';
-import { loadRunPlannerDataResult, saveRunPlannerDataResult, resetRunPlannerData } from '@/utils/runPlannerStorage';
+import { loadRunPlannerDataResult, saveRunPlannerDataResult } from '@/utils/runPlannerStorage';
 
 /** Own the persisted envelope above tab content. Save only explicit user changes. */
 export const useRunPlanner = () => {
@@ -154,44 +154,36 @@ export const useRunPlanner = () => {
 
   const startRun = (): boolean => {
     const current = currentData.current;
-    if (current.activeRunId !== null) return false; // Replacement requires the confirmed reset flow.
+    if (current !== data) { setError('Saved routes changed. Review the new route and try again.'); return false; }
     try {
       const run = createRunPlan(starterId, name);
-      return persist({ ...current, runs: [...current.runs, run], activeRunId: run.id });
+      if (!persist({ ...current, runs: [...current.runs, run], activeRunId: run.id })) return false;
+      setStarterId(''); setName('');
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not create the run.');
       return false;
     }
   };
 
-  const loadRun = (id: string) => {
+  const loadRun = (id: string): boolean => {
     const current = currentData.current;
-    if (current.runs.some((run) => run.id === id)) persist({ ...current, activeRunId: id });
+    if (!current.runs.some(run => run.id === id)) return false;
+    return current.activeRunId === id || persist({ ...current, activeRunId: id });
   };
 
-  // Discard only the active run; other saved runs belong to the user too.
-  const resetRun = (expectedRunId: string = activeRun?.id ?? ''): boolean => {
+  /** Delete only the reviewed active route; next insertion-order survivor, otherwise previous. */
+  const deleteRun = (expectedRunId: string): boolean => {
     const current = currentData.current;
-    if (!expectedRunId || current.activeRunId !== expectedRunId) {
-      setError('The active run has changed. Cancel and review the reset again.');
+    const index = current.runs.findIndex(run => run.id === expectedRunId);
+    if (index < 0 || current.activeRunId !== expectedRunId) {
+      setError('The active run has changed. Cancel and review the deletion again.');
       return false;
     }
-    const next = { ...current, runs: current.runs.filter((run) => run.id !== expectedRunId), activeRunId: null };
-    if (next.runs.length > 0) {
-      if (!persist(next)) return false;
-    } else {
-      if (!resetRunPlannerData()) {
-        setError('Could not reset the saved run. Your current run has been kept. Try again.');
-        return false;
-      }
-      setStored({ data: next, warning: null });
-      currentData.current = next;
-      setError(null);
-    }
-    setStarterId('');
-    setName('');
-    return true;
+    const runs = current.runs.filter(run => run.id !== expectedRunId);
+    const activeRunId = runs[index]?.id ?? runs[index - 1]?.id ?? null;
+    return persist({ ...current, runs, activeRunId });
   };
 
-  return { data, activeRun, error, storageWarning, starterId, setStarterId, name, setName, startRun, loadRun, resetRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
+  return { data, activeRun, error, storageWarning, starterId, setStarterId, name, setName, startRun, loadRun, deleteRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
 };
