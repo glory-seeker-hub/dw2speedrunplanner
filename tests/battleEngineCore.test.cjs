@@ -94,9 +94,9 @@ test('existing SPD debuff affects the next round in actual core resolution', () 
   const r = run([member('P', [tech('Coral Crusher')], { hp: 200, spd: 25 })], [member('E', [tech('Rock Fist')], { hp: 200, spd: 30 })], { maxRounds: 2 });
   assert.deepEqual(executed(r).map(a => a.actorId), ['enemy-0', 'player-0', 'player-0', 'enemy-0']);
 });
-test('advanced WAZADATA priority flags remain deferred', () => {
+test('Act Last queues Rail Cannon after ordinary attacks', () => {
   const r = run([member('P', [{ ...tech('Rock Fist'), id: 'rail-cannon', name: 'Rail Cannon' }], { spd: 100 })], [member('E', [tech('Rock Fist')])]);
-  assert.equal(executed(r)[0].actorId, 'player-0');
+  assert.equal(executed(r)[0].actorId, 'enemy-0');
 });
 for (const count of [1, 2, 3]) test(`one AOE execution produces ${count} independent impacts`, () => {
   const enemies = Array.from({ length: count }, (_, i) => member('Duplicate', [tech('Rock Fist')], { hp: i === 0 ? 5 : 80, def: 20 + i * 10 }));
@@ -197,11 +197,11 @@ test('unknown identities or unusable unknown skills never create synthetic attac
     assert.ok(['invalid', 'unsupported'].includes(r.outcome)); assert.ok(!r.actions.some(a => a.source === 'synthetic-legacy-fallback'));
   }
 });
-test('Alias Fake encounter remains incomplete and public facade rejects it', () => {
+test('Alias Fake is ignored and no longer blocks its encounter', () => {
   const encounter = load('src/data/encounters.ts').encounters.find(e => e.id === 149);
-  const r = run(cases.single[0], encounter); assert.equal(r.outcome, 'invalid'); assert.equal(r.winner, null);
-  assert.ok(r.diagnostics.join().includes('Alias Fake')); assert.equal(r.actions.length, 0);
-  assert.throws(() => runBattleSimulation(cases.single[0], encounter, 'None', 1), /Alias Fake/);
+  const r = run(cases.single[0], encounter, {maxRounds: 1}); assert.notEqual(r.outcome, 'invalid');
+  assert.ok(!r.diagnostics.join().includes('Alias Fake'));
+  assert.ok(r.state.combatants.every(a=>a.skills.every(s=>s.canonicalSkillId!==0xea)));
 });
 for (const [stat, value] of [['hp', -1], ['mp', -1], ['atk', NaN], ['spd', Infinity], ['def', 0], ['def', 0.2]]) test(`reject invalid runtime ${stat}=${value}`, () => {
   const r = run([member('P', [tech('Rock Fist')], { [stat]: value })], cases.single[1]);
@@ -220,7 +220,7 @@ test('invalid operational limits and simulation counts are rejected', () => {
 });
 test('support diagnostic distinguishes unknown, incomplete and future mechanics', () => {
   assert.equal(assessBattleSkill(linkLegacySkill({ ...tech('Rock Fist'), id: 'unknown', name: 'unknown' })).level, 'unknown');
-  assert.equal(assessBattleSkill(linkLegacySkill(tech('Black Pearl Shot'))).level, 'canonical-data-incomplete');
+  assert.equal(assessBattleSkill(linkLegacySkill(tech('Black Pearl Shot'))).level, 'legacy-compatibility');
   assert.equal(assessBattleSkill(linkLegacySkill(tech('Poison Ivy'))).level, 'legacy-compatibility');
   assert.equal(assessBattleSkill(linkLegacySkill(tech('Rock Fist'))).level, 'legacy-compatibility');
   const scenario = input(...cases.single); const copy = structuredClone(scenario);

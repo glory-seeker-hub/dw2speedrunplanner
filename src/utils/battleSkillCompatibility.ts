@@ -8,7 +8,7 @@ import type { Tech } from '@/types/digimon';
  * No identity/name controls a mechanical field here.
  */
 export function toLegacyTech(skill: BattleSkillDefinition, id: string, name: string): Tech {
-  if (skill.attackPower === null || !skill.element || !skill.actionKind || !skill.targetGroup) {
+  if (skill.attackPower === null || !skill.element && skill.id !== 0xf4 || !skill.actionKind || !skill.targetGroup) {
     throw new Error(`Cannot project unresolved WAZADATA skill ${skill.id} into Tech`);
   }
   let specialEffect: Tech['specialEffect'];
@@ -26,7 +26,7 @@ export function toLegacyTech(skill: BattleSkillDefinition, id: string, name: str
   else if (reduction?.kind === 'parameter-modifier') specialEffect = { type: 'debuffStat', stat: reduction.stats[0] };
   return {
     id, name, ap: skill.attackPower,
-    element: skill.element === 'Neutral' ? 'None' : skill.element === 'Darkness' ? 'Dark' : skill.element,
+    element: !skill.element || skill.element === 'Neutral' ? 'None' : skill.element === 'Darkness' ? 'Dark' : skill.element,
     target: skill.targetGroup === 'all-enemies' || skill.targetGroup === 'all-allies' ? 'All' : 'Single',
     isCounter: skill.actionKind === 'counter',
     ...(specialEffect ? { specialEffect } : {}),

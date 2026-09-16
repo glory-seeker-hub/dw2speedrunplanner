@@ -30,7 +30,7 @@ function getSpecialtyBonus(techSpecialty: string, defenderSpecialty: string): nu
   return specialtyMap[defenderSpecialty] || 1;
 }
 
-function getTypeBonus(attackerType: string, defenderType: string): number {
+export function getTypeBonus(attackerType: string, defenderType: string): number {
   const typeMap = TYPE_BONUS_MATRIX[attackerType];
   if (!typeMap) return 1;
 
@@ -51,7 +51,8 @@ export function calculateLegacyDamage(
   attacker: BattleCombatantState,
   defender: BattleCombatantState,
   tech: Tech,
-  floorSpecialty: string
+  floorSpecialty: string,
+  apRatio: readonly [number, number] = [1, 1]
 ): number {
   const typeBonus = getTypeBonus(attacker.type, defender.type);
   const specialtyBonus = getSpecialtyBonus(tech.element, defender.specialty);
@@ -72,7 +73,7 @@ export function calculateLegacyDamage(
   const defense = effectiveParameter(defender, 'def');
   const defenderBonus = getDefenderBonus(defender.specialty, floorSpecialty);
 
-  const baseDamage = Math.floor(attackPower * Math.round(typeBonus * 5) * Math.round(specialtyBonus * 5) * Math.round(tileBonus * 5) / 125);
+  const baseDamage = Math.floor(attackPower * apRatio[0] * Math.round(typeBonus * 5) * Math.round(specialtyBonus * 5) * Math.round(tileBonus * 5) / (125 * apRatio[1]));
   const adjustedDefense = Math.floor(defense * defenderBonus);
   const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
 
@@ -87,7 +88,11 @@ export function calculateActionDamage(attacker: BattleCombatantState, defender: 
   const canonical = counterDefinition(action);
   const tech = (action.kind === 'counter' || action.kind === 'interrupt') && canonical?.attackPower !== null && canonical?.attackPower !== undefined
     ? { ...action.skill.legacyTech, ap: canonical.attackPower, specialEffect: undefined } : action.skill.legacyTech;
-  let damage = calculateLegacyDamage(attacker, defender, attacker.elementalPower ? { ...tech, element: attacker.elementalPower === 'Darkness' ? 'Dark' : attacker.elementalPower === 'Neutral' ? 'None' : attacker.elementalPower } : tech, floorSpecialty);
+  const waitingCounter = state?.plannedActions.find(a => a.id === defender.plannedActionId)?.counter?.executionMode === 'waiting';
+  let numerator = 1, denominator = 1;
+  for (const effect of canonical?.effects ?? []) if (effect.kind === 'damage-modifier' && (effect.condition === 'user-poisoned' && attacker.statuses.poison || effect.condition === 'target-countering' && waitingCounter)) { numerator *= 3; denominator *= 2; }
+  const element = action.effectiveElement ?? attacker.elementalPower;
+  let damage = calculateLegacyDamage(attacker, defender, element ? { ...tech, element: element === 'Darkness' ? 'Dark' : element === 'Neutral' ? 'None' : element } : tech, floorSpecialty, [numerator, denominator]);
   if (usesActivatedCounterMechanics(action)) for (const effect of canonical?.effects ?? []) {
     if (effect.kind !== 'damage-modifier' || effect.condition !== 'counter-triggered') continue;
     damage = Math.floor((effect.modifier === 'returned-damage' ? action.counter!.damageReceivedFromTrigger! : damage) * effect.multiplier);

@@ -11,7 +11,7 @@ export function applyLegacyImpactEffects(actor: BattleCombatantState, target: Ba
   const applied: BattleImpact['appliedEffects'] = [];
   if ((action.kind === 'counter' || action.kind === 'interrupt') && action.skill.canonicalSkillId !== null) return applied;
   const effect = action.skill?.legacyTech.specialEffect;
-  if (effect?.type === 'healOnDamage') {
+  if (action.skill.canonicalSkillId === null && effect?.type === 'healOnDamage') {
     const before = actor.currentHp;
     actor.currentHp = Math.min(actor.maxHp, actor.currentHp + damage);
     applied.push({ source: 'legacy', kind: 'drain', combatantId: actor.id, amount: actor.currentHp - before });

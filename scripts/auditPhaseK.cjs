@@ -1,0 +1,14 @@
+const fs = require('node:fs');
+const {load} = require('../tests/helpers/loadTs.cjs');
+const {BATTLE_SKILLS} = load('src/data/battleSkills.ts');
+const {SKILL_EFFECT_SOURCE} = load('src/data/wazaSource.ts');
+const {classifyEffect} = load('src/utils/battle/battleEffectCoverage.ts');
+const rows = BATTLE_SKILLS.map(s => ({id:s.id, hexId:'0x'+s.id.toString(16).toUpperCase().padStart(4,'0'), name:s.name, category:s.actionKind, recordKind:s.recordKind, target:s.targetGroup, targetModes:s.targetModes, raw:s.provenance, effects:s.effects.map(e=>({...e,coverage:classifyEffect(e,s)}))}));
+const special = ['half-current-hp','execute-below-hp','execute-after-hits','additional-mp-damage'].map(rule=>({rule, occurrences:rows.flatMap(s=>s.effects.filter(e=>e.kind==='damage-rule'&&e.rule===rule).map(e=>({id:s.hexId,name:s.name,byte:e.byte,mask:e.mask}))).filter(x=>rows.find(s=>s.hexId===x.id).recordKind==='technique')}));
+const unknown = rows.flatMap(s=>s.effects.filter(e=>e.kind==='unresolved'&&e.reason==='unknown-bit').map(e=>({id:s.hexId,name:s.name,effect:e,raw:s.raw})));
+const report={baseline:'816976f', rows, byte21:special.map(s=>({...s,count:s.occurrences.length})),unknown,unused:SKILL_EFFECT_SOURCE.filter(s=>!rows.some(r=>r.effects.some(e=>e.sourceRow===s.row)))};
+fs.mkdirSync('docs/phase-2k-k',{recursive:true});
+const path='docs/phase-2k-k/source-audit-before.json';
+if(fs.existsSync(path)) throw Error('Pre-implementation audit already exists; do not overwrite.');
+fs.writeFileSync(path,JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({byte21:report.byte21,unknown:unknown.map(({raw,...rest})=>rest),review:rows.filter(s=>/Party Time|Crimson Claw|Poison Wave|Fantasmic Ray|Trick or Treat|Black Pearl|Necro Magic|Pummel|Motivation|Zen Recovery|Re-Format|Re-Initialize|Protect Grenade|Light Gun/i.test(s.name??'')).map(({raw,...rest})=>rest)},null,2));

@@ -63,7 +63,7 @@ test('Strategy Shadow Scythe restart still fails Paralysis and stops its chain',
 test('Strategy unresolved accuracy descriptors remain deferred',()=>{
   const {classifyEffect}=load('src/utils/battle/battleEffectCoverage.ts');let count=0;
   for(const skill of data.BATTLE_SKILLS)for(const effect of skill.effects)if(effect.kind==='accuracy-modifier'&&(effect.modifier==='increased-accuracy'||effect.modifier==='cannot-miss'&&skill.actionKind!=='assist')){
-    assert.equal(classifyEffect(effect,skill).status,'deferred-unresolved');count++;
+    assert.equal(classifyEffect(effect,skill).status,effect.modifier==='cannot-miss'||skill.id===0x66?'authoritative':'deferred-unresolved');count++;
   }
   assert.ok(count>0);
 });

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "descriptorOccurrences": 598,
   "classifiedOccurrences": 598,
-  "descriptorGroups": 100,
+  "descriptorGroups": 101,
   "descriptors": [
     {
       "sourceByte": 17,
@@ -160,8 +160,38 @@
       },
       "status": "authoritative",
       "handler": "battleAccuracy.resolveActionAccuracy",
-      "boundary": "Project Assist guarantee; not a general interpretation of the uncertain bit.",
+      "boundary": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
       "techniques": [
+        {
+          "id": 52,
+          "hexId": "0x34",
+          "name": "Tusk Crusher",
+          "recordKind": "technique"
+        },
+        {
+          "id": 164,
+          "hexId": "0xA4",
+          "name": "Venom Infusion",
+          "recordKind": "technique"
+        },
+        {
+          "id": 166,
+          "hexId": "0xA6",
+          "name": "MP Magic",
+          "recordKind": "technique"
+        },
+        {
+          "id": 167,
+          "hexId": "0xA7",
+          "name": "Life Shield",
+          "recordKind": "technique"
+        },
+        {
+          "id": 168,
+          "hexId": "0xA8",
+          "name": "MP Destroyer",
+          "recordKind": "technique"
+        },
         {
           "id": 180,
           "hexId": "0xB4",
@@ -424,39 +454,15 @@
         "sourceRow": 5,
         "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
       },
-      "status": "deferred-unresolved",
+      "status": "ignored-by-project",
       "handler": "none",
-      "boundary": "Increased Accuracy / general Cannot Miss arithmetic not established.",
+      "boundary": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
       "techniques": [
         {
-          "id": 52,
-          "hexId": "0x34",
-          "name": "Tusk Crusher",
-          "recordKind": "technique"
-        },
-        {
-          "id": 164,
-          "hexId": "0xA4",
-          "name": "Venom Infusion",
-          "recordKind": "technique"
-        },
-        {
-          "id": 166,
-          "hexId": "0xA6",
-          "name": "MP Magic",
-          "recordKind": "technique"
-        },
-        {
-          "id": 167,
-          "hexId": "0xA7",
-          "name": "Life Shield",
-          "recordKind": "technique"
-        },
-        {
-          "id": 168,
-          "hexId": "0xA8",
-          "name": "MP Destroyer",
-          "recordKind": "technique"
+          "id": 234,
+          "hexId": "0xEA",
+          "name": "Alias Fake (?)",
+          "recordKind": "unresolved"
         }
       ]
     },
@@ -483,12 +489,6 @@
           "hexId": "0xE6",
           "name": "abc? Unused?",
           "recordKind": "unresolved"
-        },
-        {
-          "id": 234,
-          "hexId": "0xEA",
-          "name": "Alias Fake (?)",
-          "recordKind": "unresolved"
         }
       ]
     },
@@ -505,9 +505,9 @@
         "sourceRow": 6,
         "sourceLabel": "Double your SPD this turn"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Double-speed / act-last skill modifiers not implemented.",
+      "status": "authoritative",
+      "handler": "battleOrder.calculateActionOrder",
+      "boundary": "Queue-only Double SPD / Act Last.",
       "techniques": [
         {
           "id": 110,
@@ -556,9 +556,9 @@
         "sourceRow": 8,
         "sourceLabel": "Delays user's turn to the end"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Double-speed / act-last skill modifiers not implemented.",
+      "status": "authoritative",
+      "handler": "battleOrder.calculateActionOrder",
+      "boundary": "Queue-only Double SPD / Act Last.",
       "techniques": [
         {
           "id": 238,
@@ -586,9 +586,9 @@
         "sourceRow": 9,
         "sourceLabel": "Your DEF is halved this turn"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Temporary raw-stat multipliers are not persistent stages.",
+      "status": "authoritative",
+      "handler": "battleEffectCompletion.postUseDefenseOne",
+      "boundary": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
       "techniques": [
         {
           "id": 21,
@@ -642,9 +642,9 @@
         "sourceRow": 11,
         "sourceLabel": "Heal strong digimon/ damage weak/neutral digimon"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
       "techniques": [
         {
           "id": 80,
@@ -694,9 +694,9 @@
         "sourceRow": 13,
         "sourceLabel": "Increased accuracy"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Increased Accuracy / general Cannot Miss arithmetic not established.",
+      "status": "authoritative",
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "boundary": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
       "techniques": [
         {
           "id": 102,
@@ -784,9 +784,9 @@
         "sourceRow": 16,
         "sourceLabel": "1.5x Damage output when poisoned"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Condition/arithmetic not promoted by this phase.",
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
       "techniques": [
         {
           "id": 64,
@@ -842,9 +842,9 @@
         "sourceRow": 18,
         "sourceLabel": "1.5x Damage vs Countering target"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Condition/arithmetic not promoted by this phase.",
+      "status": "authoritative",
+      "handler": "battleDamage.calculateActionDamage",
+      "boundary": "",
       "techniques": [
         {
           "id": 37,
@@ -926,9 +926,9 @@
         "sourceRow": 21,
         "sourceLabel": "Steal HP"
       },
-      "status": "compatibility-only",
-      "handler": "battleLegacyEffects.applyLegacyImpactEffects",
-      "boundary": "Legacy full damage HP drain; amount remains unspecified in source.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Canonical HP drain heals actual HP removed, excluding overkill; capped at user Max HP.",
       "techniques": [
         {
           "id": 71,
@@ -976,9 +976,9 @@
         "sourceRow": 23,
         "sourceLabel": "Steal MP from a target that is dead and has MP to steal"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "MP transfer amount/payer/order unresolved.",
+      "status": "authoritative",
+      "handler": "battleInterrupts / battleSimulation",
+      "boundary": "Own cost first, Max MP cap; Necro conserves transferred MP.",
       "techniques": [
         {
           "id": 210,
@@ -1002,9 +1002,9 @@
         "sourceRow": 24,
         "sourceLabel": "Steal MP equivalent to amount used by Interrupted tech"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "MP transfer amount/payer/order unresolved.",
+      "status": "authoritative",
+      "handler": "battleInterrupts / battleSimulation",
+      "boundary": "Own cost first, Max MP cap; Necro conserves transferred MP.",
       "techniques": [
         {
           "id": 166,
@@ -2120,9 +2120,9 @@
         "sourceRow": 26,
         "sourceLabel": "Deals damage equal to 50% of target's current HP"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
       "techniques": [
         {
           "id": 225,
@@ -2181,9 +2181,9 @@
         "sourceRow": 28,
         "sourceLabel": "Eliminates target if its HP is less than 60"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
       "techniques": [
         {
           "id": 226,
@@ -2209,9 +2209,9 @@
         "sourceRow": 30,
         "sourceLabel": "Deals additional random MP damage in range of 4-7 points"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
       "techniques": [
         {
           "id": 60,
@@ -2237,9 +2237,9 @@
         "sourceRow": 31,
         "sourceLabel": "Deals additional random MP damage in range of 13-20 points"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Special damage/death/execute/MP rules not implemented.",
+      "status": "authoritative",
+      "handler": "battleSimulation",
+      "boundary": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
       "techniques": [
         {
           "id": 65,
@@ -2285,9 +2285,9 @@
         "byte": 22,
         "mask": 1
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "No documented interpretation.",
+      "status": "authoritative",
+      "handler": "battleResources.accountActionMp",
+      "boundary": "Activated Counter cost charged once to causal attacker.",
       "techniques": [
         {
           "id": 137,
@@ -2308,9 +2308,9 @@
         "sourceRow": 33,
         "sourceLabel": "Pass on your status to target"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Status transfer semantics not implemented.",
+      "status": "authoritative",
+      "handler": "battleEffectCompletion.copyNegativeStatuses",
+      "boundary": "Copy negative ailments and recovery blocks; hard immunities retained.",
       "techniques": [
         {
           "id": 112,
@@ -2618,9 +2618,9 @@
         "sourceRow": 42,
         "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "All stored stages suppressed for remainder of round.",
       "techniques": [
         {
           "id": 204,
@@ -2643,9 +2643,9 @@
         "sourceRow": 43,
         "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "All stored stages suppressed for remainder of round.",
       "techniques": [
         {
           "id": 198,
@@ -2841,9 +2841,9 @@
         "sourceRow": 49,
         "sourceLabel": "66% Poison"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Direct probabilistic ailment on Assist is not specified; supported temporary states execute independently.",
+      "status": "ignored-by-project",
+      "handler": "battleSupportEffects",
+      "boundary": "Reviewed Poison Wave grants Poison Power and Poison Body; no direct Poison ailment.",
       "techniques": [
         {
           "id": 215,
@@ -3069,9 +3069,9 @@
         "sourceRow": 58,
         "sourceLabel": "Motivation Down"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Enemy immunity in battleImmunity; exact Player behavior unresolved.",
+      "status": "authoritative",
+      "handler": "battleStatuses / battleEffectCompletion",
+      "boundary": "User-confirmed 100% on Hit; Enemy immunity; blocked slots, Guard and recovery.",
       "techniques": [
         {
           "id": 58,
@@ -3382,9 +3382,9 @@
         "sourceRow": 70,
         "sourceLabel": "Apply Invisibility Status"
       },
-      "status": "not-applicable",
+      "status": "ignored-by-project",
       "handler": "none",
-      "boundary": "Item/system record; not a simulated technique.",
+      "boundary": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
       "techniques": [
         {
           "id": 234,
@@ -3719,9 +3719,9 @@
         "byte": 31,
         "mask": 4
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "No documented interpretation.",
+      "status": "authoritative",
+      "handler": "battleEffectCompletion.postUseDefenseOne",
+      "boundary": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
       "techniques": [
         {
           "id": 61,
@@ -3743,9 +3743,9 @@
         "sourceRow": 77,
         "sourceLabel": "Can’t Recover HP"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Recovery restriction duration/scope not established.",
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses",
+      "boundary": "Round-scoped component-specific recovery block.",
       "techniques": [
         {
           "id": 75,
@@ -3767,9 +3767,9 @@
         "sourceRow": 78,
         "sourceLabel": "Can’t Recover Status"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Recovery restriction duration/scope not established.",
+      "status": "authoritative",
+      "handler": "battleSupportEffects / battleStatuses",
+      "boundary": "Round-scoped component-specific recovery block.",
       "techniques": [
         {
           "id": 103,
@@ -3792,9 +3792,9 @@
         "sourceRow": 79,
         "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Turn-wide support protection not specified; broken Interrupt flag retained.",
+      "status": "authoritative",
+      "handler": "battleSupportEffects.applySupportEffects",
+      "boundary": "Prevents only unactivated waiting Counters for this round.",
       "techniques": [
         {
           "id": 187,
@@ -3818,9 +3818,9 @@
         "sourceRow": 79,
         "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
       },
-      "status": "deferred-unresolved",
+      "status": "ignored-by-project",
       "handler": "none",
-      "boundary": "Turn-wide support protection not specified; broken Interrupt flag retained.",
+      "boundary": "Source claims turn-wide Interrupt prevention; actual game behavior is broken, ignored by confirmed project rule.",
       "techniques": [
         {
           "id": 187,
@@ -5229,6 +5229,30 @@
         "sourceRow": 89,
         "sourceLabel": "Hit target(s)"
       },
+      "status": "ignored-by-project",
+      "handler": "none",
+      "boundary": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
+      "techniques": [
+        {
+          "id": 234,
+          "hexId": "0xEA",
+          "name": "Alias Fake (?)",
+          "recordKind": "unresolved"
+        }
+      ]
+    },
+    {
+      "sourceByte": 33,
+      "mask": 1,
+      "canonicalLabel": "Hit target(s)",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "normal",
+        "byte": 33,
+        "mask": 1,
+        "sourceRow": 89,
+        "sourceLabel": "Hit target(s)"
+      },
       "status": "not-applicable",
       "handler": "none",
       "boundary": "Item/system record; not a simulated technique.",
@@ -5255,12 +5279,6 @@
           "id": 233,
           "hexId": "0xE9",
           "name": "Energy Blast (?)",
-          "recordKind": "unresolved"
-        },
-        {
-          "id": 234,
-          "hexId": "0xEA",
-          "name": "Alias Fake (?)",
           "recordKind": "unresolved"
         },
         {
@@ -5409,9 +5427,9 @@
         "sourceRow": 90,
         "sourceLabel": "Hit random digimon"
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "Random-Digimon semantics remain unresolved; ordinary compatibility targeting only.",
+      "status": "authoritative",
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "boundary": "One execution-time draw in canonical target domain.",
       "techniques": [
         {
           "id": 7,
@@ -5522,9 +5540,9 @@
         "byte": 33,
         "mask": 8
       },
-      "status": "deferred-unresolved",
-      "handler": "none",
-      "boundary": "No documented interpretation.",
+      "status": "authoritative",
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "boundary": "Execution-time random all-field HP0 and MP-positive target.",
       "techniques": [
         {
           "id": 210,
@@ -5590,8 +5608,8 @@
   "projectRules": [
     {
       "rule": "Assist vs Interrupt",
-      "status": "deferred-unresolved",
-      "boundary": "Existing exclusion preserved; no new scheduling eligibility inferred."
+      "status": "authoritative",
+      "boundary": "Assists use the existing Interrupt engine; damage reduction does not reduce healing."
     },
     {
       "rule": "Fixed heal values",

@@ -27,7 +27,7 @@ export interface PlannerBattleAnalysisPreset {
 export function analysisTechnique(name: string, side: 'player' | 'enemy'): Tech & { canonicalSkillId: number } {
   const skill = getBattleSkillByName(name), legacy = getTechByName(name);
   const code = side === 'player' ? 'unresolved-player-technique' : 'unresolved-enemy-skill';
-  if (!skill || skill.recordKind !== 'technique' || !skill.actionKind || !skill.targetGroup || (!legacy && skill.actionKind !== 'assist' && (skill.attackPower === null || skill.element === null))) throw new BattleAnalysisError(code, 'Unresolved ' + side + ' canonical technique: ' + name);
+  if (!skill || skill.recordKind !== 'technique' || !skill.actionKind || !skill.targetGroup || (!legacy && skill.actionKind !== 'assist' && (skill.attackPower === null || skill.element === null && skill.id !== 0xf4))) throw new BattleAnalysisError(code, 'Unresolved ' + side + ' canonical technique: ' + name);
   return { ...(legacy ?? { id: 'waza-' + skill.id, name: skill.name!, ap: skill.attackPower ?? 0,
     element: skill.element === 'Darkness' ? 'Dark' : skill.element === 'Neutral' || !skill.element ? 'None' : skill.element,
     target: ['all-allies', 'all-enemies', 'field'].includes(skill.targetGroup) ? 'All' : 'Single', isCounter: skill.actionKind === 'counter' }), canonicalSkillId: skill.id };
@@ -57,10 +57,10 @@ export function historicalEnemyTeam(event: RunBattleEvent): PlannerBattleAnalysi
   const encounter = option.preview.encounter;
   for (const enemy of encounter.digimons) {
     if (!getDigimonByName(enemy.name)) throw new BattleAnalysisError('unresolved-enemy-species', 'Unresolved Enemy species: ' + enemy.name);
-    enemy.techs.forEach(name => analysisTechnique(name, 'enemy'));
+    enemy.techs.filter(name => name !== 'Alias Fake').forEach(name => analysisTechnique(name, 'enemy'));
   }
   // Shared encounter adapter owns stats, slot order and reviewed boss metadata.
-  return encounterToBattleTeam(encounter, names => names.map(name => analysisTechnique(name, 'enemy')));
+  return encounterToBattleTeam(encounter, names => names.filter(name => name !== 'Alias Fake').map(name => analysisTechnique(name, 'enemy')));
 }
 export function buildPlannerBattleAnalysisPreset(run: RunPlan, eventId: string): PlannerBattleAnalysisPreset {
   const event = run.history.find(e => e.id === eventId);

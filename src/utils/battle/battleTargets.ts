@@ -1,3 +1,4 @@
+import { resolvePolicyTarget } from './battleEffectCompletion';
 import type { BattleRng } from './battleRng';
 import type { BattleState, PlannedAction } from './battleTypes';
 import { counterTargetForm, usesActivatedCounterMechanics } from './battleReactions';
@@ -16,6 +17,7 @@ export function selectableSingleOpponents(state: BattleState, actorId: string) {
 }
 /** Resolve IDs against current state, never a stored mutable target reference. */
 export function resolveEffectiveTargets(state: BattleState, action: PlannedAction, rng: BattleRng, confused = false): string[] {
+  if (!confused) { const policyTargets = resolvePolicyTarget(state, action, rng); if (policyTargets !== null) return policyTargets; }
   if (action.kind === 'counter' && action.counter && !confused) {
     const form = counterTargetForm(action);
     if (form === 'aoe') {

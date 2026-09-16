@@ -1,3 +1,4 @@
+import { necroTarget, resolvePolicyTarget } from './battleEffectCompletion';
 import { getBattleSkillById } from '@/data/battleSkills';
 import type { Ailment, SkillElement } from '@/types/battleSkill';
 import type { BattleCombatantState, BattleSkillSelection, BattleState, PlannedAction } from './battleTypes';
@@ -50,6 +51,7 @@ export function chooseAssistTargets(state: BattleState, action: PlannedAction, r
   return [candidates[rng.nextIntExclusive(candidates.length, isRevive(action.skill) ? 'revive-target-choice' : cures(action.skill).length ? 'assist-status-cure-target' : 'assist-target-choice')]];
 }
 export function assistTargetsAtExecution(state: BattleState, action: PlannedAction, rng: BattleRng): string[] {
+  if (necroTarget(action.skill)) return resolvePolicyTarget(state, action, rng)!;
   const group = definition(action.skill)?.targetGroup;
   if (group === 'field' || group === 'all-allies' || group === 'all-enemies') {
     // AOE uses the living recipients at execution, never a stale party-size measurement.
@@ -75,22 +77,36 @@ export function applySupportEffects(state: BattleState, actor: BattleCombatantSt
     }
   }
   if (phase === 'pre-damage') return events;
-  if (skill.id === 0xbe || skill.id === 0xe3) {
+  if (skill.effects.some(e => e.kind === 'action-protection' && e.scope === 'turn' && e.against === 'counter')) {
+    const waiting = state.plannedActions.find(a => a.id === target.plannedActionId && a.round === state.round);
+    if (waiting?.counter?.executionMode === 'waiting' && waiting.state === 'waiting') {
+      waiting.counter.executionMode = 'prevented';
+      waiting.counter.activatedMechanics = false;
+      events.push({ kind: 'temporary-state', targetId: target.id, state: 'counter-prevented', before: false, after: true, sourceSkillId: skill.id });
+    }
+  }
+  if ([0xbe, 0xe3, 0xcc, 0xc6, 0xd4].includes(skill.id)) {
     target.parametersSuppressed = true; events.push({ kind: 'parameter-suppression', targetId: target.id, round: state.round });
   }
   if (action.kind === 'assist' && (isRevive(action.skill) || isHealing(action.skill))) {
     const hpBefore = target.currentHp, revive = isRevive(action.skill), fixed = FIXED_HEALS[skill.id];
     const requestedAmount = revive || fixed === undefined ? target.maxHp : fixed;
     const revived = revive && hpBefore === 0;
-    if (revived || (!revive && hpBefore > 0)) target.currentHp = Math.min(target.maxHp, revive || fixed === undefined ? target.maxHp : hpBefore + fixed);
+    if (revived || (!revive && hpBefore > 0 && !(fixed !== undefined && target.hpRecoveryBlocked))) target.currentHp = Math.min(target.maxHp, revive || fixed === undefined ? target.maxHp : hpBefore + fixed);
     if (revived) { target.isAlive = true; target.revivedRound = state.round; }
     events.push({ kind: 'healing', targetId: target.id, mode: revive ? 'revive-full' : fixed === undefined ? 'full' : 'fixed', requestedAmount, hpBefore, hpAfter: target.currentHp, appliedAmount: target.currentHp - hpBefore, revived });
     // A second locked revive is an executed no-op, including its secondary states.
     if (revive && !revived) return events;
   }
   for (const effect of skill.effects) {
-    if (effect.kind === 'status-cure') {
+    if (effect.kind === 'recovery-restriction') {
+      const key = effect.resource === 'hp' ? 'hpRecoveryBlocked' : 'statusRecoveryBlocked';
+      const before = !!target[key]; target[key] = true;
+      events.push({ kind: 'temporary-state', targetId: target.id, state: effect.resource + '-recovery-block', before, after: true, sourceSkillId: skill.id });
+    }
+    if (effect.kind === 'status-cure' && !target.statusRecoveryBlocked) {
       const before = !!target.statuses[effect.status]; delete target.statuses[effect.status];
+      if (effect.status === 'motivation-down') delete target.motivationBlocked;
       events.push({ kind: 'cure', targetId: target.id, status: effect.status, before, after: false });
     }
     if (effect.kind === 'temporary-attack-power') {

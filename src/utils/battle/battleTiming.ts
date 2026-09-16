@@ -13,7 +13,7 @@ export const ACTION_TIMING_PROFILE = Object.freeze({
 export const INTERRUPT_PRELUDE_FRAMES = 76;
 export interface InterruptTiming { preludeFrames: number; executionFrames: number; totalFrames: number }
 export type TimingClass = 'single-target' | 'aoe' | 'field-all' | 'interrupt' | 'unknown';
-export type ExecutionOutcome = 'hit' | 'miss' | 'cancelled' | 'skipped' | 'unsupported' | 'invalid';
+export type ExecutionOutcome = 'guard' | 'hit' | 'miss' | 'cancelled' | 'skipped' | 'unsupported' | 'invalid';
 export interface ActionTimingInput {
   actionKind: ActionKind | 'guard'; timingClass: TimingClass;
   effectiveTargetCount: number; outcome: ExecutionOutcome;
@@ -41,6 +41,7 @@ export function resolveActionTiming(input: ActionTimingInput): { durationFrames:
 }
 export function classifySkillTiming(skill: BattleSkillSelection): TimingClass {
   const canonical = skill.canonicalSkillId === null ? undefined : getBattleSkillById(skill.canonicalSkillId);
+  if (canonical?.id === 0xd2 || canonical?.targetModes.includes('random-digimon')) return 'single-target';
   if (canonical?.actionKind === 'interrupt') return 'interrupt';
   if (canonical?.actionKind === 'assist') {
     if (canonical.targetModes.some(m => m !== 'normal')) return 'unknown';

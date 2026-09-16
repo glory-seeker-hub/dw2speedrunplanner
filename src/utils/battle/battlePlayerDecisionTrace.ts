@@ -1,3 +1,4 @@
+import { randomTarget, necroTarget } from './battleEffectCompletion';
 import { getBattleSkillById } from '@/data/battleSkills';
 import type { PlayerOrder, PlayerRoundPlan } from './battleActionPlans';
 import type { BattleState, PlannedAction, TargetIntent, PlayerDecisionObserver } from './battleTypes';
@@ -26,7 +27,7 @@ export function createPlayerDecisionTrace() {
       const order: PlayerOrder = { actorId: actor.id, actorName: actor.name, skillKey: action.skill.key,
         canonicalSkillId: action.skill.canonicalSkillId, skillName: skill?.name ?? action.skill.legacyTech.name,
         targetIntent: structuredClone(action.targetIntent),
-        targetLabel: self ? 'Self' : action.kind !== 'attack' ? 'Engine policy' : label(state, action.targetIntent), key: '' };
+        targetLabel: action.guard ? 'None' : randomTarget(action.skill) || necroTarget(action.skill) ? 'Random / engine policy' : self ? 'Self' : action.kind !== 'attack' ? 'Engine policy' : label(state, action.targetIntent), key: '' };
       plan.orders.push(order); byAction.set(action.id, { order, plan, controlledSingle }); refresh(plan);
     },
     selectedTargets(state, action: PlannedAction, targetIds) {

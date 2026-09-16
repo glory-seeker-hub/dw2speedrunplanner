@@ -49,7 +49,9 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
   const rootSeed = options.seed ?? 0;
   if (!Number.isInteger(rootSeed) || rootSeed < 0 || rootSeed > 0xffffffff) throw new Error('Invalid root search seed.');
   const engineOptions: BattleEngineOptions = { simulationRules: rules, ...(options.maxRounds === undefined ? {} : { maxRounds: options.maxRounds }) };
-  const root = rootPlanInfo(snapshot);
+  // Initial injected ailments use the same representative-state policy as later
+  // stochastic decision boundaries. Blocked-slot ties are RNG, never plans.
+  const root = rootPlanInfo(snapshot, rolloutSeed(rootSeed, 1, prefixKey([]), 0));
   if (!root.count) throw new Error('No complete legal Player round plan is available.');
   if (!Number.isSafeInteger(root.minimumBudget) || budget < root.minimumBudget)
     throw new Error('Search budget too small. Minimum required for current first-round action space: ' + root.minimumBudget + '.');

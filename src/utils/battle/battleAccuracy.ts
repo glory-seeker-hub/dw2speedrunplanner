@@ -47,7 +47,7 @@ function thresholdForTargetSpds(attackerSpd: number, targets: readonly number[])
 }
 /** One resolution per action. User-confirmed Phase 2K-E clarification:
  * multi-target accuracy uses the average of valid targets' effective SPD. */
-export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false, accuracyMode: AccuracyMode = 'game-accurate', policy: BattleRngPolicy = 'natural'): AccuracyResolution {
+export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionKind, targets: readonly BattleCombatantState[], rng: BattleRng, tailBladeEligible = false, accuracyMode: AccuracyMode = 'game-accurate', policy: BattleRngPolicy = 'natural', standardBypass = false): AccuracyResolution {
   if (kind === 'assist') return { outcome: 'hit', cause: 'guaranteed', referenceTargetId: null };
   const audit: { paralysisRoll?: number; tailBladeRoll?: number; rngResolution?: RngResolution } = {};
   if (actor.statuses.paralysis) {
@@ -66,6 +66,7 @@ export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionK
   }
   // All earlier mechanical Miss gates remain authoritative in both modes.
   // Do not calculate a threshold or consume/discard an accuracy draw here.
+  if (standardBypass) return { outcome: 'hit', cause: 'guaranteed', standardRollSkipped: true, referenceTargetId: targets.length === 1 ? targets[0].id : null, ...audit };
   if (accuracyMode === 'strategy') {
     // Preserve invalid-input rejection even though the Hit Rate arithmetic is skipped.
     validateAccuracySpds(effectiveParameter(actor, 'spd'), targets.map(target => effectiveParameter(target, 'spd')));

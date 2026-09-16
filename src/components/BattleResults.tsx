@@ -21,7 +21,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
           <span className="font-semibold text-digital-cyan">{action.actorName}</span> · {action.skillName}
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'assist-target-lost' ? 'Assist target KO' : action.accuracy?.cause === 'invisibility' ? 'Invisibility forced Miss' : action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
+          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'guard' ? 'Guard — Motivation Down' : action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'assist-target-lost' ? 'Assist target KO' : action.accuracy?.cause === 'invisibility' ? 'Invisibility forced Miss' : action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
@@ -71,6 +71,7 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
       {action.resourceAlerts.map((alert, index) => <p key={`${alert.kind}-${alert.combatantId}-${index}`} role="note" className="text-sm text-info">⚠ {resourceAlertText(alert)}</p>)}
       {action.timingDiagnostics.map(d => <p key={d} className="text-xs text-muted-foreground">{d}</p>)}
       {(action.effectDiagnostics ?? []).map((d, index) => <p key={index} className="text-xs text-muted-foreground">Unresolved effect: {d}</p>)}
+      {(action.effectAudit ?? []).map((d, index) => <p key={index} className="text-xs text-info">{d}</p>)}
       {action.resourceDiagnostics.map(d => <p key={d} className="text-xs text-muted-foreground">{d}</p>)}
     </li>)}
   </ol></ScrollArea>;

@@ -8,24 +8,24 @@ import type { BattleStatus, StatusSnapshot, StatusRecoveryResult, StatusApplicat
 import type { ConfusionResolution } from './battleConfusion';
 
 export type BattleSide = 'player' | 'enemy';
-export type BattleActionKind = ActionKind;
+export type BattleActionKind = ActionKind | 'guard';
 export type ActionState = 'planned' | 'waiting' | 'resolving' | 'resolved' | 'cancelled' | 'skipped';
 export interface BattleSkillSelection {
   key: string;
   canonicalSkillId: number | null;
   kind: ActionKind;
-  source: 'legacy-known-technique' | 'legacy-custom-technique' | 'synthetic-legacy-fallback';
+  source: 'legacy-known-technique' | 'legacy-custom-technique' | 'synthetic-legacy-fallback' | 'motivation-guard';
   /** Compatibility input for the retained base damage and ordinary legacy effects. */
   legacyTech: Tech;
 }
 export type CounterExecutionMode = 'activated' | 'shared-trigger-promoted' | 'untriggered-end-of-turn';
 export interface CounterRuntimeState {
   selected: true;
-  executionMode: 'waiting' | CounterExecutionMode | 'resolved';
+  executionMode: 'waiting' | CounterExecutionMode | 'resolved' | 'prevented';
   activatedMechanics: boolean;
   triggerActionId?: string; triggerActorId?: string; triggerActorName?: string;
   triggerImpactTargetId?: string; damageReceivedFromTrigger?: number;
-  targetRule?: 'causal-attacker' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement';
+  targetRule?: 'causal-attacker' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement' | 'random-policy';
   replacedByConfusion?: boolean;
 }
 export interface InterruptRuntimeState {
@@ -64,6 +64,7 @@ export interface BattleCombatantState {
   maxMp: number;
   currentMp: number;
   atkStage: number; defStage: number; spdStage: number;
+  motivationBlocked?: string[]; hpRecoveryBlocked?: boolean; statusRecoveryBlocked?: boolean; defenseOne?: boolean;
   parametersSuppressed: boolean; revivedRound?: number;
   elementalPower: SkillElement | null;
   /** Custom legacy inputs only; canonical effects use discrete stages. */
@@ -81,18 +82,20 @@ export type TargetIntent =
   | { kind: 'combatants'; targetIds: readonly string[] };
 export interface ReactionContext { reactionToActionId: string; triggeredByActorId: string; counterActorId: string }
 interface PlannedActionBase {
+  guard?: true;
   id: string; round: number; actorId: string; targetIntent: TargetIntent;
   state: ActionState; initiative: number | null; priority: 'normal' | 'counter-last' | 'counter-promoted' | 'interrupt-waiting';
   counter: CounterRuntimeState | null;
   interrupt?: InterruptRuntimeState;
   prepared?: PreparedActionContext;
+  effectiveElement?: SkillElement;
   assistTargetIds?: string[]; assistEligibleAtPlanning?: boolean; assistCandidateIds?: string[];
   supportEvents?: import('./battleSupportEffects').SupportEvent[];
   reaction: ReactionContext | null;
   chainFromActionId: string | null;
 }
 export type PlannedAction = PlannedActionBase & { kind: ActionKind; skill: BattleSkillSelection };
-export type ActionChoice = { kind: 'skill'; skillKey: string; targetIntent?: TargetIntent };
+export type ActionChoice = { kind: 'skill' | 'skip'; skillKey: string; targetIntent?: TargetIntent };
 export interface ActionPolicy {
   chooseAction(actor: Readonly<BattleCombatantState>, context: { round: number; combatants: readonly BattleCombatantState[] }, rng: BattleRng): ActionChoice;
 }
@@ -100,7 +103,7 @@ export interface BattleImpact {
   targetId: string; targetName: string; hpBefore: number; hpAfter: number;
   baseDamage: number; poisonBonusDamage: number; statusApplications: StatusApplicationResult[];
   damage: number; healing: number; outcome: 'hit' | 'ko' | 'miss' | 'blocked' | 'invincible';
-  appliedEffects: { source: 'legacy'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
+  appliedEffects: { source: 'legacy' | 'canonical'; kind: 'parameter-modifier' | 'drain'; combatantId: string; amount: number; stat?: 'atk' | 'def' | 'spd' }[];
   damageBeforeInterruptReduction?: number;
   effectiveElement?: SkillElement; invincibilityPreventedDamage?: number;
   ko: boolean;
@@ -123,9 +126,10 @@ export interface BattleActionRecord {
   outcome: ExecutionOutcome; timingClass: TimingClass; durationFrames: number | null;
   interruptTiming?: InterruptTiming;
   effectDiagnostics?: string[];
+  effectAudit?: string[];
   timingDiagnostics: string[]; chainFromActionId: string | null;
   resourceAlerts: BattleResourceAlert[]; resourceDiagnostics: string[];
-  mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete'; payerCombatantId: string | null; payerName: string | null; payerSide: BattleSide | null; paymentRule: 'own' | 'counter-triggering-actor' | 'shadow-scythe-free-repeat' | 'none-on-miss' | 'unknown' } | null;
+  mpAccounting: { before: number; costCharged: number | null; after: number; completeness: 'complete' | 'incomplete'; payerCombatantId: string | null; payerName: string | null; payerSide: BattleSide | null; paymentRule: 'own' | 'counter-triggering-actor' | 'guard-no-cost' | 'shadow-scythe-free-repeat' | 'none-on-miss' | 'unknown' } | null;
 }
 export interface BattleState {
   combatants: BattleCombatantState[];

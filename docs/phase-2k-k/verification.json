@@ -1,0 +1,50 @@
+{
+  "branch": "phase-2k-k-battle-effect-completion",
+  "baseline": "816976f",
+  "tests": {
+    "passed": 2580,
+    "failed": 0,
+    "baselinePassed": 2363,
+    "preCorrectionPassed": 2508,
+    "phaseKFocused": 214,
+    "finalClosureTests": 72,
+    "log": "phase-2kk-full.log"
+  },
+  "dataSelfChecks": {
+    "passed": 57,
+    "total": 57
+  },
+  "battleSkillChecks": {
+    "passed": 11,
+    "total": 11
+  },
+  "workbook": "Passed: all 68 bytes, labels, effect dictionary, provenance",
+  "typescript": {
+    "app": "passed",
+    "node": "passed"
+  },
+  "build": {
+    "result": "passed",
+    "seconds": 8.46,
+    "warning": "Existing large chunk warning"
+  },
+  "lint": {
+    "errors": 3,
+    "warnings": 7,
+    "baselineErrors": 3,
+    "baselineWarnings": 7,
+    "changed": false
+  },
+  "effectCoverage": {
+    "occurrences": 598,
+    "groups": 101,
+    "authoritative": 370,
+    "deferredOccurrences": 0,
+    "unusedDictionaryRows": 5,
+    "ignored": 6,
+    "compatibility": 1
+  },
+  "diffCheck": "passed",
+  "commit": false,
+  "push": false
+}

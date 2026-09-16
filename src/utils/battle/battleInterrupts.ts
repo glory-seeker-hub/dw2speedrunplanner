@@ -2,15 +2,18 @@ import type { BattleActionRecord, BattleSide, BattleState, InterruptResolution, 
 import type { BattleRng } from './battleRng';
 import { actorById } from './battleState';
 import { counterDefinition } from './battleReactions';
+import { canPayRequiredMp } from './battleEffectCompletion';
 
 export function potentiallyInterruptible(state: BattleState, action: PlannedAction): boolean {
+  if (action.guard) return false;
   if (actorById(state, action.actorId).revivedRound === state.round || !actorById(state, action.actorId).isAlive || !['planned', 'waiting'].includes(action.state)
-    || action.prepared?.interruptConsumed || action.kind === 'interrupt' || action.kind === 'assist' || action.skill.canonicalSkillId === 0x4d) return false;
+    || action.prepared?.interruptConsumed || action.kind === 'interrupt' || action.skill.canonicalSkillId === 0x4d) return false;
   if (action.counter && !['waiting', 'untriggered-end-of-turn'].includes(action.counter.executionMode)) return false;
   return !counterDefinition(action)?.effects.some(e => e.kind === 'action-protection' && e.against === 'interrupt');
 }
 const waitingUsers = (state: BattleState, side: BattleSide) => state.plannedActions.filter(a => a.round === state.round
-  && actorById(state, a.actorId).revivedRound !== state.round && a.interrupt?.state === 'waiting' && actorById(state, a.actorId).side === side && actorById(state, a.actorId).isAlive);
+  && actorById(state, a.actorId).revivedRound !== state.round && a.interrupt?.state === 'waiting' && actorById(state, a.actorId).side === side && actorById(state, a.actorId).isAlive
+  && canPayRequiredMp(actorById(state, a.actorId), a.skill));
 
 /** Reservations belong to target opportunities, not to an executor. */
 export function refreshPlayerReservations(state: BattleState, reserved: Set<string>, rng: BattleRng): void {
@@ -50,6 +53,12 @@ export function resolveInterruptEffects(state: BattleState, interrupt: PlannedAc
   if (entry.outcome !== 'hit') return;
   if (entry.impacts.some(i => i.statusApplications.some(s => s.status === 'confusion' && s.applied))) {
     actor.confusionSuppressedForActionId = target.id; audit.confusionSuppressedForActionId = target.id;
+  }
+  const user = actorById(state, interrupt.actorId);
+  if (counterDefinition(interrupt)?.effects.some(e => e.kind === 'drain' && e.mode === 'interrupted-tech-cost')) {
+    const gain = Math.min(user.maxMp - user.currentMp, counterDefinition(target)?.mpCost ?? 0);
+    user.currentMp += gain; entry.resourceDiagnostics.push(`Interrupt MP gained: ${gain}`);
+    if (entry.mpAccounting) entry.mpAccounting.after = user.currentMp;
   }
   for (const effect of counterDefinition(interrupt)?.effects ?? []) {
     if (effect.kind !== 'interrupt-modifier') continue;

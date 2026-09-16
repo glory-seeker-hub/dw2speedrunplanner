@@ -194,7 +194,7 @@ test('Planner and encounter coverage matches reviewed report with every unresolv
 });
 test('data preflight flags unresolved identities, unknown bytes and effects', () => {
   assert.equal(v.validateBattleSkillLabels(['Pepper Breath']).complete, true);
-  for (const name of ['Alias Fake', 'Fantasmic Ray', 'HP Recovery', 'Black Pearl Shot', 'Pummel Whack', 'Necro Magic', 'SubZero Ice Punch']) assert.equal(v.validateBattleSkillLabels([name]).complete, false, name);
+  for (const name of ['HP Recovery', 'SubZero Ice Punch']) assert.equal(v.validateBattleSkillLabels([name]).complete, false, name);
 });
 test('encounter lookup cannot become fake AP10 and normalizes safe variants', () => {
   assert.throws(() => requireEncounterTechs([]), /no technique data/);
@@ -207,7 +207,7 @@ test('encounter lookup cannot become fake AP10 and normalizes safe variants', ()
 });
 test('actual simulator rejects unresolved and empty encounter techniques before damage', () => {
   const { runBattleSimulation } = load('src/utils/battleEngine.ts');
-  for (const techs of [['Alias Fake'], ['Unlisted'], []]) {
+  for (const techs of [['Unlisted'], []]) {
     assert.throws(() => runBattleSimulation([], { digimons: [{ name: 'Agumon', hp: 50, mp: 10, atk: 10, def: 10, spd: 10, techs }] }, 'None', 1), /technique/i);
   }
 });
