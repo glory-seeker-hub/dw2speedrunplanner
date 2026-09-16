@@ -1,3 +1,4 @@
+import { toLegacyTech } from './battleSkillCompatibility';
 import { getTechByName } from '@/utils/techLookup';
 import { getBattleSkillByName } from '@/data/battleSkills';
 import type { Tech } from '@/types/digimon';
@@ -12,6 +13,7 @@ export function requireEncounterTech(label: string): Tech {
     element: skill.element === 'Darkness' ? 'Dark' : skill.element === 'Neutral' || !skill.element ? 'None' : skill.element,
     target: ['all-allies', 'all-enemies', 'field'].includes(skill.targetGroup ?? '') ? 'All' : 'Single', isCounter: false,
   } as Tech & { canonicalSkillId: number };
+  if (skill?.recordKind === 'technique' && skill.attackPower !== null && skill.name) return { ...toLegacyTech(skill, 'waza-' + skill.id, skill.name), canonicalSkillId: skill.id } as Tech;
   throw new Error(skill
     ? `Technique "${label}" is not supported by the current simulator.`
     : `Unresolved authoritative encounter technique: "${label}".`);
@@ -19,5 +21,5 @@ export function requireEncounterTech(label: string): Tech {
 
 export function requireEncounterTechs(labels: readonly string[]): Tech[] {
   if (labels.length === 0) throw new Error('Encounter has no technique data. Simulation cannot continue.');
-  return labels.map(requireEncounterTech);
+  return labels.filter(label => label !== 'Alias Fake').map(requireEncounterTech);
 }

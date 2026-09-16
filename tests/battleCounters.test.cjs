@@ -128,8 +128,8 @@ test('Miss does not cause player MP depletion; subsequent Hit does',()=>{
  const random=rng({accuracy:[127,0]});const r=run([attack('A',{mp:1})],[unit('C')],{rng:random});assert.equal(done(r)[0].mpAccounting.costCharged,0);assert.ok(!done(r)[0].resourceAlerts.some(a=>a.kind==='player-mp-depleted'));assert.equal(r.state.combatants[0].currentMp,1);
  const hit=run([attack('A',{mp:1})],[unit('C')]);assert.ok(done(hit)[0].resourceAlerts.some(a=>a.kind==='player-mp-depleted'));
 });
-test('base AOE is retained for shared Thunder Ball, random target descriptor stays explicitly unresolved',()=>{
- const r=modeRun(0x84,'shared-trigger-promoted'),a=counters(r).find(a=>a.actorName==='C');assert.equal(a.effectiveTargetIds.length,2);assert.equal(a.counter.targetRule,'base-aoe');assert.equal(a.durationFrames,null);assert.equal(assessBattleSkill(linkLegacySkill(unit('C',0x84).techs[0])).level,'future-mechanic-unsupported');
+test('shared Thunder Ball resolves one random target at execution',()=>{
+ const r=modeRun(0x84,'shared-trigger-promoted'),a=counters(r).find(a=>a.actorName==='C');assert.equal(a.effectiveTargetIds.length,1);assert.equal(a.durationFrames,685);assert.equal(assessBattleSkill(linkLegacySkill(unit('C',0x84).techs[0])).level,'supported');
 });
 test('Shadow Scythe repeat triggers surviving Counter with independent chain and reaction IDs',()=>{
  const p=attack();p.techs=[tech('Shadow Scythe')];const r=run([p],[attack('KO',{hp:1,spd:10}),unit('C')]);const rows=done(r);assert.equal(rows[1].chainFromActionId,rows[0].id);assert.equal(rows[1].mpAccounting.costCharged,0);assert.equal(rows[2].counter.triggerActionId,rows[1].id);assert.equal(rows[2].chainFromActionId,null);assert.equal(rows[2].counter.executionMode,'activated');

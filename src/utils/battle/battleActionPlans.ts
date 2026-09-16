@@ -1,4 +1,5 @@
 import { createPlayerDecisionTrace } from './battlePlayerDecisionTrace';
+import { MOTIVATION_GUARD, initializeMotivation, randomTarget, necroTarget } from './battleEffectCompletion';
 import { getBattleSkillById } from '@/data/battleSkills';
 import { selectableSkills } from './battleActions';
 import { selectableSingleOpponents } from './battleTargets';
@@ -24,7 +25,7 @@ export function enumerateLegalPlayerOrders(state: BattleState, actor: BattleComb
     const canonical = getBattleSkillById(skill.canonicalSkillId ?? -1);
     const policyTarget = skill.kind !== 'attack' || canonical?.targetGroup === 'self'
       || canonical?.effects.some(e => e.kind === 'target-mode-modifier' && e.mode === 'random-digimon');
-    const targets: { intent?: TargetIntent; label: string }[] = policyTarget ? [{ label: canonical?.targetGroup === 'self' ? 'Self' : 'Engine policy' }]
+    const targets: { intent?: TargetIntent; label: string }[] = policyTarget ? [{ label: skill === MOTIVATION_GUARD ? 'None' : randomTarget(skill) || necroTarget(skill) ? 'Random / engine policy' : canonical?.targetGroup === 'self' ? 'Self' : 'Engine policy' }]
       : skill.legacyTech.target === 'All' ? [{ label: 'All' }]
       : selectableSingleOpponents(state, actor.id).map(t => ({ intent: { kind: 'combatants', targetIds: [t.id] }, label: t.name }));
     for (const target of targets) {
@@ -56,8 +57,10 @@ export function* enumeratePlayerRoundPlans(state: BattleState): Generator<Player
   }
   yield* product(0, []);
 }
-export function rootPlanInfo(input: BattleInput) {
+export function rootPlanInfo(input: BattleInput, initialSeed = 0) {
   const state = createBattleState(input); state.round = 1;
+  const rng = createSeededBattleRng(initialSeed);
+  for (const actor of state.combatants) initializeMotivation(actor, rng);
   const count = countPlayerRoundPlans(state);
   return { state, count, minimumBudget: count * 4 };
 }

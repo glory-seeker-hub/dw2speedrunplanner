@@ -9,10 +9,12 @@ export function shadowScytheCanRepeat(entry: BattleActionRecord): boolean {
 }
 export function scheduleShadowScytheRepeat(state: BattleState, action: PlannedAction, entry: BattleActionRecord): PlannedAction | null {
   // Only actual enemy KOs trigger this reviewed rule. Zero-HP players stay active.
-  if (!shadowScytheCanRepeat(entry) || !state.combatants.some(a => a.id === entry.impacts[0].targetId && a.side === 'enemy')
-    || !state.combatants.some(a => a.side === 'enemy' && a.isAlive)) return null;
+  const actor = state.combatants.find(a=>a.id===action.actorId)!;
+  const enemyUse = actor.side === 'enemy';
+  const causedKo = enemyUse ? entry.canonicalSkillId === SHADOW_SCYTHE_ID && entry.outcome === 'hit' && entry.impacts.length === 1 && entry.impacts[0].hpBefore > 0 && entry.impacts[0].hpAfter === 0 : shadowScytheCanRepeat(entry);
+  if (!causedKo || !state.combatants.some(a=>a.side !== actor.side && (enemyUse ? a.currentHp > 0 : a.isAlive))) return null;
   const repeat: PlannedAction = { ...action, id: nextActionId(state), state: 'waiting',
-    targetIntent: { kind: 'opponents', side: 'enemy', selection: 'random-at-execution' },
+    targetIntent: { kind: 'opponents', side: enemyUse ? 'player' : 'enemy', selection: 'random-at-execution' },
     chainFromActionId: action.id, reaction: null, prepared: undefined, interrupt: undefined };
   state.plannedActions.push(repeat); state.queue.unshift(repeat.id);
   return repeat;

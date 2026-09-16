@@ -1,3 +1,4 @@
+import { counterCostTransfer } from './battleEffectCompletion';
 import { usesActivatedCounterMechanics } from './battleReactions';
 import { actorById } from './battleState';
 import { getBattleSkillById } from '@/data/battleSkills';
@@ -17,7 +18,7 @@ export function accountActionMp(actor: BattleCombatantState, action: PlannedActi
   }
   let payer = actor;
   let paymentRule: NonNullable<BattleActionRecord['mpAccounting']>['paymentRule'] = 'own';
-  if (usesActivatedCounterMechanics(action) && canonical?.effects.some(e => e.kind === 'counter-payment')) {
+  if (usesActivatedCounterMechanics(action) && (canonical?.effects.some(e => e.kind === 'counter-payment') || counterCostTransfer(action.skill))) {
     if (!state || !action.counter?.triggerActorId) throw new Error('Activated Counter payment requires causal actor.');
     payer = actorById(state, action.counter.triggerActorId); paymentRule = 'counter-triggering-actor';
   }

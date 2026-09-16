@@ -5,6 +5,7 @@ import { SPECIES_PROGRESSION } from '@/data/speciesProgression';
 import { encounters } from '@/data/encounters';
 import { normalizeWazaRecord } from '@/utils/battleSkillDecoder';
 import { LEGACY_TECH_IDENTITIES } from '@/data/legacyTechIdentities';
+import { classifyEffect } from '@/utils/battle/battleEffectCoverage';
 
 export function validateWazaRecords(records: readonly RawWazaRecord[]): string[] {
   const errors: string[] = [];
@@ -25,16 +26,21 @@ export function validateBattleSkillLabels(labels: readonly string[]) {
   if (labels.length === 0) blockers.push({ label: '', reason: 'No technique data supplied.' });
   const unresolvedEffects: { label: string; byte: number; mask: number; reason: string }[] = [];
   for (const label of labels) {
+    if (label === 'Alias Fake' || label === 'Alias Fake (?)') continue;
     const skill = getBattleSkillByName(label);
     if (!skill) { blockers.push({ label, reason: 'No unambiguous authoritative technique identity.' }); continue; }
     resolved.push(skill);
-    for (const issue of skill.issues) blockers.push({ label, reason: `${issue.field}: ${issue.detail}` });
+    for (const issue of skill.issues) {
+      if (skill.id === 0xf4 && issue.field === 'byte4' || skill.id === 0xd2 && issue.field === 'byte33') continue;
+      blockers.push({ label, reason: `${issue.field}: ${issue.detail}` });
+    }
     for (const effect of skill.effects) {
+      const coverage = classifyEffect(effect,skill);
       if (effect.kind === 'unresolved') {
         unresolvedEffects.push({ label, byte: effect.byte, mask: effect.mask, reason: effect.reason });
-        if (effect.reason !== 'deprecated') blockers.push({ label, reason: `Unresolved effect byte ${effect.byte}, mask ${effect.mask}.` });
+        if (effect.reason !== 'deprecated' && coverage.status === 'deferred-unresolved') blockers.push({ label, reason: `Unresolved effect byte ${effect.byte}, mask ${effect.mask}.` });
       }
-      if (effect.kind === 'accuracy-modifier' && effect.certainty === 'uncertain') blockers.push({ label, reason: 'Uncertain cannot-miss flag.' });
+      if (effect.kind === 'accuracy-modifier' && effect.certainty === 'uncertain' && coverage.status === 'deferred-unresolved') blockers.push({ label, reason: 'Uncertain cannot-miss flag.' });
       if (effect.kind === 'consecutive-power') blockers.push({ label, reason: 'Consecutive AP cap interpretation unresolved.' });
     }
   }

@@ -48,7 +48,7 @@ test('ordinary AOE never maps to field-all from battlefield population',()=>{
 });
 test('canonical Assist field skills use measured field class; other fields remain unresolved',()=>{
  const field=BATTLE_SKILLS.filter(s=>s.targetGroup==='field');assert.ok(field.length);
- for(const skill of field)assert.equal(classifySkillTiming(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:skill.id,target:'All'})),skill.actionKind==='assist'&&skill.targetModes.every(m=>m==='normal')?'field-all':'unknown');
+ for(const skill of field)assert.equal(classifySkillTiming(linkLegacySkill({...tech('Rock Fist'),canonicalSkillId:skill.id,target:'All'})),skill.id===0xd2||skill.targetModes.includes('random-digimon')?'single-target':skill.actionKind==='assist'&&skill.targetModes.every(m=>m==='normal')?'field-all':'unknown');
 });
 test('mismatched canonical target data does not acquire a measured class',()=>assert.equal(classifySkillTiming(linkLegacySkill(tech('Triple Forces',{target:'Single'}))),'unknown'));
 test('custom targeting allies does not claim measured opposing Attack timing',()=>{

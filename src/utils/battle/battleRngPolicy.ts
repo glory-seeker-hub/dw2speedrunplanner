@@ -25,7 +25,7 @@ export function resolveDirectStatusApplication(policy: BattleRngPolicy, side: Ba
 }
 export function resolveNaturalStatusRecovery(policy: BattleRngPolicy, side: BattleSide, status: RecoverableState, rng: BattleRng): Gate {
   // Only these two recoverable states are in the authoritative I4 matrix.
-  const supported = status === 'paralysis' || status === 'confusion';
+  const supported = status === 'paralysis' || status === 'confusion' || status === 'motivation-down';
   return gate(supported ? policy : 'natural', side, 'natural-status-recovery', side === 'player', ['recover', 'remain'], 1, 4, rng, `status-recovery-${status}`, roll => roll === 0);
 }
 export function resolveParalysisFailure(policy: BattleRngPolicy, side: BattleSide, rng: BattleRng): Gate {

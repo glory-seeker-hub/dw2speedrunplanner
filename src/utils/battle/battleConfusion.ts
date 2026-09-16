@@ -17,7 +17,8 @@ export function prepareConfusionAction(state: BattleState, actor: BattleCombatan
   const audit: ConfusionResolution = { active: !!actor.statuses.confusion, redirected: false, skipped: false,
     plannedSkillKey: action.skill.key, selectedSkillKey: action.skill.key, eligibleSkillKeys: [], originalTargetIntent: structuredClone(action.targetIntent) };
   if (!audit.active || action.kind === 'interrupt' || actor.confusionSuppressedForActionId === action.id) return audit;
-  const eligible = actor.skills.filter(isConfusionUsableSkill);
+  const eligible = actor.skills.filter(skill => isConfusionUsableSkill(skill)
+    && !(actor.statuses['motivation-down'] && actor.motivationBlocked?.includes(skill.key)));
   audit.eligibleSkillKeys = eligible.map(s => s.key);
   if (action.chainFromActionId) {
     audit.skipped = !isConfusionUsableSkill(action.skill);

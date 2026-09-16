@@ -1,0 +1,1009 @@
+{
+  "before": {
+    "data-only": 161,
+    "authoritative": 326,
+    "deferred-unresolved": 45,
+    "compatibility-only": 2,
+    "ignored-by-project": 1,
+    "not-applicable": 63
+  },
+  "after": {
+    "authoritative": 370,
+    "ignored-by-project": 6,
+    "not-applicable": 60,
+    "compatibility-only": 1,
+    "data-only": 161
+  },
+  "changed": [
+    {
+      "id": 52,
+      "name": "Tusk Crusher",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 164,
+      "name": "Venom Infusion",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 166,
+      "name": "MP Magic",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 167,
+      "name": "Life Shield",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 168,
+      "name": "MP Destroyer",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 234,
+      "name": "Alias Fake (?)",
+      "byte": 17,
+      "mask": 4,
+      "label": "Can't Miss (could be defunct, it's always set for Assists?)",
+      "status": "ignored-by-project",
+      "reason": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "cannot-miss",
+        "condition": "always",
+        "certainty": "uncertain",
+        "byte": 17,
+        "mask": 4,
+        "sourceRow": 5,
+        "sourceLabel": "Can't Miss (could be defunct, it's always set for Assists?)"
+      },
+      "handler": "none",
+      "recordKind": "unresolved"
+    },
+    {
+      "id": 110,
+      "name": "Slamming Tusk",
+      "byte": 17,
+      "mask": 8,
+      "label": "Double your SPD this turn",
+      "status": "authoritative",
+      "reason": "Queue-only Double SPD / Act Last.",
+      "descriptor": {
+        "kind": "initiative-modifier",
+        "modifier": "double-speed",
+        "subject": "user",
+        "byte": 17,
+        "mask": 8,
+        "sourceRow": 6,
+        "sourceLabel": "Double your SPD this turn"
+      },
+      "handler": "battleOrder.calculateActionOrder",
+      "recordKind": "technique"
+    },
+    {
+      "id": 238,
+      "name": "Rail Cannon",
+      "byte": 17,
+      "mask": 32,
+      "label": "Delays user's turn to the end",
+      "status": "authoritative",
+      "reason": "Queue-only Double SPD / Act Last.",
+      "descriptor": {
+        "kind": "initiative-modifier",
+        "modifier": "act-last",
+        "subject": "user",
+        "byte": 17,
+        "mask": 32,
+        "sourceRow": 8,
+        "sourceLabel": "Delays user's turn to the end"
+      },
+      "handler": "battleOrder.calculateActionOrder",
+      "recordKind": "technique"
+    },
+    {
+      "id": 21,
+      "name": "Trick Or Treat",
+      "byte": 17,
+      "mask": 64,
+      "label": "Your DEF is halved this turn",
+      "status": "authoritative",
+      "reason": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "user",
+        "multiplier": 0.5,
+        "duration": "this-turn",
+        "byte": 17,
+        "mask": 64,
+        "sourceRow": 9,
+        "sourceLabel": "Your DEF is halved this turn"
+      },
+      "handler": "battleEffectCompletion.postUseDefenseOne",
+      "recordKind": "technique"
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "byte": 17,
+      "mask": 64,
+      "label": "Your DEF is halved this turn",
+      "status": "authoritative",
+      "reason": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
+      "descriptor": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "user",
+        "multiplier": 0.5,
+        "duration": "this-turn",
+        "byte": 17,
+        "mask": 64,
+        "sourceRow": 9,
+        "sourceLabel": "Your DEF is halved this turn"
+      },
+      "handler": "battleEffectCompletion.postUseDefenseOne",
+      "recordKind": "technique"
+    },
+    {
+      "id": 80,
+      "name": "Musical Fist",
+      "byte": 18,
+      "mask": 2,
+      "label": "Heal strong digimon/ damage weak/neutral digimon",
+      "status": "authoritative",
+      "reason": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "attribute-dependent-heal-or-damage",
+        "byte": 18,
+        "mask": 2,
+        "sourceRow": 11,
+        "sourceLabel": "Heal strong digimon/ damage weak/neutral digimon"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 102,
+      "name": "Protect Grenade",
+      "byte": 18,
+      "mask": 8,
+      "label": "Increased accuracy",
+      "status": "authoritative",
+      "reason": "Bypass ordinary accuracy only; mechanical Miss gates preserved.",
+      "descriptor": {
+        "kind": "accuracy-modifier",
+        "modifier": "increased-accuracy",
+        "condition": "always",
+        "certainty": "documented",
+        "byte": 18,
+        "mask": 8,
+        "sourceRow": 13,
+        "sourceLabel": "Increased accuracy"
+      },
+      "handler": "battleAccuracy.resolveActionAccuracy",
+      "recordKind": "technique"
+    },
+    {
+      "id": 64,
+      "name": "Party Time",
+      "byte": 18,
+      "mask": 64,
+      "label": "1.5x Damage output when poisoned",
+      "status": "authoritative",
+      "reason": "",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "user-poisoned",
+        "byte": 18,
+        "mask": 64,
+        "sourceRow": 16,
+        "sourceLabel": "1.5x Damage output when poisoned"
+      },
+      "handler": "battleDamage.calculateActionDamage",
+      "recordKind": "technique"
+    },
+    {
+      "id": 37,
+      "name": "V-Nova Blast",
+      "byte": 19,
+      "mask": 1,
+      "label": "1.5x Damage vs Countering target",
+      "status": "authoritative",
+      "reason": "",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "target-countering",
+        "byte": 19,
+        "mask": 1,
+        "sourceRow": 18,
+        "sourceLabel": "1.5x Damage vs Countering target"
+      },
+      "handler": "battleDamage.calculateActionDamage",
+      "recordKind": "technique"
+    },
+    {
+      "id": 228,
+      "name": "Transcend Sword",
+      "byte": 19,
+      "mask": 1,
+      "label": "1.5x Damage vs Countering target",
+      "status": "authoritative",
+      "reason": "",
+      "descriptor": {
+        "kind": "damage-modifier",
+        "modifier": "multiplier",
+        "multiplier": 1.5,
+        "condition": "target-countering",
+        "byte": 19,
+        "mask": 1,
+        "sourceRow": 18,
+        "sourceLabel": "1.5x Damage vs Countering target"
+      },
+      "handler": "battleDamage.calculateActionDamage",
+      "recordKind": "technique"
+    },
+    {
+      "id": 71,
+      "name": "Twig Tap",
+      "byte": 19,
+      "mask": 8,
+      "label": "Steal HP",
+      "status": "authoritative",
+      "reason": "Canonical HP drain heals actual HP removed, excluding overkill; capped at user Max HP.",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "hp",
+        "mode": "damage",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 8,
+        "sourceRow": 21,
+        "sourceLabel": "Steal HP"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "byte": 19,
+      "mask": 32,
+      "label": "Steal MP from a target that is dead and has MP to steal",
+      "status": "authoritative",
+      "reason": "Own cost first, Max MP cap; Necro conserves transferred MP.",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "mp",
+        "mode": "dead-target-remaining-mp",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 32,
+        "sourceRow": 23,
+        "sourceLabel": "Steal MP from a target that is dead and has MP to steal"
+      },
+      "handler": "battleInterrupts / battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 166,
+      "name": "MP Magic",
+      "byte": 19,
+      "mask": 64,
+      "label": "Steal MP equivalent to amount used by Interrupted tech",
+      "status": "authoritative",
+      "reason": "Own cost first, Max MP cap; Necro conserves transferred MP.",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "mp",
+        "mode": "interrupted-tech-cost",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 64,
+        "sourceRow": 24,
+        "sourceLabel": "Steal MP equivalent to amount used by Interrupted tech"
+      },
+      "handler": "battleInterrupts / battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 168,
+      "name": "MP Destroyer",
+      "byte": 19,
+      "mask": 64,
+      "label": "Steal MP equivalent to amount used by Interrupted tech",
+      "status": "authoritative",
+      "reason": "Own cost first, Max MP cap; Necro conserves transferred MP.",
+      "descriptor": {
+        "kind": "drain",
+        "resource": "mp",
+        "mode": "interrupted-tech-cost",
+        "amount": "unspecified",
+        "byte": 19,
+        "mask": 64,
+        "sourceRow": 24,
+        "sourceLabel": "Steal MP equivalent to amount used by Interrupted tech"
+      },
+      "handler": "battleInterrupts / battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 225,
+      "name": "HP Zapper",
+      "byte": 21,
+      "mask": 2,
+      "label": "Deals damage equal to 50% of target's current HP",
+      "status": "authoritative",
+      "reason": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "half-current-hp",
+        "byte": 21,
+        "mask": 2,
+        "sourceRow": 26,
+        "sourceLabel": "Deals damage equal to 50% of target's current HP"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 226,
+      "name": "Critical Blow",
+      "byte": 21,
+      "mask": 8,
+      "label": "Eliminates target if its HP is less than 60",
+      "status": "authoritative",
+      "reason": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "execute-below-hp",
+        "threshold": 60,
+        "byte": 21,
+        "mask": 8,
+        "sourceRow": 28,
+        "sourceLabel": "Eliminates target if its HP is less than 60"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 60,
+      "name": "Demi Dart",
+      "byte": 21,
+      "mask": 32,
+      "label": "Deals additional random MP damage in range of 4-7 points",
+      "status": "authoritative",
+      "reason": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "additional-mp-damage",
+        "range": [
+          4,
+          7
+        ],
+        "byte": 21,
+        "mask": 32,
+        "sourceRow": 30,
+        "sourceLabel": "Deals additional random MP damage in range of 4-7 points"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 65,
+      "name": "Evil Touch",
+      "byte": 21,
+      "mask": 64,
+      "label": "Deals additional random MP damage in range of 13-20 points",
+      "status": "authoritative",
+      "reason": "Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage.",
+      "descriptor": {
+        "kind": "damage-rule",
+        "rule": "additional-mp-damage",
+        "range": [
+          13,
+          20
+        ],
+        "byte": 21,
+        "mask": 64,
+        "sourceRow": 31,
+        "sourceLabel": "Deals additional random MP damage in range of 13-20 points"
+      },
+      "handler": "battleSimulation",
+      "recordKind": "technique"
+    },
+    {
+      "id": 137,
+      "name": "Pummel Whack",
+      "byte": 22,
+      "mask": 1,
+      "label": "Unknown bit",
+      "status": "authoritative",
+      "reason": "Activated Counter cost charged once to causal attacker.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 22,
+        "mask": 1
+      },
+      "handler": "battleResources.accountActionMp",
+      "recordKind": "technique"
+    },
+    {
+      "id": 112,
+      "name": "Crimson Claw",
+      "byte": 22,
+      "mask": 2,
+      "label": "Pass on your status to target",
+      "status": "authoritative",
+      "reason": "Copy negative ailments and recovery blocks; hard immunities retained.",
+      "descriptor": {
+        "kind": "status-transfer",
+        "byte": 22,
+        "mask": 2,
+        "sourceRow": 33,
+        "sourceLabel": "Pass on your status to target"
+      },
+      "handler": "battleEffectCompletion.copyNegativeStatuses",
+      "recordKind": "technique"
+    },
+    {
+      "id": 204,
+      "name": "Zen Recovery",
+      "byte": 23,
+      "mask": 4,
+      "label": "Remove parameter changes on targets (friendly- or debuffs specifically?)",
+      "status": "authoritative",
+      "reason": "All stored stages suppressed for remainder of round.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 4,
+        "sourceRow": 42,
+        "sourceLabel": "Remove parameter changes on targets (friendly- or debuffs specifically?)"
+      },
+      "handler": "battleSupportEffects.applySupportEffects",
+      "recordKind": "technique"
+    },
+    {
+      "id": 198,
+      "name": "Re-Format",
+      "byte": 23,
+      "mask": 8,
+      "label": "Remove parameter changes on targets (enemy- or buffs specifically?)",
+      "status": "authoritative",
+      "reason": "All stored stages suppressed for remainder of round.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 8,
+        "sourceRow": 43,
+        "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
+      },
+      "handler": "battleSupportEffects.applySupportEffects",
+      "recordKind": "technique"
+    },
+    {
+      "id": 212,
+      "name": "Re-Initialize",
+      "byte": 23,
+      "mask": 8,
+      "label": "Remove parameter changes on targets (enemy- or buffs specifically?)",
+      "status": "authoritative",
+      "reason": "All stored stages suppressed for remainder of round.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "uncertain-source",
+        "note": "Isolated parameter reset: buff/debuff and side interpretation unresolved.",
+        "byte": 23,
+        "mask": 8,
+        "sourceRow": 43,
+        "sourceLabel": "Remove parameter changes on targets (enemy- or buffs specifically?)"
+      },
+      "handler": "battleSupportEffects.applySupportEffects",
+      "recordKind": "technique"
+    },
+    {
+      "id": 215,
+      "name": "Poison Wave",
+      "byte": 25,
+      "mask": 2,
+      "label": "66% Poison",
+      "status": "ignored-by-project",
+      "reason": "Reviewed Poison Wave grants Poison Power and Poison Body; no direct Poison ailment.",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 25,
+        "mask": 2,
+        "sourceRow": 49,
+        "sourceLabel": "66% Poison"
+      },
+      "handler": "battleSupportEffects",
+      "recordKind": "technique"
+    },
+    {
+      "id": 58,
+      "name": "Ocean Love",
+      "byte": 26,
+      "mask": 16,
+      "label": "Motivation Down",
+      "status": "authoritative",
+      "reason": "User-confirmed 100% on Hit; Enemy immunity; blocked slots, Guard and recovery.",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      },
+      "handler": "battleStatuses / battleEffectCompletion",
+      "recordKind": "technique"
+    },
+    {
+      "id": 73,
+      "name": "Concert Crush",
+      "byte": 26,
+      "mask": 16,
+      "label": "Motivation Down",
+      "status": "authoritative",
+      "reason": "User-confirmed 100% on Hit; Enemy immunity; blocked slots, Guard and recovery.",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      },
+      "handler": "battleStatuses / battleEffectCompletion",
+      "recordKind": "technique"
+    },
+    {
+      "id": 115,
+      "name": "Pretty Attack",
+      "byte": 26,
+      "mask": 16,
+      "label": "Motivation Down",
+      "status": "authoritative",
+      "reason": "User-confirmed 100% on Hit; Enemy immunity; blocked slots, Guard and recovery.",
+      "descriptor": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      },
+      "handler": "battleStatuses / battleEffectCompletion",
+      "recordKind": "technique"
+    },
+    {
+      "id": 234,
+      "name": "Alias Fake (?)",
+      "byte": 28,
+      "mask": 2,
+      "label": "Apply Invisibility Status",
+      "status": "ignored-by-project",
+      "reason": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
+      "descriptor": {
+        "kind": "special-state",
+        "state": "invisibility",
+        "byte": 28,
+        "mask": 2,
+        "sourceRow": 70,
+        "sourceLabel": "Apply Invisibility Status"
+      },
+      "handler": "none",
+      "recordKind": "unresolved"
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "byte": 31,
+      "mask": 4,
+      "label": "Unknown bit",
+      "status": "authoritative",
+      "reason": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 31,
+        "mask": 4
+      },
+      "handler": "battleEffectCompletion.postUseDefenseOne",
+      "recordKind": "technique"
+    },
+    {
+      "id": 75,
+      "name": "Darkside Attack",
+      "byte": 31,
+      "mask": 8,
+      "label": "Can’t Recover HP",
+      "status": "authoritative",
+      "reason": "Round-scoped component-specific recovery block.",
+      "descriptor": {
+        "kind": "recovery-restriction",
+        "resource": "hp",
+        "byte": 31,
+        "mask": 8,
+        "sourceRow": 77,
+        "sourceLabel": "Can’t Recover HP"
+      },
+      "handler": "battleSupportEffects / battleStatuses",
+      "recordKind": "technique"
+    },
+    {
+      "id": 103,
+      "name": "GigaByte Wing",
+      "byte": 31,
+      "mask": 16,
+      "label": "Can’t Recover Status",
+      "status": "authoritative",
+      "reason": "Round-scoped component-specific recovery block.",
+      "descriptor": {
+        "kind": "recovery-restriction",
+        "resource": "status",
+        "byte": 31,
+        "mask": 16,
+        "sourceRow": 78,
+        "sourceLabel": "Can’t Recover Status"
+      },
+      "handler": "battleSupportEffects / battleStatuses",
+      "recordKind": "technique"
+    },
+    {
+      "id": 187,
+      "name": "Banana Slip",
+      "byte": 31,
+      "mask": 32,
+      "label": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)",
+      "status": "authoritative",
+      "reason": "Prevents only unactivated waiting Counters for this round.",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "counter",
+        "scope": "turn",
+        "byte": 31,
+        "mask": 32,
+        "sourceRow": 79,
+        "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
+      },
+      "handler": "battleSupportEffects.applySupportEffects",
+      "recordKind": "technique"
+    },
+    {
+      "id": 187,
+      "name": "Banana Slip",
+      "byte": 31,
+      "mask": 32,
+      "label": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)",
+      "status": "ignored-by-project",
+      "reason": "Source claims turn-wide Interrupt prevention; actual game behavior is broken, ignored by confirmed project rule.",
+      "descriptor": {
+        "kind": "action-protection",
+        "against": "interrupt",
+        "scope": "turn",
+        "caveat": "Source explicitly says interrupt prevention is broken.",
+        "byte": 31,
+        "mask": 32,
+        "sourceRow": 79,
+        "sourceLabel": "Prevent counters & Interrupts this turn (Interrupt prevention is broken)"
+      },
+      "handler": "none",
+      "recordKind": "technique"
+    },
+    {
+      "id": 234,
+      "name": "Alias Fake (?)",
+      "byte": 33,
+      "mask": 1,
+      "label": "Hit target(s)",
+      "status": "ignored-by-project",
+      "reason": "Alias Fake is unused in gameplay; filtered from encounter/selection inputs.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "normal",
+        "byte": 33,
+        "mask": 1,
+        "sourceRow": 89,
+        "sourceLabel": "Hit target(s)"
+      },
+      "handler": "none",
+      "recordKind": "unresolved"
+    },
+    {
+      "id": 7,
+      "name": "S-Thunder Smack",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 33,
+      "name": "Super Shocker",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 58,
+      "name": "Ocean Love",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 74,
+      "name": "Dark Shot",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 80,
+      "name": "Musical Fist",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 104,
+      "name": "Giga Cannon",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 132,
+      "name": "Thunder Ball",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 220,
+      "name": "Chaos Cannon",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 221,
+      "name": "Blind Attack",
+      "byte": 33,
+      "mask": 2,
+      "label": "Hit random digimon",
+      "status": "authoritative",
+      "reason": "One execution-time draw in canonical target domain.",
+      "descriptor": {
+        "kind": "target-mode-modifier",
+        "mode": "random-digimon",
+        "byte": 33,
+        "mask": 2,
+        "sourceRow": 90,
+        "sourceLabel": "Hit random digimon"
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    },
+    {
+      "id": 210,
+      "name": "Necro Magic",
+      "byte": 33,
+      "mask": 8,
+      "label": "Unknown bit",
+      "status": "authoritative",
+      "reason": "Execution-time random all-field HP0 and MP-positive target.",
+      "descriptor": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 33,
+        "mask": 8
+      },
+      "handler": "battleEffectCompletion.resolvePolicyTarget",
+      "recordKind": "technique"
+    }
+  ],
+  "residual": []
+}

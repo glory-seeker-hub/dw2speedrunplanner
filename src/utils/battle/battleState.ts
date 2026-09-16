@@ -28,6 +28,7 @@ export function validateCombatant(actor: BattleCombatantState): void {
   }
 }
 export function effectiveParameter(actor: BattleCombatantState, stat: 'atk' | 'def' | 'spd'): number {
+  if (stat === 'def' && actor.defenseOne) return 1;
   return finite(actor.baseStats[stat] * stageMultiplier(actor.parametersSuppressed ? 0 : actor[`${stat}Stage`]) * (actor.parameterModifiers[stat] ?? 1), `effective ${stat}`);
 }
 export const actorById = (state: BattleState, id: string): BattleCombatantState => {

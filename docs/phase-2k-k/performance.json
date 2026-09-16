@@ -1,0 +1,92 @@
+[
+  {
+    "name": "ordinary",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 142.99300003051758,
+    "evaluationsPerSecond": 1398.6698646599202,
+    "resultBytes": 28010
+  },
+  {
+    "name": "party-time",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 58.772899985313416,
+    "evaluationsPerSecond": 3402.9289017553565,
+    "resultBytes": 28322
+  },
+  {
+    "name": "motivation",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 66.00809997320175,
+    "evaluationsPerSecond": 3029.9311763434616,
+    "resultBytes": 29642
+  },
+  {
+    "name": "mp-interrupt",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 85.49269998073578,
+    "evaluationsPerSecond": 2339.381023702215,
+    "resultBytes": 34698
+  },
+  {
+    "name": "fantasmic-random",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 119.90179997682571,
+    "evaluationsPerSecond": 1668.0316729077915,
+    "resultBytes": 43284
+  },
+  {
+    "name": "shadow-scythe",
+    "method": "Random Monte Carlo engine rollouts",
+    "config": {
+      "evaluations": 200,
+      "maxRounds": 5,
+      "accuracyMode": "strategy",
+      "rngPolicy": "natural",
+      "seeds": "0..199"
+    },
+    "evaluations": 200,
+    "wallMs": 109.8396999835968,
+    "evaluationsPerSecond": 1820.8352720361356,
+    "resultBytes": 41881
+  }
+]

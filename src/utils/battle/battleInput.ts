@@ -19,7 +19,7 @@ export function linkLegacySkill(tech: Tech & { canonicalSkillId?: number }): Bat
 }
 function createMember(member: BattleTeamMember, side: BattleSide, position: number, allowSynthetic: boolean): BattleCombatantState {
   if (member.isBoss !== undefined && typeof member.isBoss !== 'boolean') throw new BattleInputError('Invalid isBoss metadata.');
-  const skills = member.techs.map(linkLegacySkill);
+  const skills = member.techs.map(linkLegacySkill).filter(s=>s.canonicalSkillId !== 0xea);
   const initialStatuses: BattleCombatantState['statuses'] = {};
   for (const [status, active] of Object.entries(member.initialStatuses ?? {})) {
     if (!['poison', 'paralysis', 'confusion', 'poison-body', 'invincibility', 'invisibility', 'motivation-down'].includes(status) || typeof active !== 'boolean') throw new BattleInputError('Invalid initial battle status.');
@@ -63,10 +63,9 @@ export function createBattleState(input: BattleInput, simulationIndex = 0): Batt
   const encounterInput = !Array.isArray(input.enemy);
   if (encounterInput) {
     try {
-      // Audit all identities first: an earlier unsupported known skill must not
-      // conceal an unresolved label such as encounter 149's Alias Fake.
+      // Audit identities before projection. Alias Fake is explicitly unused.
       const labels = (input.enemy as Encounter).digimons.flatMap(d => d.techs);
-      const unknown = labels.filter(label => !getBattleSkillByName(label));
+      const unknown = labels.filter(label => label !== 'Alias Fake' && !getBattleSkillByName(label));
       if (unknown.length) throw new BattleInputError(`Unresolved authoritative encounter technique: ${unknown.join(', ')}.`);
       enemy = encounterToBattleTeam(input.enemy as Encounter);
     } catch (error) { throw new BattleInputError(error instanceof Error ? error.message : 'Invalid encounter.'); }
