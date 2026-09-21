@@ -1,5 +1,7 @@
 export type BattleDrawCategory = 'motivation-blocked-choice' | 'status-recovery-motivation-down' | 'status-apply-motivation-down' | 'random-digimon-target' | 'necro-ko-target' | 'shadow-scythe-hp-tie' | 'fantasmic-element' | 'revive-target-choice' | 'assist-status-cure-target' | 'assist-target-choice' | `status-recovery-${'poison-body' | 'poison-power' | 'paralysis-power' | 'confusion-power' | 'elemental-power' | 'invincibility' | 'invisibility'}` | 'action-choice' | 'target-choice' | 'initiative' | 'hit-miss' | 'status-application' | 'status-recovery' | 'interrupt' | 'counter' | 'assist' | 'status-recovery-paralysis' | 'status-recovery-confusion' | 'confusion-action-choice' | 'confusion-target' | 'paralysis-failure' | 'accuracy' | 'status-apply-poison' | 'status-apply-paralysis' | 'status-apply-confusion' | 'tail-blade-evasion' | 'interrupt-target-choice' | 'interrupt-user-choice' | 'interrupt-delete-action' | 'interrupt-force-miss';
 export interface BattleRng {
+  position?: () => number;
+  tasLuck?: import('./battleTasLuck').TasLuckControl;
   nextFloat(category?: BattleDrawCategory): number;
   nextIntExclusive(max: number, category?: BattleDrawCategory): number;
   nextIntInclusive(min: number, max: number, category?: BattleDrawCategory): number;
@@ -36,11 +38,13 @@ export function createSequenceBattleRng(sequence: readonly number[]) {
 export const SEEDED_RNG_VERSION = 'mulberry32-v1';
 export function createSeededBattleRng(seed: number): BattleRng {
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new BattleRngError('Seed must be an unsigned 32-bit integer.');
-  let state = seed >>> 0;
-  return createBattleRng(() => {
+  let state = seed >>> 0, consumed = 0;
+  const rng = createBattleRng(() => {
+    consumed++;
     state = (state + 0x6d2b79f5) >>> 0;
     let value = Math.imul(state ^ (state >>> 15), 1 | state);
     value ^= value + Math.imul(value ^ (value >>> 7), 61 | value);
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   });
+  return {...rng,position:()=>consumed};
 }

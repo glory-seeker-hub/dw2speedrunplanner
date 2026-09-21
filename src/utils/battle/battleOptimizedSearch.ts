@@ -1,3 +1,4 @@
+import { createTasLuckSearch, createTasLuckReplay, emptyTasLuckSummary, addTasLuckSummary, tasLuckCapForBudget, type TasLuckDecisionTrace } from './battleTasLuck';
 import { createFastestRouteTracker, type FastestRoute } from './battleFastestRoute';
 import { getBattleSkillById } from '@/data/battleSkills';
 import { classifyEffect } from './battleEffectCoverage';
@@ -23,7 +24,7 @@ export interface OptimizedCandidate { key: string; plans: PlayerRoundPlan[]; sta
 interface StageSnapshot { stats: OptimizedCandidateStats; samples: RepresentativeSample[]; fallback: Candidate['fallback'] }
 interface Candidate extends OptimizedCandidate {
   stages: Partial<Record<number, StageSnapshot>>;
-  parentKey: string; samples: RepresentativeSample[]; fallback: { seed: number; score: number; sampleIndex: number; rounds: number } | null;
+  parentKey: string; samples: RepresentativeSample[]; fallback: { seed: number; score: number; sampleIndex: number; rounds: number; tasLuckTrace?: TasLuckDecisionTrace } | null;
 }
 export interface OptimizedProgress {
   searchMethod: 'optimized-action-search'; objective: OptimizationObjective;
@@ -55,6 +56,7 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
   if (!root.count) throw new Error('No complete legal Player round plan is available.');
   if (!Number.isSafeInteger(root.minimumBudget) || budget < root.minimumBudget)
     throw new Error('Search budget too small. Minimum required for current first-round action space: ' + root.minimumBudget + '.');
+  const tasSummary = emptyTasLuckSummary(options.tasFrontierCap ?? tasLuckCapForBudget(budget));
   const accumulator = createBattleAccumulator();
   const fastest = createFastestRouteTracker();
   let bestTurnsSample: { turns: number; key: string; sampleIndex: number; actions: SimulationResult['fastestBattleHistory'] } | null = null;
@@ -85,13 +87,26 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
     expansionBeam = withElite(views, fair);
     fairStageEvaluations = evaluations; beamSize = expansionBeam.length;
   };
-  function evaluate(candidate: Candidate) {
+  function* evaluate(candidate: Candidate): Generator<void> {
     const sampleIndex = candidate.stats.evaluations;
     const seeds = pairedSeeds.get(candidate.parentKey) ?? [];
     if (!pairedSeeds.has(candidate.parentKey)) pairedSeeds.set(candidate.parentKey, seeds);
     const seed = seeds[sampleIndex] ?? (seeds[sampleIndex] = rolloutSeed(rootSeed, candidate.plans.length, candidate.parentKey, sampleIndex));
-    const { result, diverged, decisionTrace } = replayPlayerPrefix(snapshot, candidate.plans, seed, engineOptions, false, true);
-    fastest.consider(result, diverged, decisionTrace, candidate.key, sampleIndex, seed);
+    let sample;
+    if (rules.rngPolicy === 'tas-luck') {
+      const search = createTasLuckSearch(tasLuck => replayPlayerPrefix(snapshot,candidate.plans,seed,{...engineOptions,tasLuck},false,true),tasSummary.frontierCap);
+      let counted = emptyTasLuckSummary(tasSummary.frontierCap);
+      while(!search.done) {
+        search.step();
+        const delta={...search.summary};for(const k of ['opportunities','branchesExplored','deduplicated','pruned'] as const)delta[k]-=counted[k];
+        addTasLuckSummary(tasSummary,delta);counted={...search.summary};
+        const observed=search.best;if(observed)fastest.consider(observed.result,observed.diverged,observed.decisionTrace,candidate.key,sampleIndex,seed,candidate.plans);
+        yield;
+      }
+      sample=search.best!;
+    } else sample=replayPlayerPrefix(snapshot,candidate.plans,seed,engineOptions,false,true);
+    const {result,diverged,decisionTrace}=sample;
+    fastest.consider(result, diverged, decisionTrace, candidate.key, sampleIndex, seed, candidate.plans);
     if (!diverged && (result.outcome === 'invalid' || result.outcome === 'unsupported')) throw new Error(result.diagnostics.join(' '));
     if (!candidate.stats.evaluations) candidatesEvaluated++;
     addCandidateOutcome(candidate.stats, result, diverged); evaluations++; depthReached = Math.max(depthReached, candidate.plans.length);
@@ -103,10 +118,10 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
           bestTurnsSample = { turns: result.actionCount, key: candidate.key, sampleIndex, actions: result.actions };
       }
       if (result.outcome === 'player-win' && result.timingCompleteness === 'complete' && result.totalFrames !== null)
-        candidate.samples.push({ frames: result.totalFrames, sampleIndex, seed, rounds: result.rounds });
+        candidate.samples.push({ frames: result.totalFrames, sampleIndex, seed, rounds: result.rounds, ...(result.tasLuckTrace?{tasLuckTrace:result.tasLuckTrace}:{}) });
       // Deterministic fallback: victory, then less remaining Enemy HP, then earlier sample.
       const score = (result.outcome === 'player-win' ? 1e15 : 0) - result.state.combatants.filter(a => a.side === 'enemy').reduce((n, a) => n + a.currentHp, 0);
-      if (!candidate.fallback || score > candidate.fallback.score) candidate.fallback = { score, seed, sampleIndex, rounds: result.rounds };
+      if (!candidate.fallback || score > candidate.fallback.score) candidate.fallback = { score, seed, sampleIndex, rounds: result.rounds, ...(result.tasLuckTrace?{tasLuckTrace:result.tasLuckTrace}:{}) };
     }
     if ([4, 16, 64].includes(candidate.stats.evaluations)) candidate.stages[candidate.stats.evaluations] = {
       stats: { ...candidate.stats }, samples: [...candidate.samples], fallback: candidate.fallback,
@@ -137,7 +152,7 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
         // Round-robin paired samples; rank only after every survivor reaches the target.
         for (let sample = candidates[0].stats.evaluations; sample < target; sample++)
           for (let i = 0; i < candidates.length; i++) {
-            evaluate(candidates[i]);
+            yield* evaluate(candidates[i]);
             if (sample === target - 1 && i === candidates.length - 1) checkpoint(candidates);
             yield;
           }
@@ -152,7 +167,7 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
         if (!active.length || cost > budget - evaluations) continue;
         phase = 'refining';
         for (let i = 0; i < active.length; i++) while (active[i].stats.evaluations < target) {
-          evaluate(active[i]);
+          yield* evaluate(active[i]);
           if (i === active.length - 1 && active[i].stats.evaluations === target) checkpoint(beam);
           yield;
         }
@@ -167,7 +182,7 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
         if (seed === undefined) continue;
         // Reconstruct only up to the decision boundary, never retain every rollout state/history.
         const alreadyEnded = (representative?.rounds ?? c.fallback?.rounds ?? Infinity) <= c.plans.length;
-        const replay = alreadyEnded ? { nextState: null } : replayPlayerPrefix(snapshot, c.plans, seed, engineOptions, true);
+        const replay = alreadyEnded ? { nextState: null } : replayPlayerPrefix(snapshot, c.plans, seed, {...engineOptions, ...(rules.rngPolicy==='tas-luck'?{tasLuck:createTasLuckReplay(representative?.tasLuckTrace??c.fallback?.tasLuckTrace??[]).control}:{})}, true);
         if (replay.nextState) parents.push({ plans: c.plans, state: replay.nextState, key: c.key });
         else {
           const bestStage = c.stages[64] ?? c.stages[16] ?? c.stages[4]!;
@@ -209,14 +224,14 @@ export function createOptimizedSearch(input: BattleInput, budget: number, option
           if (coverage.status === 'deferred-unresolved') diagnostics.add(order.skillName + ': ' + coverage.boundary);
         }
       }
-      const optimized: OptimizedSearchResult = { ...details(), status, rootSeed, config, ...(rules.rngPolicy === 'tas-favorable' ? { rngPolicy: rules.rngPolicy } : {}),
+      const optimized: OptimizedSearchResult = { ...details(), status, rootSeed, config, ...(rules.rngPolicy !== 'natural' ? { rngPolicy: rules.rngPolicy } : {}),
         primaryRecommendation: objective === 'fastest-potential' ? 'fastest-route' : 'fair-prefix', fastestRoute: fastest.best,
         recommendedPrefix: fair[0]?.plans ?? [], recommendedStats: fair[0]?.stats ?? null,
         topCandidates: fair.slice(0, 5).map(({ key, plans, stats }) => ({ key, plans, stats })),
         diagnostics: [...diagnostics], fairStageEvaluations };
       const observed = accumulator.snapshot();
-      return { ...observed, timingDiagnostics: [...observed.timingDiagnostics].sort(), resourceDiagnostics: [...observed.resourceDiagnostics].sort(), fastestBattleByFrames: fastest.best?.actions ?? [], fastestBattleHistory: bestTurnsSample?.actions ?? [], accuracyMode: rules.accuracyMode,
-        search: { ...this.progress(elapsedMs), accuracyMode: rules.accuracyMode, ...(rules.rngPolicy === 'tas-favorable' ? { rngPolicy: rules.rngPolicy } : {}), status }, optimized };
+      return { ...observed, ...(rules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary}}:{}), timingDiagnostics: [...observed.timingDiagnostics].sort(), resourceDiagnostics: [...observed.resourceDiagnostics].sort(), fastestBattleByFrames: fastest.best?.actions ?? [], fastestBattleHistory: bestTurnsSample?.actions ?? [], accuracyMode: rules.accuracyMode,
+        search: { ...this.progress(elapsedMs), accuracyMode: rules.accuracyMode, ...(rules.rngPolicy !== 'natural' ? { rngPolicy: rules.rngPolicy } : {}), status }, optimized };
     },
   };
 }

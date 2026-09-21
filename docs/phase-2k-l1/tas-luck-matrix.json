@@ -1,0 +1,12 @@
+{
+  "baseline": "Phase 2K-L0",
+  "oldPolicy": "tas-favorable",
+  "matrix": [
+    {"category":"direct-status-application","statuses":["poison","paralysis","confusion","probabilistic motivation-down"],"natural":"1/3 or 2/3 application","legacyTas":"apply to Enemy; prevent on Player","legacyDraw":false,"legality":true,"timing":true,"requirements":true,"luck":["apply","prevent"]},
+    {"category":"natural-status-recovery","statuses":["paralysis","confusion","motivation-down"],"natural":"1/4 recover","legacyTas":"Player recovers; Enemy remains","legacyDraw":false,"legality":true,"timing":true,"requirements":true,"luck":["recover","remain"]},
+    {"category":"paralysis-failure","natural":"1/2 miss","legacyTas":"Enemy misses; Player proceeds","legacyDraw":false,"legality":false,"timing":true,"requirements":true,"luck":["miss","pass"]}
+  ],
+  "deterministicExclusions":["native Motivation application including Concert Crush","activated Counter/Interrupt guaranteed status","status Powers","explicit cure","immunity","blocked recovery"],
+  "naturalOnly":["initiative","ordinary accuracy","Enemy decisions","ordinary targets","Random Digimon targets","Player Interrupt targets","Fantasmic element","Necro target","Shadow Scythe ties","Motivation blocked-skill ties","Confusion skill and target replacement","Tail Blade evasion","Interrupt force-miss","Interrupt deletion","cure/revive targets","temporary power recovery","Poison Body recovery","Elemental Power recovery","Invincibility recovery","Invisibility recovery","unreviewed categories"],
+  "coexistence":"Statuses are independent keyed states. Direct effects iterate independent gates; Paralysis and Confusion coexist. No mutually exclusive status-choice gate is implemented."
+}

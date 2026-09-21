@@ -42,7 +42,7 @@ export function rolloutSeed(rootSeed: number, depth: number, parentKey: string, 
   value ^= value >>> 16; value = Math.imul(value, 0x7feb352d); value ^= value >>> 15;
   return (Math.imul(value, 0x846ca68b) ^ (value >>> 16)) >>> 0;
 }
-export interface RepresentativeSample { frames: number; sampleIndex: number; seed: number; rounds?: number }
+export interface RepresentativeSample { tasLuckTrace?: import('./battleTasLuck').TasLuckDecisionTrace; frames: number; sampleIndex: number; seed: number; rounds?: number }
 /** Samples are bounded by the configured finite evaluation-stage ceiling (64 by default). */
 export function representativeSample(samples: readonly RepresentativeSample[], objective: OptimizationObjective): RepresentativeSample | null {
   if (!samples.length) return null;

@@ -1,0 +1,284 @@
+[
+  {
+    "id": 1,
+    "name": "Poison Ivy",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 33,
+        "condition": "always",
+        "byte": 25,
+        "mask": 1,
+        "sourceRow": 48,
+        "sourceLabel": "33% Poison"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Stun Flame Shot",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 66,
+        "condition": "always",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 32,
+        "sourceRow": 52,
+        "sourceLabel": "66% Stun"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "name": "Ocean Love",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "name": "Stun Bubble",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 33,
+        "condition": "always",
+        "byte": 26,
+        "mask": 1,
+        "sourceRow": 55,
+        "sourceLabel": "33% Confuse"
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "name": "Evil Charm",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 26,
+        "mask": 2,
+        "sourceRow": 56,
+        "sourceLabel": "66% Confuse"
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "name": "Sonic Crusher",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 26,
+        "mask": 2,
+        "sourceRow": 56,
+        "sourceLabel": "66% Confuse"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "name": "Concert Crush",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "name": "E-Stun Blast",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 33,
+        "condition": "always",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 16,
+        "sourceRow": 51,
+        "sourceLabel": "33% Stun"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "name": "Brown Stinger",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 25,
+        "mask": 2,
+        "sourceRow": 49,
+        "sourceLabel": "66% Poison"
+      }
+    ]
+  },
+  {
+    "id": 115,
+    "name": "Pretty Attack",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    ]
+  },
+  {
+    "id": 130,
+    "name": "Needle Spray",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "byte": 25,
+        "mask": 4,
+        "sourceRow": 50,
+        "sourceLabel": "Poison w/ Counter"
+      }
+    ]
+  },
+  {
+    "id": 132,
+    "name": "Thunder Ball",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 64,
+        "sourceRow": 53,
+        "sourceLabel": "Stun w/ Counter"
+      }
+    ]
+  },
+  {
+    "id": 140,
+    "name": "Buffalo Breath",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "byte": 26,
+        "mask": 4,
+        "sourceRow": 57,
+        "sourceLabel": "Confuse w/ Counter"
+      }
+    ]
+  },
+  {
+    "id": 185,
+    "name": "Fungus Cruncher",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "poison-body",
+        "condition": "always",
+        "byte": 26,
+        "mask": 128,
+        "sourceRow": 60,
+        "sourceLabel": "Target's body becomes poisonous"
+      }
+    ]
+  },
+  {
+    "id": 215,
+    "name": "Poison Wave",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "poison",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 25,
+        "mask": 2,
+        "sourceRow": 49,
+        "sourceLabel": "66% Poison"
+      },
+      {
+        "kind": "status-application",
+        "status": "poison-body",
+        "condition": "always",
+        "byte": 26,
+        "mask": 128,
+        "sourceRow": 60,
+        "sourceLabel": "Target's body becomes poisonous"
+      }
+    ]
+  },
+  {
+    "id": 228,
+    "name": "Transcend Sword",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 66,
+        "condition": "always",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 32,
+        "sourceRow": 52,
+        "sourceLabel": "66% Stun"
+      }
+    ]
+  },
+  {
+    "id": 237,
+    "name": "Stun Punch",
+    "statusEffects": [
+      {
+        "kind": "status-application",
+        "status": "paralysis",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "sourceAlias": "stun",
+        "byte": 25,
+        "mask": 64,
+        "sourceRow": 53,
+        "sourceLabel": "Stun w/ Counter"
+      }
+    ]
+  }
+]

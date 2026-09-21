@@ -84,8 +84,9 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   field('Accuracy Mode', c.rules.accuracyMode === 'strategy' ? 'Strategy' : 'Game-accurate');
   field('RNG Policy', RNG_POLICY_LABELS[c.rules.rngPolicy ?? 'natural']); field('Floor Specialty', c.floorSpecialty);
   field('Requested evaluations / budget', c.requestedEvaluations); field('Beam width', c.optimizedConfig?.beamWidth); field('Max optimized depth', c.optimizedConfig?.maxDepth);
-  field('Simulator root seed', c.seed); field('Max rounds safety limit', c.maxRounds);
+  field('TAS Luck frontier cap', c.tasFrontierCap); field('Simulator root seed', c.seed); field('Max rounds safety limit', c.maxRounds);
   section('Search Summary'); lines.push(...details(report.searchSummary));
+  if(report.tasLuckSummary){section('TAS Luck Search');lines.push(...details(report.tasLuckSummary));}
   section('Result');
   const selected = report.selectedResult;
   if (selected.kind === 'random-monte-carlo') {
@@ -111,7 +112,7 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     lines.push('', '### Global fastest observation — intended orders', '', 'These may differ from the selected fair strategy.'); orders(selected.fastestCompleteRoute.decisionTrace);
   }
   if (report.rngRequirements.length) {
-    section('TAS RNG Requirements');
+    section(c.rules.rngPolicy === 'tas-luck' ? 'TAS Luck Requirements' : 'TAS RNG Requirements');
     for (const r of report.rngRequirements) lines.push(`- Round ${r.round} · ${reportText(r.actionId)} · ${reportText(actorLabel(r.actorId))} · ${reportText(r.skillName ?? 'Guard')} · ${reportText(actorLabel(r.targetId))} · ${r.phase}: ${reportText(rngRequirementText(r))}`);
   }
   section('Executed Battle'); field('Observation', report.executedBattle.kind); field('Total modeled frames', report.executedBattle.totalFrames); field('Rounds', report.executedBattle.rounds);
