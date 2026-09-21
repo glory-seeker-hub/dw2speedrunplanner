@@ -1,0 +1,61 @@
+{
+  "sizes": [
+    {
+      "name": "random",
+      "markdownUtf8Bytes": 4023,
+      "jsonUtf8Bytes": 8865,
+      "actionHistoryEvents": 2,
+      "tasRequirements": 0,
+      "candidateSummaries": 0
+    },
+    {
+      "name": "fastest",
+      "markdownUtf8Bytes": 5300,
+      "jsonUtf8Bytes": 13314,
+      "actionHistoryEvents": 2,
+      "tasRequirements": 0,
+      "candidateSummaries": 1
+    },
+    {
+      "name": "average",
+      "markdownUtf8Bytes": 5666,
+      "jsonUtf8Bytes": 13668,
+      "actionHistoryEvents": 2,
+      "tasRequirements": 0,
+      "candidateSummaries": 1
+    },
+    {
+      "name": "tas",
+      "markdownUtf8Bytes": 15794,
+      "jsonUtf8Bytes": 33004,
+      "actionHistoryEvents": 6,
+      "tasRequirements": 7,
+      "candidateSummaries": 1
+    },
+    {
+      "name": "long",
+      "markdownUtf8Bytes": 337762,
+      "jsonUtf8Bytes": 627296,
+      "actionHistoryEvents": 250,
+      "tasRequirements": 0,
+      "candidateSummaries": 0
+    },
+    {
+      "name": "cancelled",
+      "markdownUtf8Bytes": 5467,
+      "jsonUtf8Bytes": 13470,
+      "actionHistoryEvents": 2,
+      "tasRequirements": 0,
+      "candidateSummaries": 1
+    }
+  ],
+  "performance": {
+    "fixture": "long",
+    "iterations": 100,
+    "buildMs": 4.108397,
+    "markdownMs": 62.21596899999999,
+    "jsonMs": 2.0090990000000057,
+    "markdownUtf8Bytes": 337762,
+    "jsonUtf8Bytes": 627296
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "branch": "phase-2l-a-simulation-report-export",
+  "baseline": "7945fac",
+  "fullTests": { "passed": 2664, "failed": 0, "durationMs": 37688.5367 },
+  "focusedTests": { "passed": 112, "failed": 0 },
+  "dataSelfChecks": { "passed": 57, "total": 57 },
+  "battleSkillChecks": { "passed": 11, "total": 11 },
+  "effectCoverage": { "decodedOccurrences": 598, "groups": 101, "authoritativeOccurrences": 370, "usedDeferredOccurrences": 0, "unusedDictionaryRows": 5 },
+  "workbookSourceCheck": "passed",
+  "typescriptApp": "passed",
+  "typescriptNode": "passed",
+  "productionBuild": "passed; existing chunk-size warning",
+  "lint": { "errors": 3, "warnings": 7, "newFindings": 0 },
+  "diffCheck": "passed",
+  "browserSmoke": {
+    "plannerNaturalExport": "passed; downloaded file inspected",
+    "customStatDelta": "passed; downloaded file inspected",
+    "frozenControls": "passed; downloaded file inspected after live controls changed",
+    "tas": "completed with six visible requirements; export clicked; downloaded file inspection incomplete",
+    "cancellation": "incomplete: automatic approval review failed on cancel click due to usage limit",
+    "routeSwitch": "not completed in browser; automated switch and deletion tests pass"
+  },
+  "plannerSchemaVersion": 7,
+  "mechanicsChanged": false,
+  "searchSemanticsChanged": false,
+  "reportPersistenceAdded": false,
+  "committed": false,
+  "pushed": false
+}

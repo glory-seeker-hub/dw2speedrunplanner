@@ -1,4 +1,5 @@
 import { STAT_LABELS } from '@/utils/battle/battleStatOverrides';
+import { SimulationReportExport } from './SimulationReportExport';
 import { RNG_POLICY_LABELS } from '@/utils/battle/battleRngPolicy';
 import { OptimizedSearchResults } from './OptimizedSearchResults';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,6 +87,7 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
     ['Completed Successes', `${results.completedSuccesses.toLocaleString()} / ${results.totalSimulations.toLocaleString()}`],
   ];
   return <div className="space-y-6">
+    <SimulationReportExport report={results.report} />
     {results.playerStatProvenance && <section aria-label="Player stat provenance" className="rounded border p-3 space-y-1">
       <p className="font-semibold">Player stat source: {results.playerStatProvenance.source === 'custom-simulation-stats' ? 'Custom simulation stats' : 'Planner baseline'}</p>
       {results.playerStatProvenance.players.map(p => <div key={p.instanceId}>
