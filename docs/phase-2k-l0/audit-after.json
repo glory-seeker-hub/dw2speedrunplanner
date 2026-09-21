@@ -1,0 +1,952 @@
+{
+  "growth": [
+    {
+      "speciesId": "kunemon",
+      "profile": {
+        "speciesId": "kunemon",
+        "rank": "Rookie",
+        "hpGrowth": "low",
+        "mpGrowth": "normal",
+        "atkGrowth": "high",
+        "defGrowth": "low",
+        "spdGrowth": "high"
+      },
+      "from": 8,
+      "to": 9,
+      "spd": 20,
+      "stats": {
+        "hp": 108,
+        "mp": 100,
+        "atk": 61.25,
+        "def": 67.75,
+        "spd": 23.25
+      },
+      "growth": {
+        "hp": {
+          "available": true,
+          "min": 8,
+          "max": 11,
+          "expected": 9.5,
+          "rolls": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "mp": {
+          "available": true,
+          "min": 9,
+          "max": 11,
+          "expected": 10,
+          "rolls": [
+            9,
+            10,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "atk": {
+          "available": true,
+          "min": 1,
+          "max": 2,
+          "expected": 1.25,
+          "rolls": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "def": {
+          "available": true,
+          "min": 0,
+          "max": 1,
+          "expected": 0.75,
+          "rolls": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "spd": {
+          "available": true,
+          "min": 2,
+          "max": 4,
+          "expected": 3.25,
+          "rolls": [
+            2,
+            3,
+            4,
+            4
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-20"
+        }
+      },
+      "missing": []
+    },
+    {
+      "speciesId": "kunemon",
+      "profile": {
+        "speciesId": "kunemon",
+        "rank": "Rookie",
+        "hpGrowth": "low",
+        "mpGrowth": "normal",
+        "atkGrowth": "high",
+        "defGrowth": "low",
+        "spdGrowth": "high"
+      },
+      "from": 8,
+      "to": 9,
+      "spd": 20.75,
+      "stats": {
+        "hp": 108,
+        "mp": 100,
+        "atk": 61.25,
+        "def": 67.75,
+        "spd": 24
+      },
+      "growth": {
+        "hp": {
+          "available": true,
+          "min": 8,
+          "max": 11,
+          "expected": 9.5,
+          "rolls": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "mp": {
+          "available": true,
+          "min": 9,
+          "max": 11,
+          "expected": 10,
+          "rolls": [
+            9,
+            10,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "atk": {
+          "available": true,
+          "min": 1,
+          "max": 2,
+          "expected": 1.25,
+          "rolls": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "def": {
+          "available": true,
+          "min": 0,
+          "max": 1,
+          "expected": 0.75,
+          "rolls": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "spd": {
+          "available": true,
+          "min": 2,
+          "max": 4,
+          "expected": 3.25,
+          "rolls": [
+            2,
+            3,
+            4,
+            4
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-20"
+        }
+      },
+      "missing": []
+    },
+    {
+      "speciesId": "kunemon",
+      "profile": {
+        "speciesId": "kunemon",
+        "rank": "Rookie",
+        "hpGrowth": "low",
+        "mpGrowth": "normal",
+        "atkGrowth": "high",
+        "defGrowth": "low",
+        "spdGrowth": "high"
+      },
+      "from": 8,
+      "to": 9,
+      "spd": 50.75,
+      "stats": {
+        "hp": 108,
+        "mp": 100,
+        "atk": 61.25,
+        "def": 67.75,
+        "spd": 53.25
+      },
+      "growth": {
+        "hp": {
+          "available": true,
+          "min": 8,
+          "max": 11,
+          "expected": 9.5,
+          "rolls": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "mp": {
+          "available": true,
+          "min": 9,
+          "max": 11,
+          "expected": 10,
+          "rolls": [
+            9,
+            10,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "atk": {
+          "available": true,
+          "min": 1,
+          "max": 2,
+          "expected": 1.25,
+          "rolls": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "def": {
+          "available": true,
+          "min": 0,
+          "max": 1,
+          "expected": 0.75,
+          "rolls": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "spd": {
+          "available": true,
+          "min": 2,
+          "max": 3,
+          "expected": 2.5,
+          "rolls": [
+            2,
+            2,
+            3,
+            3
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "21-50"
+        }
+      },
+      "missing": []
+    },
+    {
+      "speciesId": "kunemon",
+      "profile": {
+        "speciesId": "kunemon",
+        "rank": "Rookie",
+        "hpGrowth": "low",
+        "mpGrowth": "normal",
+        "atkGrowth": "high",
+        "defGrowth": "low",
+        "spdGrowth": "high"
+      },
+      "from": 8,
+      "to": 9,
+      "spd": 100.75,
+      "stats": {
+        "hp": 108,
+        "mp": 100,
+        "atk": 61.25,
+        "def": 67.75,
+        "spd": 102
+      },
+      "growth": {
+        "hp": {
+          "available": true,
+          "min": 8,
+          "max": 11,
+          "expected": 9.5,
+          "rolls": [
+            8,
+            9,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "mp": {
+          "available": true,
+          "min": 9,
+          "max": 11,
+          "expected": 10,
+          "rolls": [
+            9,
+            10,
+            10,
+            11
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "1-11"
+        },
+        "atk": {
+          "available": true,
+          "min": 1,
+          "max": 2,
+          "expected": 1.25,
+          "rolls": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "def": {
+          "available": true,
+          "min": 0,
+          "max": 1,
+          "expected": 0.75,
+          "rolls": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "7-10"
+        },
+        "spd": {
+          "available": true,
+          "min": 1,
+          "max": 2,
+          "expected": 1.25,
+          "rolls": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "outcomeProbability": 0.25,
+          "bracket": "51-100"
+        }
+      },
+      "missing": []
+    }
+  ],
+  "selected": [
+    {
+      "id": 21,
+      "name": "Trick Or Treat",
+      "recordKind": "technique",
+      "actionKind": "attack",
+      "animationKind": "magic",
+      "targetGroup": "all-enemies",
+      "rank": "Ultimate",
+      "element": "Nature",
+      "mpCost": 30,
+      "attackPowerRaw": 60,
+      "attackPower": 30,
+      "targetModes": [
+        "normal"
+      ],
+      "effectFlags": {
+        "17": 64,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 1,
+        "22": 0,
+        "23": 0,
+        "24": 0,
+        "25": 0,
+        "26": 0,
+        "27": 0,
+        "28": 0,
+        "29": 0,
+        "30": 0,
+        "31": 0,
+        "32": 0,
+        "33": 1
+      },
+      "effects": [
+        {
+          "kind": "parameter-modifier",
+          "stats": [
+            "def"
+          ],
+          "direction": "down",
+          "subject": "user",
+          "multiplier": 0.5,
+          "duration": "this-turn",
+          "byte": 17,
+          "mask": 64,
+          "sourceRow": 9,
+          "sourceLabel": "Your DEF is halved this turn"
+        },
+        {
+          "kind": "unresolved",
+          "reason": "deprecated",
+          "note": "Source marks this bit deprecated; no damage semantics inferred.",
+          "byte": 21,
+          "mask": 1,
+          "sourceRow": 25,
+          "sourceLabel": "Deprecated"
+        },
+        {
+          "kind": "target-mode-modifier",
+          "mode": "normal",
+          "byte": 33,
+          "mask": 1,
+          "sourceRow": 89,
+          "sourceLabel": "Hit target(s)"
+        }
+      ],
+      "issues": [],
+      "provenance": {
+        "row": 44,
+        "label": "Pumpkinmon - Trick Or Treat",
+        "bytes": [
+          21,
+          0,
+          97,
+          34,
+          30,
+          3,
+          188,
+          12,
+          60,
+          0,
+          0,
+          0,
+          190,
+          0,
+          239,
+          1,
+          64,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          226,
+          2,
+          0,
+          0,
+          252,
+          2,
+          0,
+          0,
+          0,
+          0,
+          50,
+          8,
+          22,
+          9,
+          0,
+          0,
+          57,
+          8,
+          50,
+          9,
+          0,
+          0,
+          188,
+          3,
+          0,
+          0,
+          0,
+          0,
+          150,
+          3,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "recordKind": "technique",
+      "actionKind": "attack",
+      "animationKind": "projectile",
+      "targetGroup": "one-enemy",
+      "rank": "Rookie",
+      "element": "Neutral",
+      "mpCost": 4,
+      "attackPowerRaw": 40,
+      "attackPower": 20,
+      "targetModes": [
+        "normal"
+      ],
+      "effectFlags": {
+        "17": 64,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 1,
+        "22": 0,
+        "23": 0,
+        "24": 0,
+        "25": 0,
+        "26": 0,
+        "27": 0,
+        "28": 0,
+        "29": 0,
+        "30": 0,
+        "31": 4,
+        "32": 0,
+        "33": 1
+      },
+      "effects": [
+        {
+          "kind": "parameter-modifier",
+          "stats": [
+            "def"
+          ],
+          "direction": "down",
+          "subject": "user",
+          "multiplier": 0.5,
+          "duration": "this-turn",
+          "byte": 17,
+          "mask": 64,
+          "sourceRow": 9,
+          "sourceLabel": "Your DEF is halved this turn"
+        },
+        {
+          "kind": "unresolved",
+          "reason": "deprecated",
+          "note": "Source marks this bit deprecated; no damage semantics inferred.",
+          "byte": 21,
+          "mask": 1,
+          "sourceRow": 25,
+          "sourceLabel": "Deprecated"
+        },
+        {
+          "kind": "target-mode-modifier",
+          "mode": "normal",
+          "byte": 33,
+          "mask": 1,
+          "sourceRow": 89,
+          "sourceLabel": "Hit target(s)"
+        },
+        {
+          "kind": "unresolved",
+          "reason": "unknown-bit",
+          "note": "No documented interpretation.",
+          "byte": 31,
+          "mask": 4
+        }
+      ],
+      "issues": [],
+      "provenance": {
+        "row": 124,
+        "label": "Syakomon – Black Pearl Shot",
+        "bytes": [
+          61,
+          0,
+          80,
+          5,
+          4,
+          6,
+          156,
+          12,
+          40,
+          0,
+          0,
+          0,
+          12,
+          0,
+          239,
+          1,
+          64,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          1,
+          0,
+          0,
+          0,
+          44,
+          9,
+          0,
+          0,
+          60,
+          9,
+          0,
+          0,
+          0,
+          0,
+          229,
+          3,
+          0,
+          0,
+          0,
+          0,
+          250,
+          3,
+          0,
+          0,
+          0,
+          0,
+          188,
+          3,
+          0,
+          0,
+          0,
+          0,
+          150,
+          3,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": 73,
+      "name": "Concert Crush",
+      "recordKind": "technique",
+      "actionKind": "attack",
+      "animationKind": "magic",
+      "targetGroup": "one-enemy",
+      "rank": "Ultimate",
+      "element": "Neutral",
+      "mpCost": 18,
+      "attackPowerRaw": 55,
+      "attackPower": 27.5,
+      "targetModes": [
+        "normal"
+      ],
+      "effectFlags": {
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0,
+        "24": 0,
+        "25": 0,
+        "26": 16,
+        "27": 0,
+        "28": 0,
+        "29": 0,
+        "30": 0,
+        "31": 0,
+        "32": 0,
+        "33": 1
+      },
+      "effects": [
+        {
+          "kind": "status-application",
+          "status": "motivation-down",
+          "condition": "always",
+          "byte": 26,
+          "mask": 16,
+          "sourceRow": 58,
+          "sourceLabel": "Motivation Down"
+        },
+        {
+          "kind": "target-mode-modifier",
+          "mode": "normal",
+          "byte": 33,
+          "mask": 1,
+          "sourceRow": 89,
+          "sourceLabel": "Hit target(s)"
+        }
+      ],
+      "issues": [],
+      "provenance": {
+        "row": 148,
+        "label": "Etemon - Concert Crush",
+        "bytes": [
+          73,
+          0,
+          81,
+          37,
+          18,
+          2,
+          177,
+          12,
+          55,
+          0,
+          0,
+          0,
+          110,
+          0,
+          239,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          16,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          240,
+          10,
+          0,
+          0,
+          0,
+          11,
+          0,
+          0,
+          0,
+          0,
+          41,
+          8,
+          48,
+          8,
+          0,
+          0,
+          66,
+          8,
+          69,
+          8,
+          0,
+          0,
+          243,
+          3,
+          0,
+          0,
+          0,
+          0,
+          252,
+          3,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "occurrences": [
+    {
+      "id": 21,
+      "name": "Trick Or Treat",
+      "effect": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "user",
+        "multiplier": 0.5,
+        "duration": "this-turn",
+        "byte": 17,
+        "mask": 64,
+        "sourceRow": 9,
+        "sourceLabel": "Your DEF is halved this turn"
+      }
+    },
+    {
+      "id": 58,
+      "name": "Ocean Love",
+      "effect": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "effect": {
+        "kind": "parameter-modifier",
+        "stats": [
+          "def"
+        ],
+        "direction": "down",
+        "subject": "user",
+        "multiplier": 0.5,
+        "duration": "this-turn",
+        "byte": 17,
+        "mask": 64,
+        "sourceRow": 9,
+        "sourceLabel": "Your DEF is halved this turn"
+      }
+    },
+    {
+      "id": 61,
+      "name": "Black Pearl Shot",
+      "effect": {
+        "kind": "unresolved",
+        "reason": "unknown-bit",
+        "note": "No documented interpretation.",
+        "byte": 31,
+        "mask": 4
+      }
+    },
+    {
+      "id": 62,
+      "name": "Stun Bubble",
+      "effect": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 33,
+        "condition": "always",
+        "byte": 26,
+        "mask": 1,
+        "sourceRow": 55,
+        "sourceLabel": "33% Confuse"
+      }
+    },
+    {
+      "id": 66,
+      "name": "Evil Charm",
+      "effect": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 26,
+        "mask": 2,
+        "sourceRow": 56,
+        "sourceLabel": "66% Confuse"
+      }
+    },
+    {
+      "id": 69,
+      "name": "Sonic Crusher",
+      "effect": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 66,
+        "condition": "always",
+        "byte": 26,
+        "mask": 2,
+        "sourceRow": 56,
+        "sourceLabel": "66% Confuse"
+      }
+    },
+    {
+      "id": 73,
+      "name": "Concert Crush",
+      "effect": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    },
+    {
+      "id": 115,
+      "name": "Pretty Attack",
+      "effect": {
+        "kind": "status-application",
+        "status": "motivation-down",
+        "condition": "always",
+        "byte": 26,
+        "mask": 16,
+        "sourceRow": 58,
+        "sourceLabel": "Motivation Down"
+      }
+    },
+    {
+      "id": 140,
+      "name": "Buffalo Breath",
+      "effect": {
+        "kind": "status-application",
+        "status": "confusion",
+        "chancePercent": 100,
+        "condition": "counter-triggered",
+        "byte": 26,
+        "mask": 4,
+        "sourceRow": 57,
+        "sourceLabel": "Confuse w/ Counter"
+      }
+    }
+  ]
+}

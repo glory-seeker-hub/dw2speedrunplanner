@@ -64,7 +64,7 @@ export interface BattleCombatantState {
   maxMp: number;
   currentMp: number;
   atkStage: number; defStage: number; spdStage: number;
-  motivationBlocked?: string[]; hpRecoveryBlocked?: boolean; statusRecoveryBlocked?: boolean; defenseOne?: boolean;
+  motivationBlocked?: string[]; hpRecoveryBlocked?: boolean; statusRecoveryBlocked?: boolean; halfDefense?: boolean;
   parametersSuppressed: boolean; revivedRound?: number;
   elementalPower: SkillElement | null;
   /** Custom legacy inputs only; canonical effects use discrete stages. */

@@ -12,8 +12,8 @@ export const fullMpRequired = (skill: BattleSkillSelection) => effectsOf(skill).
 export const canPayRequiredMp = (actor: BattleCombatantState, skill: BattleSkillSelection) => !fullMpRequired(skill) || actor.currentMp >= getBattleSkillById(skill.canonicalSkillId!)!.mpCost;
 export const bypassAccuracy = (skill: BattleSkillSelection) => skill.canonicalSkillId === 0x66 || effectsOf(skill).some(e => e.kind === 'accuracy-modifier' && e.modifier === 'cannot-miss');
 export const counterCostTransfer = (skill: BattleSkillSelection) => skill.canonicalSkillId === 0x89 && effectsOf(skill).some(e => e.byte === 22 && e.mask === 1);
-/** Project override: the audited shared half-DEF flag means exact DEF=1 after use. */
-export const postUseDefenseOne = (skill: BattleSkillSelection) => effectsOf(skill).some(e => e.byte === 17 && e.mask === 0x40
+/** Reviewed non-stacking post-use half DEF, cleared at the round boundary. */
+export const postUseHalfDefense = (skill: BattleSkillSelection) => effectsOf(skill).some(e => e.byte === 17 && e.mask === 0x40
   || skill.canonicalSkillId === 0x3d && e.byte === 31 && e.mask === 4);
 
 /** Selection happens only on application/initialization, never during a legality query. */
@@ -49,7 +49,7 @@ export function copyNegativeStatuses(actor: BattleCombatantState, target: Battle
 export function clearRoundEffects(state: BattleState): void {
   for (const actor of state.combatants) {
     actor.parametersSuppressed = false;
-    delete actor.hpRecoveryBlocked; delete actor.statusRecoveryBlocked; delete actor.defenseOne;
+    delete actor.hpRecoveryBlocked; delete actor.statusRecoveryBlocked; delete actor.halfDefense;
   }
 }
 export function resolvePolicyTarget(state: BattleState, action: PlannedAction, rng: BattleRng): string[] | null {

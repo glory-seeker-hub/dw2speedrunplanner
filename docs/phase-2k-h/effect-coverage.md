@@ -12,7 +12,7 @@
 | 17 | 0x8 | Double your SPD this turn | 0x6E Slamming Tusk | authoritative | battleOrder.calculateActionOrder. Queue-only Double SPD / Act Last. |
 | 17 | 0x10 | Increase your evasion while countering this turn | 0x85 Tail Blade | authoritative | battleAccuracy.resolveActionAccuracy. Reviewed Tail Blade 1/3 evasion. |
 | 17 | 0x20 | Delays user's turn to the end | 0xEE Rail Cannon | authoritative | battleOrder.calculateActionOrder. Queue-only Double SPD / Act Last. |
-| 17 | 0x40 | Your DEF is halved this turn | 0x15 Trick Or Treat; 0x3D Black Pearl Shot | authoritative | battleEffectCompletion.postUseDefenseOne. User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat. |
+| 17 | 0x40 | Your DEF is halved this turn | 0x15 Trick Or Treat; 0x3D Black Pearl Shot | authoritative | battleEffectCompletion.postUseHalfDefense. Reviewed post-use half DEF for the current round; non-stacking and independent of persistent stages. |
 | 18 | 0x1 | Deal 1.5 damage back when countering | 0x8B Beast King Fist | authoritative | battleDamage.calculateActionDamage.  |
 | 18 | 0x2 | Heal strong digimon/ damage weak/neutral digimon | 0x50 Musical Fist | authoritative | battleSimulation. Reviewed half-current-HP, pre-impact <=10% execute, type-disadvantage heal, and floor(final HP damage / 2) MP damage. |
 | 18 | 0x4 | Miss if counter not triggered | 0xF2 GAIA Gear | authoritative | battleReactions.counterForcesMiss.  |
@@ -85,7 +85,7 @@
 | 29 | 0x8 | Cures Demotivation (used by Interferon) | 0xE3 Reset Status | authoritative | battleSupportEffects.applySupportEffects. Explicit cure is independent from parameter suppression. |
 | 31 | 0x2 | Revive and full heal digimon | 0xB7 Crimson Flame; 0xCE Hung on Death | authoritative | battleSupportEffects.applySupportEffects.  |
 | 31 | 0x2 | Revive and full heal digimon | 0x111 (unnamed); 0x114 (unnamed); 0x117 (unnamed) | not-applicable | none. Item/system record; not a simulated technique. |
-| 31 | 0x4 | Unknown bit | 0x3D Black Pearl Shot | authoritative | battleEffectCompletion.postUseDefenseOne. User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat. |
+| 31 | 0x4 | Unknown bit | 0x3D Black Pearl Shot | authoritative | battleEffectCompletion.postUseHalfDefense. Reviewed post-use half DEF for the current round; non-stacking and independent of persistent stages. |
 | 31 | 0x8 | Can’t Recover HP | 0x4B Darkside Attack | authoritative | battleSupportEffects / battleStatuses. Round-scoped component-specific recovery block. |
 | 31 | 0x10 | Can’t Recover Status | 0x67 GigaByte Wing | authoritative | battleSupportEffects / battleStatuses. Round-scoped component-specific recovery block. |
 | 31 | 0x20 | Prevent counters & Interrupts this turn (Interrupt prevention is broken) | 0xBB Banana Slip | authoritative | battleSupportEffects.applySupportEffects. Prevents only unactivated waiting Counters for this round. |

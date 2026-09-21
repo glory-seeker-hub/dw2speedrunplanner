@@ -1,4 +1,4 @@
-import { initializeMotivation, clearRoundEffects, copyNegativeStatuses, randomTarget, necroTarget, bypassAccuracy, postUseDefenseOne, effectsOf } from './battleEffectCompletion';
+import { initializeMotivation, clearRoundEffects, copyNegativeStatuses, randomTarget, necroTarget, bypassAccuracy, postUseHalfDefense, effectsOf } from './battleEffectCompletion';
 import { classifyEffect } from './battleEffectCoverage';
 import { getBattleSkillById } from '@/data/battleSkills';
 import { assistEligible, assistCandidateIds, chooseAssistTargets, assistTargetsAtExecution, isRevive, applySupportEffects } from './battleSupportEffects';
@@ -268,7 +268,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         }
         delete actor.confusionSuppressedForActionId;
         afterLegacyAction(actor);
-        if (postUseDefenseOne(action.skill)) { actor.defenseOne = true; (entry.effectAudit ??= []).push('Post-use DEF = 1 for the remainder of this round'); }
+        if (postUseHalfDefense(action.skill)) { actor.halfDefense = true; (entry.effectAudit ??= []).push('Post-use half DEF for the remainder of this round'); }
         action.state = 'resolved'; entry.state = 'resolved';
         // Custom legacy chains have no measured multi-execution timing claim.
         const timing = resolveActionTiming({ actionKind: action.kind, timingClass: entry.timingClass,
