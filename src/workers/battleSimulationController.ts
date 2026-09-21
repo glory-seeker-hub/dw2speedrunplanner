@@ -1,4 +1,5 @@
 import type { PlayerStatProvenance } from '@/utils/battle/battleStatOverrides';
+import { buildBattleSimulationReport, snapshotSimulationReportJob, type SimulationReportJobRequest } from '@/utils/battle/battleSimulationReport';
 import type { SearchRequest, SearchResponse } from './battleSimulationProtocol';
 import type { SearchProgress } from '@/utils/battle/battleSimulationSearch';
 import type { SimulationResult } from '@/types/digimon';
@@ -17,12 +18,13 @@ export function createSearchController(factory: () => WorkerPort, update: (state
   const dispose = () => { jobId = null; if (worker) { worker.onmessage = null; worker.onerror = null; worker.onmessageerror = null; worker.terminate(); worker = null; } };
   const fail = (message: string) => { if (import.meta.env.DEV) console.error('Battle simulation failed:', message); dispose(); publish({ running: false, cancelling: false, error: message }); };
   return {
-    start(request: Omit<Extract<SearchRequest, { type: 'START' }>, 'type' | 'jobId'> & { playerStatProvenance?: PlayerStatProvenance }) {
+    start(request: Omit<Extract<SearchRequest, { type: 'START' }>, 'type' | 'jobId'> & { playerStatProvenance?: PlayerStatProvenance; plannerProvenance?: SimulationReportJobRequest['plannerProvenance'] }) {
       if (jobId) return;
       const id = 'simulation-' + ++generation; jobId = id;
       publish({ running: true, cancelling: false, progress: null, error: null });
       try {
-        const { playerStatProvenance, ...snapshot } = structuredClone(request);
+        const { playerStatProvenance, plannerProvenance, ...snapshot } = structuredClone(request);
+        const reportJob = snapshotSimulationReportJob({ ...snapshot, playerStatProvenance, plannerProvenance });
         worker = factory();
         worker.onmessage = ({ data }) => {
           if (jobId !== id || data.jobId !== id) return;
@@ -30,7 +32,8 @@ export function createSearchController(factory: () => WorkerPort, update: (state
           if (data.type === 'ERROR') { fail(data.message); return; }
           if (data.type !== 'COMPLETE' && data.type !== 'CANCELLED') return;
           dispose(); publish({ running: false, cancelling: false, progress: data.result.search ?? null });
-          complete(playerStatProvenance ? { ...data.result, playerStatProvenance } : data.result);
+          const report = buildBattleSimulationReport(data.result, reportJob);
+          complete({ ...data.result, ...(playerStatProvenance ? { playerStatProvenance } : {}), ...(report ? { report } : {}) });
         };
         worker.onerror = event => { if (jobId !== id) return; event.preventDefault?.(); if (import.meta.env.DEV) console.error('Worker error:', event.message); fail('Simulation worker failed. Please retry.'); };
         worker.onmessageerror = () => { if (jobId === id) fail('Could not read simulation worker results. Please retry.'); };

@@ -1,0 +1,10 @@
+const fs=require('node:fs');
+const {representativeFixtures,buildBattleSimulationReport,load}=require('../tests/helpers/simulationReportFixtures.cjs');
+const {serializeBattleSimulationReportMarkdown:md,serializeBattleSimulationReportJson:json}=load('src/utils/battle/battleSimulationReportSerialization.ts');
+const fixtures=representativeFixtures(),directory='docs/phase-2l-a';fs.mkdirSync(directory,{recursive:true});
+const sizes=Object.entries(fixtures).map(([name,{report}])=>({name,markdownUtf8Bytes:Buffer.byteLength(md(report)),jsonUtf8Bytes:Buffer.byteLength(json(report)),actionHistoryEvents:report.executedBattle.actions.length,tasRequirements:report.rngRequirements.length,candidateSummaries:report.selectedResult.topCandidates?.length??0}));
+for(const name of ['fastest','average','tas'])fs.writeFileSync(`${directory}/example-${name}-report.md`,md(fixtures[name].report));
+const h=fixtures.long,iterations=100;
+const measure=fn=>{for(let i=0;i<10;i++)fn();const start=performance.now();for(let i=0;i<iterations;i++)fn();return (performance.now()-start)/iterations;};
+const result={sizes,performance:{fixture:'long',iterations,buildMs:measure(()=>buildBattleSimulationReport(h.result,h.job)),markdownMs:measure(()=>md(h.report)),jsonMs:measure(()=>json(h.report)),markdownUtf8Bytes:Buffer.byteLength(md(h.report)),jsonUtf8Bytes:Buffer.byteLength(json(h.report))}};
+fs.writeFileSync(`${directory}/characterization.json`,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));

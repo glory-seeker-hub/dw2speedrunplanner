@@ -91,6 +91,7 @@ export interface BattleDigimon {
 }
 
 export interface SimulationResult {
+  report?: import('@/utils/battle/battleSimulationReport').BattleSimulationReport;
   optimized?: import('@/utils/battle/battleOptimizedSearch').OptimizedSearchResult;
   playerStatProvenance?: import('@/utils/battle/battleStatOverrides').PlayerStatProvenance;
   rngPolicy?: import('@/utils/battle/battleRngPolicy').BattleRngPolicy;
