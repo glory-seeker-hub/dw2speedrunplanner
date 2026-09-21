@@ -1,0 +1,15 @@
+const fs = require('node:fs');
+const { load } = require('../tests/helpers/loadTs.cjs');
+const { BATTLE_SKILLS } = load('src/data/battleSkills.ts');
+const { getGrowthProfile } = load('src/data/growthProfiles.ts');
+const { getDigimonByName } = load('src/utils/digimonLookup.ts');
+const { applyExpectedLevelUpGrowth } = load('src/utils/statGrowth.ts');
+const species = getDigimonByName('Kunemon');
+const growth = [20, 20.75, 50.75, 100.75].map(spd => ({ speciesId: species.id, profile: getGrowthProfile(species.id), from: 8, to: 9, spd, ...applyExpectedLevelUpGrowth(species.id, 8, { hp: 98.5, mp: 90, atk: 60, def: 67, spd }) }));
+const selected = BATTLE_SKILLS.filter(s => [0x49, 0x15, 0x3d].includes(s.id));
+const descriptors = [[26,1],[26,2],[26,4],[26,8],[26,16],[17,64],[31,4]];
+const occurrences = BATTLE_SKILLS.flatMap(s => s.effects.filter(e => descriptors.some(([b,m]) => e.byte===b && e.mask===m)).map(effect => ({id:s.id,name:s.name,effect})));
+const report = { growth, selected, occurrences };
+fs.mkdirSync('docs/phase-2k-l0', {recursive:true});
+fs.writeFileSync(`docs/phase-2k-l0/audit-${process.argv[2] ?? 'current'}.json`,JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({growth:growth.map(g=>({spd:g.spd,growth:g.growth.spd})),selected:selected.map(s=>({id:s.id,name:s.name,action:s.actionKind,target:s.targetGroup,effects:s.effects})),occurrences},null,2));

@@ -141,19 +141,21 @@ export const estimateStatGrowth = (
     }
     row = findRow(ATK_DEF_GROWTH_ROWS, rate, offset);
   } else {
-    if (typeof currentSpeed !== 'number') {
+    if (typeof currentSpeed !== 'number' || !Number.isFinite(currentSpeed)) {
       return {
         available: false,
         reason: 'SPD growth requires the current Speed value (pre-level-up bracket lookup).',
       };
     }
-    row = findRow(SPD_GROWTH_ROWS, rate, currentSpeed);
+    // Source brackets describe integer SPD. Normalize only the lookup key;
+    // preserve the fractional expected stat when adding the selected growth.
+    row = findRow(SPD_GROWTH_ROWS, rate, Math.floor(currentSpeed));
   }
 
   if (!row) {
     return {
       available: false,
-      reason: `No verified growth row for stat "${stat}", rate "${rate}".`,
+      reason: `No verified growth row for species "${profile.speciesId}", EL ${currentLevel} -> ${newEL}, stat "${stat}", rate "${rate}"${category === 'spd' ? `, SPD ${currentSpeed}` : ''}.`,
     };
   }
   if (row.rolls.length !== GROWTH_OUTCOMES_PER_ROW) {

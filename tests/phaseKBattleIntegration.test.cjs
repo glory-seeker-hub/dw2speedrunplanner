@@ -146,21 +146,21 @@ for (const skill of data.BATTLE_SKILLS.filter(s => s.effects.some(e => e.kind ==
   });
 }
 for (const id of [0x15, 0x3d]) {
-  for (const miss of [false,true]) test(`Shared DEF1 after Hit/Miss ${id}/${miss}`, () => {
+  for (const miss of [false,true]) test(`Shared half DEF after Hit/Miss ${id}/${miss}`, () => {
     const result = run([unit('P',id)], [unit('E')], { rng: rng({ accuracy: [miss?127:0,0] }) });
     assert.equal(action(result).outcome, miss?'miss':'hit');
-    assert.ok(action(result).effectAudit.some(e => e.includes('DEF = 1')));
-    assert.equal(action(result,'E').impacts[0].damage,300);
-    assert.equal(result.state.combatants[0].defenseOne,undefined);
+    assert.ok(action(result).effectAudit.some(e => e.includes('half DEF')));
+    assert.equal(action(result,'E').impacts[0].damage,30);
+    assert.equal(result.state.combatants[0].halfDefense,undefined);
   });
-  test(`Shared DEF1 after mechanical Miss ${id}`, () => {
+  test(`Shared half DEF after mechanical Miss ${id}`, () => {
     const result = run([unit('P',id,{initialStatuses:{paralysis:true}})], [unit('E')], {rng:rng({'paralysis-failure':[1]})});
     assert.equal(action(result).outcome,'miss');
-    assert.equal(action(result,'E').impacts[0].damage,300);
+    assert.equal(action(result,'E').impacts[0].damage,30);
   });
-  test(`Shared DEF1 does not apply to skipped action ${id}`, () => {
+  test(`Shared half DEF does not apply to skipped action ${id}`, () => {
     const result = run([unit('P')], [unit('E',id,{currentHp:1,stats:{spd:1}})]);
     assert.equal(action(result,'E').outcome,'skipped');
-    assert.equal(result.state.combatants[1].defenseOne,undefined);
+    assert.equal(result.state.combatants[1].halfDefense,undefined);
   });
 }

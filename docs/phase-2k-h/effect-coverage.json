@@ -587,8 +587,8 @@
         "sourceLabel": "Your DEF is halved this turn"
       },
       "status": "authoritative",
-      "handler": "battleEffectCompletion.postUseDefenseOne",
-      "boundary": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
+      "handler": "battleEffectCompletion.postUseHalfDefense",
+      "boundary": "Reviewed post-use half DEF for the current round; non-stacking and independent of persistent stages.",
       "techniques": [
         {
           "id": 21,
@@ -3720,8 +3720,8 @@
         "mask": 4
       },
       "status": "authoritative",
-      "handler": "battleEffectCompletion.postUseDefenseOne",
-      "boundary": "User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.",
+      "handler": "battleEffectCompletion.postUseHalfDefense",
+      "boundary": "Reviewed post-use half DEF for the current round; non-stacking and independent of persistent stages.",
       "techniques": [
         {
           "id": 61,

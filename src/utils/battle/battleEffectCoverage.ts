@@ -7,7 +7,7 @@ export function classifyEffect(effect: SkillEffectDefinition, skill: Pick<Battle
   const deferred = (boundary: string) => result('deferred-unresolved', 'none', boundary);
   const authoritative = (handler: string, boundary = '') => result('authoritative', handler, boundary);
   if (skill.id === 0xea) return result('ignored-by-project', 'none', 'Alias Fake is unused in gameplay; filtered from encounter/selection inputs.');
-  if (effect.byte === 17 && effect.mask === 0x40 || skill.id === 0x3d && effect.byte === 31 && effect.mask === 4) return authoritative('battleEffectCompletion.postUseDefenseOne', 'User-confirmed exact DEF=1 after use overrides the source half-DEF label for Black Pearl Shot and Trick Or Treat.');
+  if (effect.byte === 17 && effect.mask === 0x40 || skill.id === 0x3d && effect.byte === 31 && effect.mask === 4) return authoritative('battleEffectCompletion.postUseHalfDefense', 'Reviewed post-use half DEF for the current round; non-stacking and independent of persistent stages.');
   if (skill.id === 0x89 && effect.byte === 22 && effect.mask === 1) return authoritative('battleResources.accountActionMp', 'Activated Counter cost charged once to causal attacker.');
   if (skill.id === 0xd2 && effect.byte === 33 && effect.mask === 8) return authoritative('battleEffectCompletion.resolvePolicyTarget', 'Execution-time random all-field HP0 and MP-positive target.');
   if ([0xcc,0xc6,0xd4].includes(skill.id) && effect.byte === 23 && [4,8].includes(effect.mask)) return authoritative('battleSupportEffects.applySupportEffects', 'All stored stages suppressed for remainder of round.');
