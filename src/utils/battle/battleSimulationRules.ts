@@ -7,6 +7,6 @@ export function resolveSimulationRules(rules?: BattleSimulationRules): Required<
   const accuracyMode = rules?.accuracyMode ?? 'game-accurate';
   if (accuracyMode !== 'strategy' && accuracyMode !== 'game-accurate') throw new BattleInputError('Unknown simulation accuracy mode.');
   const rngPolicy = rules?.rngPolicy ?? 'natural';
-  if (rngPolicy !== 'natural' && rngPolicy !== 'tas-favorable') throw new BattleInputError('Unknown simulation RNG policy.');
+  if (rngPolicy !== 'natural' && rngPolicy !== 'tas-favorable' && rngPolicy !== 'tas-luck') throw new BattleInputError('Unknown simulation RNG policy.');
   return { accuracyMode, rngPolicy };
 }

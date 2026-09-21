@@ -1,3 +1,4 @@
+import { tasLuckCapForBudget } from './battleTasLuck';
 import type { SimulationResult } from '@/types/digimon';
 import type { PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
 import type { BattleInput, BattleCombatantState, BattleActionRecord } from './battleTypes';
@@ -39,7 +40,7 @@ export interface SimulationReportJob {
   configuration: {
     searchMethod: BattleSearchMethod; objective?: OptimizationObjective;
     rules: BattleSimulationRules; requestedEvaluations: number; floorSpecialty: string;
-    optimizedConfig?: OptimizedSearchConfig; seed?: number; maxRounds: number;
+    optimizedConfig?: OptimizedSearchConfig; seed?: number; maxRounds: number; tasFrontierCap?: number;
   };
 }
 /** Called at dispatch, before controls can change; never reconstruct Planner state at export time. */
@@ -56,7 +57,7 @@ export function snapshotSimulationReportJob(request: SimulationReportJobRequest)
   return immutable({ input: r.input, source: r.plannerProvenance ? { kind: 'run-planner' as const, ...r.plannerProvenance } : { kind: 'manual' as const },
     combatants, playerStatProvenance: r.playerStatProvenance,
     configuration: { searchMethod: method, rules: resolveSimulationRules(r.simulationRules), requestedEvaluations: r.requestedSimulations,
-      floorSpecialty: r.input.floorSpecialty, maxRounds: r.maxRounds ?? 1000,
+      ...(r.simulationRules?.rngPolicy==='tas-luck'?{tasFrontierCap:tasLuckCapForBudget(r.requestedSimulations)}:{}), floorSpecialty: r.input.floorSpecialty, maxRounds: r.maxRounds ?? 1000,
       ...(method === 'optimized-action-search' ? { objective: r.optimizationObjective ?? 'fastest-potential', optimizedConfig: r.optimizedConfig ?? optimizedConfigForBudget(r.requestedSimulations), seed: r.seed ?? 0 } : r.seed === undefined ? {} : { seed: r.seed }) } });
 }
 type SelectedResult = {
@@ -69,6 +70,9 @@ type SelectedResult = {
   topCandidates: { key: string; statistics: OptimizedCandidateStats; firstRoundOrders: PlayerRoundPlan['orders'] }[];
 };
 interface ReportData {
+  tasLuckSummary?: import('./battleTasLuck').TasLuckSummary;
+  tasLuckRoute?: { seed: number; sampleIndex: number; sourcePlayerPrefix: PlayerRoundPlan[]; decisionTrace: PlayerRoundPlan[] };
+  tasLuckTrace?: import('./battleTasLuck').TasLuckDecisionTrace;
   reportVersion: 1; resultStatus: 'completed' | 'cancelled';
   source: SimulationReportJob['source']; battle: { encounterId?: number; label: string };
   effectiveInput: BattleInput; playerTeam: Combatant[]; enemyTeam: Combatant[];
@@ -87,8 +91,8 @@ export type BattleSimulationReport = DeepReadonly<ReportData>;
 export const TIMING_SCOPE = 'Frame totals cover modeled battle actions. External real-game UI and order-menu overhead is not modeled.';
 /** Observational only: consumes retained results and a detached dispatch snapshot. */
 export function buildBattleSimulationReport(result: SimulationResult, job: DeepReadonly<SimulationReportJob>): BattleSimulationReport | null {
-  if ((result.search?.completedSimulations ?? result.optimized?.evaluations ?? result.totalSimulations) === 0) return null;
-  const o = result.optimized, route = o?.fastestRoute;
+  if ((result.search?.completedSimulations ?? result.optimized?.evaluations ?? result.totalSimulations) === 0 && !(job.configuration.rules.rngPolicy==='tas-luck' && (result.optimized?.fastestRoute || result.tasLuckRoute))) return null;
+  const o = result.optimized, route = o?.fastestRoute ?? result.tasLuckRoute;
   const actions = route?.actions ?? (result.fastestBattleByFrames.length ? result.fastestBattleByFrames : result.fastestBattleHistory);
   const rounds = actions.reduce((n, a) => Math.max(n, a.round), 0);
   const status = result.search?.status ?? o?.status ?? 'completed';
@@ -97,12 +101,13 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
   if (job.source.kind === 'run-planner') diagnostics.push(...job.source.diagnostics.map(d => d.message), 'Current HP/MP are simulation-start resources, not historical Planner-tracked values.');
   if (status === 'cancelled') diagnostics.push('Search status: Cancelled / Partial. Results contain only completed observations retained before cancellation. Incomplete candidate stages are not fair comparisons.');
   if (job.configuration.rules.rngPolicy === 'tas-favorable') diagnostics.push('Statistics are conditional on TAS Favorable policy, not natural probabilities. Simulator seeds are not game RNG seeds or manipulation inputs.');
-  if (!o) diagnostics.push('Random Monte Carlo does not retain an intended Player decision trace or per-route seed. Executed actions are observations, not reconstructed Player orders.', ...(job.configuration.seed === undefined ? ['This run used an unseeded production RNG; exact random-stream reproduction is unavailable.'] : []));
+  if (job.configuration.rules.rngPolicy === 'tas-luck') diagnostics.push('TAS Luck statistics use one best searched manipulation outcome per sampled unsupported-RNG seed, not natural probabilities. Unsupported RNG remained Natural. Best route found within searched branches; pruning is not proof of optimality.');
+  if (!o && !result.tasLuckRoute) diagnostics.push('Random Monte Carlo does not retain an intended Player decision trace or per-route seed. Executed actions are observations, not reconstructed Player orders.', ...(job.configuration.seed === undefined ? ['This run used an unseeded production RNG; exact random-stream reproduction is unavailable.'] : []));
   if (o) diagnostics.push('Beam pruning and stochastic rollouts do not exhaust the battle tree. Orders after Round 1 are path-specific, not a complete adaptive policy.');
   if (o && o.objective !== 'fastest-potential') diagnostics.push('No representative replay of the selected fair strategy is retained. Executed Battle is the global fastest observation and may belong to another prefix.');
   if (!actions.length) diagnostics.push('No completed victory history is retained.');
   const encounterId = job.source.kind === 'run-planner' ? job.source.selectedBattle.encounterId : !Array.isArray(job.input.enemy) ? (job.input.enemy as { id?: number }).id : undefined;
-  return immutable({ reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
+  return immutable({ ...(result.tasLuckSummary?{tasLuckSummary:result.tasLuckSummary,tasLuckTrace:route?.tasLuckTrace??[],...(route?{tasLuckRoute:{seed:route.seed,sampleIndex:route.sampleIndex,sourcePlayerPrefix:route.sourcePlayerPrefix??[],decisionTrace:route.decisionTrace}}:{})}:{}), reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
     effectiveInput: job.input, playerTeam: job.combatants.filter(a => a.side === 'player'), enemyTeam: job.combatants.filter(a => a.side === 'enemy'),
     playerStatProvenance: job.playerStatProvenance, simulationConfiguration: job.configuration,
     searchSummary: { evaluations: result.search?.completedSimulations ?? o?.evaluations ?? result.totalSimulations, elapsedMs: result.search?.elapsedMs,
@@ -114,8 +119,8 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
       screenedPrefix: { plans: o.recommendedPrefix, statistics: o.recommendedStats },
       topCandidates: o.topCandidates.slice(0, 5).map(c => ({ key: c.key, statistics: c.stats, firstRoundOrders: c.plans[0]?.orders ?? [] })) }
       : { kind: 'random-monte-carlo', winRate: result.winRate, minFrames: result.minFrames, averageFrames: result.avgFrames, maxFrames: result.maxFrames, minActions: result.minTurns, averageActions: result.avgTurns, maxActions: result.maxTurns },
-    playerStrategy: { kind: o ? o.objective === 'fastest-potential' ? 'observed-route' : 'fair-prefix' : 'not-retained', plans: o ? o.objective === 'fastest-potential' ? route?.decisionTrace ?? [] : o.recommendedPrefix : [] },
-    rngRequirements: job.configuration.rules.rngPolicy === 'tas-favorable' ? collectRngRequirements(actions) : [],
+    playerStrategy: { kind: o ? o.objective === 'fastest-potential' ? 'observed-route' : 'fair-prefix' : route ? 'observed-route' : 'not-retained', plans: o ? o.objective === 'fastest-potential' ? route?.decisionTrace ?? [] : o.recommendedPrefix : route?.decisionTrace ?? [] },
+    rngRequirements: job.configuration.rules.rngPolicy !== 'natural' ? route?.rngRequirements ?? collectRngRequirements(actions) : [],
     executedBattle: { kind: route ? 'global-fastest-observation' : result.fastestBattleByFrames.length ? 'fastest-timed-observation' : 'fewest-actions-observation', totalFrames: route?.totalFrames ?? (result.fastestBattleByFrames.length ? result.minFrames : null), rounds, actions },
     diagnostics: [...new Set(diagnostics)] }) as BattleSimulationReport;
 }

@@ -91,6 +91,8 @@ export interface BattleDigimon {
 }
 
 export interface SimulationResult {
+  tasLuckSummary?: import('@/utils/battle/battleTasLuck').TasLuckSummary;
+  tasLuckRoute?: import('@/utils/battle/battleFastestRoute').FastestRoute;
   report?: import('@/utils/battle/battleSimulationReport').BattleSimulationReport;
   optimized?: import('@/utils/battle/battleOptimizedSearch').OptimizedSearchResult;
   playerStatProvenance?: import('@/utils/battle/battleStatOverrides').PlayerStatProvenance;

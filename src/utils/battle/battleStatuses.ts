@@ -27,7 +27,7 @@ export function recoverStatuses(actor: BattleCombatantState, rng: BattleRng, pol
     const power = status === 'poison-power' ? 'poison' : status === 'paralysis-power' ? 'paralysis' : status === 'confusion-power' ? 'confusion' : null;
     const active = power ? actor.temporaryPowers[power] : status === 'elemental-power' ? actor.elementalPower : actor.statuses[status as 'paralysis'];
     if (!active) continue;
-    const resolved = resolveNaturalStatusRecovery(policy, actor.side, status, rng);
+    const resolved = resolveNaturalStatusRecovery(policy, actor.side, status, rng, actor.id);
     const { roll } = resolved;
     if (resolved.succeeds) { if (power) delete actor.temporaryPowers[power]; else if (status === 'elemental-power') actor.elementalPower = null; else delete actor.statuses[status as 'paralysis']; }
     if (status === 'motivation-down' && resolved.succeeds) delete actor.motivationBlocked;
@@ -46,10 +46,14 @@ export function applyDirectStatuses(target: BattleCombatantState, effects: reado
   for (const status of ['poison', 'paralysis', 'confusion', 'motivation-down'] as const) for (const effect of effects) {
     if (!isDirectBattleStatus(effect) || effect.kind !== 'status-application' || effect.status !== status) continue;
     // Project-confirmed native Motivation Down rate: guaranteed on Hit. Keep raw source data intact.
+    if (policy === 'tas-luck' && getStatusImmunity(target,status)) {
+      const immunityReason=getStatusImmunity(target,status)!;
+      results.push({status,roll:null,successesOutOf3:null,applied:false,alreadyActive:!!target.statuses[status],immunityReason,result:'immune'});continue;
+    }
     const guaranteed = status === 'motivation-down' && (effect.chancePercent === undefined || effect.chancePercent === 100);
     const successesOutOf3 = guaranteed ? null : effect.chancePercent === 33 ? 1 : 2;
     const resolved = successesOutOf3 === null ? { roll: null, succeeds: true }
-      : resolveDirectStatusApplication(policy, target.side, status, successesOutOf3, rng);
+      : resolveDirectStatusApplication(policy, target.side, status, successesOutOf3, rng, target.id);
     const { roll } = resolved;
     const immunityReason = getStatusImmunity(target, status);
     const alreadyActive = !!target.statuses[status], applied = resolved.succeeds && !immunityReason;

@@ -51,7 +51,7 @@ export function resolveActionAccuracy(actor: BattleCombatantState, kind: ActionK
   if (kind === 'assist') return { outcome: 'hit', cause: 'guaranteed', referenceTargetId: null };
   const audit: { paralysisRoll?: number; tailBladeRoll?: number; rngResolution?: RngResolution } = {};
   if (actor.statuses.paralysis) {
-    const resolved = resolveParalysisFailure(policy, actor.side, rng);
+    const resolved = resolveParalysisFailure(policy, actor.side, rng, actor.id);
     if (resolved.rngResolution) audit.rngResolution = resolved.rngResolution;
     else audit.paralysisRoll = resolved.roll!;
     if (resolved.succeeds) return { outcome: 'miss', cause: 'paralysis', referenceTargetId: null, ...audit };

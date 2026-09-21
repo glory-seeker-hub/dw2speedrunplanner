@@ -2,6 +2,7 @@ import type { BattleActionRecord } from './battleTypes';
 import type { RngResolution } from './battleRngPolicy';
 
 export interface TasRngRequirement {
+  opportunityKey?: string;
   actionId: string; round: number; actorId: string; actorName: string; skillName: string | null;
   targetId: string; targetName: string; status?: string; phase: 'initial' | 'execution';
   resolution: RngResolution; immunityBlocked?: true;
@@ -34,8 +35,8 @@ export function collectRngRequirements(actions: readonly BattleActionRecord[]): 
 export function addRngOverrideCounts(counts: RngOverrideCounts, requirements: readonly TasRngRequirement[]) {
   for (const { resolution: r } of requirements) {
     if (r.category === 'direct-status-application') counts.directStatus++;
-    else if (r.category === 'natural-status-recovery') counts[r.affectedSide === 'enemy' ? 'enemyRecoveryPrevented' : 'playerRecoveryForced']++;
-    else counts[r.affectedSide === 'enemy' ? 'enemyParalysisMiss' : 'playerParalysisPass']++;
+    else if (r.category === 'natural-status-recovery') { if(r.affectedSide==='enemy'&&r.outcome==='remain')counts.enemyRecoveryPrevented++;if(r.affectedSide==='player'&&r.outcome==='recover')counts.playerRecoveryForced++; }
+    else {if(r.affectedSide==='enemy'&&r.outcome==='miss')counts.enemyParalysisMiss++;if(r.affectedSide==='player'&&r.outcome==='pass')counts.playerParalysisPass++;}
   }
 }
 export function rngRequirementText(r: TasRngRequirement): string {
@@ -43,5 +44,5 @@ export function rngRequirementText(r: TasRngRequirement): string {
   return `${r.targetName}: ${r.status ?? 'Paralysis'} ${gate.category === 'direct-status-application'
     ? (gate.outcome === 'apply' ? 'application must succeed' : 'application must fail')
     : gate.category === 'natural-status-recovery' ? (gate.outcome === 'recover' ? 'natural recovery must succeed' : 'natural recovery must fail')
-      : (gate.outcome === 'miss' ? 'action must fail' : 'action must pass')} — TAS Favorable RNG${r.immunityBlocked ? ' (immunity still blocks application)' : ''}`;
+      : (gate.outcome === 'miss' ? 'action must fail' : 'action must proceed')} — ${gate.policy === 'tas-luck' ? 'TAS Luck' : 'TAS Favorable'} RNG${r.immunityBlocked ? ' (immunity still blocks application)' : ''}`;
 }

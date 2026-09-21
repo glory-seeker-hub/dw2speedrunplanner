@@ -141,6 +141,7 @@ export interface BattleState {
 }
 export type BattleOutcome = 'player-win' | 'enemy-win' | 'limit-reached' | 'invalid' | 'unsupported';
 export interface BattleRunResult {
+  tasLuckTrace?: import('./battleTasLuck').TasLuckDecisionTrace;
   engineVersion: string; outcome: BattleOutcome; winner: BattleSide | null;
   rounds: number; actionCount: number; actions: BattleActionRecord[];
   state: BattleState; diagnostics: string[];
@@ -157,6 +158,8 @@ export interface PlayerDecisionProvider {
   chooseAction(actor: BattleCombatantState, state: BattleState): ActionChoice | undefined;
 }
 export interface BattleEngineOptions {
+  tasLuck?: import('./battleTasLuck').TasLuckControl;
+  tasFrontierCap?: number;
   playerDecisions?: PlayerDecisionProvider;
   playerDecisionObserver?: PlayerDecisionObserver;
   simulationRules?: import('./battleSimulationRules').BattleSimulationRules;

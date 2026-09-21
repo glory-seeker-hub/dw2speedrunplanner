@@ -1,3 +1,4 @@
+import { createSimulationSearch } from './battleSimulationSearch';
 import { collectRngRequirements, emptyRngOverrideCounts, addRngOverrideCounts } from './battleRngAudit';
 import type { SimulationResult } from '@/types/digimon';
 import type { Encounter } from '@/types/encounter';
@@ -61,6 +62,7 @@ export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): Simulation
 /** Retain the existing UI input/callback boundary. Seconds are deliberately removed. */
 export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], enemy: readonly BattleTeamMember[] | Encounter, floorSpecialty: string, simulationCount: number, options: BattleEngineOptions = {}): SimulationResult {
   if (!Number.isSafeInteger(simulationCount) || simulationCount < 1) throw new Error('simulationCount must be a positive safe integer.');
+  if(options.simulationRules?.rngPolicy==='tas-luck'){const search=createSimulationSearch({player,enemy,floorSpecialty},simulationCount,options);while(!search.done)search.step();return search.result('completed',0);}
   const rng = options.rng ?? createProductionBattleRng();
   function* runs() {
     for (let i = 0; i < simulationCount; i++) {

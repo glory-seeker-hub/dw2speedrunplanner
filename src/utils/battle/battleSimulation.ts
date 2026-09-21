@@ -1,3 +1,4 @@
+import { attachTasLuck } from './battleTasLuck';
 import { initializeMotivation, clearRoundEffects, copyNegativeStatuses, randomTarget, necroTarget, bypassAccuracy, postUseHalfDefense, effectsOf } from './battleEffectCompletion';
 import { classifyEffect } from './battleEffectCoverage';
 import { getBattleSkillById } from '@/data/battleSkills';
@@ -25,7 +26,7 @@ import { resolveActionAccuracy } from './battleAccuracy';
 export const BATTLE_ENGINE_VERSION = '2k-h-authoritative-support-v1';
 export const DEFAULT_MAX_ROUNDS = 1000;
 export function simulateBattleCore(input: BattleInput, options: BattleEngineOptions = {}): BattleRunResult {
-  const rng = options.rng ?? createProductionBattleRng();
+  const rng = attachTasLuck(options.rng ?? createProductionBattleRng(), options.tasLuck);
   const policy = options.actionPolicy ?? legacyActionPolicy;
   let state: BattleState = { combatants: [], plannedActions: [], queue: [], round: 0, nextActionNumber: 1, simulationIndex: options.simulationIndex ?? 0 };
   const records: BattleActionRecord[] = [];
@@ -125,6 +126,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           record(action, reason ?? 'already-acted'); completeCounter(action); continue;
         }
         const actor = actorById(state, action.actorId);
+        rng.tasLuck?.action(state, action, () => ({records, executionCount, acted: [...acted], playerReservations: [...playerReservations], rngPosition: rng.position?.()}));
         if (action.guard) {
           action.state = 'resolved'; acted.add(actor.id); executionCount++;
           const entry = record(action, 'Guard — Motivation Down');

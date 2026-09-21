@@ -242,11 +242,11 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             </div>
             <div className="space-y-2"><Label>RNG Policy</Label><div className="flex gap-2">
               <Button variant={rngPolicy === 'natural' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'natural'} disabled={isSimulating} onClick={() => setRngPolicy('natural')}>Natural</Button>
-              <Button variant={rngPolicy === 'tas-favorable' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'tas-favorable'} disabled={isSimulating} onClick={() => setRngPolicy('tas-favorable')}>TAS Favorable</Button>
+              <Button variant={rngPolicy === 'tas-luck' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'tas-luck'} disabled={isSimulating} onClick={() => setRngPolicy('tas-luck')}>TAS Luck</Button>
             </div>
             {rngPolicy === 'natural' ? <p>Uses the game's implemented RNG normally.</p> : <>
-              <p>Forces supported negative-status RNG against Enemies and protects Players. Enemy Paralysis/Confusion recovery fails; Paralyzed Enemies miss. Other RNG remains natural.</p>
-              <p role="note" className="font-semibold text-amber-600">TAS Favorable uses manipulated RNG assumptions and is not representative of normal real-time speedrun probability.</p>
+              <p>Searches supported status RNG outcomes. Unsupported RNG remains Natural.</p>
+              <p role="note" className="font-semibold text-amber-600">TAS Luck selects the best searched manipulation outcome per sampled unsupported-RNG seed; statistics are not natural probabilities.</p>
               <p>Standard accuracy is controlled separately by Accuracy Mode.</p>
             </>}
             </div>
