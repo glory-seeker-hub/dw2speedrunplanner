@@ -1,3 +1,4 @@
+import { isColiseumLocation } from '@/data/coliseumBattles';
 import type { BattleSimulationReport, DeepReadonly } from './battleSimulationReport';
 import type { PlayerRoundPlan, PlayerOrder } from './battleActionPlans';
 import { OBJECTIVE_LABELS } from './battleSearchObjectives';
@@ -54,7 +55,7 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     lines.push(...details(report.source.historicalStateSummary, 'Historical context'));
   }
   section('Battle'); field('Enemy group', report.battle.label); field('Encounter', report.battle.encounterId);
-  if (report.source.kind === 'run-planner') { field('Domain', report.source.selectedBattle.domainId); field('Floor', report.source.selectedBattle.floor); field('Phase', report.source.selectedBattle.phase); }
+  if (report.source.kind === 'run-planner' && !isColiseumLocation(report.source.selectedBattle)) { field('Domain', report.source.selectedBattle.domainId); field('Floor', report.source.selectedBattle.floor); field('Phase', report.source.selectedBattle.phase); }
   for (const [heading, team] of [['Player Team', report.playerTeam], ['Enemy Team', report.enemyTeam]] as const) {
     section(heading);
     lines.push('| Combatant | Max HP | Current HP | Max MP | Current MP | ATK | DEF | SPD |', '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');

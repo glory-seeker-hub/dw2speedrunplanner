@@ -1,3 +1,4 @@
+import { getColiseumBattle, isColiseumLocation } from '@/data/coliseumBattles';
 import { isValidTradeEvent } from '@/utils/runTradeValidation';
 import { isValidBattleTechniqueMisses } from '@/utils/battleTechniqueProgression';
 import { isValidDnaEvent } from '@/utils/runDnaValidation';
@@ -23,8 +24,11 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
   if (!nonEmptyString(v.id) || !integer(v.order, 0) || !isValidRunActionCheckpoint(v.preActionCheckpoint)) return false;
   const checkpoint = v.preActionCheckpoint;
   if (v.type === 'battle') {
-    if (!reward(v.xpReward) || !isValidBattleTechniqueAudit(v.techniqueChoices, checkpoint.roster, checkpoint.digiline, v.xpReward)) return false;
-    if (!isValidBattleTechniqueMisses(v.techniqueMisses, checkpoint.roster, checkpoint.digiline, v.xpReward)) return false;
+    if (!reward(v.xpReward)) return false;
+    const coliseum = typeof v.encounterId === 'number' && !!getColiseumBattle(v.encounterId);
+    if (coliseum && (!isColiseumLocation({ domainId: v.domainId, phase: v.phase, floor: v.floor, encounterId: v.encounterId }) || v.xpReward !== 0 || v.bitsReward !== 0 || v.capturedEnemySlot !== null || !Array.isArray(v.techniqueChoices) || v.techniqueChoices.length !== 0 || (v.techniqueMisses !== undefined && (!Array.isArray(v.techniqueMisses) || v.techniqueMisses.length !== 0)))) return false;
+    if (!coliseum && (!reward(v.xpReward) || !isValidBattleTechniqueAudit(v.techniqueChoices, checkpoint.roster, checkpoint.digiline, v.xpReward))) return false;
+    if (!coliseum && (!isValidBattleTechniqueMisses(v.techniqueMisses, checkpoint.roster, checkpoint.digiline, v.xpReward))) return false;
     if (v.capturedEnemySlot == null) {
       if (v.capturedInstanceId !== null || v.capturedLevelCap !== null) return false;
     } else {
@@ -36,7 +40,7 @@ export const isValidRunEvent = (value: unknown): value is RunEvent => {
           v.capturedLevelCap.min !== cap.min || v.capturedLevelCap.max !== cap.max) return false;
     }
     return nonEmptyString(v.domainId) && DOMAIN_PHASES.includes(v.phase as DomainPhase) &&
-      integer(v.floor, 1) && integer(v.encounterId, 0) &&
+      (coliseum ? v.floor === 0 : integer(v.floor, 1)) && integer(v.encounterId, 0) &&
       Array.isArray(v.digilineInstanceIds) && v.digilineInstanceIds.length > 0 &&
       v.digilineInstanceIds.length === checkpoint.digiline.length &&
       v.digilineInstanceIds.every((id, index) => id === checkpoint.digiline[index]) &&

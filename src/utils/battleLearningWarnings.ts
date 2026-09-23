@@ -1,3 +1,4 @@
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { RunPlan } from '@/types/runPlanner';
 import { DigimonRank } from '@/types/techniqueInheritance';
 import { getBattleTechniqueProgression } from '@/utils/battleTechniqueProgression';
@@ -16,7 +17,7 @@ export interface BattleLearningWarning {
 /** Uses the exact cap-aware XP/technique transition used by recording. No future-form registration. */
 export const getBattleLearningWarnings = (run: RunPlan, selection: BattleSelection): BattleLearningWarning[] => {
   const reward = getRecordingEncounter(selection)?.preview?.reward;
-  if (!reward) return [];
+  if (!reward || !getBattleProgressionPolicy(selection.encounterId).resolveLevelUp) return [];
   return run.roster.filter(p => run.digiline.includes(p.instanceId)).flatMap(member => {
     const { xp, rank, state } = getBattleTechniqueProgression(member, reward.xp);
     const requiredRank = getLearningMilestoneRank(xp.newLevel);

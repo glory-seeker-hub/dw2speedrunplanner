@@ -4,7 +4,8 @@ import { getUndoUnavailableReason } from '@/utils/runActionUndo';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription,
   AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { getDomainById } from '@/data/domains';
+import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { getBattlePreview } from '@/utils/runBattleSelection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -61,12 +62,11 @@ export const RunHistory = ({ run, onUndo, error, onAnalyze }: { onAnalyze?: (run
             const encounter = getBattlePreview(event.encounterId)?.encounter;
             const captured = encounter?.digimons.find(enemy => enemy.slot === event.capturedEnemySlot);
             return <li key={event.id} className="space-y-1 rounded-lg border p-3 text-sm">
-              <p className="font-semibold">Action {index + 1} · Battle · {getDomainById(event.domainId)?.name ?? event.domainId} · {`Floor ${event.floor}`}</p>
-              <p className="text-muted-foreground">{event.phase === 'before-blood-knights' ? 'Before Blood Knights' : 'After Blood Knights'}</p>
+              <p className="font-semibold">Action {index + 1} · Battle · {getPlannerBattleLabel(event)}</p>
               <p>{encounter?.digimons.map(enemy => `${enemy.name} EL ${enemy.level}`).join(' · ') ?? `Encounter ${event.encounterId}`}</p>
               <p>{event.xpReward} XP · {event.bitsReward} Bits</p>
               <p>Participants: {event.digilineInstanceIds.map(id => event.preActionCheckpoint.roster.find(member => member.instanceId === id)?.name ?? id).join(' · ')}</p>
-              <p>Capture: {event.capturedEnemySlot == null ? 'None' : `Slot ${event.capturedEnemySlot} — ${captured?.name ?? 'Unknown enemy'}`}</p>
+              {getBattleProgressionPolicy(event.encounterId).allowCapture && <p>Capture: {event.capturedEnemySlot == null ? 'None' : `Slot ${event.capturedEnemySlot} — ${captured?.name ?? 'Unknown enemy'}`}</p>}
               {event.techniqueChoices.map(choice => <p key={choice.instanceId}>
                 {event.preActionCheckpoint.roster.find(member => member.instanceId === choice.instanceId)?.name ?? choice.instanceId}:
                 {' '}Learned {choice.learned.join(', ') || 'none'} · Discarded {choice.discarded.join(', ') || 'none'}

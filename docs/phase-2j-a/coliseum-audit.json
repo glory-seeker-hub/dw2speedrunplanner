@@ -1,0 +1,690 @@
+{
+  "validation": [],
+  "locationEncoding": {
+    "domainId": "coliseum",
+    "phase": "after-blood-knights",
+    "floor": 0
+  },
+  "battles": [
+    {
+      "encounterId": 158,
+      "category": "coliseum",
+      "rank": 2,
+      "round": "A",
+      "label": "Rank 2-A",
+      "enemies": [
+        {
+          "name": "Patamon",
+          "techs": [
+            "Boom Bubble"
+          ]
+        },
+        {
+          "name": "ToyAgumon",
+          "techs": [
+            "Toy Flame"
+          ]
+        },
+        {
+          "name": "Gizamon",
+          "techs": [
+            "Spiral Saw"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 159,
+      "category": "coliseum",
+      "rank": 2,
+      "round": "B",
+      "label": "Rank 2-B",
+      "enemies": [
+        {
+          "name": "Crabmon",
+          "techs": [
+            "Scissor Magic"
+          ]
+        },
+        {
+          "name": "Tapirmon",
+          "techs": [
+            "Waking Dream"
+          ]
+        },
+        {
+          "name": "Kunemon",
+          "techs": [
+            "Electro Thread"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 160,
+      "category": "coliseum",
+      "rank": 2,
+      "round": "C",
+      "label": "Rank 2-C",
+      "enemies": [
+        {
+          "name": "Biyomon",
+          "techs": [
+            "Spiral Twister"
+          ]
+        },
+        {
+          "name": "Tentomon",
+          "techs": [
+            "Super Shocker"
+          ]
+        },
+        {
+          "name": "Tapirmon",
+          "techs": [
+            "Waking Dream"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 161,
+      "category": "coliseum",
+      "rank": 3,
+      "round": "A",
+      "label": "Rank 3-A",
+      "enemies": [
+        {
+          "name": "Gotsumon",
+          "techs": [
+            "Rock Fist"
+          ]
+        },
+        {
+          "name": "Elecmon",
+          "techs": [
+            "S-Thunder Smack"
+          ]
+        },
+        {
+          "name": "Floramon",
+          "techs": [
+            "Rain Of Pollen"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 162,
+      "category": "coliseum",
+      "rank": 3,
+      "round": "B",
+      "label": "Rank 3-B",
+      "enemies": [
+        {
+          "name": "DemiDevimon",
+          "techs": [
+            "Demi Dart"
+          ]
+        },
+        {
+          "name": "Otamamon",
+          "techs": [
+            "Stun Bubble"
+          ]
+        },
+        {
+          "name": "Gazimon",
+          "techs": [
+            "E-Stun Blast"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 163,
+      "category": "coliseum",
+      "rank": 3,
+      "round": "C",
+      "label": "Rank 3-C",
+      "enemies": [
+        {
+          "name": "Gabumon",
+          "techs": [
+            "Blue Blaster"
+          ]
+        },
+        {
+          "name": "Raremon",
+          "techs": [
+            "Buffalo Breath"
+          ]
+        },
+        {
+          "name": "Penguinmon",
+          "techs": [
+            "Super Slap"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 164,
+      "category": "coliseum",
+      "rank": 4,
+      "round": "A",
+      "label": "Rank 4-A",
+      "enemies": [
+        {
+          "name": "Unimon",
+          "techs": [
+            "Air Attack"
+          ]
+        },
+        {
+          "name": "Piddomon",
+          "techs": [
+            "Mega Heal",
+            "Fist Of Fate"
+          ]
+        },
+        {
+          "name": "Birdramon",
+          "techs": [
+            "Meteor Wing"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 165,
+      "category": "coliseum",
+      "rank": 4,
+      "round": "B",
+      "label": "Rank 4-B",
+      "enemies": [
+        {
+          "name": "Gururumon",
+          "techs": [
+            "AntiDote",
+            "Blaze Blast"
+          ]
+        },
+        {
+          "name": "Saberdramon",
+          "techs": [
+            "AntiConfusion",
+            "Meteor Stream"
+          ]
+        },
+        {
+          "name": "ShimaUnimon",
+          "techs": [
+            "AntiFreeze",
+            "Boom Bubble"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 166,
+      "category": "coliseum",
+      "rank": 4,
+      "round": "C",
+      "label": "Rank 4-C",
+      "enemies": [
+        {
+          "name": "Kiwimon",
+          "techs": [
+            "Pummel Peck",
+            "Marching Fishes"
+          ]
+        },
+        {
+          "name": "Angemon",
+          "techs": [
+            "Fist Of Fate",
+            "Fireball",
+            "Needle Spray"
+          ]
+        },
+        {
+          "name": "Mushroomon",
+          "techs": [
+            "Fungus Cruncher",
+            "E-Stun Blast"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 167,
+      "category": "coliseum",
+      "rank": 5,
+      "round": "A",
+      "label": "Rank 5-A",
+      "enemies": [
+        {
+          "name": "J-Mojyamon",
+          "techs": [
+            "Parameter Patch",
+            "Icicle Shot"
+          ]
+        },
+        {
+          "name": "MoriShellmon",
+          "techs": [
+            "Nature Hit Ray",
+            "Spinning Needle"
+          ]
+        },
+        {
+          "name": "Togemon",
+          "techs": [
+            "Needle Spray"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 168,
+      "category": "coliseum",
+      "rank": 5,
+      "round": "B",
+      "label": "Rank 5-B",
+      "enemies": [
+        {
+          "name": "Woodmon",
+          "techs": [
+            "Twig Tap"
+          ]
+        },
+        {
+          "name": "Bakemon",
+          "techs": [
+            "Evil Charm"
+          ]
+        },
+        {
+          "name": "Soulmon",
+          "techs": [
+            "Necro Magic",
+            "Evil Touch"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 169,
+      "category": "coliseum",
+      "rank": 5,
+      "round": "C",
+      "label": "Rank 5-C",
+      "enemies": [
+        {
+          "name": "Centarumon",
+          "techs": [
+            "Solar Ray"
+          ]
+        },
+        {
+          "name": "Tyrannomon",
+          "techs": [
+            "Blaze Blast"
+          ]
+        },
+        {
+          "name": "Monochromon",
+          "techs": [
+            "Volcanic Strike"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 170,
+      "category": "coliseum",
+      "rank": 6,
+      "round": "A",
+      "label": "Rank 6-A",
+      "enemies": [
+        {
+          "name": "Flarerizamon",
+          "techs": [
+            "Blaze Blaster",
+            "Meteor Wing"
+          ]
+        },
+        {
+          "name": "Gatomon",
+          "techs": [
+            "Lightning Paw"
+          ]
+        },
+        {
+          "name": "Devidramon",
+          "techs": [
+            "Crimson Claw"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 171,
+      "category": "coliseum",
+      "rank": 6,
+      "round": "B",
+      "label": "Rank 6-B",
+      "enemies": [
+        {
+          "name": "Devimon",
+          "techs": [
+            "Evil Touch"
+          ]
+        },
+        {
+          "name": "Gesomon",
+          "techs": [
+            "Coral Crusher"
+          ]
+        },
+        {
+          "name": "Guardromon",
+          "techs": [
+            "Protect Grenade"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 172,
+      "category": "coliseum",
+      "rank": 6,
+      "round": "C",
+      "label": "Rank 6-C",
+      "enemies": [
+        {
+          "name": "Gururumon",
+          "techs": [
+            "AntiDote",
+            "Howling Blaster"
+          ]
+        },
+        {
+          "name": "Saberdramon",
+          "techs": [
+            "AntiConfusion",
+            "Meteor Wing"
+          ]
+        },
+        {
+          "name": "ShimaUnimon",
+          "techs": [
+            "AntiFreeze",
+            "Air Attack"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 173,
+      "category": "coliseum",
+      "rank": 7,
+      "round": "A",
+      "label": "Rank 7-A",
+      "enemies": [
+        {
+          "name": "Mamemon",
+          "techs": [
+            "Smiley Bomb",
+            "Giga Blaster"
+          ]
+        },
+        {
+          "name": "Mamemon",
+          "techs": [
+            "Smiley Bomb",
+            "Metal Fireball"
+          ]
+        },
+        {
+          "name": "Mamemon",
+          "techs": [
+            "Smiley Bomb",
+            "Big Bang Boom"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 174,
+      "category": "coliseum",
+      "rank": 7,
+      "round": "B",
+      "label": "Rank 7-B",
+      "enemies": [
+        {
+          "name": "Lillymon",
+          "techs": [
+            "Flower Cannon"
+          ]
+        },
+        {
+          "name": "Angewomon",
+          "techs": [
+            "Heaven's Arrow"
+          ]
+        },
+        {
+          "name": "Etemon",
+          "techs": [
+            "Concert Crush"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 175,
+      "category": "coliseum",
+      "rank": 7,
+      "round": "C",
+      "label": "Rank 7-C",
+      "enemies": [
+        {
+          "name": "Myotismon",
+          "techs": [
+            "Grisly Wing"
+          ]
+        },
+        {
+          "name": "Phantomon",
+          "techs": [
+            "Shadow Scythe"
+          ]
+        },
+        {
+          "name": "Megadramon",
+          "techs": [
+            "Darkside Attack"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 176,
+      "category": "coliseum",
+      "rank": 8,
+      "round": "A",
+      "label": "Rank 8-A",
+      "enemies": [
+        {
+          "name": "AeroVeedramon",
+          "techs": [
+            "V-Wing Blade"
+          ]
+        },
+        {
+          "name": "Garudamon",
+          "techs": [
+            "Wing Blade",
+            "Meteor Wing"
+          ]
+        },
+        {
+          "name": "Mammothmon",
+          "techs": [
+            "Tusk Crusher"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 177,
+      "category": "coliseum",
+      "rank": 8,
+      "round": "B",
+      "label": "Rank 8-B",
+      "enemies": [
+        {
+          "name": "Deramon",
+          "techs": [
+            "Royal Smasher",
+            "Pit Pelter"
+          ]
+        },
+        {
+          "name": "Blossomon",
+          "techs": [
+            "Ninja Flower",
+            "Spinning Needle"
+          ]
+        },
+        {
+          "name": "Pumpkinmon",
+          "techs": [
+            "Trick Or Treat",
+            "Thunder Ball"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 178,
+      "category": "coliseum",
+      "rank": 8,
+      "round": "C",
+      "label": "Rank 8-C",
+      "enemies": [
+        {
+          "name": "WaruMonzaemon",
+          "techs": [
+            "Heart Break Hit",
+            "Pretty Attack"
+          ]
+        },
+        {
+          "name": "Megadramon",
+          "techs": [
+            "Darkside Attack"
+          ]
+        },
+        {
+          "name": "Tekkamon",
+          "techs": [
+            "MP Destroyer",
+            "Tentacle Claw"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 179,
+      "category": "coliseum",
+      "rank": 9,
+      "round": "A",
+      "label": "Rank 9-A",
+      "enemies": [
+        {
+          "name": "Puppetmon",
+          "techs": [
+            "Puppet Pummel",
+            "Tomahawk Crunch"
+          ]
+        },
+        {
+          "name": "Hagurumon",
+          "techs": [
+            "Darkness Gear",
+            "Spiral Saw"
+          ]
+        },
+        {
+          "name": "DemiDevimon",
+          "techs": [
+            "Demi Dart",
+            "Black Pearl Shot"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 180,
+      "category": "coliseum",
+      "rank": 9,
+      "round": "B",
+      "label": "Rank 9-B",
+      "enemies": [
+        {
+          "name": "Mamemon",
+          "techs": [
+            "Smiley Bomb"
+          ]
+        },
+        {
+          "name": "MetalMamemon",
+          "techs": [
+            "Energetic Bomb",
+            "Defensive Ray"
+          ]
+        },
+        {
+          "name": "P-Mamemon",
+          "techs": [
+            "Smiley Warhead",
+            "Invincibility"
+          ]
+        }
+      ]
+    },
+    {
+      "encounterId": 181,
+      "category": "coliseum",
+      "rank": 9,
+      "round": "C",
+      "label": "Rank 9-C",
+      "enemies": [
+        {
+          "name": "Magnadramon",
+          "techs": [
+            "Fire Tornado",
+            "Full HP Cure"
+          ]
+        },
+        {
+          "name": "Jijimon",
+          "techs": [
+            "Hung on Death",
+            "Howling Crusher"
+          ]
+        },
+        {
+          "name": "MarineAngemon",
+          "techs": [
+            "Ocean Love",
+            "Crimson Flame"
+          ]
+        }
+      ]
+    }
+  ]
+}

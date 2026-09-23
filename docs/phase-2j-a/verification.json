@@ -1,0 +1,87 @@
+{
+  "phase": "2J-A",
+  "branch": "phase-2j-a-story-segments-coliseum",
+  "baselineCommit": "2f8ed77",
+  "finalReviewDate": "2026-09-23",
+  "tests": {
+    "command": "node --test tests/*.test.cjs",
+    "passed": 2815,
+    "failed": 0,
+    "skipped": 0,
+    "newStoryColiseumTests": 39
+  },
+  "dataSelfChecks": { "passed": 61, "failed": 0, "added": 4 },
+  "battleSkills": { "command": "node scripts/checkBattleSkills.cjs", "passed": 11, "failed": 0 },
+  "effectCoverage": {
+    "command": "node scripts/checkBattleEffectCoverage.cjs",
+    "status": "passed",
+    "classifiedOccurrences": 598,
+    "descriptorGroups": 101,
+    "unusedDictionaryRows": 5,
+    "canonicalDataChanged": false
+  },
+  "workbook": {
+    "command": "python scripts/importBattleSkills.py <DW2 Modding Info.xlsx> --check",
+    "status": "passed",
+    "runtime": "Bundled Codex Python",
+    "checks": ["All 68 bytes", "Labels", "Effect dictionary", "Provenance"]
+  },
+  "typescript": {
+    "app": { "command": "npx tsc -p tsconfig.app.json --noEmit", "status": "passed" },
+    "node": { "command": "npx tsc -p tsconfig.node.json --noEmit", "status": "passed" }
+  },
+  "build": {
+    "command": "npm run build",
+    "status": "passed",
+    "notes": "Existing large-chunk warning remains."
+  },
+  "lint": {
+    "command": "npm run lint",
+    "status": "existing-baseline-failures",
+    "errors": 3,
+    "warnings": 7,
+    "newFindings": 0,
+    "errorFiles": ["src/components/ui/command.tsx", "src/components/ui/textarea.tsx", "tailwind.config.ts"]
+  },
+  "diffCheck": { "command": "git diff --check", "status": "passed" },
+  "metadata": {
+    "normalDomainsBySection": [8, 10, 9, 6],
+    "totalNormalDomainVariants": 33,
+    "duplicates": 0,
+    "unassigned": 0,
+    "unknownAssignments": 0,
+    "excludedDeveloperDomains": [],
+    "coliseumBattles": 24,
+    "firstEncounterId": 158,
+    "lastEncounterId": 181
+  },
+  "browserSmoke": {
+    "status": "passed",
+    "date": "2026-09-22",
+    "surface": "Codex in-app browser",
+    "run": "Phase 2J-A Smoke",
+    "performed": [
+      "Verified five sections and all ordered Domain lists",
+      "Verified 24 direct Coliseum entries without Domain/floor controls",
+      "Recorded normal encounter 152 to establish pending stored XP",
+      "Recorded encounters 158, 159 and 160 as separate events",
+      "Confirmed no capture, zero rewards, unchanged EL2 and 4468 XP and 6630 Bits",
+      "Analyzed middle event 159 with historical Player and canonical enemies",
+      "Natural Random Monte Carlo completed 10/10 simulations",
+      "TAS Luck Optimized Action Search completed early at 5204/100000 budget, depth 6",
+      "Switched between saved runs, verified isolation and reloaded fixture"
+    ],
+    "automatedOnly": ["All 24 canonical team mappings", "Undo", "Route export", "Later normal one-level progression"],
+    "notPerformed": ["Browser simulation for every rank", "Browser export download"]
+  },
+  "scope": {
+    "plannerSchemaVersion": 7,
+    "simulationReportVersion": 1,
+    "battleMechanicsChanged": false,
+    "tasLuckSemanticsChanged": false,
+    "broadUiRedesign": false,
+    "howToUseChanged": false,
+    "committed": false,
+    "pushed": false
+  }
+}

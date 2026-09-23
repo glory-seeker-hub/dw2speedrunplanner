@@ -6,7 +6,7 @@ import { StatGrowthEstimate } from '@/types/runPlanner';
 import { DigimonStats } from '@/types/digimon';
 import { getBattleTechniqueProgression } from '@/utils/battleTechniqueProgression';
 import { applyExpectedLevelUpGrowth, StatKey } from '@/utils/statGrowth';
-import { getResolvedReward } from '@/utils/rewardMatching';
+import { getBattleProgressionPolicy, getPlannerBattleReward } from '@/utils/battleProgressionPolicy';
 import { tryCreateCapturedDigimon } from '@/utils/capture';
 
 /**
@@ -92,7 +92,21 @@ export const resolveBattle = (input: ResolveBattleInput): BattleResolution => {
     roster.some((r) => r.instanceId === id)
   );
 
-  const reward = getResolvedReward(encounterId);
+  const policy = getBattleProgressionPolicy(encounterId);
+  // No progression opportunity: bypass XP resolution, cap resolution, growth and technique learning.
+  if (!policy.resolveLevelUp) return {
+    encounterId, participantIds, xpAwarded: 0, bitsAwarded: 0, rewardUnknown: false,
+    roster: structuredClone(roster), totalBits, techniqueChoices: [], techniqueMisses: [],
+    capturedInstanceId: null, captureError: input.capturedEnemySlot != null ? 'Coliseum capture is unavailable.' : null,
+    outcomes: roster.filter(p => participantIds.includes(p.instanceId)).map(p => ({
+      encounterXpReward: 0, actualXpApplied: 0, capped: p.levelCap.resolved !== null && p.level >= p.levelCap.resolved,
+      capResolutionRequired: false, plannerScopeUnsupported: false, learnedTechniques: [], missedTechniques: [],
+      instanceId: p.instanceId, previousLevel: p.level, newLevel: p.level, leveledUp: false,
+      previousTotalXp: p.totalXp, newTotalXp: p.totalXp, xpToNextLevel: null,
+      previousStats: { ...p.stats }, newStats: { ...p.stats }, growth: null, statsWithoutGrowthData: [],
+    })),
+  };
+  const reward = getPlannerBattleReward(encounterId);
   const rewardUnknown = reward === undefined;
   const xpAwarded = reward?.xp ?? 0;
   const bitsAwarded = reward?.bits ?? 0;

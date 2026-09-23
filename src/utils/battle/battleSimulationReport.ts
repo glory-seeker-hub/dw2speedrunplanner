@@ -1,3 +1,4 @@
+import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { tasLuckCapForBudget } from './battleTasLuck';
 import type { SimulationResult } from '@/types/digimon';
 import type { PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
@@ -107,7 +108,7 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
   if (o && o.objective !== 'fastest-potential') diagnostics.push('No representative replay of the selected fair strategy is retained. Executed Battle is the global fastest observation and may belong to another prefix.');
   if (!actions.length) diagnostics.push('No completed victory history is retained.');
   const encounterId = job.source.kind === 'run-planner' ? job.source.selectedBattle.encounterId : !Array.isArray(job.input.enemy) ? (job.input.enemy as { id?: number }).id : undefined;
-  return immutable({ ...(result.tasLuckSummary?{tasLuckSummary:result.tasLuckSummary,tasLuckTrace:route?.tasLuckTrace??[],...(route?{tasLuckRoute:{seed:route.seed,sampleIndex:route.sampleIndex,sourcePlayerPrefix:route.sourcePlayerPrefix??[],decisionTrace:route.decisionTrace}}:{})}:{}), reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
+  return immutable({ ...(result.tasLuckSummary?{tasLuckSummary:result.tasLuckSummary,tasLuckTrace:route?.tasLuckTrace??[],...(route?{tasLuckRoute:{seed:route.seed,sampleIndex:route.sampleIndex,sourcePlayerPrefix:route.sourcePlayerPrefix??[],decisionTrace:route.decisionTrace}}:{})}:{}), reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: (job.source.kind === 'run-planner' ? getPlannerBattleLabel(job.source.selectedBattle) + ' · ' : '') + job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
     effectiveInput: job.input, playerTeam: job.combatants.filter(a => a.side === 'player'), enemyTeam: job.combatants.filter(a => a.side === 'enemy'),
     playerStatProvenance: job.playerStatProvenance, simulationConfiguration: job.configuration,
     searchSummary: { evaluations: result.search?.completedSimulations ?? o?.evaluations ?? result.totalSimulations, elapsedMs: result.search?.elapsedMs,
