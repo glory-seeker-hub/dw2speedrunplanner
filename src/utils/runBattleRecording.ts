@@ -1,7 +1,8 @@
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { TechniqueSelection } from '@/types/techniqueCapacity';
 import { createRunActionCheckpoint } from '@/utils/runActionCheckpoint';
 import { RunBattleEvent, RunPlan } from '@/types/runPlanner';
-import { BattleSelection, getEncountersForFloor } from '@/utils/runBattleSelection';
+import { BattleSelection, getSelectedBattleOption } from '@/utils/runBattleSelection';
 import { BattleResolution, resolveBattle } from '@/utils/runProgression';
 import { getRequiredTotalXpForLevel } from '@/utils/experience';
 import { newInstanceId } from '@/utils/capture';
@@ -11,13 +12,11 @@ import { getInitialLevelCap, getAcquisitionLevelCap } from '@/utils/levelCap';
 export type RecordBattleRequest = BattleSelection & { capturedEnemySlot?: number | null; capturedMaxLevel?: number | null; techniqueSelections?: TechniqueSelection[]; reviewTechniques?: boolean; expectedRunId?: string; expectedRunState?: string };
 
 /** Re-query location metadata at submission time; never trust a UI-provided boss flag. */
-export const getRecordingEncounter = (selection: BattleSelection) =>
-  selection.floor === null ? undefined : getEncountersForFloor(selection.domainId, selection.phase, selection.floor)
-    .find((option) => option.encounterId === selection.encounterId);
+export const getRecordingEncounter = getSelectedBattleOption;
 
 export const getCaptureChoices = (selection: BattleSelection) => {
   const option = getRecordingEncounter(selection);
-  return !option || option.isBoss ? [] : option.preview?.encounter.digimons.map((enemy) => ({
+  return !option || option.isBoss || !getBattleProgressionPolicy(selection.encounterId).allowCapture ? [] : option.preview?.encounter.digimons.map((enemy) => ({
     slot: enemy.slot, name: enemy.name, level: enemy.level, levelCap: getInitialLevelCap(enemy.level),
     unavailableReason: !getInitialLevelCap(enemy.level) ? 'No authoritative acquisition cap for this level'
       : getRequiredTotalXpForLevel(enemy.level) === null ? 'No verified XP threshold for this level' : null,
@@ -37,13 +36,14 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
   if (run.digiline.length === 0) throw new Error('Add at least one Digimon to the Digiline before recording a battle.');
   const unresolved = run.roster.find(member => run.digiline.includes(member.instanceId) &&
     member.levelCap.resolved === null && member.level >= member.levelCap.min);
-  if (unresolved) throw new Error('Maximum EL is unresolved for ' + unresolved.name + '. This battle cannot be recorded safely.');
+  if (unresolved && getBattleProgressionPolicy(request.encounterId).resolveLevelUp) throw new Error('Maximum EL is unresolved for ' + unresolved.name + '. This battle cannot be recorded safely.');
   const option = getRecordingEncounter(request);
   if (!option?.preview) throw new Error('Select a valid Domain, phase, floor and encounter.');
   if (!option.preview.reward) throw new Error('Reward metadata is missing. This battle cannot be recorded.');
   const slot = request.capturedEnemySlot ?? null;
   if (slot === null && request.capturedMaxLevel != null) throw new Error('Maximum EL requires a capture target.');
   if (slot !== null) {
+    if (!getBattleProgressionPolicy(option.encounterId).allowCapture) throw new Error('Coliseum capture is unavailable.');
     if (option.isBoss) throw new Error('Boss encounters cannot be captured.');
     const choice = getCaptureChoices(request).find(enemy => enemy.slot === slot);
     if (!choice) throw new Error('Select a valid enemy slot to capture.');

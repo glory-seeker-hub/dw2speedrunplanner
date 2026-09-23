@@ -1,3 +1,4 @@
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { useState } from 'react';
 import { RunPlan } from '@/types/runPlanner';
 import { getBattleLearningWarnings } from '@/utils/battleLearningWarnings';
@@ -28,6 +29,7 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord, run
   const option = getRecordingEncounter(selection);
   const warnings = run ? getBattleLearningWarnings(run, selection) : [];
   const choices = getCaptureChoices(selection);
+  const policy = getBattleProgressionPolicy(selection.encounterId);
   const cap = choices.find(enemy => String(enemy.slot) === capture)?.levelCap;
   const capRequired = cap?.resolved === null;
   const blocked = !hasParticipants ? 'Add at least one Digimon to the Digiline before recording a battle.'
@@ -46,7 +48,7 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord, run
     capturedEnemySlot: capture === 'none' ? null : Number(capture), capturedMaxLevel: selectedCap === '' ? null : Number(selectedCap) });
   return (
     <div className="space-y-4 rounded-lg border p-4">
-      {option?.isBoss ? <p className="text-sm text-muted-foreground">Boss encounter: capture is unavailable.</p> : (
+      {!policy.allowCapture ? <p className="text-sm text-muted-foreground">Coliseum: 0 XP · 0 Bits · No level-up · Capture unavailable.</p> : option?.isBoss ? <p className="text-sm text-muted-foreground">Boss encounter: capture is unavailable.</p> : (
         <div className="max-w-md space-y-2">
           <Label htmlFor="battle-capture">Capture</Label>
           <Select value={capture} disabled={review !== null} onValueChange={value => { setCapture(value); setSelectedCap(''); }}>
@@ -71,13 +73,13 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord, run
       <p className="text-sm text-muted-foreground">Recording keeps this encounter selected for the next battle and resets capture to No capture.</p>
       <BattleLearningWarnings warnings={warnings} />
       <Button onClick={() => record()} disabled={Boolean(blocked) || review !== null} aria-describedby={blocked ? 'record-battle-reason' : warnings.length ? 'battle-learning-warning' : undefined}>Record Battle</Button>
-      <Button variant="outline" onClick={() => record(true)} disabled={Boolean(blocked) || review !== null}>Review techniques before recording</Button>
+      {policy.resolveLevelUp && <Button variant="outline" onClick={() => record(true)} disabled={Boolean(blocked) || review !== null}>Review techniques before recording</Button>}
       {review && <TechniqueChoiceControls choices={review.response.choices} selections={selections} onChange={setSelections}
         onCancel={() => setReview(null)} onConfirm={() => submit({ ...review.request, reviewTechniques: false,
           expectedRunState: review.response.expectedRunState, techniqueSelections: selections })} />}
       {blocked && <p id="record-battle-reason" className="text-sm text-destructive">{blocked}</p>}
       {result && <div role="status" className="space-y-3 text-sm">
-        <p className="font-semibold">Battle recorded · +{result.xpAwarded} XP per participant · +{result.bitsAwarded} Bits</p>
+        <p className="font-semibold">Battle recorded · {policy.resolveLevelUp ? `+${result.xpAwarded} XP per participant · +${result.bitsAwarded} Bits` : '0 XP · 0 Bits · No level-up'}</p>
         {result.outcomes.filter(outcome => outcome.leveledUp).map(outcome => (
           <div key={outcome.instanceId} className="space-y-1">
             <p>{result.roster.find(member => member.instanceId === outcome.instanceId)?.name} · EL {outcome.previousLevel} → {outcome.newLevel} · +{result.xpAwarded} XP</p>

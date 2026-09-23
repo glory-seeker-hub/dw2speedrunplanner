@@ -1,3 +1,4 @@
+import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
 import { type BattleRngPolicy } from '@/utils/battle/battleRngPolicy';
 import { rootPlanInfo } from '@/utils/battle/battleActionPlans';
@@ -108,7 +109,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {imported && <section className="rounded border p-3 space-y-2" aria-label="Pre-battle Planner state">
             <p className="font-semibold">Analyzing pre-battle state</p>
             <p className="text-sm">Run: {imported.source.runName ?? imported.source.runId}</p>
-            <p className="text-sm">{imported.selectedBattle.domainId} · {imported.selectedBattle.phase} · Floor {imported.selectedBattle.floor} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
+            <p className="text-sm">{getPlannerBattleLabel(imported.selectedBattle)} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
             <p className="text-sm text-muted-foreground">Run Planner does not track historical current HP/MP. This copy starts at full resources. Adjust below if needed; changes affect only this simulation.</p>
             <p className="text-xs text-muted-foreground">Stats follow Planner expected growth, rounded down for simulation. Floor specialty is a local setting.</p>
             <p className="text-sm">Planner stats use expected growth. If you know the Digimon's actual in-game stats, you can override them for this simulation.</p>

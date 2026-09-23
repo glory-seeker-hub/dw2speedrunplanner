@@ -1,0 +1,201 @@
+{
+  "segments": [
+    {
+      "id": "before-blood-knights",
+      "label": "Before Blood Knights"
+    },
+    {
+      "id": "after-blood-knights",
+      "label": "After Blood Knights"
+    },
+    {
+      "id": "file-island",
+      "label": "File Island"
+    },
+    {
+      "id": "after-file-island",
+      "label": "After File Island"
+    },
+    {
+      "id": "coliseum",
+      "label": "Coliseum"
+    }
+  ],
+  "domains": {
+    "before-blood-knights": [
+      {
+        "domainId": "boot-domain",
+        "phase": "before-blood-knights",
+        "label": "Boot Domain"
+      },
+      {
+        "domainId": "scsi-domain",
+        "phase": "before-blood-knights",
+        "label": "SCSI Domain"
+      },
+      {
+        "domainId": "disk-domain",
+        "phase": "before-blood-knights",
+        "label": "Disk Domain"
+      },
+      {
+        "domainId": "video-domain",
+        "phase": "before-blood-knights",
+        "label": "Video Domain"
+      },
+      {
+        "domainId": "bios-domain",
+        "phase": "before-blood-knights",
+        "label": "BIOS Domain"
+      },
+      {
+        "domainId": "web-domain",
+        "phase": "before-blood-knights",
+        "label": "Web Domain"
+      },
+      {
+        "domainId": "drive-domain",
+        "phase": "before-blood-knights",
+        "label": "Drive Domain"
+      },
+      {
+        "domainId": "modem-domain",
+        "phase": "before-blood-knights",
+        "label": "Modem Domain"
+      }
+    ],
+    "after-blood-knights": [
+      {
+        "domainId": "scsi-domain",
+        "phase": "after-blood-knights",
+        "label": "SCSI Domain 2"
+      },
+      {
+        "domainId": "disk-domain",
+        "phase": "after-blood-knights",
+        "label": "Disk Domain 2"
+      },
+      {
+        "domainId": "video-domain",
+        "phase": "after-blood-knights",
+        "label": "Video Domain 2"
+      },
+      {
+        "domainId": "bios-domain",
+        "phase": "after-blood-knights",
+        "label": "BIOS Domain 2"
+      },
+      {
+        "domainId": "web-domain",
+        "phase": "after-blood-knights",
+        "label": "Web Domain 2"
+      },
+      {
+        "domainId": "drive-domain",
+        "phase": "after-blood-knights",
+        "label": "Drive Domain 2"
+      },
+      {
+        "domainId": "modem-domain",
+        "phase": "after-blood-knights",
+        "label": "Modem Domain 2"
+      },
+      {
+        "domainId": "dvd-domain",
+        "phase": "before-blood-knights",
+        "label": "DVD Domain"
+      },
+      {
+        "domainId": "code-domain",
+        "phase": "after-blood-knights",
+        "label": "Code Domain"
+      },
+      {
+        "domainId": "laser-domain",
+        "phase": "after-blood-knights",
+        "label": "Laser Domain"
+      }
+    ],
+    "file-island": [
+      {
+        "domainId": "power",
+        "phase": "after-blood-knights",
+        "label": "Power"
+      },
+      {
+        "domainId": "port",
+        "phase": "after-blood-knights",
+        "label": "Port"
+      },
+      {
+        "domainId": "giga",
+        "phase": "after-blood-knights",
+        "label": "Giga"
+      },
+      {
+        "domainId": "scan",
+        "phase": "after-blood-knights",
+        "label": "Scan"
+      },
+      {
+        "domainId": "diode",
+        "phase": "after-blood-knights",
+        "label": "Diode"
+      },
+      {
+        "domainId": "patch",
+        "phase": "after-blood-knights",
+        "label": "Patch"
+      },
+      {
+        "domainId": "mega",
+        "phase": "after-blood-knights",
+        "label": "Mega"
+      },
+      {
+        "domainId": "data",
+        "phase": "after-blood-knights",
+        "label": "Data"
+      },
+      {
+        "domainId": "soft",
+        "phase": "after-blood-knights",
+        "label": "Soft"
+      }
+    ],
+    "after-file-island": [
+      {
+        "domainId": "bug-domain",
+        "phase": "after-blood-knights",
+        "label": "Bug Domain"
+      },
+      {
+        "domainId": "ram-domain",
+        "phase": "after-blood-knights",
+        "label": "RAM Domain"
+      },
+      {
+        "domainId": "rom-domain",
+        "phase": "after-blood-knights",
+        "label": "ROM Domain"
+      },
+      {
+        "domainId": "core-tower",
+        "phase": "after-blood-knights",
+        "label": "Core Tower"
+      },
+      {
+        "domainId": "chaos-tower",
+        "phase": "after-blood-knights",
+        "label": "Chaos Tower"
+      },
+      {
+        "domainId": "tera-domain",
+        "phase": "after-blood-knights",
+        "label": "Tera Domain"
+      }
+    ]
+  },
+  "excluded": [],
+  "validation": []
+}

@@ -1,3 +1,6 @@
+import { validateStoryDomains } from '@/data/storySegments';
+import { COLISEUM_BATTLES, validateColiseumBattles } from '@/data/coliseumBattles';
+import { getBattleProgressionPolicy, getPlannerBattleReward } from '@/utils/battleProgressionPolicy';
 import { DOMAIN_GROUPS } from '@/data/domainGroups';
 import { runBattleSkillSelfChecks } from '@/utils/battleSkillValidation';
 import { ENCOUNTER_REWARD_SOURCE } from '@/data/encounterRewardSource';
@@ -72,6 +75,22 @@ const roster = (partial: Partial<RosterDigimon>): RosterDigimon => ({
 
 export const runDataSelfChecks = (): SelfCheckResult[] => {
   const results: SelfCheckResult[] = runBattleSkillSelfChecks();
+
+  check(results, '33 playable Domain variants allocated exactly once', () => validateStoryDomains().join('; ') || true);
+  check(results, '24 ordered Coliseum battles reference unique canonical encounters', () => validateColiseumBattles().join('; ') || true);
+  check(results, 'Coliseum rewards, capture and level-up policy', () => COLISEUM_BATTLES.every(b => {
+    const p = getBattleProgressionPolicy(b.encounterId), r = getPlannerBattleReward(b.encounterId);
+    return !p.allowCapture && !p.resolveLevelUp && r?.xp === 0 && r.bits === 0;
+  }) ? true : 'Invalid Coliseum progression policy');
+  check(results, 'representative Coliseum enemy identities', () => {
+    const expected: Record<number, string[]> = {
+      158: ['Patamon', 'ToyAgumon', 'Gizamon'], 163: ['Gabumon', 'Raremon', 'Penguinmon'],
+      168: ['Woodmon', 'Bakemon', 'Soulmon'], 169: ['Centarumon', 'Tyrannomon', 'Monochromon'],
+      174: ['Lillymon', 'Angewomon', 'Etemon'], 175: ['Myotismon', 'Phantomon', 'Megadramon'],
+      177: ['Deramon', 'Blossomon', 'Pumpkinmon'], 181: ['Magnadramon', 'Jijimon', 'MarineAngemon'],
+    };
+    return Object.entries(expected).every(([id, names]) => JSON.stringify(encounters.find(e => e.id === Number(id))?.digimons.map(e => e.name)) === JSON.stringify(names)) ? true : 'Coliseum lineup mismatch';
+  });
 
   // --- Rewards -------------------------------------------------------------
   check(results, 'zero XP / zero Bits records are valid known data', () => {

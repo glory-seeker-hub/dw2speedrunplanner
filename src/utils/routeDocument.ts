@@ -1,7 +1,8 @@
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
 import { isValidPersistedRunPlannerData } from '@/utils/runPlannerStorage';
 import { getStarterById } from '@/data/starters';
-import { getDomainById } from '@/data/domains';
+import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { getBattlePreview } from '@/utils/runBattleSelection';
 import { getPlanningSummary } from '@/utils/runPlanningDisplay';
 import { getSpeciesProgression } from '@/data/speciesProgression';
@@ -65,11 +66,11 @@ export const buildRouteDocument = (run: RunPlan, generatedAt: Date): RouteDocume
     const captured = encounter.digimons.find(enemy => enemy.slot === event.capturedEnemySlot);
     const nameAtBattle = (id: string) => event.preActionCheckpoint.roster.find(p => p.instanceId === id)!.name;
     return { ...base, title: 'Battle', lines: [
-      `${getDomainById(event.domainId)!.name} · Floor ${event.floor} · ${event.phase === 'before-blood-knights' ? 'Before Blood Knights' : 'After Blood Knights'}`,
+      getPlannerBattleLabel(event),
       `Enemies: ${encounter.digimons.map(p => `${p.name} EL${p.level}`).join(', ')}`,
       `Participants: ${event.digilineInstanceIds.map(nameAtBattle).join(', ')}`,
       `Capture: ${captured ? `Slot ${captured.slot} — ${captured.name} EL${captured.level}` : 'None'}`],
-      rewards: `+${event.xpReward} XP · +${event.bitsReward} Bits`,
+      rewards: getBattleProgressionPolicy(event.encounterId).resolveLevelUp ? `+${event.xpReward} XP · +${event.bitsReward} Bits` : '0 XP · 0 Bits · No level-up',
       ...(event.techniqueMisses?.length ? { misses: event.techniqueMisses.map(miss => ({ name: nameAtBattle(miss.instanceId), missed: [...miss.missed] })) } : {}),
       // The audit stores learned/discarded, not a complete offered/kept list. Do not invent one.
       decisions: event.techniqueChoices.map(choice => ({ name: nameAtBattle(choice.instanceId),

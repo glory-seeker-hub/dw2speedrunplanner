@@ -1,6 +1,7 @@
+import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
 import { RunEvent, RunActionCheckpoint } from '@/types/runPlanner';
 import { resolveBattle } from '@/utils/runProgression';
-import { getEncountersForFloor } from '@/utils/runBattleSelection';
+import { getSelectedBattleOption } from '@/utils/runBattleSelection';
 import { getBattleTechniqueChoices } from '@/utils/battleTechniqueChoices';
 import { applyNormalDigivolution } from '@/utils/normalDigivolution';
 import { proposeDnaChild, replaceDnaParents } from '@/utils/dnaProposal';
@@ -21,11 +22,11 @@ export const equalRunState = (a: unknown, b: unknown): boolean => {
 export const deriveActionPostState = (event: RunEvent): Pick<RunActionCheckpoint, 'roster' | 'totalBits'> => {
   const before = event.preActionCheckpoint;
   if (event.type === 'battle') {
-    const option = getEncountersForFloor(event.domainId, event.phase, event.floor)
-      .find(o => o.encounterId === event.encounterId);
-    if (!option?.preview?.reward || (event.capturedInstanceId !== null && option.isBoss)) throw new Error('Invalid encounter or capture location.');
-    if (before.roster.some(p => before.digiline.includes(p.instanceId) && p.levelCap.resolved === null && p.level >= p.levelCap.min)) throw new Error('Participant Maximum EL is unresolved.');
-    const choices = getBattleTechniqueChoices(before.roster, before.digiline, option.preview.reward.xp);
+    const option = getSelectedBattleOption(event);
+    const policy = getBattleProgressionPolicy(event.encounterId);
+    if (!option?.preview?.reward || (event.capturedInstanceId !== null && (option.isBoss || !policy.allowCapture))) throw new Error('Invalid encounter or capture location.');
+    if (policy.resolveLevelUp && before.roster.some(p => before.digiline.includes(p.instanceId) && p.levelCap.resolved === null && p.level >= p.levelCap.min)) throw new Error('Participant Maximum EL is unresolved.');
+    const choices = policy.resolveLevelUp ? getBattleTechniqueChoices(before.roster, before.digiline, option.preview.reward.xp) : [];
     const resolution = resolveBattle({
       roster: before.roster, totalBits: before.totalBits, encounterId: event.encounterId,
       digilineInstanceIds: event.digilineInstanceIds,
