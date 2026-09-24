@@ -19,7 +19,7 @@ export function collectRngRequirements(actions: readonly BattleActionRecord[]): 
     const add = (resolution: RngResolution | undefined, status?: string, targetId = a.actorId, targetName = a.actorName,
       phase: TasRngRequirement['phase'] = 'execution', immunityBlocked = false) => {
       if (!resolution) return;
-      const entry: TasRngRequirement = { actionId: a.id, round: a.round, actorId: a.actorId, actorName: a.actorName,
+      const entry: TasRngRequirement = { ...(resolution.opportunityKey ? {opportunityKey:resolution.opportunityKey} : {}), actionId: a.id, round: a.round, actorId: a.actorId, actorName: a.actorName,
         skillName: a.skillName, targetId, targetName, phase, resolution, ...(status ? { status } : {}), ...(immunityBlocked ? { immunityBlocked: true } : {}) };
       // Collapse duplicate copies of the same event, preserving distinct actions/rounds and restart gates.
       const key = JSON.stringify([a.id, phase, targetId, status, resolution.category, resolution.outcome]);
@@ -44,5 +44,5 @@ export function rngRequirementText(r: TasRngRequirement): string {
   return `${r.targetName}: ${r.status ?? 'Paralysis'} ${gate.category === 'direct-status-application'
     ? (gate.outcome === 'apply' ? 'application must succeed' : 'application must fail')
     : gate.category === 'natural-status-recovery' ? (gate.outcome === 'recover' ? 'natural recovery must succeed' : 'natural recovery must fail')
-      : (gate.outcome === 'miss' ? 'action must fail' : 'action must proceed')} — ${gate.policy === 'tas-luck' ? 'TAS Luck' : 'TAS Favorable'} RNG${r.immunityBlocked ? ' (immunity still blocks application)' : ''}`;
+      : (gate.outcome === 'miss' ? 'action must fail' : (r.opportunityKey ? 'action must proceed so Confusion can execute' : 'action must proceed'))} — ${gate.policy === 'tas-luck' ? 'TAS Luck' : 'TAS Favorable'} RNG${r.immunityBlocked ? ' (immunity still blocks application)' : ''}`;
 }

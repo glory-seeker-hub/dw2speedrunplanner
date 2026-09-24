@@ -1,0 +1,287 @@
+{
+  "notes": "Local seeded engine characterization; one warmup per fixture/policy; strategy accuracy, cap 8. One-conflict limited to one round, repeated conflicts five, double E-Stun sixty. Timings characterize this machine, not test thresholds. Before counts include generalized initial replay work; after branch counts exclude initial execution.",
+  "results": [
+    {
+      "name": "no-status",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 9.55860000000007,
+      "fairRolloutsPerSecond": 3138.534931893769,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 5727
+    },
+    {
+      "name": "no-status",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 3.1562999999998738,
+      "fairRolloutsPerSecond": 9504.79992396198,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 5727
+    },
+    {
+      "name": "no-status",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 6.373399999999947,
+      "fairRolloutsPerSecond": 4707.063733642993,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 5745
+    },
+    {
+      "name": "repeated-paralysis",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 39.5163,
+      "fairRolloutsPerSecond": 759.1803888521952,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 28437
+    },
+    {
+      "name": "repeated-paralysis",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 20.844500000000153,
+      "fairRolloutsPerSecond": 1439.2285734846016,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 32099
+    },
+    {
+      "name": "repeated-paralysis",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 20.23169999999982,
+      "fairRolloutsPerSecond": 1482.8215127745207,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 31992
+    },
+    {
+      "name": "confusion-only",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 12.858199999999897,
+      "fairRolloutsPerSecond": 2333.141497254689,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 7179
+    },
+    {
+      "name": "confusion-only",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 9.680100000000039,
+      "fairRolloutsPerSecond": 3099.141537794019,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 7573
+    },
+    {
+      "name": "confusion-only",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 10.84719999999993,
+      "fairRolloutsPerSecond": 2765.69068515379,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 7581
+    },
+    {
+      "name": "one-conflict",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 4.020500000000084,
+      "fairRolloutsPerSecond": 7461.758487750125,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 7328
+    },
+    {
+      "name": "one-conflict",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 2.4005999999999403,
+      "fairRolloutsPerSecond": 12496.875781055047,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 8184
+    },
+    {
+      "name": "one-conflict",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 21.09789999999998,
+      "fairRolloutsPerSecond": 1421.9424682077376,
+      "opportunities": 30,
+      "branchesExplored": 60,
+      "pruned": 0,
+      "maxFrontier": 2,
+      "resultBytes": 8959
+    },
+    {
+      "name": "repeated-conflicts",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 10.767500000000155,
+      "fairRolloutsPerSecond": 2786.1620617598855,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 28177
+    },
+    {
+      "name": "repeated-conflicts",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 9.420200000000023,
+      "fairRolloutsPerSecond": 3184.6457612364843,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 33047
+    },
+    {
+      "name": "repeated-conflicts",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 759.9484000000002,
+      "fairRolloutsPerSecond": 39.47636444790198,
+      "opportunities": 930,
+      "branchesExplored": 1860,
+      "pruned": 0,
+      "maxFrontier": 6,
+      "resultBytes": 35518
+    },
+    {
+      "name": "double-e-stun",
+      "policy": "natural",
+      "fairRollouts": 30,
+      "wallMs": 84.48909999999978,
+      "fairRolloutsPerSecond": 355.07538842288625,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 291232
+    },
+    {
+      "name": "double-e-stun",
+      "policy": "tas-favorable",
+      "fairRollouts": 30,
+      "wallMs": 70.01340000000027,
+      "fairRolloutsPerSecond": 428.48940345705086,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 322069
+    },
+    {
+      "name": "double-e-stun",
+      "policy": "tas-luck",
+      "fairRollouts": 30,
+      "wallMs": 94.90170000000035,
+      "fairRolloutsPerSecond": 316.11657114677496,
+      "opportunities": 0,
+      "branchesExplored": 0,
+      "pruned": 0,
+      "maxFrontier": 0,
+      "resultBytes": 321037
+    }
+  ],
+  "browserSmoke": {
+    "date": "2026-09-23",
+    "fixture": "Agumon with only E-Stun Blast; canonical encounter 95 (Birdramon, Flarerizamon, Candlemon)",
+    "playerStats": {
+      "hp": 1000,
+      "mp": 200,
+      "atk": 150,
+      "def": 120,
+      "spd": 100
+    },
+    "method": "optimized-action-search",
+    "objective": "fastest-potential",
+    "accuracyMode": "strategy",
+    "preset": "Deep",
+    "budget": 1000000,
+    "natural": {
+      "firstEvaluations": 13,
+      "firstSpeed": 232.1,
+      "laterEvaluations": 8128,
+      "laterCandidates": 266,
+      "laterSpeed": 1298.2,
+      "laterElapsedSeconds": 6.3,
+      "completedEvaluations": 17484,
+      "completedCandidates": 426,
+      "depth": 10
+    },
+    "tasLuck": {
+      "firstEvaluations": 12,
+      "firstSpeed": 195.1,
+      "laterEvaluations": 5286,
+      "laterCandidates": 207,
+      "laterSpeed": 526.9,
+      "laterElapsedSeconds": 10,
+      "completedEvaluations": 17664,
+      "completedCandidates": 471,
+      "depth": 10,
+      "noConflictsVisible": true
+    },
+    "notes": "Separate local browser runs; live speeds are approximate observations, not controlled timings. Both completed early. Additional Natural Standard runs also completed. No real-conflict browser fixture, no browser export download, and no browser cancellation test; these are covered programmatically."
+  },
+  "ratios": [
+    {
+      "name": "no-status",
+      "naturalToTasSlowdown": 0.6667712844977194
+    },
+    {
+      "name": "repeated-paralysis",
+      "naturalToTasSlowdown": 0.5119836624380273
+    },
+    {
+      "name": "confusion-only",
+      "naturalToTasSlowdown": 0.8436017483006967
+    },
+    {
+      "name": "one-conflict",
+      "naturalToTasSlowdown": 5.247581146623441
+    },
+    {
+      "name": "repeated-conflicts",
+      "naturalToTasSlowdown": 70.57798003250423
+    },
+    {
+      "name": "double-e-stun",
+      "naturalToTasSlowdown": 1.123241932983078
+    }
+  ]
+}
