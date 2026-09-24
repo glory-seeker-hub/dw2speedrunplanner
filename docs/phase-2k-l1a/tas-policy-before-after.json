@@ -1,0 +1,82 @@
+{
+  "baseline": "ebbeaa4",
+  "gates": [
+    {
+      "gate": "Poison application",
+      "l1Alternatives": "apply / prevent",
+      "legacyFavorable": "Enemy apply; Player prevent",
+      "l1a": "Enemy apply; Player prevent",
+      "branches": 0
+    },
+    {
+      "gate": "Paralysis application",
+      "l1Alternatives": "apply / prevent",
+      "legacyFavorable": "Enemy apply; Player prevent",
+      "l1a": "Enemy apply; Player prevent",
+      "branches": 0
+    },
+    {
+      "gate": "Confusion application",
+      "l1Alternatives": "apply / prevent",
+      "legacyFavorable": "Enemy apply; Player prevent",
+      "l1a": "Enemy apply; Player prevent",
+      "branches": 0
+    },
+    {
+      "gate": "Probabilistic Motivation application",
+      "l1Alternatives": "apply / prevent",
+      "legacyFavorable": "Enemy apply if legal; Player prevent (Enemy immunity preserved)",
+      "l1a": "Enemy apply if legal; Player prevent (Enemy immunity preserved)",
+      "branches": 0
+    },
+    {
+      "gate": "Paralysis recovery",
+      "l1Alternatives": "recover / remain",
+      "legacyFavorable": "Enemy remain; Player recover",
+      "l1a": "Enemy remain; Player recover",
+      "branches": 0
+    },
+    {
+      "gate": "Confusion recovery",
+      "l1Alternatives": "recover / remain",
+      "legacyFavorable": "Enemy remain; Player recover",
+      "l1a": "Enemy remain; Player recover",
+      "branches": 0
+    },
+    {
+      "gate": "Motivation recovery",
+      "l1Alternatives": "recover / remain",
+      "legacyFavorable": "Enemy remain; Player recover",
+      "l1a": "Enemy remain; Player recover",
+      "branches": 0
+    },
+    {
+      "gate": "Player Paralysis action",
+      "l1Alternatives": "miss / pass",
+      "legacyFavorable": "pass",
+      "l1a": "pass",
+      "branches": 0
+    },
+    {
+      "gate": "Enemy Paralysis without executing Confusion",
+      "l1Alternatives": "miss / pass",
+      "legacyFavorable": "miss",
+      "l1a": "miss",
+      "branches": 0
+    },
+    {
+      "gate": "Enemy Confusion + Paralysis action",
+      "l1Alternatives": "miss / pass",
+      "legacyFavorable": "miss",
+      "l1a": "Search miss / pass; compare complete downstream routes",
+      "branches": 2
+    }
+  ],
+  "unchanged": [
+    "Guaranteed Concert Crush on Hit (no application gate)",
+    "Enemy Motivation immunity",
+    "Poison has no natural recovery",
+    "Unsupported RNG and Accuracy Mode",
+    "Interrupt suppresses Confusion and recovery: direct Paralysis policy"
+  ]
+}

@@ -87,7 +87,7 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   field('Requested evaluations / budget', c.requestedEvaluations); field('Beam width', c.optimizedConfig?.beamWidth); field('Max optimized depth', c.optimizedConfig?.maxDepth);
   field('TAS Luck frontier cap', c.tasFrontierCap); field('Simulator root seed', c.seed); field('Max rounds safety limit', c.maxRounds);
   section('Search Summary'); lines.push(...details(report.searchSummary));
-  if(report.tasLuckSummary){section('TAS Luck Search');lines.push(...details(report.tasLuckSummary));}
+  if(report.tasLuckSummary){section('TAS Luck Conflicts');if(report.tasLuckSummary.opportunities === 0) lines.push('Deterministic favorable status outcomes; no Confusion + Paralysis conflicts encountered.');else lines.push('Enemy Confusion + Paralysis action conflicts only.', ...details(report.tasLuckSummary));}
   section('Result');
   const selected = report.selectedResult;
   if (selected.kind === 'random-monte-carlo') {

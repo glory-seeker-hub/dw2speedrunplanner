@@ -24,16 +24,18 @@ export class TasLuckBranch extends Error {
   constructor(public opportunity: TasLuckOpportunity, public trace: TasLuckDecisionTrace, public checkpoint: string) { super('TAS Luck branch'); }
 }
 export interface TasLuckControl {
+  readonly lastOpportunityKey?: string;
   action(state: BattleState, action: PlannedAction, continuation?: () => unknown): void;
   choose(category: RngResolution['category'], status: string | undefined, targetId: string | undefined,
     alternatives: RngResolution['outcome'][], numerator: number, denominator: number): RngResolution['outcome'];
 }
-/** Replay prefixes stop at the first unassigned supported gate. No Natural draw is consumed. */
+/** Replay prefixes stop at the first unassigned Enemy Confusion + Paralysis action gate. No Natural draw is consumed. */
 export function createTasLuckReplay(trace: readonly TasLuckDecision[], strict = false) {
   let state: BattleState | undefined, action: PlannedAction | undefined, index = 0;
   const visited: TasLuckDecisionTrace = [];
   let continuation: (()=>unknown) | undefined;
   const control: TasLuckControl = {
+    get lastOpportunityKey() { return visited[visited.length - 1]?.key; },
     action(s,a,c) { state=s; action=a; continuation=c; },
     choose(category,status,targetId,alternatives,numerator,denominator) {
       if (!state || !action) throw new TasLuckDivergence('TAS gate has no execution identity.');
@@ -60,8 +62,8 @@ const lexical=(a:string,b:string)=>a<b?-1:a>b?1:0;
 export function createTasLuckSearch(execute: (control: TasLuckControl) => TasLuckSample, cap: number, reverseOutcomes = false) {
   if (![8,16,32].includes(cap)) throw new Error('Unsupported TAS frontier cap.');
   const summary=emptyTasLuckSummary(cap);
-  let frontier: TasLuckDecisionTrace[]=[[]], best: TasLuckSample | null=null;
-  const seen=new Map<string,string>();
+  let frontier: TasLuckDecisionTrace[] | null=null, best: TasLuckSample | null=null, started=false;
+  let seen: Map<string,string> | null=null;
   const compare=(a:TasLuckSample,b:TasLuckSample)=>{
     const win=(s:TasLuckSample)=>!s.diverged&&s.result.outcome==='player-win';
     return Number(win(b))-Number(win(a)) || (win(a)?(a.result.totalFrames??Infinity)-(b.result.totalFrames??Infinity):0)
@@ -69,16 +71,21 @@ export function createTasLuckSearch(execute: (control: TasLuckControl) => TasLuc
       || lexical(playerDecisionTraceKey(a.decisionTrace),playerDecisionTraceKey(b.decisionTrace));
   };
   return {
-    summary, get done(){return !frontier.length;}, get best(){return best;},
+    summary, get done(){return started && !frontier?.length;}, get best(){return best;},
     step(){
-      const prefix=frontier.shift();if(!prefix)return;
-      const replay=createTasLuckReplay(prefix);summary.branchesExplored++;
+      if (started && !frontier?.length) return;
+      const prefix=started ? frontier!.shift()! : [];
+      if (started) summary.branchesExplored++;
+      started=true;
+      const replay=createTasLuckReplay(prefix);
       try {
         const sample=execute(replay.control);replay.finish();sample.result.tasLuckTrace=structuredClone(replay.visited);
         if(!best||compare(sample,best)<0)best=sample;
       } catch(error) {
         if(!(error instanceof TasLuckBranch))throw error;
         summary.opportunities++;
+        frontier ??= [];
+        seen ??= new Map<string,string>();
         const key=error.checkpoint;
         if(seen.has(key) && seen.get(key)! <= tasLuckTraceKey(error.trace))summary.deduplicated++;
         else {
@@ -89,6 +96,7 @@ export function createTasLuckSearch(execute: (control: TasLuckControl) => TasLuc
           frontier.push(...outcomes.map(selected=>[...error.trace,{...error.opportunity,selected}]));
         }
       }
+      if (!frontier) return; // Direct favorable sample: no frontier or nested replay.
       // Depth-first canonical order guarantees a terminal path before work pruning.
       frontier.sort((a,b)=>b.length-a.length||lexical(tasLuckTraceKey(a),tasLuckTraceKey(b)));
       const unique=new Map<string,TasLuckDecisionTrace>();for(const t of frontier){const k=tasLuckTraceKey(t);if(unique.has(k))summary.deduplicated++;else unique.set(k,t);}

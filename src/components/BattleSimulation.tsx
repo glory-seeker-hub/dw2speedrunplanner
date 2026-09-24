@@ -246,8 +246,8 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
               <Button variant={rngPolicy === 'tas-luck' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'tas-luck'} disabled={isSimulating} onClick={() => setRngPolicy('tas-luck')}>TAS Luck</Button>
             </div>
             {rngPolicy === 'natural' ? <p>Uses the game's implemented RNG normally.</p> : <>
-              <p>Searches supported status RNG outcomes. Unsupported RNG remains Natural.</p>
-              <p role="note" className="font-semibold text-amber-600">TAS Luck selects the best searched manipulation outcome per sampled unsupported-RNG seed; statistics are not natural probabilities.</p>
+              <p>Uses favorable status RNG outcomes. Only an Enemy acting with Confusion + Paralysis branches: Paralysis Miss or Confusion action proceeds. Unsupported RNG remains Natural; Accuracy Mode controls accuracy.</p>
+              <p role="note" className="font-semibold text-amber-600">TAS Luck selects one result per sampled unsupported-RNG seed, comparing complete paths only for Confusion + Paralysis conflicts; statistics are not natural probabilities.</p>
               <p>Standard accuracy is controlled separately by Accuracy Mode.</p>
             </>}
             </div>

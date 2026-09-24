@@ -1,4 +1,4 @@
-import { tasLuckRequirements, tasLuckTraceKey, type TasLuckDecisionTrace } from './battleTasLuck';
+import { tasLuckTraceKey, type TasLuckDecisionTrace } from './battleTasLuck';
 import { collectRngRequirements, type TasRngRequirement } from './battleRngAudit';
 import type { BattleRunResult } from './battleTypes';
 import type { PlayerRoundPlan } from './battleActionPlans';
@@ -24,7 +24,7 @@ export function createFastestRouteTracker() {
       if (!best || (next.totalFrames - best.totalFrames || lexical(next.decisionTraceKey, best.decisionTraceKey)
         || lexical(tasLuckTraceKey(next.tasLuckTrace??[]),tasLuckTraceKey(best.tasLuckTrace??[]))
         || lexical(next.sourcePrefixKey, best.sourcePrefixKey) || next.sampleIndex - best.sampleIndex || next.seed - best.seed) < 0) {
-        const requirements = result.tasLuckTrace ? tasLuckRequirements(result.tasLuckTrace,result.state) : collectRngRequirements(result.actions);
+        const requirements = collectRngRequirements(result.actions);
         if (requirements.length) next.rngRequirements = requirements;
         best = next;
       }
