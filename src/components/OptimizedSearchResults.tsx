@@ -1,47 +1,34 @@
 import { rngRequirementText } from '@/utils/battle/battleRngAudit';
 import type { OptimizedSearchResult } from '@/utils/battle/battleOptimizedSearch';
 import { OBJECTIVE_LABELS } from '@/utils/battle/battleSearchObjectives';
+import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, type DisplayCombatant } from '@/utils/battle/battlePresentation';
 const value = (n: number | null) => n === null ? 'Unavailable' : n.toLocaleString('en-US', { maximumFractionDigits: 1 });
-export function OptimizedSearchResults({ result }: { result: OptimizedSearchResult }) {
-  const luck = result.rngPolicy === 'tas-luck';
-  const tas = luck || result.rngPolicy === 'tas-favorable';
+export function OptimizedSearchResults({ result, combatants = [] }: { result: OptimizedSearchResult; combatants?: readonly DisplayCombatant[] }) {
   const fastest = result.objective === 'fastest-potential', route = result.fastestRoute, stats = result.recommendedStats;
-  const orders = (plans: OptimizedSearchResult['recommendedPrefix']) => plans.map(plan => <div key={plan.key}><h4>Round {plan.round}</h4><ul>{plan.orders.map(o => <li key={o.key}>{o.actorName} — {o.skillName} → {o.targetLabel}</li>)}</ul></div>);
-  const events = [...new Set((route?.actions ?? []).flatMap(a => [
-    ...(a.accuracy && a.outcome === 'miss' ? [a.accuracy.cause + ' Miss'] : []),
-    ...(a.confusion?.redirected ? ['Confusion replacement'] : []),
-    ...a.statusRecoveries.filter(r => r.recovered).map(r => r.status + ' natural recovery'),
-    ...a.impacts.flatMap(i => i.statusApplications.filter(r => r.applied).map(r => r.status + ' application')),
-  ]))];
-  return <section aria-label="Optimized search results" className="space-y-3 rounded border p-4">
-    <h2 className="font-semibold">{result.status === 'cancelled' ? 'Partial optimized search — cancelled' : result.evaluations < result.rolloutBudget ? 'Search completed early' : 'Optimized search completed'}</h2>
-    <p>Search method: Optimized Action Search · Optimization objective: {OBJECTIVE_LABELS[result.objective]}</p>
-    <p>Rollout budget used: {value(result.evaluations)} / {value(result.rolloutBudget)} · Depth reached: {result.depth}</p>
-    <p>Root Player plans: {value(result.rootPlanCount)} · Candidate plans evaluated: {value(result.candidatesEvaluated)}</p>
-    <p>Screened-prefix statistics use the last completed fair comparison stage ({value(result.fairStageEvaluations)} evaluations). In-progress samples do not affect that ranking.</p>
-    {result.diagnostics.map(d => <p key={d} role="status">{d}</p>)}
-    {fastest && <div><h3 className="font-semibold">{luck ? 'Fastest TAS Luck route found' : tas ? 'Fastest TAS route found under supported favorable RNG assumptions' : 'Fastest route found'}</h3>
-      {route ? <><p>Observed frames: {value(route.totalFrames)}</p>{orders(route.decisionTrace)}
-        {tas && <div><h4>{luck ? 'TAS Luck Requirements' : 'TAS RNG requirements'}</h4>{(route.rngRequirements ?? []).map((r, i) => <p key={i}>Round {r.round} · {r.actorName} / {r.skillName} · {rngRequirementText(r)}</p>)}</div>}
-        <p>Rollout seed: {route.seed} · Sample index: {route.sampleIndex}</p>
-        <details><summary>Source candidate/prefix</summary><code className="break-all">{route.sourcePrefixKey}</code></details>
-        <p>Observed mechanical events: {events.join('; ') || 'None recorded'}.</p></> : <p>No eligible complete Player victory observed.</p>}
-    </div>}
-    <h3 className="font-semibold">{fastest ? 'Best screened prefix' : result.objective === 'average-victory' ? 'Best average strategy' : 'Highest-success strategy'}</h3>
-    {luck && <p>Supported manipulable RNG outcomes were searched. Unsupported RNG remained Natural. Average and success statistics use one best searched manipulation outcome per sampled unsupported-RNG seed, not natural probabilities.</p>}
-    {tas && !luck && <p>Average under TAS Favorable policy. Success rate under the selected TAS policy is not natural probability.</p>}
-    {stats && <div>
-      {result.objective === 'success-rate' ? <p>Success rate: {value(stats.successRate * 100)}%</p> : <p>Average victory frames: {value(stats.averageVictoryFrames)}</p>}
-      <p>Fastest fair-stage sample: {value(stats.fastestFrames)}f · Average victory frames: {value(stats.averageVictoryFrames)} · Success rate: {value(stats.successRate * 100)}% · Divergence: {value(stats.divergenceRate * 100)}% · Rollouts: {value(stats.evaluations)}</p>
-    </div>}
-    {orders(result.recommendedPrefix)}
-    <p className="text-sm">Orders after Round 1 are path-specific and assume the searched battle state for that round. A different battle state may make those orders illegal or unsuitable. This is not a complete adaptive policy.</p>
-    <h3 className="font-semibold">Top candidates</h3>
-    <p>Fair-stage statistical candidates; these are not the globally fastest individual rollouts.</p>
-    <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr>{['Rank / first-round orders', 'Rollouts', 'Fastest f', 'Average victory f', 'Success rate', 'Divergence'].map(s => <th key={s} className="p-2 text-left">{s}</th>)}</tr></thead>
-      <tbody>{result.topCandidates.map((c, i) => <tr key={c.key}><td className="p-2">{i + 1}. {c.plans[0]?.orders.map(o => `${o.actorName}: ${o.skillName} → ${o.targetLabel}`).join('; ')}</td><td>{value(c.stats.evaluations)}</td><td>{value(c.stats.fastestFrames)}</td><td>{value(c.stats.averageVictoryFrames)}</td><td>{value(c.stats.successRate * 100)}%</td><td>{value(c.stats.divergenceRate * 100)}%</td></tr>)}</tbody></table></div>
-    <p className="text-sm">Every completed screening stage evaluates all legal Player plans at its expanded decision states, but beam pruning and stochastic rollouts do not exhaust the full battle tree. Fastest Potential may depend on favorable remaining RNG.</p>
-    <h3 className="font-semibold">Best observed battle</h3>
-    <p className="text-sm">The battle histories below are individual observed rollouts. Fastest route found uses the globally fastest eligible observation; screened prefixes use repeated fair evaluations.</p>
+  const conditional = result.rngPolicy === 'tas-favorable' ? 'Average under TAS Favorable policy. Success is conditional on the selected TAS policy, not natural probabilities.' : RESULT_HELP.conditional;
+  const tas = result.rngPolicy === 'tas-luck' || result.rngPolicy === 'tas-favorable';
+  const plans = fastest ? route?.decisionTrace ?? [] : result.recommendedPrefix;
+  const metric = (label: string, n: number | null, suffix = '') => <div className="rounded bg-muted/30 p-3"><dt className="text-sm text-muted-foreground">{label}</dt><dd className="text-xl font-semibold">{value(n)}{n === null ? '' : suffix}</dd></div>;
+  const strategyMetrics = <dl className="grid gap-3 sm:grid-cols-3">{stats ? <>{result.objective === 'success-rate' && metric('Observed success rate', stats.successRate * 100, '%')}{stats.averageVictoryFrames !== null && metric('Average winning frames', stats.averageVictoryFrames, ' f')}{result.objective !== 'success-rate' && metric('Observed success rate', stats.successRate * 100, '%')}{metric('Fair samples', stats.evaluations)}</> : <p>No completed fair-stage statistics retained.</p>}</dl>;
+  return <section aria-label="Optimized search results" className="space-y-5 min-w-0">
+    <p className="text-sm">{result.status === 'cancelled' ? 'Partial optimized search — cancelled' : result.evaluations < result.rolloutBudget ? 'Search completed early' : 'Optimized search completed'} · {OBJECTIVE_LABELS[result.objective]}</p>
+    <section className="rounded-lg border p-4 space-y-3" aria-label="Main result">
+      <h2 className="text-xl font-semibold">{fastest ? route ? 'Fastest Route Found' : 'No complete winning route found' : strategyTitle(result.objective)}</h2>
+      <p className="text-sm text-muted-foreground">{fastest ? RESULT_HELP.fastest : strategyHelp(result.objective)}</p>
+      {fastest ? route ? <dl className="grid gap-3 sm:grid-cols-3">{metric('Frames', route.totalFrames, ' f')}{metric('Rounds', Math.max(0, ...route.actions.map(a => a.round)))}<div className="p-3">Complete Player victory</div></dl> : <p>No eligible complete Player victory observed.</p> : strategyMetrics}
+      {!fastest && tas && <p role="note">{conditional}</p>}
+      <p className="text-xs text-muted-foreground">{RESULT_HELP.timing}</p>
+    </section>
+    <section aria-label="Recommended Player actions" className="rounded-lg border p-4 space-y-3">
+      <h3 className="text-lg font-semibold">{fastest ? 'Recommended Player Orders' : 'Recommended Player Strategy'}</h3>
+      <p className="text-sm">{fastest ? 'Exact intended orders of the fastest observed route' : `${strategyTitle(result.objective)} — selected fair prefix`}</p>
+      {!plans.length && <p>No intended orders retained.</p>}
+      {plans.map(plan => <div key={plan.key} className="space-y-2"><h4 className="font-semibold">Round {plan.round}</h4><ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{plan.orders.map(o => <li key={o.key} className="rounded bg-muted/30 p-3 text-sm break-words"><p className="font-semibold">{combatantLabel(combatants, o.actorId, o.actorName)}</p><p>{o.skillName} → {intendedTarget(o, combatants)}</p>{fastest && route && !route.actions.some(a => a.round === plan.round && a.actorId === o.actorId && a.state === 'resolved') && <p>Planned — not executed in retained execution</p>}</li>)}</ul></div>)}
+      <p className="text-sm text-muted-foreground">{RESULT_HELP.fair}</p>
+    </section>
+    {tas && !!route?.rngRequirements?.length && <section aria-label="TAS Requirements" className="rounded-lg border p-4 space-y-2"><h3 className="font-semibold">TAS Requirements</h3>{!fastest && <p>Requirements for the retained Fastest Route observation; these do not establish requirements for the selected screened strategy.</p>}{route.rngRequirements.map((r, i) => <p key={i}>Round {r.round} · {combatantLabel(combatants, r.actorId, r.actorName)} · {r.skillName} → {combatantLabel(combatants, r.targetId, r.targetName)}: {rngRequirementText(r)}</p>)}</section>}
+    <section className="rounded border p-4 space-y-3" aria-label="Secondary result"><h3 className="font-semibold">{fastest ? 'Best Screened Strategy' : 'Fastest Complete Route Observed'}</h3><p className="text-sm">{fastest ? RESULT_HELP.screened : RESULT_HELP.fastest}</p>{fastest ? <>{strategyMetrics}<details><summary>Screened strategy prefix</summary>{result.recommendedPrefix.map(p => <p key={p.key}>Round {p.round}: {p.orders.map(o => `${combatantLabel(combatants, o.actorId, o.actorName)} — ${o.skillName} → ${intendedTarget(o, combatants)}`).join('; ')}</p>)}</details>{tas && <p className="text-sm">{conditional}</p>}</> : <p>{route ? `${value(route.totalFrames)} f · one observed victory` : 'No eligible complete Player victory observed.'}</p>}{stats?.fastestFrames != null && <p className="text-sm">Fastest fair sample: {value(stats.fastestFrames)} f</p>}</section>
+    <details className="rounded border p-4"><summary className="cursor-pointer font-semibold">Top Screened Strategies</summary><p className="my-2 text-sm">{RESULT_HELP.candidates}</p><ol className="space-y-3">{result.topCandidates.map((c, i) => <li key={c.key} className="rounded bg-muted/30 p-3 text-sm"><p className="font-semibold">{i + 1}. {c.plans[0]?.orders.map(o => `${combatantLabel(combatants, o.actorId, o.actorName)}: ${o.skillName} → ${intendedTarget(o, combatants)}`).join('; ')}</p><p>Success {value(c.stats.successRate * 100)}% · {value(c.stats.evaluations)} fair samples · Average winning frames {value(c.stats.averageVictoryFrames)} · Fastest fair sample {value(c.stats.fastestFrames)} f · Divergence {value(c.stats.divergenceRate * 100)}%</p></li>)}</ol></details>
+    <details className="rounded border p-4"><summary className="cursor-pointer font-semibold">Search Details</summary><div className="space-y-2 mt-3 text-sm"><p>Rollout budget used: {value(result.evaluations)} / {value(result.rolloutBudget)} · Depth reached: {result.depth}</p><p>Root Player plans: {value(result.rootPlanCount)} · Candidate plans evaluated: {value(result.candidatesEvaluated)}</p><p>Current candidates: {value(result.candidateCount)} · Beam: {result.beamSize}</p><p>Completed fair screening evaluations: {value(result.fairStageEvaluations)}. In-progress samples do not affect ranking.</p><p>{RESULT_HELP.screened}</p><p>{RESULT_HELP.limitation}</p>{result.diagnostics.map(d => <p key={d}>{d}</p>)}</div></details>
   </section>;
 }

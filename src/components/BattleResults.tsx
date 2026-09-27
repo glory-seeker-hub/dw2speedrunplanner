@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { RESULT_HELP, combatantLabel, intendedTarget, replayExplanation, replayLimitation, type DisplayCombatant } from '@/utils/battle/battlePresentation';
 import { rngRequirementText } from '@/utils/battle/battleRngAudit';
 import { STAT_LABELS } from '@/utils/battle/battleStatOverrides';
 import { SimulationReportExport } from './SimulationReportExport';
@@ -15,19 +18,28 @@ const rngPolicyLabel = (policy: keyof typeof RNG_POLICY_LABELS) => RNG_POLICY_LA
 const frames = (value: number | null) => value === null ? 'Unavailable' : `${value.toLocaleString('en-US', { maximumFractionDigits: 1 })} f`;
 const number = (value: number | null) => value === null ? 'Unavailable' : value.toLocaleString('en-US', { maximumFractionDigits: 1 });
 
-function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
+export function ActionHistory({ actions, combatants = [] }: { actions: readonly BattleActionRecord[]; combatants?: readonly DisplayCombatant[] }) {
+  const label = (id: string, fallback?: string) => combatantLabel(combatants, id, fallback ?? actions.find(a => a.actorId === id)?.actorName ?? actions.flatMap(a => a.impacts).find(i => i.targetId === id)?.targetName);
   if (!actions.length) return <p className="text-sm text-muted-foreground">No completed victory with the required timing coverage.</p>;
   return <ScrollArea className="h-96 w-full"><ol className="space-y-3 pr-4">
     {actions.map(action => <li key={action.id} className="rounded border border-border bg-muted/30 p-3 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-sm"><span className="text-muted-foreground">Round {action.round} · </span>
-          <span className="font-semibold text-digital-cyan">{action.actorName}</span> · {action.skillName}
+          <span className="font-semibold text-digital-cyan">{label(action.actorId, action.actorName)}</span> · {action.skillName}
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'guard' ? 'Guard — Motivation Down' : action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'assist-target-lost' ? 'Assist target KO' : action.accuracy?.cause === 'invisibility' ? 'Invisibility forced Miss' : action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
+      <p className="text-sm">Actual targets: {action.effectiveTargetIds.map(id => label(id)).join(', ') || 'None'}</p>
+      <div className="text-sm">{action.impacts.map((impact, i) => <p key={i}>{label(impact.targetId, impact.targetName)}: {impact.damage} damage · {impact.hpBefore} → {impact.hpAfter} HP{impact.statusApplications.filter(s => s.applied).map(s => ' · ' + stateLabel(s.status)).join('')}</p>)}</div>
+      {(action.supportEvents ?? []).filter(e => e.kind === 'healing').map((e, i) => e.kind === 'healing' && <p key={i}>{label(e.targetId)}: Healed {e.appliedAmount} HP · {e.hpBefore} → {e.hpAfter}</p>)}
+      {action.counter && <p>Counter — {stateLabel(action.counter.executionMode)}</p>}
+      {action.kind === 'interrupt' && <p>Interrupt</p>}
+      {action.kind === 'assist' && <p>Assist</p>}
+      {action.accuracy?.rngResolution && <p>{action.accuracy.rngResolution.outcome === 'miss' ? 'Paralysis must prevent this action' : 'Paralysis must allow the action so Confusion can execute'}</p>}
+      <details><summary className="cursor-pointer text-sm">Action details — HP/MP, status, RNG and effect audit</summary><div className="mt-2 space-y-2 break-words">
       {action.interruptTiming && <p className="text-xs text-muted-foreground">Interrupt timing: {action.interruptTiming.totalFrames}f · {action.interruptTiming.preludeFrames}f interrupted-action prelude + {action.interruptTiming.executionFrames}f {action.outcome === 'miss' ? 'Miss execution' : 'Interrupt execution'}</p>}
       {action.kind === 'interrupt' && <p className="text-sm text-info">{action.reason === 'interrupt-no-eligible-target' ? 'Interrupt skipped — no eligible target' : 'Interrupt — ' + (action.outcome === 'hit' ? 'Hit' : action.accuracy?.cause === 'paralysis' ? 'Miss — Paralysis' : 'Miss — Accuracy')}</p>}
       {action.interrupt && <div className="text-xs text-info">
@@ -55,14 +67,14 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
       {action.accuracy?.rngResolution && <p>{rngPolicyLabel(action.accuracy.rngResolution.policy)} RNG: {action.accuracy.rngResolution.outcome === 'miss' ? 'Paralysis action must fail' : 'Paralysis action must proceed'}</p>}
       {action.accuracy?.paralysisRoll !== undefined && <p className="text-xs text-muted-foreground">Paralysis check: {action.accuracy.paralysisRoll === 1 ? 'failed' : 'passed'}</p>}
       <ul className="space-y-1 text-sm">{action.impacts.map((impact, index) => <li key={`${impact.targetId}-${index}`} className="flex flex-wrap justify-between gap-2">
-        <span>{impact.targetName} <span className="text-xs text-muted-foreground">({impact.targetId})</span></span>
+        <span>{label(impact.targetId, impact.targetName)}</span>
         <span><span className="text-destructive">{impact.damage} dmg</span>{impact.poisonBonusDamage > 0 && <span className="text-info"> (Poison +{impact.poisonBonusDamage})</span>} · {impact.hpBefore} → {impact.hpAfter} HP · {impact.ko ? 'KO' : impact.outcome}
           {impact.effectiveElement && <span className="block text-xs text-info">Effective element: {impact.effectiveElement}</span>}
           {impact.statusApplications.map((status, index) => <span key={`${status.status}-${index}`} className="block text-xs text-info">{stateLabel(status.status)} {status.result === 'immune' ? `immune (${status.immunityReason === 'enemy' ? 'Enemy' : 'Boss'})` : status.applied ? status.alreadyActive ? 'already active; reapplied' : 'applied' : 'not applied'}{status.condition === 'interrupt-hit' ? ' by Interrupt; affects restarted action immediately' : status.condition === 'counter-activated' ? ' by activated Counter' : status.condition?.endsWith('-power') ? ` by ${stateLabel(status.condition)}` : status.rngResolution ? ' — '+rngPolicyLabel(status.rngResolution.policy)+' RNG' : status.roll === null ? ' · guaranteed on Hit' : ` · roll ${status.roll}/2`}</span>)}
         </span>
       </li>)}</ul>
       {(action.supportEvents ?? []).map((event, index) => <p key={index} className="text-xs text-info">
-        {event.targetId} · {event.kind === 'healing' ? `Assist — ${event.mode === 'revive-full' ? 'Revive' : event.mode === 'full' ? 'Full Heal' : 'Heal ' + event.requestedAmount}: +${event.appliedAmount} HP (${event.hpBefore} → ${event.hpAfter})`
+        {label(event.targetId)} · {event.kind === 'healing' ? `Assist — ${event.mode === 'revive-full' ? 'Revive' : event.mode === 'full' ? 'Full Heal' : 'Heal ' + event.requestedAmount}: +${event.appliedAmount} HP (${event.hpBefore} → ${event.hpAfter})`
           : event.kind === 'stage' ? `${event.stat.toUpperCase()} ${event.delta > 0 ? '+1' : '-1'} stage: ${event.before} → ${event.after}${event.effectiveSuppressed ? ' (suppressed this round)' : ''}`
           : event.kind === 'parameter-suppression' ? 'Parameters suppressed for this round'
           : event.kind === 'cure' ? `${stateLabel(event.status)} ${event.before ? 'cured' : 'already clear'}`
@@ -76,8 +88,22 @@ function ActionHistory({ actions }: { actions: BattleActionRecord[] }) {
       {(action.effectDiagnostics ?? []).map((d, index) => <p key={index} className="text-xs text-muted-foreground">Unresolved effect: {d}</p>)}
       {(action.effectAudit ?? []).map((d, index) => <p key={index} className="text-xs text-info">{d}</p>)}
       {action.resourceDiagnostics.map(d => <p key={d} className="text-xs text-muted-foreground">{d}</p>)}
+      </div></details>
     </li>)}
   </ol></ScrollArea>;
+}
+
+function ReplayPanel({ results, combatants }: { results: SimulationResult; combatants: readonly DisplayCombatant[] }) {
+  const [fewest, setFewest] = useState(false);
+  const retained = (results.report?.executedBattle.actions ?? results.optimized?.fastestRoute?.actions ?? (results.fastestBattleByFrames.length ? results.fastestBattleByFrames : results.fastestBattleHistory)) as readonly BattleActionRecord[];
+  const actions = fewest ? results.fastestBattleHistory : retained;
+  const alternate = results.fastestBattleHistory.length > 0 && JSON.stringify(results.fastestBattleHistory) !== JSON.stringify(retained);
+  return <Card><CardHeader><CardTitle>Executed Battle Replay</CardTitle></CardHeader><CardContent className="space-y-3">
+    <p>{fewest ? 'Fewest-actions victory observation. This is a separate retained execution, not the selected screened strategy.' : results.report ? replayExplanation(results.report) : results.fastestBattleByFrames.length ? 'Retained fastest timed victory observation.' : 'Retained fewest-actions victory observation; complete timing may be unavailable.'}</p>
+    {!fewest && results.report && replayLimitation(results.report) && <p role="note">{replayLimitation(results.report)}</p>}
+    {alternate && <div role="group" aria-label="Replay selection" className="flex flex-wrap gap-2"><Button variant="outline" aria-pressed={!fewest} onClick={() => setFewest(false)}>Retained fastest replay</Button><Button variant="outline" aria-pressed={fewest} onClick={() => setFewest(true)}>Fewest-actions replay</Button></div>}
+    <ActionHistory actions={actions} combatants={combatants} />
+  </CardContent></Card>;
 }
 
 export const BattleResults = ({ results }: { results: SimulationResult }) => {
@@ -88,8 +114,18 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
     ['Slowest Victory', frames(results.maxFrames)],
     ['Completed Successes', `${results.completedSuccesses.toLocaleString()} / ${results.totalSimulations.toLocaleString()}`],
   ];
-  return <div className="space-y-6">
+  const combatants = results.report ? [...results.report.playerTeam, ...results.report.enemyTeam] : [];
+  return <div className="space-y-6 min-w-0 break-words">
     <SimulationReportExport report={results.report} />
+    {results.report && <header className="space-y-2"><h1 className="text-xl font-semibold">{results.report.battle.label}</h1><p className="text-sm">{results.report.source.kind === 'run-planner' ? 'Run Planner · Historical pre-battle state · ' + (results.report.source.source.runName ?? 'Saved run') : 'Manual Simulator setup'}</p></header>}
+    <p className="text-sm">Accuracy Mode: {(results.search?.accuracyMode ?? results.accuracyMode) === 'strategy' ? 'Strategy' : 'Game-accurate'} · RNG Policy: {RNG_POLICY_LABELS[rngPolicy]}</p>
+    {results.optimized ? <OptimizedSearchResults result={results.optimized} combatants={combatants} /> : <section aria-label="Simulation Summary" className="rounded border p-4 space-y-3"><h2 className="text-xl font-semibold">Simulation Summary</h2><p>Random Monte Carlo · {results.search?.status === 'cancelled' ? 'Cancelled / Partial' : 'Completed'}</p><div className="grid gap-3 sm:grid-cols-3"><p>Success rate: {number(results.winRate)}%</p><p>Average victory: {frames(results.avgFrames)}</p><p>Samples: {number(results.totalSimulations)}</p><p>Fastest victory: {frames(results.minFrames)}</p></div>{!results.completedSuccesses && <p>No complete Player victory observed.</p>}<p className="text-xs">{RESULT_HELP.timing}</p>{rngPolicy === 'tas-luck' && <p>{RESULT_HELP.conditional}</p>}</section>}
+    {!results.optimized && results.tasLuckRoute && <section className="rounded border p-4 space-y-3" aria-label="Recommended Player actions"><h3 className="font-semibold">Recommended Player Orders — retained fastest observation</h3>{results.tasLuckRoute.decisionTrace.map(p => <div key={p.key}><h4>Round {p.round}</h4>{p.orders.map(o => <p key={o.key}>{combatantLabel(combatants, o.actorId, o.actorName)} — {o.skillName} → {intendedTarget(o, combatants)}</p>)}</div>)}</section>}
+    {!results.optimized && results.tasLuckRoute && <section aria-label="TAS Requirements"><h3 className="font-semibold">TAS Requirements — retained fastest observation</h3>{results.tasLuckRoute.rngRequirements?.map((r,i)=><p key={i}>Round {r.round} · {combatantLabel(combatants,r.targetId,r.targetName)} · {rngRequirementText(r)}</p>)}</section>}
+    <ReplayPanel key={results.report ? JSON.stringify([results.report.battle, results.report.searchSummary]) : results.totalSimulations} results={results} combatants={combatants} />
+    <details className="rounded border p-4"><summary className="cursor-pointer font-semibold">Technical Details</summary><div className="mt-3 space-y-4 break-words">
+    {results.tasLuckSummary && results.tasLuckSummary.opportunities > 0 && <section aria-label="TAS Luck conflicts"><p>Confusion + Paralysis conflicts: {results.tasLuckSummary.opportunities} · Branches explored: {results.tasLuckSummary.branchesExplored} · Branches pruned: {results.tasLuckSummary.pruned} · Deduplicated: {results.tasLuckSummary.deduplicated} · Frontier: {results.tasLuckSummary.maxFrontier}/{results.tasLuckSummary.frontierCap}</p></section>}
+    {results.report && <details><summary>Frozen provenance and internal identities</summary><pre className="overflow-auto max-h-80 text-xs">{JSON.stringify({ source: results.report.source, configuration: results.report.simulationConfiguration, combatants: combatants.map(a => ({ id: a.id, name: a.name, side: a.side, slot: a.slot })), fastest: results.optimized?.fastestRoute ? { seed: results.optimized.fastestRoute.seed, sampleIndex: results.optimized.fastestRoute.sampleIndex, sourcePrefixKey: results.optimized.fastestRoute.sourcePrefixKey } : null }, null, 2)}</pre></details>}
     {results.playerStatProvenance && <section aria-label="Player stat provenance" className="rounded border p-3 space-y-1">
       <p className="font-semibold">Player stat source: {results.playerStatProvenance.source === 'custom-simulation-stats' ? 'Custom simulation stats' : 'Planner baseline'}</p>
       {results.playerStatProvenance.players.map(p => <div key={p.instanceId}>
@@ -98,14 +134,11 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
         <p className="text-sm">Simulation-start resources: HP {p.currentHp} / {p.maxHp} · MP {p.currentMp} / {p.maxMp}</p>
       </div>)}
     </section>}
-    {results.optimized ? <OptimizedSearchResults result={results.optimized} /> : <p>Search method: Random Monte Carlo</p>}
     <p className="font-semibold">Accuracy mode: {(results.search?.accuracyMode ?? results.accuracyMode) === 'strategy' ? 'Strategy' : 'Game-accurate'}</p>
     <p className="font-semibold">RNG Policy: {RNG_POLICY_LABELS[rngPolicy]}</p>
     {rngPolicy === 'tas-favorable' && <p role="note">Manipulated RNG assumptions: averages and success rates are conditional on TAS Favorable policy, not natural probability. Ordinary Hit Rate still follows Accuracy Mode.</p>}
     {rngPolicy === 'tas-luck' && <p role="note">Supported status RNG uses favorable TAS outcomes; only Enemy Confusion + Paralysis action conflicts compare complete paths. Averages and success rates use one selected result per unsupported-RNG seed, not natural probabilities. Unsupported RNG remains Natural; ordinary accuracy follows Accuracy Mode.</p>}
-    {results.tasLuckSummary && <section aria-label="TAS Luck conflicts">{results.tasLuckSummary.opportunities === 0 ? <p>TAS Luck: deterministic favorable status outcomes; no Confusion + Paralysis conflicts encountered.</p> : <><p>Confusion + Paralysis conflicts: {results.tasLuckSummary.opportunities} · Branches explored {results.tasLuckSummary.branchesExplored} · Deduplicated {results.tasLuckSummary.deduplicated} · Pruned {results.tasLuckSummary.pruned} · Frontier {results.tasLuckSummary.maxFrontier}/{results.tasLuckSummary.frontierCap}</p><p>Best route found within the searched TAS Luck branches; no optimality guarantee.</p></>}</section>}
-    {results.tasLuckRoute && <section aria-label="TAS Luck Requirements"><h3>TAS Luck Requirements</h3>{results.tasLuckRoute.rngRequirements?.map((r,i)=><p key={i}>Round {r.round} · {rngRequirementText(r)}</p>)}</section>}
-    {rngPolicy !== 'tas-luck' && results.rngOverrideCounts && <p>TAS overrides across completed valid rollouts: direct status gates {results.rngOverrideCounts.directStatus}; Enemy recoveries prevented {results.rngOverrideCounts.enemyRecoveryPrevented}; Player recoveries forced {results.rngOverrideCounts.playerRecoveryForced}; Enemy paralysis misses forced {results.rngOverrideCounts.enemyParalysisMiss}; Player paralysis failures prevented {results.rngOverrideCounts.playerParalysisPass}.</p>}
+    {rngPolicy === 'tas-favorable' && results.rngOverrideCounts && <p>TAS overrides across completed valid rollouts: direct status gates {results.rngOverrideCounts.directStatus}; Enemy recoveries prevented {results.rngOverrideCounts.enemyRecoveryPrevented}; Player recoveries forced {results.rngOverrideCounts.playerRecoveryForced}; Enemy paralysis misses forced {results.rngOverrideCounts.enemyParalysisMiss}; Player paralysis failures prevented {results.rngOverrideCounts.playerParalysisPass}.</p>}
     {results.search && !results.optimized && <Card><CardHeader><CardTitle>{results.search.status === 'cancelled' ? 'Partial results — simulation cancelled' : 'Search completed'}</CardTitle></CardHeader><CardContent className="space-y-1 text-sm">
       <p>{number(results.search.completedSimulations)} / {number(results.search.requestedSimulations)} simulations completed</p>
       <p>Best found at simulation: {number(results.search.bestFoundAtSimulation)}</p>
@@ -130,14 +163,9 @@ export const BattleResults = ({ results }: { results: SimulationResult }) => {
         {results.resourceDiagnostics.map(d => <p key={d} className="text-muted-foreground">{d}</p>)}
       </CardContent>
     </Card>
-    <Card className="bg-gradient-card border-border"><CardHeader><CardTitle>Fastest Battle by Frames ({frames(results.minFrames)})</CardTitle></CardHeader>
-      <CardContent><ActionHistory actions={results.fastestBattleByFrames} /></CardContent>
-    </Card>
-    <Card className="bg-gradient-card border-border"><CardHeader><CardTitle>Fewest Actions in a Victory ({number(results.minTurns)})</CardTitle></CardHeader>
-      <CardContent><ActionHistory actions={results.fastestBattleHistory} /></CardContent>
-    </Card>
     <Card className="bg-gradient-card border-border"><CardHeader><CardTitle>Action Statistics</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-3 text-sm">
       <p>Fewest: {number(results.minTurns)}</p><p>Average: {number(results.avgTurns)}</p><p>Most: {number(results.maxTurns)}</p>
     </CardContent></Card>
+    </div></details>
   </div>;
 };

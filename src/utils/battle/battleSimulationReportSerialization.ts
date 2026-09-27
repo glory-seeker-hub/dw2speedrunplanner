@@ -1,3 +1,4 @@
+import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, replayExplanation, replayLimitation } from './battlePresentation';
 import { isColiseumLocation } from '@/data/coliseumBattles';
 import type { BattleSimulationReport, DeepReadonly } from './battleSimulationReport';
 import type { PlayerRoundPlan, PlayerOrder } from './battleActionPlans';
@@ -32,9 +33,9 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   const section = (heading: string) => { lines.push('', `## ${heading}`, ''); };
   const field = (label: string, value: string | number | undefined | null) => { if (value !== undefined && value !== null) lines.push(`- ${label}: ${reportText(value)}`); };
   const combatants = [...report.playerTeam, ...report.enemyTeam];
-  const actorLabel = (id: string) => { const a = combatants.find(a => a.id === id); return a ? `${a.name} · ${a.side === 'player' ? 'Player' : 'Enemy'} Slot ${a.slot} (${a.id})` : id; };
+  const actorLabel = (id: string) => combatantLabel(combatants, id);
   const order = (o: DeepReadonly<PlayerOrder>) => {
-    const target = o.targetIntent?.kind === 'combatants' ? o.targetIntent.targetIds.map(actorLabel).join(', ') : o.targetLabel;
+    const target = intendedTarget(o, combatants);
     return `${reportText(actorLabel(o.actorId))} — ${reportText(o.skillName)} → ${reportText(target)}`;
   };
   const orders = (plans: DeepReadonly<PlayerRoundPlan[]>) => {
@@ -46,12 +47,21 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     field('Fastest fair-stage sample (frames)', s.fastestFrames); field('Success rate', `${s.successRate * 100}%`);
     field('Divergence rate', `${s.divergenceRate * 100}%`); field('Victories', s.victories); field('Complete timing victories', s.completeTimingVictories);
   };
+  section('How to Read This Report');
+  if (report.selectedResult.kind === 'optimized-action-search') {
+    lines.push(RESULT_HELP.fastest, '', RESULT_HELP.screened, '', RESULT_HELP.fair);
+    if (report.selectedResult.objective !== 'fastest-potential') lines.push('', strategyHelp(report.selectedResult.objective));
+  } else lines.push('Simulation Summary describes the completed Random Monte Carlo samples. The retained replay is one observed victory, not the average sample.');
+  lines.push('', RESULT_HELP.timing);
+  if (report.simulationConfiguration.rules.rngPolicy === 'tas-luck') lines.push('', RESULT_HELP.tas, '', RESULT_HELP.conditional, '', 'TAS requirements describe outcomes needed by the retained observation.');
+  lines.push('', replayExplanation(report));
+  const replayNote = replayLimitation(report); if (replayNote) lines.push('', replayNote);
   section('Source');
   if (report.source.kind === 'manual') lines.push('Manual setup');
   else {
     lines.push('Run Planner — historical pre-battle reconstruction', '');
-    field('Run', report.source.source.runName); field('Run ID', report.source.source.runId);
-    field('Battle event ID', report.source.source.battleEventId); field('Action', report.source.source.battleEventIndex + 1);
+    field('Run', report.source.source.runName);
+    field('Action', report.source.source.battleEventIndex + 1);
     lines.push(...details(report.source.historicalStateSummary, 'Historical context'));
   }
   section('Battle'); field('Enemy group', report.battle.label); field('Encounter', report.battle.encounterId);
@@ -87,42 +97,45 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   field('Requested evaluations / budget', c.requestedEvaluations); field('Beam width', c.optimizedConfig?.beamWidth); field('Max optimized depth', c.optimizedConfig?.maxDepth);
   field('TAS Luck frontier cap', c.tasFrontierCap); field('Simulator root seed', c.seed); field('Max rounds safety limit', c.maxRounds);
   section('Search Summary'); lines.push(...details(report.searchSummary));
-  if(report.tasLuckSummary){section('TAS Luck Conflicts');if(report.tasLuckSummary.opportunities === 0) lines.push('Deterministic favorable status outcomes; no Confusion + Paralysis conflicts encountered.');else lines.push('Enemy Confusion + Paralysis action conflicts only.', ...details(report.tasLuckSummary));}
+  if(report.tasLuckSummary && report.tasLuckSummary.opportunities > 0){section('TAS Luck Conflicts');if(report.tasLuckSummary.opportunities === 0) lines.push('Deterministic favorable status outcomes; no Confusion + Paralysis conflicts encountered.');else lines.push('Enemy Confusion + Paralysis action conflicts only.', ...details(report.tasLuckSummary));}
   section('Result');
   const selected = report.selectedResult;
   if (selected.kind === 'random-monte-carlo') {
     field('Success rate', `${selected.winRate}%`); field('Fastest victory (frames)', selected.minFrames); field('Average victory (frames)', selected.averageFrames); field('Slowest victory (frames)', selected.maxFrames);
     field('Fewest actions', selected.minActions); field('Average actions', selected.averageActions); field('Most actions', selected.maxActions);
   } else {
-    lines.push('### Fastest complete route found', '');
+    if (selected.objective !== 'fastest-potential') { lines.push('### ' + strategyTitle(selected.objective), '', strategyHelp(selected.objective)); statistics(selected.screenedPrefix.statistics); }
+    lines.push('### Fastest Route Found', '', RESULT_HELP.fastest, '');
     const route = selected.fastestCompleteRoute;
-    if (route) { field('Total frames', route.totalFrames); field('Rounds', route.rounds); field('Simulator seed', route.seed); field('Sample index', route.sampleIndex); field('Source prefix identity', route.sourcePrefixKey); }
+    if (route) { field('Total frames', route.totalFrames); field('Rounds', route.rounds); }
     else lines.push('No eligible complete victory observed.');
-    lines.push('', `### ${selected.objective === 'fastest-potential' ? 'Best screened prefix' : selected.objective === 'average-victory' ? 'Average Victory — selected fair strategy' : 'Success Rate — selected fair strategy'}`, '');
-    statistics(selected.screenedPrefix.statistics);
+    if (selected.objective === 'fastest-potential') { lines.push('', `### ${strategyTitle(selected.objective)}`, '', RESULT_HELP.screened); statistics(selected.screenedPrefix.statistics); }
     lines.push('', 'Fair prefix orders (distinct from the global fastest observation):'); orders(selected.screenedPrefix.plans);
     if (selected.topCandidates.length) {
-      lines.push('', '### Top Candidates', '', 'Fair-stage rankings; the global fastest individual route is tracked separately.', '', '| Rank / first-round orders | Rollouts | Fastest frames | Mean frames | Success | Divergence |', '| --- | ---: | ---: | ---: | ---: | ---: |');
+      lines.push('', '### Top Screened Strategies', '', RESULT_HELP.candidates, '', '| Rank / first-round orders | Rollouts | Fastest frames | Mean frames | Success | Divergence |', '| --- | ---: | ---: | ---: | ---: | ---: |');
       selected.topCandidates.forEach((candidate, i) => { const s = candidate.statistics; lines.push(`| ${i + 1}. ${candidate.firstRoundOrders.map(order).join('; ')} | ${s.evaluations} | ${s.fastestFrames ?? ''} | ${s.averageVictoryFrames ?? ''} | ${s.successRate * 100}% | ${s.divergenceRate * 100}% |`); });
     }
   }
   section('Recommended Player Orders');
   if (report.playerStrategy.kind === 'not-retained') lines.push('Intended orders were not retained for Random Monte Carlo. See the executed observation below.');
-  else { field('Order source', report.playerStrategy.kind); lines.push('These are intended orders. Orders can remain unexecuted if the battle ends earlier. Random/policy targets are resolved by the engine.'); orders(report.playerStrategy.plans); }
+  else { field('Order source', report.playerStrategy.kind === 'observed-route' ? 'Exact intended orders of the retained fastest observation' : 'Selected screened strategy/prefix'); lines.push('These are intended orders. Orders can remain unexecuted if the battle ends earlier. Random/policy targets are resolved by the engine.'); orders(report.playerStrategy.plans); }
   if (selected.kind === 'optimized-action-search' && selected.objective !== 'fastest-potential' && selected.fastestCompleteRoute) {
     lines.push('', '### Global fastest observation — intended orders', '', 'These may differ from the selected fair strategy.'); orders(selected.fastestCompleteRoute.decisionTrace);
   }
   if (report.rngRequirements.length) {
     section(c.rules.rngPolicy === 'tas-luck' ? 'TAS Luck Requirements' : 'TAS RNG Requirements');
-    for (const r of report.rngRequirements) lines.push(`- Round ${r.round} · ${reportText(r.actionId)} · ${reportText(actorLabel(r.actorId))} · ${reportText(r.skillName ?? 'Guard')} · ${reportText(actorLabel(r.targetId))} · ${r.phase}: ${reportText(rngRequirementText(r))}`);
+    if (selected.kind === 'optimized-action-search' && selected.objective !== 'fastest-potential') lines.push('These requirements belong to the retained Fastest Route observation; they do not establish requirements for the selected screened strategy.');
+    for (const r of report.rngRequirements) lines.push(`- Round ${r.round} · ${reportText(actorLabel(r.actorId))} · ${reportText(r.skillName ?? 'Guard')} · ${reportText(actorLabel(r.targetId))} · ${r.phase}: ${reportText(rngRequirementText(r))}`);
   }
-  section('Executed Battle'); field('Observation', report.executedBattle.kind); field('Total modeled frames', report.executedBattle.totalFrames); field('Rounds', report.executedBattle.rounds);
+  section('Executed Battle Replay'); lines.push(replayExplanation(report)); if (replayNote) lines.push('', replayNote); field('Observation', report.executedBattle.kind); field('Total modeled frames', report.executedBattle.totalFrames); field('Rounds', report.executedBattle.rounds);
   let round = 0;
   for (const a of report.executedBattle.actions) {
     if (round !== a.round) { round = a.round; lines.push('', `### Round ${round}`, ''); }
     lines.push('', `#### ${a.sequence}. ${reportText(actorLabel(a.actorId))} — ${reportText(a.skillName ?? a.kind)}`, '');
-    field('Action ID', a.id); field('Outcome', a.outcome); field('State', a.state); field('Reason', a.reason); field('Action frames', a.durationFrames);
+    field('Outcome', a.outcome); field('State', a.state); field('Reason', a.reason); field('Action frames', a.durationFrames);
     field('Actual targets', a.effectiveTargetIds.map(actorLabel).join(', '));
+    lines.push('', '<details><summary>Action details — resources, status, RNG and effect audit</summary>', '');
+    field('Internal action ID', a.id);
     for (const i of a.impacts) {
       lines.push(`- ${reportText(actorLabel(i.targetId))}: ${i.damage} damage; ${i.healing} healing; HP ${i.hpBefore} → ${i.hpAfter}; ${reportText(i.outcome)}.`);
       lines.push(...details(i.statusApplications, 'Status application'), ...details(i.appliedEffects, 'Applied effect'));
@@ -133,7 +146,15 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     for (const [label, data] of Object.entries({ 'MP accounting': a.mpAccounting, 'Accuracy': a.accuracy, 'Status before': a.statusesBefore, 'Status after recovery': a.statusesAfterRecovery,
       'Status recovery': a.statusRecoveries, 'Confusion': a.confusion, 'Counter': a.counter, 'Interrupt': a.interrupt, 'Restart': a.restart, 'Reaction': a.reaction, 'Support events': a.supportEvents,
       'Effect audit': a.effectAudit, 'Effect diagnostics': a.effectDiagnostics, 'Resource alerts': a.resourceAlerts, 'Resource diagnostics': a.resourceDiagnostics, 'Timing diagnostics': a.timingDiagnostics, 'Interrupt timing': a.interruptTiming, 'Chain from action': a.chainFromActionId })) lines.push(...details(data, label));
+    lines.push('', '</details>', '');
   }
-  section('Diagnostics'); for (const diagnostic of report.diagnostics) lines.push(`- ${reportText(diagnostic)}`);
+  section('Technical Details');
+  if (report.source.kind === 'run-planner') { field('Run ID', report.source.source.runId); field('Battle event ID', report.source.source.battleEventId); }
+  for (const a of combatants) field(actorLabel(a.id), a.id);
+  if (selected.kind === 'optimized-action-search' && selected.fastestCompleteRoute) { field('Source prefix identity', selected.fastestCompleteRoute.sourcePrefixKey); field('Simulator seed', selected.fastestCompleteRoute.seed); field('Sample index', selected.fastestCompleteRoute.sampleIndex); }
+  section('Diagnostics'); for (const diagnostic of report.diagnostics) {
+    if (!replayNote && diagnostic.startsWith('No representative replay of the selected fair strategy')) continue;
+    lines.push(`- ${reportText(diagnostic)}`);
+  }
   return lines.join('\n') + '\n';
 }

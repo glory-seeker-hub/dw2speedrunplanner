@@ -1,3 +1,4 @@
+import { RESULT_HELP } from '@/utils/battle/battlePresentation';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
 import { type BattleRngPolicy } from '@/utils/battle/battleRngPolicy';
@@ -52,6 +53,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
   const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(preset ? manualTeams.length + 1 : null);
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
+  const [customBudget, setCustomBudget] = useState(false);
   const [simulationCount, setSimulationCount] = useState<number>(100000);
   const [encounterSearch, setEncounterSearch] = useState<string>('');
   const [rngPolicy, setRngPolicy] = useState<BattleRngPolicy>('natural');
@@ -102,19 +104,19 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     <div className="space-y-6">
       <Card className="bg-gradient-card border-border">
         <CardHeader>
-          <CardTitle>Battle Simulation Setup</CardTitle>
+          <CardTitle>Battle Simulation Setup</CardTitle><p className="text-sm text-muted-foreground">Battle / Teams → Simulation Strategy → RNG / Accuracy → Search Quality</p>
         </CardHeader>
         <CardContent className="space-y-6">
           <fieldset disabled={isSimulating} className="space-y-6 min-w-0">
           {imported && <section className="rounded border p-3 space-y-2" aria-label="Pre-battle Planner state">
-            <p className="font-semibold">Analyzing pre-battle state</p>
-            <p className="text-sm">Run: {imported.source.runName ?? imported.source.runId}</p>
+            <nav aria-label="Battle source" className="text-sm">Run Planner › {getPlannerBattleLabel(imported.selectedBattle)}</nav><p className="font-semibold">Analyzing pre-battle state — historical Planner copy</p>
+            <p className="text-sm">Run: {imported.source.runName ?? 'Saved run'}</p>
             <p className="text-sm">{getPlannerBattleLabel(imported.selectedBattle)} · Encounter {imported.selectedBattle.encounterId} · Action {imported.source.battleEventIndex + 1}</p>
             <p className="text-sm text-muted-foreground">Run Planner does not track historical current HP/MP. This copy starts at full resources. Adjust below if needed; changes affect only this simulation.</p>
             <p className="text-xs text-muted-foreground">Stats follow Planner expected growth, rounded down for simulation. Floor specialty is a local setting.</p>
             <p className="text-sm">Planner stats use expected growth. If you know the Digimon's actual in-game stats, you can override them for this simulation.</p>
             <p className="font-semibold">{provenance?.source === 'custom-simulation-stats' ? 'Custom simulation stats' : 'Using Planner stats'}</p>
-            {imported.playerTeam.map((member, index) => <div key={member.plannerDigimonInstanceId} className="space-y-1">
+            <details open={localStats?.valid === false}><summary className="cursor-pointer font-semibold">Advanced — exact simulation stats</summary>{imported.playerTeam.map((member, index) => <div key={member.plannerDigimonInstanceId} className="space-y-1">
               <p className="text-sm">Slot {index + 1}: {member.digimon.name} · Lv{member.level} · DP{member.dp}</p>
               <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr><th className="text-left">Stat</th><th className="text-left">Planner baseline</th><th className="text-left">Simulation value</th></tr></thead><tbody>
               {SIMULATION_FIELDS.map(field => {
@@ -131,7 +133,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
               })}
               </tbody></table></div>
             </div>)}
-            <div className="flex flex-wrap gap-2">
+            </details><div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) setStatDrafts(resetPlayerStatDrafts(imported.playerTeam, statDrafts)); }}>Reset stats to Planner values</Button>
               <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) { setImported(structuredClone(preset!)); setStatDrafts(createPlayerStatDrafts(preset!.playerTeam)); } }}>Reset imported team</Button>
               <Button variant="outline" size="sm" disabled={isSimulating} onClick={onClearPreset}>Use manual setup</Button>
@@ -146,7 +148,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
               <p className="text-sm text-muted-foreground">No saved teams available. Create a team first.</p>
             ) : (
               <Select disabled={isSimulating} value={selectedPlayerTeam?.toString() || ''} onValueChange={(value) => setSelectedPlayerTeam(parseInt(value))}>
-                <SelectTrigger>
+                <SelectTrigger id="player-team">
                   <SelectValue placeholder="Choose your team" />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,23 +243,21 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
               <Button variant={accuracyMode === 'strategy' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'strategy'} disabled={isSimulating} onClick={() => setAccuracyMode('strategy')}>Strategy</Button>
               <Button variant={accuracyMode === 'game-accurate' ? 'default' : 'outline'} aria-pressed={accuracyMode === 'game-accurate'} disabled={isSimulating} onClick={() => setAccuracyMode('game-accurate')}>Game-accurate</Button>
             </div>
-            <div className="space-y-2"><Label>RNG Policy</Label><div className="flex gap-2">
+            <p className="text-sm text-muted-foreground">{accuracyMode === 'strategy' ? 'Standard Hit Rate misses are disabled. Misses caused by Paralysis, Invisibility and other battle mechanics still occur.' : "Uses Digimon World 2's normal Hit Rate RNG."}</p></div><div className="space-y-2" role="group" aria-label="RNG Policy"><Label>RNG Policy</Label><div className="flex gap-2">
               <Button variant={rngPolicy === 'natural' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'natural'} disabled={isSimulating} onClick={() => setRngPolicy('natural')}>Natural</Button>
               <Button variant={rngPolicy === 'tas-luck' ? 'default' : 'outline'} aria-pressed={rngPolicy === 'tas-luck'} disabled={isSimulating} onClick={() => setRngPolicy('tas-luck')}>TAS Luck</Button>
             </div>
-            {rngPolicy === 'natural' ? <p>Uses the game's implemented RNG normally.</p> : <>
-              <p>Uses favorable status RNG outcomes. Only an Enemy acting with Confusion + Paralysis branches: Paralysis Miss or Confusion action proceeds. Unsupported RNG remains Natural; Accuracy Mode controls accuracy.</p>
-              <p role="note" className="font-semibold text-amber-600">TAS Luck selects one result per sampled unsupported-RNG seed, comparing complete paths only for Confusion + Paralysis conflicts; statistics are not natural probabilities.</p>
+            {rngPolicy === 'natural' ? <p className="text-sm text-muted-foreground">{RESULT_HELP.natural}</p> : <>
+              <p className="text-sm text-muted-foreground">{RESULT_HELP.tas}</p>
+              <p role="note" className="text-sm">{RESULT_HELP.conditional}</p>
               <p>Standard accuracy is controlled separately by Accuracy Mode.</p>
             </>}
-            </div>
-            <p className="text-sm text-muted-foreground">{accuracyMode === 'strategy' ? 'Standard Hit Rate misses are disabled. Misses caused by Paralysis, Invisibility and other battle mechanics still occur.' : "Uses Digimon World 2's normal Hit Rate RNG."}</p>
           </div>
           {/* Floor Specialty */}
           <div className="space-y-2">
             <Label htmlFor="floor-specialty">Floor Specialty</Label>
             <Select disabled={isSimulating} value={floorSpecialty} onValueChange={setFloorSpecialty}>
-              <SelectTrigger>
+              <SelectTrigger id="floor-specialty">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -273,21 +273,23 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Simulation Count */}
           <div className="space-y-2">
             <Label htmlFor="simulation-count">{searchMethod === 'optimized-action-search' ? 'Search Quality / Rollout Budget' : 'Number of Simulations'}</Label>
+            <p className="text-sm">{simulationCount.toLocaleString()} {searchMethod === 'optimized-action-search' ? 'rollout budget' : 'simulations'}</p>
             <Input
+              hidden={!customBudget} className={customBudget ? '' : 'hidden'}
               id="simulation-count"
               type="number"
               min="1"
               max={Number.MAX_SAFE_INTEGER}
               value={simulationCount}
-              onChange={(e) => setSimulationCount(Number(e.target.value))}
+              onChange={(e) => { setSimulationCount(Number(e.target.value)); setCustomBudget(true); }}
             />
           </div>
 
           <div className="flex flex-wrap gap-2" aria-label="Simulation count presets">
-            {([['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const).map(([label, count]) => <Button key={label} variant="outline" aria-pressed={simulationCount === count} onClick={() => setSimulationCount(count)}>{label} · {count.toLocaleString()}</Button>)}
-            <Button variant="outline" aria-pressed={![10000, 100000, 1000000].includes(simulationCount)} onClick={() => document.getElementById('simulation-count')?.focus()}>Custom</Button>
+            {([['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const).map(([label, count]) => <Button key={label} variant="outline" aria-pressed={!customBudget && simulationCount === count} onClick={() => { setSimulationCount(count); setCustomBudget(false); }}>{label} · {count.toLocaleString()}</Button>)}
+            <Button variant="outline" aria-pressed={customBudget} onClick={() => { setCustomBudget(true); requestAnimationFrame(() => document.getElementById('simulation-count')?.focus()); }}>Custom</Button>
           </div>
-          <p className="text-sm text-muted-foreground">{searchMethod === 'optimized-action-search' ? 'Every legal Player plan is screened at expanded states. Beam pruning and stochastic rollouts do not prove a global optimum.' : 'Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.'}</p>
+          <p className="text-sm text-muted-foreground">{searchMethod === 'optimized-action-search' ? 'Every legal Player plan is screened at expanded states. Beam pruning, stochastic/fair rollouts and bounded TAS conflict search do not prove a global optimum.' : 'Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.'}</p>
           {!validCount && <p role="alert">Enter a positive safe integer number of simulations.</p>}
           </fieldset>
           {search.error && <p role="alert">Simulation unavailable: {search.error}</p>}
