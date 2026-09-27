@@ -986,7 +986,8 @@ export const DIGIMONS: Digimon[] = [
     name: 'P-Sukamon',
     baseStats: { hp: 1000, mp: 200, atk: 150, def: 120, spd: 100 },
     type: 'Virus',
-    specialty: 'Dark',
+    // Reviewed project correction (2K-L3): Machine; external MetalKid value was Dark.
+    specialty: 'Machine',
   },
   {
     id: 'pukumon',

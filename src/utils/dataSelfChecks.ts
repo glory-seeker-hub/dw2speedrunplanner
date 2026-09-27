@@ -18,7 +18,7 @@ import {
   REWARDS_BY_ENCOUNTER_ID, REWARD_MATCHES, AMBIGUOUS_REWARD_MATCHES,
   UNMATCHED_REWARD_MATCHES, matchRewardRecord, getRewardMatchingSlots,
 } from '@/utils/rewardMatching';
-import { normalizeDigimonName } from '@/utils/digimonLookup';
+import { getSpecies, normalizeDigimonName } from '@/utils/digimonLookup';
 import { VERIFIED_REWARD_MATCH_OVERRIDES, PROJECT_ONLY_ENCOUNTERS_WITHOUT_SOURCE_REWARD } from '@/data/rewardMatchOverrides';
 import { applyBattleXp } from '@/utils/experience';
 import {
@@ -75,6 +75,8 @@ const roster = (partial: Partial<RosterDigimon>): RosterDigimon => ({
 
 export const runDataSelfChecks = (): SelfCheckResult[] => {
   const results: SelfCheckResult[] = runBattleSkillSelfChecks();
+
+  check(results, 'Reviewed P-Sukamon specialty is Machine', () => getSpecies('p-sukamon')?.specialty === 'Machine' || 'P-Sukamon specialty regression');
 
   check(results, '33 playable Domain variants allocated exactly once', () => validateStoryDomains().join('; ') || true);
   check(results, '24 ordered Coliseum battles reference unique canonical encounters', () => validateColiseumBattles().join('; ') || true);
