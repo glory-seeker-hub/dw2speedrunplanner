@@ -133,7 +133,7 @@ test('storage access failures are reported without throwing', () => {
 });
 test('all existing Phase 1.6a data self-checks still pass', () => {
   const checks = runDataSelfChecks();
-  assert.equal(checks.length, 61); // Original 46 + 11 battle-data + 4 story/Coliseum checks.
+  assert.equal(checks.length, 63); // Original 61 + two L3 canonical identity checks.
   assert.deepEqual(checks.filter((check) => !check.passed), []);
 });
 

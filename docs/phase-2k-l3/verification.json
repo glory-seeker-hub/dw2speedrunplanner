@@ -1,0 +1,47 @@
+{
+  "phase": "2K-L3",
+  "branch": "phase-2k-l3-canonical-data-corrections",
+  "baseline": "7cc490c",
+  "tests": {
+    "passed": 2974,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "newTests": 22,
+    "durationMs": 80829.6432
+  },
+  "dataSelfChecks": {
+    "passed": 63,
+    "total": 63
+  },
+  "battleSkills": {
+    "passed": 12,
+    "total": 12
+  },
+  "effectCoverage": {
+    "classified": 598,
+    "groups": 101,
+    "authoritative": 370,
+    "usedDeferred": 0,
+    "unusedRows": 5
+  },
+  "workbook": "passed",
+  "typeScriptApp": "passed",
+  "typeScriptNode": "passed",
+  "build": {
+    "status": "passed",
+    "seconds": 13.44
+  },
+  "lint": {
+    "status": "unchanged baseline failures",
+    "errors": 3,
+    "warnings": 7,
+    "newFindings": 0
+  },
+  "diffCheck": "passed",
+  "smoke": "engine/data/report and server-rendered species card; no browser claim",
+  "plannerSchema": 7,
+  "reportVersion": 1,
+  "committed": false,
+  "pushed": false
+}

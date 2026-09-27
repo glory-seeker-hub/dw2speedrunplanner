@@ -1,0 +1,161 @@
+{
+  "phase": "2K-L3",
+  "baseline": "7cc490c",
+  "pSukamon": {
+    "id": "p-sukamon",
+    "name": "P-Sukamon",
+    "previousValue": "Dark",
+    "correctedValue": "Machine",
+    "rawSourceValue": "Dark (external MetalKid attribution supplied by authoritative user review)",
+    "reviewedProjectValue": "Machine",
+    "source": "src/data/digimons.ts",
+    "staticCopy": "src/data/digimon_data.csv",
+    "generator": null,
+    "downstream": [
+      "DIGIMONS",
+      "ALL_SPECIES/getSpecies",
+      "Team Builder DigimonCard",
+      "Planner roster adapter",
+      "historicalPlayerTeam",
+      "encounterToBattleTeam",
+      "BattleInput",
+      "damage/floor DEF",
+      "Simulation Report"
+    ],
+    "provenance": "Local static records have no per-row external attribution. User review supersedes MetalKid for this record only. No external re-verification claimed.",
+    "structuralAudit": {
+      "speciesCount": 202,
+      "changedIds": [
+        "p-sukamon"
+      ],
+      "changedFields": [
+        "specialty"
+      ]
+    }
+  },
+  "wingBlade": {
+    "id": 161,
+    "hexId": "0x00A1",
+    "name": "Wing Blade",
+    "previousValue": {
+      "actionKind": "interrupt",
+      "element": "Nature"
+    },
+    "correctedValue": {
+      "actionKind": "interrupt",
+      "element": "Nature"
+    },
+    "changed": false,
+    "rawSourceValue": {
+      "actionKind": "interrupt",
+      "element": "Nature"
+    },
+    "reviewedProjectValue": {
+      "actionKind": "interrupt",
+      "element": "Nature"
+    },
+    "source": "src/data/wazaSource.ts",
+    "generator": "scripts/importBattleSkills.py",
+    "decoder": "src/utils/battleSkillDecoder.ts",
+    "runtime": "src/data/battleSkills.ts",
+    "downstream": [
+      "TECHS/toLegacyTech",
+      "analysisTechnique",
+      "BattleInput",
+      "engine/history",
+      "Simulation Report/Markdown/JSON"
+    ],
+    "rawRecord": {
+      "row": 258,
+      "label": "Garudamon – Wing Blade",
+      "bytes": [
+        161,
+        0,
+        152,
+        34,
+        20,
+        5,
+        160,
+        12,
+        70,
+        0,
+        0,
+        0,
+        163,
+        0,
+        239,
+        1,
+        2,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        112,
+        19,
+        0,
+        0,
+        124,
+        19,
+        0,
+        0,
+        0,
+        0,
+        251,
+        4,
+        249,
+        4,
+        0,
+        0,
+        253,
+        4,
+        254,
+        4,
+        0,
+        0,
+        0,
+        0,
+        207,
+        2,
+        0,
+        0,
+        0,
+        0,
+        178,
+        2
+      ]
+    },
+    "decoding": {
+      "byte3": "0x98: high 9 interrupt-target, low 8 interrupt/projectile",
+      "byte4": "0x22: high 2 Ultimate, low 2 Nature"
+    },
+    "fingerprint": "00a1f844",
+    "provenance": "Raw workbook and committed runtime already agree. No Neutral origin found; neither proposed mismatch case applies. No override or raw-byte edit needed.",
+    "distinctVWingBlade": {
+      "id": 49,
+      "hexId": "0x0031",
+      "actionKind": "attack",
+      "element": "Neutral"
+    }
+  },
+  "regeneration": {
+    "stable": true,
+    "gitContentDiff": false,
+    "note": "First import normalized CRLF to LF; repeated generated outputs byte-identical. Original working-copy line endings restored.",
+    "generatedSha256": "CD9E8918213C1789E731E06A650E69D4E2AEC3CFB3BBA4217433E19FF470E512"
+  }
+}

@@ -102,6 +102,8 @@ export function runBattleSkillSelfChecks() {
   const errors = validateWazaRecords(WAZADATA_RECORDS);
   check('WAZADATA valid bytes, unique IDs and technique names', errors.length === 0, errors.join('; '));
   check('WAZADATA source record count', BATTLE_SKILLS.length === 256 && WAZADATA_SOURCE.recordCount === 256);
+  const wingBlade = BATTLE_SKILLS.find(s => s.id === 0x00a1);
+  check('WAZADATA Wing Blade is Interrupt and Nature', wingBlade?.actionKind === 'interrupt' && wingBlade.element === 'Nature');
   check('WAZADATA source fingerprint', battleSourceFingerprint() === '00a1f844', battleSourceFingerprint());
   check('WAZADATA AP conversion and MP import', BATTLE_SKILLS.every(s => s.mpCost === s.provenance.bytes[4] && s.mpCost >= 0 && (s.attackPowerRaw >= 0x8000 ? s.attackPower === null : s.attackPower === s.attackPowerRaw / 2)));
   check('WAZADATA byte3 known source values', BATTLE_SKILLS.every(s => s.actionKind && s.animationKind && s.targetGroup));
