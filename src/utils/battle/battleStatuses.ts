@@ -80,6 +80,9 @@ export function resolveImpactStatuses(target: BattleCombatantState, skill: Battl
     if (!immunityReason) target.statuses[status] = true;
     statusApplications.push({ status, roll: null, successesOutOf3: null, condition: `${status}-power`, applied: !immunityReason, alreadyActive, ...(immunityReason ? { immunityReason, result: 'immune' as const } : {}) });
   }
-  const poisonBonusDamage = wasPoisoned || statusApplications.some(s => s.status === 'poison' && s.applied) ? 10 : 0;
+  // Direct technique Poison (including activated Counter/Interrupt effects) qualifies
+  // immediately. Power still applies status now, but qualifies only on later impacts.
+  const directPoisonApplied = statusApplications.some(s => s.status === 'poison' && s.applied && s.condition !== 'poison-power');
+  const poisonBonusDamage = wasPoisoned || directPoisonApplied ? 10 : 0;
   return { statusApplications, poisonBonusDamage, damage: baseDamage + poisonBonusDamage };
 }
