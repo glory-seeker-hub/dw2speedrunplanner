@@ -1,0 +1,203 @@
+{
+  "baseline": "dea02e2",
+  "entries": [
+    {
+      "id": 1,
+      "hexId": "0x1",
+      "name": "Poison Ivy",
+      "actionKind": "attack",
+      "recordKind": "technique",
+      "targetMode": "one-enemy",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison",
+            "chancePercent": 33,
+            "condition": "always",
+            "byte": 25,
+            "mask": 1,
+            "sourceRow": 48,
+            "sourceLabel": "33% Poison"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleStatuses.resolveImpactStatuses",
+            "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees."
+          },
+          "applicationGate": "1 of 3 Natural; TAS direct by target side"
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "hexId": "0x6b",
+      "name": "Brown Stinger",
+      "actionKind": "attack",
+      "recordKind": "technique",
+      "targetMode": "one-enemy",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison",
+            "chancePercent": 66,
+            "condition": "always",
+            "byte": 25,
+            "mask": 2,
+            "sourceRow": 49,
+            "sourceLabel": "66% Poison"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleStatuses.resolveImpactStatuses",
+            "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees."
+          },
+          "applicationGate": "2 of 3 Natural; TAS direct by target side"
+        }
+      ]
+    },
+    {
+      "id": 130,
+      "hexId": "0x82",
+      "name": "Needle Spray",
+      "actionKind": "counter",
+      "recordKind": "technique",
+      "targetMode": "one-enemy",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison",
+            "chancePercent": 100,
+            "condition": "counter-triggered",
+            "byte": 25,
+            "mask": 4,
+            "sourceRow": 50,
+            "sourceLabel": "Poison w/ Counter"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleStatuses.resolveImpactStatuses",
+            "boundary": "Direct 1/3 or 2/3; activated Counter/Interrupt conditional guarantees."
+          },
+          "applicationGate": "Guaranteed when Counter activated"
+        }
+      ]
+    },
+    {
+      "id": 185,
+      "hexId": "0xb9",
+      "name": "Fungus Cruncher",
+      "actionKind": "assist",
+      "recordKind": "technique",
+      "targetMode": "self",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison-body",
+            "condition": "always",
+            "byte": 26,
+            "mask": 128,
+            "sourceRow": 60,
+            "sourceLabel": "Target's body becomes poisonous"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleSupportEffects / battleSimulation",
+            "boundary": ""
+          },
+          "applicationGate": "Guaranteed reaction to qualifying opposing Hit; no application draw"
+        }
+      ]
+    },
+    {
+      "id": 186,
+      "hexId": "0xba",
+      "name": "Rotten Rainballs",
+      "actionKind": "assist",
+      "recordKind": "technique",
+      "targetMode": "one-ally",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "temporary-attack-power",
+            "power": "poison",
+            "byte": 27,
+            "mask": 1,
+            "sourceRow": 61,
+            "sourceLabel": "Add Poison effect to target’s attack"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleSupportEffects / battleStatuses / battleDamage",
+            "boundary": "25% recovery; status Powers coexist, Elemental Power replaces."
+          },
+          "applicationGate": "Guaranteed Power application on eligible later Hit; no application draw"
+        }
+      ]
+    },
+    {
+      "id": 215,
+      "hexId": "0xd7",
+      "name": "Poison Wave",
+      "actionKind": "assist",
+      "recordKind": "technique",
+      "targetMode": "one-ally",
+      "effects": [
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison",
+            "chancePercent": 66,
+            "condition": "always",
+            "byte": 25,
+            "mask": 2,
+            "sourceRow": 49,
+            "sourceLabel": "66% Poison"
+          },
+          "coverage": {
+            "status": "ignored-by-project",
+            "handler": "battleSupportEffects",
+            "boundary": "Reviewed Poison Wave grants Poison Power and Poison Body; no direct Poison ailment."
+          },
+          "applicationGate": "Ignored redundant direct source; Assist grants Power and Body"
+        },
+        {
+          "descriptor": {
+            "kind": "status-application",
+            "status": "poison-body",
+            "condition": "always",
+            "byte": 26,
+            "mask": 128,
+            "sourceRow": 60,
+            "sourceLabel": "Target's body becomes poisonous"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleSupportEffects / battleSimulation",
+            "boundary": ""
+          },
+          "applicationGate": "Guaranteed reaction to qualifying opposing Hit; no application draw"
+        },
+        {
+          "descriptor": {
+            "kind": "temporary-attack-power",
+            "power": "poison",
+            "byte": 27,
+            "mask": 1,
+            "sourceRow": 61,
+            "sourceLabel": "Add Poison effect to target’s attack"
+          },
+          "coverage": {
+            "status": "authoritative",
+            "handler": "battleSupportEffects / battleStatuses / battleDamage",
+            "boundary": "25% recovery; status Powers coexist, Elemental Power replaces."
+          },
+          "applicationGate": "Guaranteed Power application on eligible later Hit; no application draw"
+        }
+      ]
+    }
+  ]
+}

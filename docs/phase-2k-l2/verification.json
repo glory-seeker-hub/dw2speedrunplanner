@@ -1,0 +1,21 @@
+{
+  "phase": "2K-L2",
+  "branch": "phase-2k-l2-poison-power-timing",
+  "baseline": "dea02e2",
+  "finalPhase2LBCommit": "41d7c61",
+  "tests": { "passed": 2952, "failed": 0, "cancelled": 0, "skipped": 0, "newTests": 62, "durationMs": 62836.7419 },
+  "dataSelfChecks": { "passed": 61, "total": 61 },
+  "battleSkills": { "passed": 11, "total": 11 },
+  "effectCoverage": { "classified": 598, "groups": 101, "authoritative": 370, "usedDeferred": 0, "unusedRows": 5 },
+  "workbook": "passed: all 68 bytes, labels, effect dictionary, provenance",
+  "typeScriptApp": "passed",
+  "typeScriptNode": "passed",
+  "build": { "status": "passed", "seconds": 7.60 },
+  "lint": { "status": "unchanged baseline failures", "errors": 3, "warnings": 7, "newFindings": 0 },
+  "diffCheck": "passed",
+  "smoke": "engine-backed, search/report and server-rendered history; no real-browser claim",
+  "plannerSchema": 7,
+  "reportVersion": 1,
+  "committed": false,
+  "pushed": false
+}
