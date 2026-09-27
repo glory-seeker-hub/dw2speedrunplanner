@@ -104,7 +104,7 @@ export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAn
       {run && (
         <div hidden={creating}>
           <section aria-label="Run summary" className="run-status status-panel flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
-            <div><h3 className="font-semibold">{run.name}</h3><p className="text-xs text-muted-foreground">{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</p></div>
+            <div><p className="text-xs text-muted-foreground">Active run</p><h3 className="font-semibold">{run.name}</h3><p className="text-xs text-muted-foreground">{starter?.label ?? 'Starter'} / {starter?.name ?? 'No starter recorded'}</p></div>
             <dl className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
               <div><dt className="text-xs text-muted-foreground">Total Bits</dt><dd className="font-semibold tabular-nums">{run.totalBits}</dd></div>
               <div><dt className="text-xs text-muted-foreground">Recorded battles</dt><dd className="font-semibold tabular-nums">{run.history.filter(event => event.type === 'battle').length}</dd></div>

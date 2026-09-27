@@ -74,7 +74,7 @@ for(const phase of ['enumerating','screening','refining','expanding','finalizing
 });
 for(const status of ['completed','cancelled'])test('Results '+status+' shows strategy, statistics and path-specific notice',()=>{
   const r=structuredClone(result);r.optimized.status=status;const text=html(React.createElement(load('src/components/BattleResults.tsx').BattleResults,{results:r}));
-  for(const label of ['Fastest route found','Best screened prefix','Round 1','Rock Fist','Top candidates','Fastest f','Average victory f','Success rate','Divergence','path-specific','Search method: Optimized Action Search','Accuracy mode: Strategy','Optimization objective: Fastest Potential','Best observed battle'])assert.ok(text.includes(label),label);
+  for(const label of ['Fastest Route Found','Best Screened Strategy','Round 1','Rock Fist','Top Screened Strategies','Fastest fair sample','Average winning frames','Observed success rate','path-specific','Accuracy Mode: Strategy','Fastest Potential','Executed Battle Replay'])assert.ok(text.includes(label),label);
   assert.ok(text.includes(status==='cancelled'?'Partial optimized search — cancelled':'Search completed early'));assert.ok(!text.includes('100 / 100 simulations completed'));
 });
 test('AOE order renders All and recommended deferred effects stay diagnostic',()=>{

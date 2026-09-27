@@ -221,7 +221,7 @@ test('BattleResults renders frames, action-level impacts, MP traces and informat
  const r=aggregateBattleRuns([resourceRun()]); // no victory history; use successful depleted resource fixture
  const success=run([member('P',[tech('Rock Fist')],{hp:1,mp:1,spd:10})],[member('E',[tech('Rock Fist')],{hp:1,spd:100})]);
  const html=renderToStaticMarkup(React.createElement(BattleResults,{results:aggregateBattleRuns([success])}));
- assert.match(html,/1,370 f/);assert.match(html,/685 f/);assert.match(html,/P reached 0 HP/);assert.match(html,/P reached 0 MP/);assert.match(html,/role="note"/);assert.match(html,/Guard\/item/);assert.match(html,/MP:/);assert.match(html,/Fastest Battle by Frames/);assert.doesNotMatch(html,/seconds|200 seconds|50 seconds/);
+ assert.match(html,/1,370 f/);assert.match(html,/685 f/);assert.match(html,/P reached 0 HP/);assert.match(html,/P reached 0 MP/);assert.match(html,/role="note"/);assert.match(html,/Guard\/item/);assert.match(html,/MP:/);assert.match(html,/Executed Battle Replay/);assert.doesNotMatch(html,/seconds|200 seconds|50 seconds/);
  const empty=renderToStaticMarkup(React.createElement(BattleResults,{results:r}));assert.match(empty,/Unavailable/);assert.doesNotMatch(empty,/Infinity|NaN/);
 });
 test('BattleResults visibly explains incomplete timing and excludes obsolete thresholds',()=>{

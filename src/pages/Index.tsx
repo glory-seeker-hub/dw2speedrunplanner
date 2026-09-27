@@ -1,4 +1,5 @@
 import { buildPlannerBattleAnalysisPreset, type PlannerBattleAnalysisPreset } from '@/utils/runPlanner/runBattleAnalysis';
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,7 +27,7 @@ const Index = () => {
   };
   const [savedTeams, setSavedTeams] = useState<TeamDigimon[][]>([]);
   const [simulationResults, setSimulationResults] = useState<SimulationResult | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('team-builder');
+  const [activeTab, setActiveTab] = useState<string>('run-planner');
   const [resultSource, setResultSource] = useState<PlannerBattleAnalysisPreset['source'] | null>(null);
   const staleResult = resultSource && (resultSource.runId !== planner.data.activeRunId || !planner.data.runs.some(run => run.id === resultSource.runId && run.history.some(event => event.id === resultSource.battleEventId)));
   // Clear stale local analysis during the state transition, before it can be shown for another route.
@@ -75,13 +76,14 @@ const Index = () => {
       <main className="container mx-auto px-4 py-5">
         <div className="space-y-4">
           <section aria-label="Planner introduction" className="menu-inset rounded-md px-4 py-3 text-sm">
-            <p className="font-semibold text-info">Plan the route. Build the team. Test the battle.</p>
-            <p className="mt-1 text-muted-foreground">Run Planner tracks your roster and route. Team Builder prepares simulation teams; Battle Simulation tests them and Results shows the outcome.</p>
+            <p className="font-semibold text-info">Plan the route. Analyze the battle. Optimize the result.</p>
+            <p className="mt-1 text-muted-foreground">Use Run Planner to build and track your route, or Team Builder for a manual battle setup. Battle Simulation tests the selected team and Results shows the recommended strategy.</p>
           </section>
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
+              <TabsTrigger value="run-planner">Run Planner</TabsTrigger>
               <TabsTrigger value="team-builder" className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 Team Builder
@@ -94,7 +96,6 @@ const Index = () => {
                 <Trophy className="h-4 w-4 mr-2" />
                 Results
               </TabsTrigger>
-              <TabsTrigger value="run-planner">Run Planner</TabsTrigger>
             </TabsList>
 
             <TabsContent value="run-planner" className="mt-6">
@@ -106,11 +107,12 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="battle-simulation" className="mt-6">
+              <div className="mb-3 flex flex-wrap gap-2">{validAnalysis && <Button variant="outline" onClick={() => setActiveTab('run-planner')}>Back to Run Planner</Button>}<p className="text-sm">Configure battle → Run simulation → Results → Export Simulation</p></div>
               <BattleSimulation key={validAnalysis?.revision ?? 'manual'} preset={validAnalysis?.preset} onClearPreset={() => setAnalysis(null)} savedTeams={savedTeams} onSimulationComplete={handleSimulationComplete} />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
-              {visibleResults ? <BattleResults results={visibleResults} /> : <Card className="bg-gradient-card border-border">
+              {visibleResults ? <><Button variant="outline" className="mb-3" onClick={() => setActiveTab('battle-simulation')}>Back to Simulator setup</Button><BattleResults results={visibleResults} /></> : <Card className="bg-gradient-card border-border">
                   <CardHeader>
                     <CardTitle>Battle Results</CardTitle>
                   </CardHeader>

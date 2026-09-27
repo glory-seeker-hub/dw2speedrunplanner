@@ -47,8 +47,9 @@ for(const [fg,bg,min] of [
 
 test('theme top-level tabs retain selected and disabled semantics; Info has an accessible name',()=>{
  const html=render(load('src/pages/Index.tsx').default,{});
- const tabs=html.match(/<button[^>]*role="tab"[^>]*>/g);assert.ok(tabs.length>=4);
- assert.match(tabs[0],/aria-selected="true"/);assert.match(tabs[2],/disabled=""/);assert.match(tabs[3],/aria-selected="false"/);
+ const tabs=html.match(/<button[^>]*role="tab"[^>]*>[\s\S]*?<\/button>/g);assert.equal(tabs.length,4);
+ const named=label=>tabs.find(tab=>tab.includes(label));
+ assert.match(named('Run Planner'),/aria-selected="true"/);assert.match(named('Results'),/disabled=""/);assert.match(named('Team Builder'),/aria-selected="false"/);
  assert.ok(html.includes('aria-label="About this application"'));
 });
 test('theme active and reserve badges preserve text and do not alter the run during render',()=>{

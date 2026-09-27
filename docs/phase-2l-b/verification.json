@@ -1,0 +1,64 @@
+{
+  "phase": "2L-B",
+  "completedAtDate": "2026-09-25",
+  "branch": "phase-2l-b-ui-navigation-results",
+  "baselineHead": "5f76b49",
+  "requiredL1aCommit": "62161c9",
+  "tests": {
+    "command": "node --test tests/*.test.cjs",
+    "passed": 2878,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 133123.2224,
+    "newPresentationTests": 50
+  },
+  "typeScript": { "app": "passed", "node": "passed" },
+  "productionBuild": {
+    "status": "passed",
+    "durationSeconds": 50.03,
+    "existingWarnings": ["stale Browserslist data", "chunks larger than 500 kB"]
+  },
+  "lint": {
+    "status": "unchanged baseline failures",
+    "errors": 3,
+    "warnings": 7,
+    "newFindings": 0,
+    "errorFiles": ["src/components/ui/command.tsx", "src/components/ui/textarea.tsx", "tailwind.config.ts"]
+  },
+  "dataSelfChecks": { "passed": 61, "total": 61 },
+  "battleSkillChecks": { "passed": 11, "total": 11 },
+  "effectCoverage": {
+    "status": "passed",
+    "occurrences": 598,
+    "groups": 101,
+    "authoritative": 370,
+    "usedDeferred": 0,
+    "unusedDictionaryRows": 5
+  },
+  "workbookCheck": { "status": "passed", "skillBytes": 68, "labelsDictionaryAndProvenance": "passed" },
+  "browser": {
+    "status": "targeted smoke passed",
+    "scenarios": ["historical normal Analyze", "Natural Fastest", "Natural Average", "TAS Luck Success", "TAS Luck Fastest", "Random Natural", "Markdown export verified on disk", "Coliseum history and Analyze", "partial cancellation", "390x844 responsive setup and Results", "keyboard action disclosure"],
+    "automatedOnly": ["true Confusion and Paralysis conflict", "mismatched replay provenance", "duplicate species", "zero victory", "export unavailable", "long history", "Game-accurate"],
+    "limitations": "No fresh complete manual-setup browser run. Download-event wait timed out; actual downloaded Markdown was verified on disk. See IMPLEMENTATION.md for scope and observations."
+  },
+  "longHistoryRendering": {
+    "environment": "server-side rendering characterization",
+    "actions": 250,
+    "durationMs": 174.822,
+    "markupBytes": 333154,
+    "mountedActionLists": 1,
+    "auditInitiallyCollapsed": true,
+    "limitation": "Not a search benchmark or browser responsiveness guarantee."
+  },
+  "scope": {
+    "plannerSchema": 7,
+    "simulationReportVersion": 1,
+    "canonicalJsonUnchanged": true,
+    "mechanicsSearchTasProgressionUnchanged": true,
+    "howToUseRewritten": false,
+    "commitPerformed": false,
+    "pushPerformed": false
+  }
+}

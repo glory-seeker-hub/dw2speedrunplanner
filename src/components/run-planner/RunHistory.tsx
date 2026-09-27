@@ -64,7 +64,7 @@ export const RunHistory = ({ run, onUndo, error, onAnalyze }: { onAnalyze?: (run
             return <li key={event.id} className="space-y-1 rounded-lg border p-3 text-sm">
               <p className="font-semibold">Action {index + 1} · Battle · {getPlannerBattleLabel(event)}</p>
               <p>{encounter?.digimons.map(enemy => `${enemy.name} EL ${enemy.level}`).join(' · ') ?? `Encounter ${event.encounterId}`}</p>
-              <p>{event.xpReward} XP · {event.bitsReward} Bits</p>
+              <p>{event.xpReward} XP · {event.bitsReward} Bits{!getBattleProgressionPolicy(event.encounterId).resolveLevelUp && ' · No level-up (Coliseum)'}</p>
               <p>Participants: {event.digilineInstanceIds.map(id => event.preActionCheckpoint.roster.find(member => member.instanceId === id)?.name ?? id).join(' · ')}</p>
               {getBattleProgressionPolicy(event.encounterId).allowCapture && <p>Capture: {event.capturedEnemySlot == null ? 'None' : `Slot ${event.capturedEnemySlot} — ${captured?.name ?? 'Unknown enemy'}`}</p>}
               {event.techniqueChoices.map(choice => <p key={choice.instanceId}>
