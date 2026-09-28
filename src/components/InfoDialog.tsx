@@ -1,3 +1,4 @@
+import { UserGuide } from './help/UserGuide';
 import { Info, ExternalLink } from 'lucide-react';
 import {
   Dialog,
@@ -20,78 +21,29 @@ export const InfoDialog = () => {
           <Info className="h-5 w-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-1rem)] max-w-3xl max-h-[85dvh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl">About This Application</DialogTitle>
           <DialogDescription>
-            Information about the Digimon World 2 Battle Simulator
+            User guide for the Run Planner and Battle Simulator
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="how-to" className="w-full">
           <TabsList className="grid h-auto w-full grid-cols-3">
-            <TabsTrigger value="how-to">How to Use</TabsTrigger>
-            <TabsTrigger value="mechanics">Battle Mechanics</TabsTrigger>
-            <TabsTrigger value="credits">Credits</TabsTrigger>
+            <TabsTrigger className="min-h-11 whitespace-normal text-center" value="how-to">How to Use</TabsTrigger>
+            <TabsTrigger className="min-h-11 whitespace-normal text-center" value="mechanics">Battle Mechanics</TabsTrigger>
+            <TabsTrigger className="min-h-11 whitespace-normal text-center" value="credits">Credits</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="how-to" className="space-y-4">
-            <Card>
-              <CardContent className="pt-6 space-y-3">
-                <div>
-                  <h3 className="font-semibold mb-2">1. Build Your Team</h3>
-                  <p className="text-sm text-muted-foreground">
-                    In the Team Builder tab, select up to 3 Digimon for your team. Customize their stats (HP, MP, ATK, DEF, SPD) and choose their techs (abilities).
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">2. Run Battle Simulations</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Navigate to the Battle Simulation tab. Select your saved team, choose an enemy team (encounter or saved team), set the floor specialty, and configure the number of simulations to run.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">3. Analyze Results</h3>
-                  <p className="text-sm text-muted-foreground">
-                    After simulations complete, view detailed statistics including win rate, average turns, fastest/slowest battles, and a complete battle history in the Results tab.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
+          <TabsContent value="how-to"><UserGuide /></TabsContent>
           <TabsContent value="mechanics" className="space-y-4">
-            <Card>
-              <CardContent className="pt-6 space-y-3">
-                <div>
-                  <h3 className="font-semibold mb-2">Implemented Mechanics</h3>
-                  <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-                    <li><strong>Turn Order:</strong> Based on SPD stat with random initiative</li>
-                    <li><strong>Counter Mechanics:</strong> Counter techs can be triggered when attacked</li>
-                    <li><strong>Counter Chains:</strong> Counters cannot trigger other counters</li>
-                    <li><strong>Interrupts:</strong> Treated as normal attacks in the turn order</li>
-                    <li><strong>Debuff Effects:</strong> ATK/DEF/SPD down effects stack up to 2 times</li>
-                    <li><strong>Type/Specialty Bonuses:</strong> Damage calculation includes type advantages and specialty bonuses</li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Special Tech Effects</h3>
-                  <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-                    <li><strong>Shadow Scythe:</strong> Chains to another target on kill</li>
-                    <li><strong>Twig Tap:</strong> Heals HP equal to damage dealt</li>
-                    <li><strong>SubZero Ice Punch:</strong> AP increases by 2.5 when used consecutively (up to 10 times)</li>
-                    <li><strong>Howling Crusher:</strong> Does not trigger enemy counters</li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Not Implemented</h3>
-                  <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-                    <li>Assist mechanics</li>
-                    <li>Status effects (paralysis, confusion, poison, etc.)</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+            <Card><CardContent className="space-y-3 pt-6 text-sm">
+              <h3 className="font-semibold">Supported battle model</h3>
+              <p>The Simulator models action timing, initiative, MP, supported status effects, Counter, Interrupt and Assist/support behavior. Availability depends on the technique and modeled effect; inspect action details and effect diagnostics for a specific execution.</p>
+              <p>Accuracy Mode controls ordinary Hit Rate. RNG Policy separately controls supported status outcomes. See Accuracy and RNG and TAS Luck in How to Use for the supported scope.</p>
+              <p>Reported frames cover modeled battle actions, excluding external menu/order-entry overhead. The model and bounded search do not establish an exact real-game optimum.</p>
+            </CardContent></Card>
           </TabsContent>
 
           <TabsContent value="credits" className="space-y-4">
