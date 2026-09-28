@@ -1,5 +1,5 @@
 import type { SearchThoroughness } from '@/utils/battle/battleSearchPasses';
-import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, THOROUGHNESS_DESCRIPTIONS } from '@/utils/battle/battlePresentation';
+import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, THOROUGHNESS_DESCRIPTIONS, SEARCH_QUALITY_PRESETS } from '@/utils/battle/battlePresentation';
 import { RESULT_HELP } from '@/utils/battle/battlePresentation';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
@@ -293,7 +293,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           </div>
 
           <div className="flex flex-wrap gap-2" aria-label="Simulation count presets">
-            {([['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const).map(([label, count]) => <Button key={label} variant="outline" aria-pressed={!customBudget && simulationCount === count} onClick={() => { setSimulationCount(count); setCustomBudget(false); }}>{label} · {count.toLocaleString()}</Button>)}
+            {SEARCH_QUALITY_PRESETS.map(([label, count]) => <Button key={label} variant="outline" aria-pressed={!customBudget && simulationCount === count} onClick={() => { setSimulationCount(count); setCustomBudget(false); }}>{label} · {count.toLocaleString()}</Button>)}
             <Button variant="outline" aria-pressed={customBudget} onClick={() => { setCustomBudget(true); requestAnimationFrame(() => document.getElementById('simulation-count')?.focus()); }}>Custom</Button>
           </div>
           <p className="text-sm text-muted-foreground">{searchMethod === 'optimized-action-search' ? 'Every legal Player plan is screened at expanded states. Beam pruning, stochastic/fair rollouts and bounded TAS conflict search do not prove a global optimum.' : 'Quick: fast iteration. Standard (100,000): a good first/development search. Deep (1,000,000): important battles. Monte Carlo search does not prove the global optimum.'}</p>

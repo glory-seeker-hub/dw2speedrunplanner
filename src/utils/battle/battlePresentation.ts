@@ -41,6 +41,13 @@ export function replayLimitation(r: BattleSimulationReport): string | null {
 
 
 export const THOROUGHNESS_LABELS = { standard: 'Standard', thorough: 'Thorough', maximum: 'Maximum' } as const;
+/** Shared display descriptors; consistency tests check these against production policy. */
+export const SEARCH_QUALITY_PRESETS = [['Quick', 10000], ['Standard', 100000], ['Deep', 1000000]] as const;
+export const THOROUGHNESS_DETAILS = {
+  standard: { samples: [4, 16, 64], beamMultiplier: 1, restart: 'No restart.' },
+  thorough: { samples: [8, 32, 128], beamMultiplier: 2, restart: 'No restart.' },
+  maximum: { samples: [16, 64, 256], beamMultiplier: 4, restart: 'Conditional fallback restart only after enhanced search, when useful continuation and enough budget remain.' },
+} as const;
 export const THOROUGHNESS_HELP = 'Higher thoroughness increases search coverage and statistical screening and may take substantially longer. It does not guarantee the global optimum.';
 export const THOROUGHNESS_DESCRIPTIONS = {
   standard: 'Uses the current optimized search.',
