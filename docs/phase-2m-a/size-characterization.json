@@ -1,0 +1,10 @@
+{
+  "events": 2018,
+  "roster": 2,
+  "bytes": 11129979,
+  "capBytes": 33554432,
+  "parseValidationMs": 1183.1319999999996,
+  "prepareMs": 840.4319000000005,
+  "fixture": "Rich route plus 2,000 legitimate zero-reward Coliseum events; complete checkpoints retained",
+  "timingAssertions": false
+}

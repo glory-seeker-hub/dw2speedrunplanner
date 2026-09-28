@@ -1,4 +1,5 @@
 import { recordTradeAction } from '@/utils/runTradeRecording';
+import { prepareRunImport, RunBackup } from '@/utils/runPlannerBackup';
 import { recordDnaAction } from '@/utils/runDnaRecording';
 import { useRef, useState } from 'react';
 import { recordRunBattle, RecordBattleRequest } from '@/utils/runBattleRecording';
@@ -185,5 +186,12 @@ export const useRunPlanner = () => {
     return persist({ ...current, runs, activeRunId });
   };
 
-  return { data, activeRun, error, storageWarning, starterId, setStarterId, name, setName, startRun, loadRun, deleteRun, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
+  const importBackup = (backup: RunBackup): boolean => {
+    // An unreadable existing payload is not an empty Planner: never replace it by import.
+    if (storageWarning) { setError('Existing browser data could not be loaded. Import was stopped to protect it.'); return false; }
+    try { return persist(prepareRunImport(currentData.current, backup)); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not import this backup.'); return false; }
+  };
+
+  return { data, activeRun, error, storageWarning, starterId, setStarterId, name, setName, startRun, loadRun, deleteRun, importBackup, addMember, removeMember, moveMember, recordBattle, digivolve, dna, trade, undoAction, feedbackRevision };
 };

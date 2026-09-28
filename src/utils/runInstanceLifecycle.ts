@@ -2,12 +2,35 @@ import { validateStarterBinding } from '@/utils/runStarterValidation';
 import { equalRunState as equal, validateActionContinuity } from '@/utils/runTransitionValidation';
 import { RunPlan, RosterDigimon } from '@/types/runPlanner';
 import { getStarterById } from '@/data/starters';
+import { encounters } from '@/data/encounters';
 
 export const getHistoricalInstanceIds = (run: RunPlan): Set<string> => new Set([
   ...run.roster.map(p => p.instanceId),
   ...run.history.flatMap(e => [...e.preActionCheckpoint.roster.map(p => p.instanceId),
     ...(e.type === 'trade' ? [e.receivedInstanceId] : e.type === 'dna' ? [e.childInstanceId] : e.type === 'battle' && e.capturedInstanceId ? [e.capturedInstanceId] : [])]),
 ]);
+
+/** Additional external-file boundary checks. Existing local schema-v7 loading
+ * retains its compatibility policy; canonical lifecycle checks below are shared. */
+export const validateExternalRunReferences = (run: RunPlan) => {
+  const errors: { code: string; message: string }[] = [];
+  const fail = (code: string, message: string) => errors.push({ code, message });
+  const historicalIds = getHistoricalInstanceIds(run);
+  for (const roster of [run.roster, ...run.history.map(event => event.preActionCheckpoint.roster)]) {
+    for (const member of roster) {
+      const sources = [member.source, ...member.techniquePool.flatMap(technique => technique.sources)];
+      if (sources.some(source => source.type === 'capture' &&
+        !encounters.find(encounter => encounter.id === source.encounterId)?.digimons.some(enemy => enemy.slot === source.enemySlot))) {
+        fail('unknown-capture-source', 'Capture provenance must reference a canonical encounter slot.');
+      }
+      if (member.techniquePool.some(technique => technique.sources.some(source =>
+        source.type === 'inherited' && (!historicalIds.has(source.parentInstanceId) || source.parentInstanceId === member.instanceId)))) {
+        fail('unknown-technique-parent', 'Inherited techniques must reference another historical individual in this run.');
+      }
+    }
+  }
+  return errors;
+};
 
 /** One chronological pass checks identity and exact action-controlled state. */
 export const validateInstanceLifecycle = (run: RunPlan) => {
