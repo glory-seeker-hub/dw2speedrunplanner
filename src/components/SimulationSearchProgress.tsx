@@ -1,3 +1,4 @@
+import { THOROUGHNESS_LABELS } from '@/utils/battle/battlePresentation';
 import { OBJECTIVE_LABELS } from '@/utils/battle/battleSearchObjectives';
 import type { SearchProgress } from '@/utils/battle/battleSimulationSearch';
 import { Button } from '@/components/ui/button';
@@ -9,11 +10,14 @@ export function SimulationSearchProgress({ progress, requested, cancelling, onCa
       <p className="font-semibold">Optimized Action Search · {OBJECTIVE_LABELS[p.objective]} · {p.phase}</p>
       <progress aria-label="Rollout budget used" max={p.rolloutBudget} value={p.evaluations} className="w-full" />
       <p>Rollout evaluations: {searchNumber(p.evaluations)} / {searchNumber(p.rolloutBudget)}</p>
+      {p.passes && p.passes.passIndex > 1 && <p>Search pass {p.passes.passIndex} · {p.passes.passesCompleted} completed · Current pass: {searchNumber(p.passes.currentPassEvaluations)} evaluations</p>}
+      {p.passes?.thoroughness !== 'standard' && <p>Fastest found: {searchNumber(progress.bestFrames)} f</p>}
+      <p>Search Thoroughness: {THOROUGHNESS_LABELS[p.passes?.thoroughness ?? 'standard']}{p.effort && <> · Screening stage: {p.effort.screeningTarget} / {p.effort.screeningSchedule.at(-1)} samples</>}</p>
       <p>Round depth: {p.depth} / {p.maxDepth} · Root Player plans: {searchNumber(p.rootPlanCount)}</p>
       <p>Candidate plans evaluated: {searchNumber(p.candidatesEvaluated)} · Current candidates: {searchNumber(p.candidateCount)} · Beam: {p.beamSize}</p>
       {!p.bestStats && <p role="status">Search is actively processing; no completed fair screening result yet.</p>}
       <p>Best candidate: {searchNumber(p.bestStats?.fastestFrames ?? null)} f · Success: {searchNumber(p.bestStats ? p.bestStats.successRate * 100 : null)}%</p>
-      <p>Elapsed: {searchNumber(progress.elapsedMs / 1000)} s · Speed: {searchNumber(progress.simulationsPerSecond)} evaluations/s · ETA: —</p>
+      <p>Elapsed: {searchNumber(progress.elapsedMs / 1000)} s · Speed: {searchNumber(progress.simulationsPerSecond)} evaluations/s · ETA: {searchNumber(progress.etaMs === null ? null : progress.etaMs / 1000)} s</p>
       <Button onClick={onCancel} disabled={cancelling}>{cancelling ? 'Cancelling…' : 'Cancel Simulation'}</Button>
     </section>;
   }

@@ -1,3 +1,5 @@
+import type { SearchThoroughness } from '@/utils/battle/battleSearchPasses';
+import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, THOROUGHNESS_DESCRIPTIONS } from '@/utils/battle/battlePresentation';
 import { RESULT_HELP } from '@/utils/battle/battlePresentation';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
@@ -24,6 +26,7 @@ import { Loader2 } from 'lucide-react';
 
 interface BattleSimulationProps {
   savedTeams: TeamDigimon[][];
+  onSimulationSettingsChange?: () => void;
   preset?: PlannerBattleAnalysisPreset; onClearPreset?: () => void;
   onSimulationComplete: (results: SimulationResult) => void;
 }
@@ -42,7 +45,7 @@ const floorSpecialties: FloorSpecialty[] = [
   { id: 'nature', name: 'Nature' }
 ];
 
-export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete, preset, onClearPreset }: BattleSimulationProps) => {
+export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete, onSimulationSettingsChange, preset, onClearPreset }: BattleSimulationProps) => {
   const [imported, setImported] = useState(() => preset ? structuredClone(preset) : null);
   const [statDrafts, setStatDrafts] = useState(() => createPlayerStatDrafts(preset?.playerTeam ?? []));
   const localStats = useMemo(() => imported ? resolvePlayerStatDrafts(imported.playerTeam, statDrafts) : null, [imported, statDrafts]);
@@ -59,6 +62,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const [rngPolicy, setRngPolicy] = useState<BattleRngPolicy>('natural');
   const [accuracyMode, setAccuracyMode] = useState<AccuracyMode>('strategy');
   const [searchMethod, setSearchMethod] = useState<BattleSearchMethod>('optimized-action-search');
+  const [searchThoroughness, setSearchThoroughness] = useState<SearchThoroughness>('standard');
   const [objective, setObjective] = useState<OptimizationObjective>('fastest-potential');
   const search = useBattleSimulationWorker(onSimulationComplete);
   const isSimulating = search.running;
@@ -68,7 +72,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
-    search.start({ ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
+    search.start({ ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { searchThoroughness, optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -231,6 +235,9 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {searchMethod === 'optimized-action-search' && <section aria-label="Optimized search settings" className="space-y-2">
             <Label>Optimization Objective</Label>
             <div className="flex flex-wrap gap-2">{Object.entries(OBJECTIVE_LABELS).map(([value, label]) => <Button key={value} disabled={isSimulating} variant={objective === value ? 'default' : 'outline'} aria-pressed={objective === value} onClick={() => setObjective(value as OptimizationObjective)}>{label}</Button>)}</div>
+            <Label>Search Thoroughness</Label>
+            <div role="group" aria-label="Search Thoroughness" className="flex flex-wrap gap-2">{Object.entries(THOROUGHNESS_LABELS).map(([value, label]) => <Button key={value} disabled={isSimulating} variant={searchThoroughness === value ? 'default' : 'outline'} aria-pressed={searchThoroughness === value} onClick={() => { if (searchThoroughness !== value) { setSearchThoroughness(value as SearchThoroughness); onSimulationSettingsChange?.(); } }}>{label}</Button>)}</div>
+            <p className="text-sm text-muted-foreground">{THOROUGHNESS_DESCRIPTIONS[searchThoroughness]} {THOROUGHNESS_HELP}</p>
             {objective === 'fastest-potential' && <p className="text-sm text-muted-foreground">Fastest Potential searches for the fastest complete valid battle route observed anywhere in the search. It may depend on favorable remaining RNG.</p>}
             <p>First-round Player plans: {root?.count.toLocaleString() ?? '—'}</p>
             <p>Minimum screening evaluations: {root?.minimumBudget.toLocaleString() ?? '—'}</p>

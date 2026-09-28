@@ -1,0 +1,107 @@
+{
+  "commit": "f705977",
+  "rows": [
+    {
+      "kind": "small",
+      "budget": 300,
+      "options": {
+        "seed": 42,
+        "objective": "fastest-potential",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 64,
+      "hash": "ab85bd735e004ef5a056a095cada50b1df8c3fd48f145047ca80e0e1b30d35f0"
+    },
+    {
+      "kind": "canonical",
+      "budget": 10000,
+      "options": {
+        "seed": 42,
+        "objective": "fastest-potential",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 8908,
+      "hash": "3ef3e16988b657a31f59d44bcf4de974985e3ab2540552ec335d26bc4483de75"
+    },
+    {
+      "kind": "small",
+      "budget": 300,
+      "options": {
+        "seed": 42,
+        "objective": "average-victory",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 64,
+      "hash": "2cfedcaf532b349f0e6ac1ee621d449d6a49afe6bd50ee0b43bef38b1074a95b"
+    },
+    {
+      "kind": "canonical",
+      "budget": 10000,
+      "options": {
+        "seed": 42,
+        "objective": "average-victory",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 8908,
+      "hash": "8e717a90f15d4c18189f813d2f008e9070bb250b7f655491e51eda453f6e4d5d"
+    },
+    {
+      "kind": "small",
+      "budget": 300,
+      "options": {
+        "seed": 42,
+        "objective": "success-rate",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 64,
+      "hash": "24134047ac02d273ad8f6dd9ff61aae4cb6f8b6d1bb051ae2f5b29a554effbe8"
+    },
+    {
+      "kind": "canonical",
+      "budget": 10000,
+      "options": {
+        "seed": 42,
+        "objective": "success-rate",
+        "simulationRules": {
+          "accuracyMode": "strategy"
+        },
+        "config": {
+          "beamWidth": 2,
+          "maxDepth": 2
+        }
+      },
+      "evaluations": 8908,
+      "hash": "91094f2824fcf4284c72bfa14cb38d2daa65efa213b69fa16cddae37d0e91ded"
+    }
+  ]
+}

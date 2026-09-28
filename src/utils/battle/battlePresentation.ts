@@ -38,3 +38,19 @@ export function replayLimitation(r: BattleSimulationReport): string | null {
   if (s.screenedPrefix.plans.length && JSON.stringify(s.screenedPrefix.plans.map(p => p.key)) === s.fastestCompleteRoute.sourcePrefixKey) return null;
   return `Detailed replay shown below is the retained Fastest Route observation. It may not use the selected ${s.objective === 'average-victory' ? 'Average Victory' : 'Success Rate'} screened strategy.`;
 }
+
+
+export const THOROUGHNESS_LABELS = { standard: 'Standard', thorough: 'Thorough', maximum: 'Maximum' } as const;
+export const THOROUGHNESS_HELP = 'Higher thoroughness increases search coverage and statistical screening and may take substantially longer. It does not guarantee the global optimum.';
+export const THOROUGHNESS_DESCRIPTIONS = {
+  standard: 'Uses the current optimized search.',
+  thorough: 'Uses more of the available budget to evaluate and retain promising strategies more carefully.',
+  maximum: 'Uses the most thorough supported search within the rollout budget.',
+} as const;
+export const SEARCH_STOP_LABELS: Record<import('./battleSearchPasses').SearchStopReason, string> = {
+  'single-pass-complete': 'Standard search completed',
+  'configured-search-complete': 'Configured screening and exploration completed',
+  'search-exhausted': 'No further useful configured search step', 'budget-exhausted': 'Rollout budget exhausted',
+  'insufficient-budget-for-pass': 'Remaining budget below valid pass minimum',
+  'no-progress': 'Search pass made no evaluation progress', 'cancelled': 'Cancelled / Partial',
+};

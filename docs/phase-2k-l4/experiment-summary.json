@@ -1,0 +1,407 @@
+{
+  "runs": 162,
+  "variants": {
+    "A-legacy": {
+      "runs": 18,
+      "meanEvaluations": 1139,
+      "meanEvalPerSecond": 4582,
+      "fastestBetter": 0,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "B-initial16": {
+      "runs": 18,
+      "meanEvaluations": 2473,
+      "meanEvalPerSecond": 5062,
+      "fastestBetter": 2,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "C-beam8": {
+      "runs": 18,
+      "meanEvaluations": 1843,
+      "meanEvalPerSecond": 4693,
+      "fastestBetter": 4,
+      "fastestWorse": 0,
+      "depthLimit": 3
+    },
+    "D-samples-beam": {
+      "runs": 18,
+      "meanEvaluations": 3429,
+      "meanEvalPerSecond": 4666,
+      "fastestBetter": 2,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "D2-stronger": {
+      "runs": 18,
+      "meanEvaluations": 9973,
+      "meanEvalPerSecond": 4389,
+      "fastestBetter": 3,
+      "fastestWorse": 0,
+      "depthLimit": 6
+    },
+    "E2-stronger-depth6": {
+      "runs": 18,
+      "meanEvaluations": 10002,
+      "meanEvalPerSecond": 4482,
+      "fastestBetter": 3,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "E-depth6": {
+      "runs": 18,
+      "meanEvaluations": 3429,
+      "meanEvalPerSecond": 4548,
+      "fastestBetter": 2,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "F-legacy-restarts": {
+      "runs": 18,
+      "meanEvaluations": 11977,
+      "meanEvalPerSecond": 4525,
+      "fastestBetter": 2,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    },
+    "G-enhanced-restarts": {
+      "runs": 18,
+      "meanEvaluations": 11392,
+      "meanEvalPerSecond": 4638,
+      "fastestBetter": 3,
+      "fastestWorse": 0,
+      "depthLimit": 0
+    }
+  },
+  "depth": {
+    "E-depth6": [
+      {
+        "fixture": "terminal125",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      }
+    ],
+    "E2-stronger-depth6": [
+      {
+        "fixture": "terminal125",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "terminal125",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "branching16",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "fastest-potential",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "fastest-potential",
+        "seed": 137,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "average-victory",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "average-victory",
+        "seed": 137,
+        "extraEvaluations": 256,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "success-rate",
+        "seed": 42,
+        "extraEvaluations": 0,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      },
+      {
+        "fixture": "stochastic4",
+        "objective": "success-rate",
+        "seed": 137,
+        "extraEvaluations": 256,
+        "fastestDelta": 0,
+        "meanDelta": 0,
+        "successDelta": 0
+      }
+    ]
+  }
+}
