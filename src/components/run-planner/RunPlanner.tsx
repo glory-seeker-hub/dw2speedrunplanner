@@ -1,4 +1,5 @@
 import { TechniquePlanningSummary } from '@/components/run-planner/TechniquePlanningSummary';
+import { RunBackupDialog } from '@/components/run-planner/RunBackupDialog';
 import { RunRouteExport } from '@/components/run-planner/export/RunRouteExport';
 import { buildRouteDocument, RouteDocumentModel } from '@/utils/routeDocument';
 import { TradeControls } from '@/components/run-planner/TradeControls';
@@ -54,8 +55,9 @@ export const RunPlanner = ({ planner, onAnalyze, analysisError }: Props & { onAn
           <h2 className="text-2xl font-bold">Run Planner</h2>
           <p className="text-sm text-muted-foreground">Choose your starter and keep your run saved in this browser.</p>
         </div>
-        {run && <div className="flex gap-2"><Button variant="outline" onClick={() => { setCreating(true); setStarterId(''); setName(''); }}>New Run</Button>
-          <Button variant="destructive" onClick={() => setConfirmDelete({ id: run.id, name: run.name })}>Delete Run</Button></div>}
+        <div className="flex flex-wrap gap-2">{run && <><Button variant="outline" onClick={() => { setCreating(true); setStarterId(''); setName(''); }}>New Run</Button>
+          <Button variant="destructive" onClick={() => setConfirmDelete({ id: run.id, name: run.name })}>Delete Run</Button></>}
+          <RunBackupDialog planner={planner} /></div>
       </div>
       {planner.storageWarning && <Alert><AlertDescription>{planner.storageWarning}</AlertDescription></Alert>}
       {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}

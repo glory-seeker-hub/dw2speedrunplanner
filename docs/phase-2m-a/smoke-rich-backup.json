@@ -1,0 +1,1919 @@
+{
+  "format": "dw2-speedrun-planner-backup",
+  "backupVersion": 1,
+  "plannerSchemaVersion": 7,
+  "exportedAt": "2026-09-28T16:43:27.470Z",
+  "scope": "active-run",
+  "activeRunId": "7ede31db-72cf-47cb-ab5c-73cf0f0baa76",
+  "runs": [
+    {
+      "id": "7ede31db-72cf-47cb-ab5c-73cf0f0baa76",
+      "name": "TAS",
+      "starterInstanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+      "starterDefinitionId": "gold-hawk",
+      "roster": [
+        {
+          "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+          "speciesId": "greymon",
+          "name": "Greymon",
+          "source": {
+            "type": "starter"
+          },
+          "level": 13,
+          "dp": 0,
+          "levelCap": {
+            "min": 13,
+            "max": 13,
+            "resolved": 13
+          },
+          "totalXp": 49152,
+          "stats": {
+            "hp": 173,
+            "mp": 168.5,
+            "atk": 55,
+            "def": 61.5,
+            "spd": 37
+          },
+          "techs": [
+            "Pepper Breath",
+            "Nova Blast"
+          ],
+          "techniquePool": [
+            {
+              "key": "pepperbreath",
+              "name": "Pepper Breath",
+              "rank": "Rookie",
+              "unlock": {
+                "status": "available"
+              },
+              "sources": [
+                {
+                  "type": "starter",
+                  "speciesId": "agumon"
+                }
+              ]
+            },
+            {
+              "key": "novablast",
+              "name": "Nova Blast",
+              "rank": "Champion",
+              "unlock": {
+                "status": "available"
+              },
+              "sources": [
+                {
+                  "type": "own-species",
+                  "speciesId": "greymon"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "instanceId": "1c92d3f7-96c2-45f0-aecc-2a672004c1d2",
+          "speciesId": "patamon",
+          "name": "Patamon",
+          "source": {
+            "type": "dna",
+            "parentInstanceIds": [
+              "37af1550-08a2-4c61-9a6b-09dcc5f10acf",
+              "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+            ]
+          },
+          "level": 2,
+          "totalXp": 4468,
+          "dp": 1,
+          "levelCap": {
+            "min": 15,
+            "max": 15,
+            "resolved": 15
+          },
+          "stats": {
+            "hp": 33.5,
+            "mp": 29.5,
+            "atk": 41,
+            "def": 42,
+            "spd": 26
+          },
+          "techs": [
+            "Boom Bubble"
+          ],
+          "techniquePool": [
+            {
+              "key": "boombubble",
+              "name": "Boom Bubble",
+              "rank": "Rookie",
+              "unlock": {
+                "status": "available"
+              },
+              "sources": [
+                {
+                  "type": "own-species",
+                  "speciesId": "patamon"
+                }
+              ]
+            },
+            {
+              "key": "necromagic",
+              "name": "Necro Magic",
+              "rank": "Champion",
+              "unlock": {
+                "status": "pending",
+                "level": 12
+              },
+              "sources": [
+                {
+                  "type": "inherited",
+                  "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                }
+              ]
+            },
+            {
+              "key": "novablast",
+              "name": "Nova Blast",
+              "rank": "Champion",
+              "unlock": {
+                "status": "pending",
+                "level": 12
+              },
+              "sources": [
+                {
+                  "type": "inherited",
+                  "parentInstanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+                }
+              ]
+            },
+            {
+              "key": "thunderball",
+              "name": "Thunder Ball",
+              "rank": "Champion",
+              "unlock": {
+                "status": "pending",
+                "level": 12
+              },
+              "sources": [
+                {
+                  "type": "inherited",
+                  "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "digiline": [
+        "1c92d3f7-96c2-45f0-aecc-2a672004c1d2"
+      ],
+      "history": [
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "297dfd7a-7cf2-48f4-ae74-034da8b8fe22",
+          "order": 0,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 1,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 0,
+                "stats": {
+                  "hp": 31,
+                  "mp": 32,
+                  "atk": 28,
+                  "def": 30,
+                  "spd": 9
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 1030
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "e6829723-5552-487e-b2f1-4d27ad721af6",
+          "order": 1,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 2,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 4468,
+                "stats": {
+                  "hp": 41,
+                  "mp": 41.5,
+                  "atk": 32,
+                  "def": 34.25,
+                  "spd": 12
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 6630
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "29eed456-55f4-499b-80ba-f1c16cfbfc47",
+          "order": 2,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 3,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 8936,
+                "stats": {
+                  "hp": 51,
+                  "mp": 51,
+                  "atk": 35,
+                  "def": 37.75,
+                  "spd": 15
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 12230
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "a987fb0e-99da-4692-800c-1e69b1f71ac6",
+          "order": 3,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 4,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 13404,
+                "stats": {
+                  "hp": 61,
+                  "mp": 60.5,
+                  "atk": 38,
+                  "def": 41.25,
+                  "spd": 18
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 17830
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "822a5d97-cf5e-4d91-a197-cab197cedb34",
+          "order": 4,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 5,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 17872,
+                "stats": {
+                  "hp": 71,
+                  "mp": 70,
+                  "atk": 40,
+                  "def": 43.75,
+                  "spd": 21
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 23430
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "f2ed988a-2dc3-4cee-b39c-b9f4a6000fbe",
+          "order": 5,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 6,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 22340,
+                "stats": {
+                  "hp": 81,
+                  "mp": 79.5,
+                  "atk": 42,
+                  "def": 46.25,
+                  "spd": 23
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 29030
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "2dc897e2-2973-4654-9ad2-8c1dbd4df861",
+          "order": 6,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 7,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 26808,
+                "stats": {
+                  "hp": 91,
+                  "mp": 89,
+                  "atk": 44,
+                  "def": 48.75,
+                  "spd": 25
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 34630
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "a77bbe97-7634-49a7-a536-da27ea5edb02",
+          "order": 7,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 8,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 31276,
+                "stats": {
+                  "hp": 101,
+                  "mp": 98.5,
+                  "atk": 45,
+                  "def": 50,
+                  "spd": 27
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 40230
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "3f344756-ffad-49dc-9292-e33d0489adc9",
+          "order": 8,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 9,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 35744,
+                "stats": {
+                  "hp": 111,
+                  "mp": 108,
+                  "atk": 46,
+                  "def": 51.25,
+                  "spd": 29
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 45830
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "59f192fa-2b68-4422-b524-127cd414b09a",
+          "order": 9,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 10,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 40212,
+                "stats": {
+                  "hp": 121,
+                  "mp": 117.5,
+                  "atk": 47,
+                  "def": 52.5,
+                  "spd": 31
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 51430
+          }
+        },
+        {
+          "type": "digivolve",
+          "id": "f85772d7-d379-4cdb-a3b4-8e69edbe09e7",
+          "order": 10,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "agumon",
+                "name": "Agumon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 11,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 44680,
+                "stats": {
+                  "hp": 131,
+                  "mp": 127,
+                  "atk": 48,
+                  "def": 53.75,
+                  "spd": 33
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 57030
+          },
+          "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+          "fromName": "Agumon",
+          "toName": "Greymon",
+          "fromSpeciesId": "agumon",
+          "toSpeciesId": "greymon",
+          "fromRank": "Rookie",
+          "toRank": "Champion",
+          "level": 11,
+          "dp": 0,
+          "levelCap": {
+            "min": 13,
+            "max": 13,
+            "resolved": 13
+          },
+          "hpBonus": 30,
+          "mpBonus": 30
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [
+            {
+              "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+              "learned": [
+                "Nova Blast"
+              ],
+              "discarded": []
+            }
+          ],
+          "id": "dd59b0d8-0ce3-4f55-bcb1-053c8b4f4a74",
+          "order": 11,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 11,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 44680,
+                "stats": {
+                  "hp": 161,
+                  "mp": 157,
+                  "atk": 48,
+                  "def": 53.75,
+                  "spd": 33
+                },
+                "techs": [
+                  "Pepper Breath"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 57030
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "0592f98b-bc1c-4660-8f67-a2b0098c305a",
+          "order": 12,
+          "domainId": "scsi-domain",
+          "phase": "before-blood-knights",
+          "floor": 3,
+          "encounterId": 2,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": 1,
+          "capturedInstanceId": "70fd60eb-3267-49ef-8de6-bea14779ac7c",
+          "capturedLevelCap": {
+            "min": 13,
+            "max": 13,
+            "resolved": 13
+          },
+          "xpReward": 4,
+          "bitsReward": 40,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 12,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49148,
+                "stats": {
+                  "hp": 167,
+                  "mp": 162.75,
+                  "atk": 52,
+                  "def": 58,
+                  "spd": 35
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 62630
+          }
+        },
+        {
+          "type": "trade",
+          "id": "ef17369b-d768-4f7a-b566-00d8a14c3ee2",
+          "order": 13,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 13,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49152,
+                "stats": {
+                  "hp": 173,
+                  "mp": 168.5,
+                  "atk": 55,
+                  "def": 61.5,
+                  "spd": 37
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "instanceId": "70fd60eb-3267-49ef-8de6-bea14779ac7c",
+                "speciesId": "crabmon",
+                "name": "Crabmon",
+                "source": {
+                  "type": "capture",
+                  "encounterId": 2,
+                  "enemySlot": 1
+                },
+                "level": 1,
+                "totalXp": 0,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "stats": {
+                  "hp": 25,
+                  "mp": 25,
+                  "atk": 20,
+                  "def": 20,
+                  "spd": 13
+                },
+                "techs": [
+                  "Scissor Magic"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "scissormagic",
+                    "name": "Scissor Magic",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "capture",
+                        "encounterId": 2,
+                        "enemySlot": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 62670
+          },
+          "tradeId": "trade-192",
+          "givenInstanceId": "70fd60eb-3267-49ef-8de6-bea14779ac7c",
+          "givenSpeciesId": "crabmon",
+          "givenName": "Crabmon",
+          "receivedInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf",
+          "receivedSpeciesId": "wizardmon",
+          "receivedName": "Wizardmon",
+          "receivedLevel": 11,
+          "receivedDp": 0,
+          "receivedMaxLevel": 19
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "b3340e29-a450-4838-9408-8ead4ace5870",
+          "order": 14,
+          "domainId": "drive-domain",
+          "phase": "after-blood-knights",
+          "floor": 4,
+          "encounterId": 43,
+          "digilineInstanceIds": [
+            "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+          ],
+          "capturedEnemySlot": 1,
+          "capturedInstanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c",
+          "capturedLevelCap": {
+            "min": 20,
+            "max": 20,
+            "resolved": 20
+          },
+          "xpReward": 193,
+          "bitsReward": 910,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 13,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49152,
+                "stats": {
+                  "hp": 173,
+                  "mp": 168.5,
+                  "atk": 55,
+                  "def": 61.5,
+                  "spd": 37
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "speciesId": "wizardmon",
+                "name": "Wizardmon",
+                "level": 11,
+                "dp": 0,
+                "totalXp": 483,
+                "levelCap": {
+                  "min": 19,
+                  "max": 19,
+                  "resolved": 19
+                },
+                "stats": {
+                  "hp": 102,
+                  "mp": 79,
+                  "atk": 49,
+                  "def": 52,
+                  "spd": 31
+                },
+                "techs": [
+                  "Thunder Ball",
+                  "Necro Magic"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "thunderball",
+                    "name": "Thunder Ball",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "trade",
+                        "tradeId": "trade-192"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "necromagic",
+                    "name": "Necro Magic",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "trade",
+                        "tradeId": "trade-192"
+                      }
+                    ]
+                  }
+                ],
+                "source": {
+                  "type": "trade",
+                  "tradeId": "trade-192",
+                  "givenInstanceId": "70fd60eb-3267-49ef-8de6-bea14779ac7c"
+                },
+                "instanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 62670
+          }
+        },
+        {
+          "type": "dna",
+          "id": "798711d4-1c3d-4a04-8e36-20622662986d",
+          "order": 15,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 13,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49152,
+                "stats": {
+                  "hp": 173,
+                  "mp": 168.5,
+                  "atk": 55,
+                  "def": 61.5,
+                  "spd": 37
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "speciesId": "wizardmon",
+                "name": "Wizardmon",
+                "level": 11,
+                "dp": 0,
+                "totalXp": 483,
+                "levelCap": {
+                  "min": 19,
+                  "max": 19,
+                  "resolved": 19
+                },
+                "stats": {
+                  "hp": 102,
+                  "mp": 79,
+                  "atk": 49,
+                  "def": 52,
+                  "spd": 31
+                },
+                "techs": [
+                  "Thunder Ball",
+                  "Necro Magic"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "thunderball",
+                    "name": "Thunder Ball",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "trade",
+                        "tradeId": "trade-192"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "necromagic",
+                    "name": "Necro Magic",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "trade",
+                        "tradeId": "trade-192"
+                      }
+                    ]
+                  }
+                ],
+                "source": {
+                  "type": "trade",
+                  "tradeId": "trade-192",
+                  "givenInstanceId": "70fd60eb-3267-49ef-8de6-bea14779ac7c"
+                },
+                "instanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+              },
+              {
+                "instanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "capture",
+                  "encounterId": 43,
+                  "enemySlot": 1
+                },
+                "level": 13,
+                "totalXp": 760,
+                "dp": 0,
+                "levelCap": {
+                  "min": 20,
+                  "max": 20,
+                  "resolved": 20
+                },
+                "stats": {
+                  "hp": 129,
+                  "mp": 130,
+                  "atk": 57,
+                  "def": 58,
+                  "spd": 52
+                },
+                "techs": [
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "capture",
+                        "encounterId": 43,
+                        "enemySlot": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb"
+            ],
+            "totalBits": 63580
+          },
+          "parentAInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf",
+          "parentBInstanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c",
+          "parentASpeciesId": "wizardmon",
+          "parentAName": "Wizardmon",
+          "parentBSpeciesId": "greymon",
+          "parentBName": "Greymon",
+          "childInstanceId": "1c92d3f7-96c2-45f0-aecc-2a672004c1d2",
+          "childSpeciesId": "patamon",
+          "childName": "Patamon",
+          "matrixSelectionRank": "Rookie",
+          "matrixSelectionType": "Data",
+          "actualResultRank": "Rookie",
+          "actualResultType": "Data",
+          "isMutation": false,
+          "childStartingLevel": 1,
+          "childDp": 1,
+          "childMaxLevel": 15,
+          "techniqueChoice": {
+            "kept": [
+              "Boom Bubble"
+            ],
+            "discarded": []
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "880922e7-5475-48da-a5e4-fdaa2ccda463",
+          "order": 16,
+          "domainId": "chaos-tower",
+          "phase": "after-blood-knights",
+          "floor": 20,
+          "encounterId": 152,
+          "digilineInstanceIds": [
+            "1c92d3f7-96c2-45f0-aecc-2a672004c1d2"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 4468,
+          "bitsReward": 5600,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 13,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49152,
+                "stats": {
+                  "hp": 173,
+                  "mp": 168.5,
+                  "atk": 55,
+                  "def": 61.5,
+                  "spd": 37
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "instanceId": "1c92d3f7-96c2-45f0-aecc-2a672004c1d2",
+                "speciesId": "patamon",
+                "name": "Patamon",
+                "source": {
+                  "type": "dna",
+                  "parentInstanceIds": [
+                    "37af1550-08a2-4c61-9a6b-09dcc5f10acf",
+                    "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+                  ]
+                },
+                "level": 1,
+                "totalXp": 0,
+                "dp": 1,
+                "levelCap": {
+                  "min": 15,
+                  "max": 15,
+                  "resolved": 15
+                },
+                "stats": {
+                  "hp": 23,
+                  "mp": 20,
+                  "atk": 37,
+                  "def": 38,
+                  "spd": 24
+                },
+                "techs": [
+                  "Boom Bubble"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "boombubble",
+                    "name": "Boom Bubble",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "patamon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "necromagic",
+                    "name": "Necro Magic",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "thunderball",
+                    "name": "Thunder Ball",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "1c92d3f7-96c2-45f0-aecc-2a672004c1d2"
+            ],
+            "totalBits": 63580
+          }
+        },
+        {
+          "type": "battle",
+          "techniqueChoices": [],
+          "id": "af52603f-5c61-4fe7-a88d-829433f86d9d",
+          "order": 17,
+          "domainId": "coliseum",
+          "phase": "after-blood-knights",
+          "floor": 0,
+          "encounterId": 158,
+          "digilineInstanceIds": [
+            "1c92d3f7-96c2-45f0-aecc-2a672004c1d2"
+          ],
+          "capturedEnemySlot": null,
+          "capturedInstanceId": null,
+          "capturedLevelCap": null,
+          "xpReward": 0,
+          "bitsReward": 0,
+          "preActionCheckpoint": {
+            "roster": [
+              {
+                "instanceId": "9e9cd57b-8182-40bf-bbdd-bfe19ac44cfb",
+                "speciesId": "greymon",
+                "name": "Greymon",
+                "source": {
+                  "type": "starter"
+                },
+                "level": 13,
+                "dp": 0,
+                "levelCap": {
+                  "min": 13,
+                  "max": 13,
+                  "resolved": 13
+                },
+                "totalXp": 49152,
+                "stats": {
+                  "hp": 173,
+                  "mp": 168.5,
+                  "atk": 55,
+                  "def": 61.5,
+                  "spd": 37
+                },
+                "techs": [
+                  "Pepper Breath",
+                  "Nova Blast"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "pepperbreath",
+                    "name": "Pepper Breath",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "starter",
+                        "speciesId": "agumon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "greymon"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "instanceId": "1c92d3f7-96c2-45f0-aecc-2a672004c1d2",
+                "speciesId": "patamon",
+                "name": "Patamon",
+                "source": {
+                  "type": "dna",
+                  "parentInstanceIds": [
+                    "37af1550-08a2-4c61-9a6b-09dcc5f10acf",
+                    "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+                  ]
+                },
+                "level": 2,
+                "totalXp": 4468,
+                "dp": 1,
+                "levelCap": {
+                  "min": 15,
+                  "max": 15,
+                  "resolved": 15
+                },
+                "stats": {
+                  "hp": 33.5,
+                  "mp": 29.5,
+                  "atk": 41,
+                  "def": 42,
+                  "spd": 26
+                },
+                "techs": [
+                  "Boom Bubble"
+                ],
+                "techniquePool": [
+                  {
+                    "key": "boombubble",
+                    "name": "Boom Bubble",
+                    "rank": "Rookie",
+                    "unlock": {
+                      "status": "available"
+                    },
+                    "sources": [
+                      {
+                        "type": "own-species",
+                        "speciesId": "patamon"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "necromagic",
+                    "name": "Necro Magic",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "novablast",
+                    "name": "Nova Blast",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "d0fffdb5-2914-42c1-99bb-f6055cd1403c"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "thunderball",
+                    "name": "Thunder Ball",
+                    "rank": "Champion",
+                    "unlock": {
+                      "status": "pending",
+                      "level": 12
+                    },
+                    "sources": [
+                      {
+                        "type": "inherited",
+                        "parentInstanceId": "37af1550-08a2-4c61-9a6b-09dcc5f10acf"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "digiline": [
+              "1c92d3f7-96c2-45f0-aecc-2a672004c1d2"
+            ],
+            "totalBits": 69180
+          }
+        }
+      ],
+      "totalBits": 69180,
+      "createdAt": "2026-09-28T16:43:23.958Z",
+      "updatedAt": "2026-09-28T16:43:24.695Z"
+    }
+  ]
+}

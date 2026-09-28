@@ -1,0 +1,20 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const {load}=require('../tests/helpers/loadTs.cjs');
+const {richBackupRun}=require('../tests/helpers/backupFixture.cjs');
+const b=load('src/utils/runPlannerBackup.ts');
+const {COLISEUM_LOCATION}=load('src/data/coliseumBattles.ts');
+const {recordRunBattle}=load('src/utils/runBattleRecording.ts');
+const rich=richBackupRun();
+// A real zero-reward Coliseum event can repeat without changing roster or Bits.
+const base=recordRunBattle(rich,{...COLISEUM_LOCATION,encounterId:158}).run;
+const event=base.history.at(-1);
+const large={...rich,history:[...rich.history,...Array.from({length:2000},(_,i)=>({...structuredClone(event),id:'large-event-'+i,order:rich.history.length+i}))]};
+const envelope={schemaVersion:7,runs:[large],activeRunId:large.id};
+const json=b.serializeRunBackup(b.createRunBackup(envelope,'all-runs'));
+const start=performance.now(),parsed=b.parseRunBackup(json),validated=performance.now();
+const next=b.prepareRunImport({schemaVersion:7,runs:[],activeRunId:null},parsed),prepared=performance.now();
+assert.equal(next.runs[0].history.length,large.history.length);assert.ok(Buffer.byteLength(json)<b.MAX_BACKUP_BYTES);
+const report={events:large.history.length,roster:large.roster.length,bytes:Buffer.byteLength(json),capBytes:b.MAX_BACKUP_BYTES,parseValidationMs:validated-start,prepareMs:prepared-validated,fixture:'Rich route plus 2,000 legitimate zero-reward Coliseum events; complete checkpoints retained',timingAssertions:false};
+fs.mkdirSync('docs/phase-2m-a',{recursive:true});fs.writeFileSync('docs/phase-2m-a/size-characterization.json',JSON.stringify(report,null,2)+'\n');
+fs.writeFileSync('docs/phase-2m-a/smoke-rich-backup.json',b.serializeRunBackup(b.createRunBackup({schemaVersion:7,runs:[rich],activeRunId:rich.id},'active-run')));
+console.log(JSON.stringify(report,null,2));
