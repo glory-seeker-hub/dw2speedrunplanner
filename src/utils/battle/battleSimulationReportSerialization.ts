@@ -1,3 +1,4 @@
+import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, SEARCH_STOP_LABELS } from './battlePresentation';
 import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, replayExplanation, replayLimitation } from './battlePresentation';
 import { isColiseumLocation } from '@/data/coliseumBattles';
 import type { BattleSimulationReport, DeepReadonly } from './battleSimulationReport';
@@ -91,12 +92,23 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   section('Simulation Configuration');
   const c = report.simulationConfiguration;
   field('Search Method', c.searchMethod === 'random-monte-carlo' ? 'Random Monte Carlo' : 'Optimized Action Search');
+  if (c.searchMethod === 'optimized-action-search') {
+    field('Search Thoroughness', THOROUGHNESS_LABELS[c.searchThoroughness ?? 'standard']);
+    const passes = report.searchSummary.passes;
+    if (passes && passes.passesStarted > 1) { field('Additional exploration restarts', passes.passesStarted - 1); field('Completed passes', passes.passesCompleted); }
+    const effort = report.searchSummary.effort;
+    if (effort) { field('Screening schedule', effort.screeningSchedule.join(' -> ')); field('Completed screening stages', effort.completedStages.join(' -> ') || 'None'); field('Effective beam width', effort.beamWidth); field('Effective max depth', effort.maxDepth); }
+    if (passes?.stopReason) field('Stop reason', SEARCH_STOP_LABELS[passes.stopReason]);
+    if (passes?.fastestPass) field('Fastest route source pass', passes.fastestPass);
+    if (passes) field('Fastest improvements', passes.fastestImprovements);
+    if (c.searchThoroughness && c.searchThoroughness !== 'standard') lines.push('', THOROUGHNESS_HELP, '');
+  }
   if (c.objective) field('Optimization Objective', OBJECTIVE_LABELS[c.objective]);
   field('Accuracy Mode', c.rules.accuracyMode === 'strategy' ? 'Strategy' : 'Game-accurate');
   field('RNG Policy', RNG_POLICY_LABELS[c.rules.rngPolicy ?? 'natural']); field('Floor Specialty', c.floorSpecialty);
   field('Requested evaluations / budget', c.requestedEvaluations); field('Beam width', c.optimizedConfig?.beamWidth); field('Max optimized depth', c.optimizedConfig?.maxDepth);
   field('TAS Luck frontier cap', c.tasFrontierCap); field('Simulator root seed', c.seed); field('Max rounds safety limit', c.maxRounds);
-  section('Search Summary'); lines.push(...details(report.searchSummary));
+  section('Search Summary'); lines.push(...details(Object.fromEntries(Object.entries(report.searchSummary).filter(([key]) => key !== 'passes' && key !== 'effort'))));
   if(report.tasLuckSummary && report.tasLuckSummary.opportunities > 0){section('TAS Luck Conflicts');if(report.tasLuckSummary.opportunities === 0) lines.push('Deterministic favorable status outcomes; no Confusion + Paralysis conflicts encountered.');else lines.push('Enemy Confusion + Paralysis action conflicts only.', ...details(report.tasLuckSummary));}
   section('Result');
   const selected = report.selectedResult;

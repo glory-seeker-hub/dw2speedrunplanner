@@ -1,0 +1,263 @@
+{
+  "player": [
+    {
+      "digimon": {
+        "id": "P0",
+        "name": "P0",
+        "type": "Data",
+        "specialty": "None",
+        "baseStats": {
+          "hp": 80,
+          "mp": 50,
+          "atk": 20,
+          "def": 20,
+          "spd": 20
+        }
+      },
+      "customStats": {
+        "hp": 1000,
+        "mp": 100,
+        "atk": 100,
+        "def": 20,
+        "spd": 100
+      },
+      "techs": [
+        {
+          "id": "waza-2",
+          "name": "Rain of Pollen",
+          "ap": 15,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 2
+        },
+        {
+          "id": "waza-3",
+          "name": "Boom Bubble",
+          "ap": 12.5,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 3
+        },
+        {
+          "id": "waza-6",
+          "name": "Rock Fist",
+          "ap": 20,
+          "element": "None",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 6
+        },
+        {
+          "id": "waza-15",
+          "name": "Stun Flame Shot",
+          "ap": 20,
+          "element": "Fire",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 15
+        },
+        {
+          "id": "waza-109",
+          "name": "Triple Forces",
+          "ap": 15,
+          "element": "Dark",
+          "target": "All",
+          "isCounter": false,
+          "canonicalSkillId": 109
+        }
+      ],
+      "stats": {
+        "spd": 100,
+        "atk": 100
+      }
+    },
+    {
+      "digimon": {
+        "id": "P1",
+        "name": "P1",
+        "type": "Data",
+        "specialty": "None",
+        "baseStats": {
+          "hp": 80,
+          "mp": 50,
+          "atk": 20,
+          "def": 20,
+          "spd": 20
+        }
+      },
+      "customStats": {
+        "hp": 1000,
+        "mp": 100,
+        "atk": 100,
+        "def": 20,
+        "spd": 100
+      },
+      "techs": [
+        {
+          "id": "waza-2",
+          "name": "Rain of Pollen",
+          "ap": 15,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 2
+        },
+        {
+          "id": "waza-3",
+          "name": "Boom Bubble",
+          "ap": 12.5,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 3
+        },
+        {
+          "id": "waza-6",
+          "name": "Rock Fist",
+          "ap": 20,
+          "element": "None",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 6
+        },
+        {
+          "id": "waza-15",
+          "name": "Stun Flame Shot",
+          "ap": 20,
+          "element": "Fire",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 15
+        },
+        {
+          "id": "waza-109",
+          "name": "Triple Forces",
+          "ap": 15,
+          "element": "Dark",
+          "target": "All",
+          "isCounter": false,
+          "canonicalSkillId": 109
+        }
+      ],
+      "stats": {
+        "spd": 100,
+        "atk": 100
+      }
+    },
+    {
+      "digimon": {
+        "id": "P2",
+        "name": "P2",
+        "type": "Data",
+        "specialty": "None",
+        "baseStats": {
+          "hp": 80,
+          "mp": 50,
+          "atk": 20,
+          "def": 20,
+          "spd": 20
+        }
+      },
+      "customStats": {
+        "hp": 1000,
+        "mp": 100,
+        "atk": 100,
+        "def": 20,
+        "spd": 100
+      },
+      "techs": [
+        {
+          "id": "waza-2",
+          "name": "Rain of Pollen",
+          "ap": 15,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 2
+        },
+        {
+          "id": "waza-3",
+          "name": "Boom Bubble",
+          "ap": 12.5,
+          "element": "Nature",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 3
+        },
+        {
+          "id": "waza-6",
+          "name": "Rock Fist",
+          "ap": 20,
+          "element": "None",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 6
+        },
+        {
+          "id": "waza-15",
+          "name": "Stun Flame Shot",
+          "ap": 20,
+          "element": "Fire",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 15
+        },
+        {
+          "id": "waza-109",
+          "name": "Triple Forces",
+          "ap": 15,
+          "element": "Dark",
+          "target": "All",
+          "isCounter": false,
+          "canonicalSkillId": 109
+        }
+      ],
+      "stats": {
+        "spd": 100,
+        "atk": 100
+      }
+    }
+  ],
+  "enemy": [
+    {
+      "digimon": {
+        "id": "E0",
+        "name": "E0",
+        "type": "Data",
+        "specialty": "None",
+        "baseStats": {
+          "hp": 80,
+          "mp": 50,
+          "atk": 20,
+          "def": 20,
+          "spd": 20
+        }
+      },
+      "customStats": {
+        "hp": 1000,
+        "mp": 100,
+        "atk": 20,
+        "def": 20,
+        "spd": 20
+      },
+      "techs": [
+        {
+          "id": "waza-6",
+          "name": "Rock Fist",
+          "ap": 20,
+          "element": "None",
+          "target": "Single",
+          "isCounter": false,
+          "canonicalSkillId": 6
+        }
+      ],
+      "currentHp": 10,
+      "stats": {
+        "spd": 20
+      }
+    }
+  ],
+  "floorSpecialty": "None"
+}

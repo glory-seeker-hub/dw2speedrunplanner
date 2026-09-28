@@ -1,0 +1,459 @@
+{
+  "found": {
+    "seed": 3,
+    "input": {
+      "player": [
+        {
+          "digimon": {
+            "id": "P",
+            "name": "P",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 50,
+            "def": 20,
+            "spd": 100
+          },
+          "techs": [
+            {
+              "id": "waza-2",
+              "name": "Rain of Pollen",
+              "ap": 15,
+              "element": "Nature",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 2
+            },
+            {
+              "id": "waza-3",
+              "name": "Boom Bubble",
+              "ap": 12.5,
+              "element": "Nature",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 3
+            },
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            },
+            {
+              "id": "waza-15",
+              "name": "Stun Flame Shot",
+              "ap": 20,
+              "element": "Fire",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 15
+            }
+          ],
+          "stats": {
+            "spd": 100
+          },
+          "currentHp": 120
+        }
+      ],
+      "enemy": [
+        {
+          "digimon": {
+            "id": "E",
+            "name": "E",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 35,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 150,
+          "initialStatuses": {
+            "paralysis": true
+          }
+        }
+      ],
+      "floorSpecialty": "None"
+    },
+    "options": {
+      "seed": 3,
+      "maxRounds": 12,
+      "objective": "average-victory",
+      "config": {
+        "beamWidth": 1,
+        "maxDepth": 1
+      },
+      "simulationRules": {
+        "accuracyMode": "game-accurate"
+      }
+    },
+    "legacy": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-6",
+                "canonicalSkillId": 6,
+                "skillName": "Rock Fist",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 64,
+          "validExecutions": 64,
+          "victories": 64,
+          "completeTimingVictories": 64,
+          "diverged": 0,
+          "sumFrames": 250669,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3916.703125,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ],
+    "enhanced": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 497252,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3884.78125,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-6",
+                "canonicalSkillId": 6,
+                "skillName": "Rock Fist",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 505575,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3949.8046875,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ],
+    "allCandidates128": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-15",
+                "canonicalSkillId": 15,
+                "skillName": "Stun Flame Shot",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",15,{\"ap\":20,\"element\":\"Fire\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",15,{\\\"ap\\\":20,\\\"element\\\":\\\"Fire\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 497252,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3884.78125,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-6",
+                "canonicalSkillId": 6,
+                "skillName": "Rock Fist",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",6,{\"ap\":20,\"element\":\"None\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",6,{\\\"ap\\\":20,\\\"element\\\":\\\"None\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 505575,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3949.8046875,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",2,{\\\\\\\"ap\\\\\\\":15,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-2",
+                "canonicalSkillId": 2,
+                "skillName": "Rain of Pollen",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",2,{\"ap\":15,\"element\":\"Nature\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",2,{\\\"ap\\\":15,\\\"element\\\":\\\"Nature\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 560248,
+          "fastestFrames": 3322,
+          "averageVictoryFrames": 4376.9375,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",3,{\\\\\\\"ap\\\\\\\":12.5,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "plans": [
+          {
+            "round": 1,
+            "orders": [
+              {
+                "actorId": "player-0",
+                "actorName": "P",
+                "skillKey": "waza-3",
+                "canonicalSkillId": 3,
+                "skillName": "Boom Bubble",
+                "targetIntent": {
+                  "kind": "combatants",
+                  "targetIds": [
+                    "enemy-0"
+                  ]
+                },
+                "targetLabel": "E",
+                "key": "[\"player-0\",3,{\"ap\":12.5,\"element\":\"Nature\",\"isCounter\":false,\"target\":\"Single\"},{\"kind\":\"combatants\",\"targetIds\":[\"enemy-0\"]}]"
+              }
+            ],
+            "key": "[1,[\"[\\\"player-0\\\",3,{\\\"ap\\\":12.5,\\\"element\\\":\\\"Nature\\\",\\\"isCounter\\\":false,\\\"target\\\":\\\"Single\\\"},{\\\"kind\\\":\\\"combatants\\\",\\\"targetIds\\\":[\\\"enemy-0\\\"]}]\"]]"
+          }
+        ],
+        "stats": {
+          "evaluations": 128,
+          "validExecutions": 128,
+          "victories": 128,
+          "completeTimingVictories": 128,
+          "diverged": 0,
+          "sumFrames": 590673,
+          "fastestFrames": 3322,
+          "averageVictoryFrames": 4614.6328125,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ],
+    "initial4": [
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",6,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"None\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "stats": {
+          "evaluations": 4,
+          "validExecutions": 4,
+          "victories": 4,
+          "completeTimingVictories": 4,
+          "diverged": 0,
+          "sumFrames": 14864,
+          "fastestFrames": 2934,
+          "averageVictoryFrames": 3716,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",15,{\\\\\\\"ap\\\\\\\":20,\\\\\\\"element\\\\\\\":\\\\\\\"Fire\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "stats": {
+          "evaluations": 4,
+          "validExecutions": 4,
+          "victories": 4,
+          "completeTimingVictories": 4,
+          "diverged": 0,
+          "sumFrames": 15846,
+          "fastestFrames": 2443,
+          "averageVictoryFrames": 3961.5,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",2,{\\\\\\\"ap\\\\\\\":15,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "stats": {
+          "evaluations": 4,
+          "validExecutions": 4,
+          "victories": 4,
+          "completeTimingVictories": 4,
+          "diverged": 0,
+          "sumFrames": 16234,
+          "fastestFrames": 3322,
+          "averageVictoryFrames": 4058.5,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      },
+      {
+        "key": "[\"[1,[\\\"[\\\\\\\"player-0\\\\\\\",3,{\\\\\\\"ap\\\\\\\":12.5,\\\\\\\"element\\\\\\\":\\\\\\\"Nature\\\\\\\",\\\\\\\"isCounter\\\\\\\":false,\\\\\\\"target\\\\\\\":\\\\\\\"Single\\\\\\\"},{\\\\\\\"kind\\\\\\\":\\\\\\\"combatants\\\\\\\",\\\\\\\"targetIds\\\\\\\":[\\\\\\\"enemy-0\\\\\\\"]}]\\\"]]\"]",
+        "stats": {
+          "evaluations": 4,
+          "validExecutions": 4,
+          "victories": 4,
+          "completeTimingVictories": 4,
+          "diverged": 0,
+          "sumFrames": 16234,
+          "fastestFrames": 3322,
+          "averageVictoryFrames": 4058.5,
+          "successRate": 1,
+          "divergenceRate": 0
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,584 @@
+[
+  {
+    "seed": 42,
+    "objective": "fastest-potential",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 7488.921600000001,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1778868,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 6948.703125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 42,
+    "objective": "fastest-potential",
+    "fallback": true,
+    "evaluations": 39600,
+    "elapsedMs": 13976.494,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1778868,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 6948.703125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20400,
+      "explorationSeed": 3627922833,
+      "fastestPass": 1,
+      "fastestImprovements": 3,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11520,
+        "64": 9648,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  },
+  {
+    "seed": 42,
+    "objective": "average-victory",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 5708.881600000001,
+    "fastest": 5674,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1810160,
+      "fastestFrames": 5674,
+      "averageVictoryFrames": 7070.9375,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 42,
+    "objective": "average-victory",
+    "fallback": true,
+    "evaluations": 39792,
+    "elapsedMs": 13379.857899999999,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1810160,
+      "fastestFrames": 5674,
+      "averageVictoryFrames": 7070.9375,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20592,
+      "explorationSeed": 3627922833,
+      "fastestPass": 2,
+      "fastestImprovements": 3,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11712,
+        "64": 9648,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  },
+  {
+    "seed": 42,
+    "objective": "success-rate",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 5570.6658000000025,
+    "fastest": 5674,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1810160,
+      "fastestFrames": 5674,
+      "averageVictoryFrames": 7070.9375,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 42,
+    "objective": "success-rate",
+    "fallback": true,
+    "evaluations": 39792,
+    "elapsedMs": 12695.577099999995,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1810160,
+      "fastestFrames": 5674,
+      "averageVictoryFrames": 7070.9375,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20592,
+      "explorationSeed": 3627922833,
+      "fastestPass": 2,
+      "fastestImprovements": 3,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11712,
+        "64": 9648,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "fastest-potential",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 5979.478000000003,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "fastest-potential",
+    "fallback": true,
+    "evaluations": 39456,
+    "elapsedMs": 12653.44230000001,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20256,
+      "explorationSeed": 1331491846,
+      "fastestPass": 1,
+      "fastestImprovements": 4,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11520,
+        "64": 9504,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "average-victory",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 5382.428,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "average-victory",
+    "fallback": true,
+    "evaluations": 39456,
+    "elapsedMs": 11059.352599999998,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20256,
+      "explorationSeed": 1331491846,
+      "fastestPass": 1,
+      "fastestImprovements": 4,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11520,
+        "64": 9504,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "success-rate",
+    "fallback": false,
+    "evaluations": 19200,
+    "elapsedMs": 6789.0435,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 5376,
+        "64": 4608,
+        "256": 9216
+      },
+      "screeningTarget": 256,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "frontier-exhausted"
+    }
+  },
+  {
+    "seed": 137,
+    "objective": "success-rate",
+    "fallback": true,
+    "evaluations": 39456,
+    "elapsedMs": 11317.558399999994,
+    "fastest": 5183,
+    "selected": {
+      "evaluations": 256,
+      "validExecutions": 256,
+      "victories": 256,
+      "completeTimingVictories": 256,
+      "diverged": 0,
+      "sumFrames": 1805741,
+      "fastestFrames": 5183,
+      "averageVictoryFrames": 7053.67578125,
+      "successRate": 1,
+      "divergenceRate": 0
+    },
+    "passes": {
+      "thoroughness": "maximum",
+      "passIndex": 2,
+      "passesStarted": 2,
+      "passesCompleted": 2,
+      "currentPassEvaluations": 20256,
+      "explorationSeed": 1331491846,
+      "fastestPass": 1,
+      "fastestImprovements": 4,
+      "stopReason": "insufficient-budget-for-pass"
+    },
+    "effort": {
+      "screeningSchedule": [
+        16,
+        64,
+        256
+      ],
+      "completedStages": [
+        16,
+        64,
+        256
+      ],
+      "stageEvaluations": {
+        "16": 11520,
+        "64": 9504,
+        "256": 18432
+      },
+      "screeningTarget": 16,
+      "maxBeam": 16,
+      "beamWidth": 16,
+      "maxDepth": 4,
+      "continuationAvailable": true,
+      "termination": "depth-limit"
+    }
+  }
+]

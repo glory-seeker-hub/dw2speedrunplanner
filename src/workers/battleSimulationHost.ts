@@ -15,7 +15,7 @@ export function createSimulationWorkerHost(post: (message: SearchResponse) => vo
     try {
       if (message.searchMethod && !['random-monte-carlo', 'optimized-action-search'].includes(message.searchMethod)) throw new Error('Unknown search method.');
       const search = message.searchMethod === 'optimized-action-search' ? createOptimizedSearch(message.input, message.requestedSimulations, {
-        seed: message.seed, objective: message.optimizationObjective, config: message.optimizedConfig, simulationRules: message.simulationRules, maxRounds: message.maxRounds,
+        searchThoroughness: message.searchThoroughness, seed: message.seed, objective: message.optimizationObjective, config: message.optimizedConfig, simulationRules: message.simulationRules, maxRounds: message.maxRounds,
       }) : createSimulationSearch(message.input, message.requestedSimulations, {
         simulationRules: message.simulationRules,
         ...(message.seed === undefined ? {} : { rng: createSeededBattleRng(message.seed) }),

@@ -1,3 +1,4 @@
+import type { SearchThoroughness, SearchPassMetadata } from './battleSearchPasses';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { tasLuckCapForBudget } from './battleTasLuck';
 import type { SimulationResult } from '@/types/digimon';
@@ -25,7 +26,7 @@ function immutable<T>(value: T): DeepReadonly<T> {
 }
 export interface SimulationReportJobRequest {
   input: BattleInput; requestedSimulations: number; searchMethod?: BattleSearchMethod;
-  optimizationObjective?: OptimizationObjective; optimizedConfig?: OptimizedSearchConfig;
+  searchThoroughness?: SearchThoroughness; optimizationObjective?: OptimizationObjective; optimizedConfig?: OptimizedSearchConfig;
   simulationRules?: BattleSimulationRules; seed?: number; maxRounds?: number;
   plannerProvenance?: Pick<PlannerBattleAnalysisPreset, 'source' | 'selectedBattle' | 'historicalStateSummary' | 'diagnostics'>;
   playerStatProvenance?: PlayerStatProvenance;
@@ -39,7 +40,7 @@ export interface SimulationReportJob {
   combatants: Combatant[];
   playerStatProvenance?: PlayerStatProvenance;
   configuration: {
-    searchMethod: BattleSearchMethod; objective?: OptimizationObjective;
+    searchMethod: BattleSearchMethod; searchThoroughness?: SearchThoroughness; objective?: OptimizationObjective;
     rules: BattleSimulationRules; requestedEvaluations: number; floorSpecialty: string;
     optimizedConfig?: OptimizedSearchConfig; seed?: number; maxRounds: number; tasFrontierCap?: number;
   };
@@ -59,7 +60,7 @@ export function snapshotSimulationReportJob(request: SimulationReportJobRequest)
     combatants, playerStatProvenance: r.playerStatProvenance,
     configuration: { searchMethod: method, rules: resolveSimulationRules(r.simulationRules), requestedEvaluations: r.requestedSimulations,
       ...(r.simulationRules?.rngPolicy==='tas-luck'?{tasFrontierCap:tasLuckCapForBudget(r.requestedSimulations)}:{}), floorSpecialty: r.input.floorSpecialty, maxRounds: r.maxRounds ?? 1000,
-      ...(method === 'optimized-action-search' ? { objective: r.optimizationObjective ?? 'fastest-potential', optimizedConfig: r.optimizedConfig ?? optimizedConfigForBudget(r.requestedSimulations), seed: r.seed ?? 0 } : r.seed === undefined ? {} : { seed: r.seed }) } });
+      ...(method === 'optimized-action-search' ? { searchThoroughness: r.searchThoroughness ?? 'standard', objective: r.optimizationObjective ?? 'fastest-potential', optimizedConfig: r.optimizedConfig ?? optimizedConfigForBudget(r.requestedSimulations), seed: r.seed ?? 0 } : r.seed === undefined ? {} : { seed: r.seed }) } });
 }
 type SelectedResult = {
   kind: 'random-monte-carlo'; winRate: number; minFrames: number | null; averageFrames: number | null;
@@ -79,7 +80,7 @@ interface ReportData {
   effectiveInput: BattleInput; playerTeam: Combatant[]; enemyTeam: Combatant[];
   playerStatProvenance?: PlayerStatProvenance;
   simulationConfiguration: SimulationReportJob['configuration'];
-  searchSummary: { evaluations: number; elapsedMs?: number; completedSuccesses: number; timedSuccesses: number; incompleteTimingSuccesses: number;
+  searchSummary: { effort?: import('./battleOptimizedSearch').SearchEffort; passes?: SearchPassMetadata; evaluations: number; elapsedMs?: number; completedSuccesses: number; timedSuccesses: number; incompleteTimingSuccesses: number;
     outcomeCounts: SimulationResult['outcomeCounts']; rootPlanCount?: number; candidateCount?: number; candidatesEvaluated?: number;
     depth?: number; fairStageEvaluations?: number; rngOverrideCounts?: SimulationResult['rngOverrideCounts']; runsWithResourceAlerts: number };
   selectedResult: SelectedResult;
@@ -114,7 +115,7 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
     searchSummary: { evaluations: result.search?.completedSimulations ?? o?.evaluations ?? result.totalSimulations, elapsedMs: result.search?.elapsedMs,
       completedSuccesses: result.completedSuccesses, timedSuccesses: result.timedSuccesses, incompleteTimingSuccesses: result.incompleteTimingSuccesses,
       outcomeCounts: result.outcomeCounts, runsWithResourceAlerts: result.runsWithResourceAlerts, rngOverrideCounts: result.rngOverrideCounts,
-      ...(o ? { rootPlanCount: o.rootPlanCount, candidateCount: o.candidateCount, candidatesEvaluated: o.candidatesEvaluated, depth: o.depth, fairStageEvaluations: o.fairStageEvaluations } : {}) },
+      ...(o ? { ...(o.effort ? { effort: o.effort } : {}), ...(o.passes ? { passes: o.passes } : {}), rootPlanCount: o.rootPlanCount, candidateCount: o.candidateCount, candidatesEvaluated: o.candidatesEvaluated, depth: o.depth, fairStageEvaluations: o.fairStageEvaluations } : {}) },
     selectedResult: o ? { kind: 'optimized-action-search', objective: o.objective,
       fastestCompleteRoute: route ? { totalFrames: route.totalFrames, rounds, sourcePrefixKey: route.sourcePrefixKey, seed: route.seed, sampleIndex: route.sampleIndex, decisionTrace: route.decisionTrace } : null,
       screenedPrefix: { plans: o.recommendedPrefix, statistics: o.recommendedStats },

@@ -1,0 +1,127 @@
+{
+  "fixture": "canonical one Enemy, 125 root plans, seed 42, beam 4, depth 3, Strategy/Natural",
+  "budget": 20000,
+  "environment": "Node production search; progress sampled every 128 steps; timing characterization, no thresholds",
+  "samples": [
+    {
+      "searchThoroughness": "single-pass",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 398.15369999999893,
+        "evaluationsPerSecond": 3455.9518095650087
+      },
+      "overall": {
+        "evaluations": 1376,
+        "elapsedMs": 398.15369999999893,
+        "evaluationsPerSecond": 3455.9518095650087,
+        "passes": 1,
+        "stopReason": "single-pass-complete"
+      }
+    },
+    {
+      "searchThoroughness": "use-full-budget",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 414.8076000000001,
+        "evaluationsPerSecond": 3317.2005527381843
+      },
+      "overall": {
+        "evaluations": 19824,
+        "elapsedMs": 5648.189,
+        "evaluationsPerSecond": 3509.7975652018727,
+        "passes": 15,
+        "stopReason": "insufficient-budget-for-pass"
+      }
+    },
+    {
+      "searchThoroughness": "use-full-budget",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 324.814699999999,
+        "evaluationsPerSecond": 4236.261474619235
+      },
+      "overall": {
+        "evaluations": 19824,
+        "elapsedMs": 7756.954299999998,
+        "evaluationsPerSecond": 2555.6422319002195,
+        "passes": 15,
+        "stopReason": "insufficient-budget-for-pass"
+      }
+    },
+    {
+      "searchThoroughness": "single-pass",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 988.5764999999992,
+        "evaluationsPerSecond": 1391.9003739214934
+      },
+      "overall": {
+        "evaluations": 1376,
+        "elapsedMs": 988.5764999999992,
+        "evaluationsPerSecond": 1391.9003739214934,
+        "passes": 1,
+        "stopReason": "single-pass-complete"
+      }
+    },
+    {
+      "searchThoroughness": "single-pass",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 606.0048999999999,
+        "evaluationsPerSecond": 2270.6087029989367
+      },
+      "overall": {
+        "evaluations": 1376,
+        "elapsedMs": 606.0048999999999,
+        "evaluationsPerSecond": 2270.6087029989367,
+        "passes": 1,
+        "stopReason": "single-pass-complete"
+      }
+    },
+    {
+      "searchThoroughness": "use-full-budget",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 714.5198999999993,
+        "evaluationsPerSecond": 1925.7686175010679
+      },
+      "overall": {
+        "evaluations": 19824,
+        "elapsedMs": 6976.931099999998,
+        "evaluationsPerSecond": 2841.3638770203715,
+        "passes": 15,
+        "stopReason": "insufficient-budget-for-pass"
+      }
+    },
+    {
+      "searchThoroughness": "use-full-budget",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 306.6380999999965,
+        "evaluationsPerSecond": 4487.374530431854
+      },
+      "overall": {
+        "evaluations": 19824,
+        "elapsedMs": 4586.575899999996,
+        "evaluationsPerSecond": 4322.178555902676,
+        "passes": 15,
+        "stopReason": "insufficient-budget-for-pass"
+      }
+    },
+    {
+      "searchThoroughness": "single-pass",
+      "firstPass": {
+        "evaluations": 1376,
+        "elapsedMs": 353.7105999999985,
+        "evaluationsPerSecond": 3890.185931662794
+      },
+      "overall": {
+        "evaluations": 1376,
+        "elapsedMs": 353.7105999999985,
+        "evaluationsPerSecond": 3890.185931662794,
+        "passes": 1,
+        "stopReason": "single-pass-complete"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>L4 production-component smoke fixture</title></head><body><div id="root"></div><script type="module">
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {BattleSimulation} from '/src/components/BattleSimulation.tsx';
+import {BattleResults} from '/src/components/BattleResults.tsx';
+import '/src/index.css';
+const input=await (await fetch('./browser-fixture.json')).json();
+function Fixture(){const [result,setResult]=React.useState(null);return React.createElement('main',{className:'p-4 mx-auto max-w-6xl'},React.createElement('h1',null,'L4 browser fixture: production UI and Worker, 125 plans'),React.createElement(BattleSimulation,{savedTeams:[input.player,input.enemy],onSimulationComplete:setResult,onSimulationSettingsChange:()=>setResult(null)}),result&&React.createElement(BattleResults,{results:result}));}
+createRoot(document.getElementById('root')).render(React.createElement(Fixture));
+</script></body></html>

@@ -108,7 +108,7 @@ const Index = () => {
 
             <TabsContent value="battle-simulation" className="mt-6">
               <div className="mb-3 flex flex-wrap gap-2">{validAnalysis && <Button variant="outline" onClick={() => setActiveTab('run-planner')}>Back to Run Planner</Button>}<p className="text-sm">Configure battle → Run simulation → Results → Export Simulation</p></div>
-              <BattleSimulation key={validAnalysis?.revision ?? 'manual'} preset={validAnalysis?.preset} onClearPreset={() => setAnalysis(null)} savedTeams={savedTeams} onSimulationComplete={handleSimulationComplete} />
+              <BattleSimulation key={validAnalysis?.revision ?? 'manual'} preset={validAnalysis?.preset} onClearPreset={() => setAnalysis(null)} savedTeams={savedTeams} onSimulationSettingsChange={() => setSimulationResults(null)} onSimulationComplete={handleSimulationComplete} />
             </TabsContent>
 
             <TabsContent value="results" className="mt-6">
