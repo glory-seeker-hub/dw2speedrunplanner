@@ -40,8 +40,6 @@ const Index = () => {
   const handleSaveTeam = (team: TeamDigimon[]) => {
     if (team.length > 0) {
       setSavedTeams([...savedTeams, team]);
-      console.log('Team saved:', team);
-      // Here you would typically save to localStorage or a database
     }
   };
   const handleSimulationComplete = (results: SimulationResult) => {
