@@ -66,6 +66,6 @@ npm audit
 
 The release audit records the lint baseline and dependency findings; a nonzero lint/audit exit is not silently ignored. Workbook verification is optional for ordinary local use and requires the external source workbook: `python scripts/importBattleSkills.py "path/to/DW2 Modding Info.xlsx" --check`.
 
-Report bugs and suggestions through [GitHub Issues](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues), with reproduction steps, browser and relevant settings. Share a backup only if you intend to disclose its run names and route contents. At the audit date, the canonical GitHub pages returned 404 to signed-out visitors; public access must be verified before launch.
+Report bugs and suggestions through [GitHub Issues](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues), with reproduction steps, browser and relevant settings. Share a backup only if you intend to disclose its run names and route contents. Public repository and Issues access passed the October 3, 2026 audit follow-up; verify these links again after deployment.
 
 Created by GlorySeeker, initially built with [Lovable](https://lovable.dev). Unofficial fan-made tool. Not affiliated with or endorsed by Bandai, Toei Animation, or the rights holders of Digimon.
