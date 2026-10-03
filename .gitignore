@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Private environment values and user-generated run backups (not test fixtures)
+.env
+.env.*
+!.env.example
+dw2-speedrunplanner-run-*.json
+dw2-speedrunplanner-backup-*.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

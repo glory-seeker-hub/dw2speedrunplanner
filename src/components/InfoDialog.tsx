@@ -62,6 +62,13 @@ export const InfoDialog = () => {
                     <p className="text-sm text-muted-foreground">
                       Digimon World 2 enthusiast and content creator
                     </p>
+                    <p className="text-sm text-muted-foreground">
+                      Unofficial fan-made tool. Not affiliated with or endorsed by Bandai, Toei Animation, or the rights holders of Digimon.
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+                      <a href="https://github.com/glory-seeker-hub/dw2speedrunplanner" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-4">Source on GitHub</a>
+                      <a href="https://github.com/glory-seeker-hub/dw2speedrunplanner/issues" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-4">Report an issue</a>
+                    </div>
                     <a
                       href="https://www.twitch.tv/glory_seeker"
                       target="_blank"

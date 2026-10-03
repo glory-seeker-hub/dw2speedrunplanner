@@ -1,0 +1,1635 @@
+{
+  "phase": "2M-B",
+  "source": "npm audit --json",
+  "captured": "2026-09-28",
+  "reviewed": "2026-10-02",
+  "counts": {
+    "info": 0,
+    "low": 5,
+    "moderate": 18,
+    "high": 29,
+    "critical": 0,
+    "total": 52
+  },
+  "note": "Counts are affected package records, including propagated findings, not 52 independent exploitable vulnerabilities. No dependencies changed. false fixAvailable is the audit response, not proof that upstream has no patched version.",
+  "packages": [
+    {
+      "name": "@eslint-community/eslint-utils",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@eslint-community/eslint-utils",
+          "version": "4.7.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@eslint/config-array",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@eslint/config-array",
+          "version": "0.21.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "minimatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@eslint/eslintrc",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@eslint/eslintrc",
+          "version": "3.3.1",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "ajv"
+        },
+        {
+          "viaPackage": "js-yaml"
+        },
+        {
+          "viaPackage": "minimatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@humanfs/node",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@humanfs/node",
+          "version": "0.16.6",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "humanfs: Recursive copy follows symlinked files and copies data from outside the source tree",
+          "url": "https://github.com/advisories/GHSA-p498-v437-472g",
+          "severity": "moderate",
+          "range": "<0.16.8"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@remix-run/router",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@remix-run/router",
+          "version": "1.23.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Router is bundled. Application uses BrowserRouter with fixed / and * routes; no data router, SSR hydration, untrusted redirect, Link or useNavigate input found. Advisory exploit paths not identified in current app.",
+      "releaseSeverity": "MEDIUM",
+      "releaseBlocking": false,
+      "recommendation": "Prioritize a separately reviewed router security update with navigation and production regression tests.",
+      "advisories": [
+        {
+          "title": "React Router vulnerable to XSS via Open Redirects",
+          "url": "https://github.com/advisories/GHSA-2w69-qvjg-hvjx",
+          "severity": "high",
+          "range": "<=1.23.1"
+        },
+        {
+          "title": "React Router's same-origin redirect with path starting // causes open redirect via protocol-relative URL reinterpretation",
+          "url": "https://github.com/advisories/GHSA-2j2x-hqr9-3h42",
+          "severity": "moderate",
+          "range": ">=1.3.0 <1.23.3"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@tailwindcss/typography",
+      "severity": "low",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/@tailwindcss/typography",
+          "version": "0.5.16",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "tailwindcss"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@typescript-eslint/eslint-plugin",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/eslint-plugin",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@typescript-eslint/parser"
+        },
+        {
+          "viaPackage": "@typescript-eslint/type-utils"
+        },
+        {
+          "viaPackage": "@typescript-eslint/utils"
+        },
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/parser",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@typescript-eslint/typescript-estree"
+        },
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@typescript-eslint/type-utils",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/type-utils",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@typescript-eslint/typescript-estree"
+        },
+        {
+          "viaPackage": "@typescript-eslint/utils"
+        },
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@typescript-eslint/typescript-estree",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/typescript-estree",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "fast-glob"
+        },
+        {
+          "viaPackage": "minimatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@typescript-eslint/utils",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/utils",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@eslint-community/eslint-utils"
+        },
+        {
+          "viaPackage": "@typescript-eslint/typescript-estree"
+        },
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "@vitejs/plugin-react-swc",
+      "severity": "low",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/@vitejs/plugin-react-swc",
+          "version": "3.11.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "vite"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "ajv",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/ajv",
+          "version": "6.12.6",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "ajv has ReDoS when using `$data` option",
+          "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+          "severity": "moderate",
+          "range": "<6.14.0"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "anymatch",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/anymatch",
+          "version": "3.1.3",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "picomatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "autoprefixer",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/autoprefixer",
+          "version": "10.4.21",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "browserslist"
+        },
+        {
+          "viaPackage": "postcss"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "brace-expansion",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion",
+          "version": "2.0.2",
+          "dev": true
+        },
+        {
+          "path": "node_modules/brace-expansion",
+          "version": "1.1.12",
+          "dev": true
+        },
+        {
+          "path": "node_modules/glob/node_modules/brace-expansion",
+          "version": "2.0.2",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+          "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+          "severity": "moderate",
+          "range": "<1.1.13"
+        },
+        {
+          "title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+          "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+          "severity": "moderate",
+          "range": ">=2.0.0 <2.0.3"
+        },
+        {
+          "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+          "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+          "severity": "high",
+          "range": ">=2.0.0 <2.1.2"
+        },
+        {
+          "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+          "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+          "severity": "high",
+          "range": "<1.1.16"
+        },
+        {
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "range": "<1.1.17"
+        },
+        {
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "range": ">=2.0.0 <2.1.3"
+        },
+        {
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "range": ">=2.0.0 <2.1.4"
+        },
+        {
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "range": "<1.1.18"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "browserslist",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/browserslist",
+          "version": "4.25.1",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+          "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+          "severity": "high",
+          "range": "<=4.28.6"
+        },
+        {
+          "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+          "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+          "severity": "high",
+          "range": "<=4.28.6"
+        },
+        {
+          "viaPackage": "update-browserslist-db"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "chokidar",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/chokidar",
+          "version": "3.6.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "anymatch"
+        },
+        {
+          "viaPackage": "readdirp"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "esbuild",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/esbuild",
+          "version": "0.21.5",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "esbuild enables any website to send any requests to the development server and read the response",
+          "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+          "severity": "moderate",
+          "range": "<=0.24.2"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "eslint",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/eslint",
+          "version": "9.32.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@eslint-community/eslint-utils"
+        },
+        {
+          "viaPackage": "@eslint/config-array"
+        },
+        {
+          "viaPackage": "@eslint/eslintrc"
+        },
+        {
+          "viaPackage": "@humanfs/node"
+        },
+        {
+          "viaPackage": "ajv"
+        },
+        {
+          "viaPackage": "file-entry-cache"
+        },
+        {
+          "viaPackage": "minimatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
+      "severity": "moderate",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/eslint-plugin-react-hooks",
+          "version": "5.2.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "eslint-plugin-react-refresh",
+      "severity": "moderate",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/eslint-plugin-react-refresh",
+          "version": "0.4.20",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "fast-glob",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/fast-glob",
+          "version": "3.3.2",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "micromatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "file-entry-cache",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/file-entry-cache",
+          "version": "8.0.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "flat-cache"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "flat-cache",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/flat-cache",
+          "version": "4.0.1",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "flatted"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "flatted",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/flatted",
+          "version": "3.3.1",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "flatted vulnerable to unbounded recursion DoS in parse() revive phase",
+          "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+          "severity": "high",
+          "range": "<3.4.0"
+        },
+        {
+          "title": "Prototype Pollution via parse() in NodeJS flatted",
+          "url": "https://github.com/advisories/GHSA-rf6f-7fwh-wjgh",
+          "severity": "high",
+          "range": "<=3.4.1"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "glob",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/glob",
+          "version": "10.4.5",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "glob CLI: Command injection via -c/--cmd executes matches with shell:true",
+          "url": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+          "severity": "high",
+          "range": ">=10.2.0 <10.5.0"
+        },
+        {
+          "viaPackage": "minimatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "js-yaml",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/js-yaml",
+          "version": "4.1.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "js-yaml has prototype pollution in merge (<<)",
+          "url": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
+          "severity": "moderate",
+          "range": ">=4.0.0 <4.1.1"
+        },
+        {
+          "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+          "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+          "severity": "moderate",
+          "range": ">=4.0.0 <=4.1.1"
+        },
+        {
+          "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+          "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+          "severity": "high",
+          "range": ">=4.0.0 <4.3.0"
+        },
+        {
+          "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+          "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+          "severity": "high",
+          "range": ">=4.0.0 <4.3.1"
+        },
+        {
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+          "severity": "high",
+          "range": ">=4.0.0 <4.3.2"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "lodash",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/lodash",
+          "version": "4.17.21",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Installed dependency, but recharts/chart is not reachable from src/main.tsx; no lodash imports in application or Worker.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Review removal or update in dependency-maintenance phase.",
+      "advisories": [
+        {
+          "title": "lodash vulnerable to Code Injection via `_.template` imports key names",
+          "url": "https://github.com/advisories/GHSA-r5fr-rjxr-66jc",
+          "severity": "high",
+          "range": ">=4.0.0 <=4.17.23"
+        },
+        {
+          "title": "lodash vulnerable to Prototype Pollution via array path bypass in `_.unset` and `_.omit`",
+          "url": "https://github.com/advisories/GHSA-f23m-r3pf-42rh",
+          "severity": "moderate",
+          "range": "<=4.17.23"
+        },
+        {
+          "title": "Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions",
+          "url": "https://github.com/advisories/GHSA-xxjr-mmjv-4gpg",
+          "severity": "moderate",
+          "range": ">=4.0.0 <=4.17.22"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "lovable-tagger",
+      "severity": "low",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/lovable-tagger",
+          "version": "1.1.9",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "tailwindcss"
+        },
+        {
+          "viaPackage": "vite"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "micromatch",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/micromatch",
+          "version": "4.0.8",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "picomatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "minimatch",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch",
+          "version": "9.0.5",
+          "dev": true
+        },
+        {
+          "path": "node_modules/glob/node_modules/minimatch",
+          "version": "9.0.5",
+          "dev": false
+        },
+        {
+          "path": "node_modules/minimatch",
+          "version": "3.1.2",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+          "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+          "severity": "high",
+          "range": "<3.1.3"
+        },
+        {
+          "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+          "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+          "severity": "high",
+          "range": ">=9.0.0 <9.0.6"
+        },
+        {
+          "title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+          "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+          "severity": "high",
+          "range": "<3.1.3"
+        },
+        {
+          "title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+          "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+          "severity": "high",
+          "range": ">=9.0.0 <9.0.7"
+        },
+        {
+          "title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+          "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+          "severity": "high",
+          "range": "<3.1.4"
+        },
+        {
+          "title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+          "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+          "severity": "high",
+          "range": ">=9.0.0 <9.0.7"
+        },
+        {
+          "viaPackage": "brace-expansion"
+        },
+        {
+          "viaPackage": "brace-expansion"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "nanoid",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/nanoid",
+          "version": "3.3.11",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+          "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+          "severity": "high",
+          "range": "<3.3.16"
+        },
+        {
+          "title": "nanoid: custom generators can loop indefinitely when size is zero",
+          "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+          "severity": "high",
+          "range": "<3.3.18"
+        },
+        {
+          "title": "nanoid: Integer Overflow or Wraparound",
+          "url": "https://github.com/advisories/GHSA-xwg4-73v4-xw9w",
+          "severity": "high",
+          "range": "<3.3.12"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "picomatch",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/picomatch",
+          "version": "2.3.1",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching",
+          "url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+          "severity": "moderate",
+          "range": "<2.3.2"
+        },
+        {
+          "title": "Picomatch has a ReDoS vulnerability via extglob quantifiers",
+          "url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+          "severity": "high",
+          "range": "<2.3.2"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/postcss",
+          "version": "8.5.6",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+          "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+          "severity": "moderate",
+          "range": "<8.5.10"
+        },
+        {
+          "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+          "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+          "severity": "high",
+          "range": "<=8.5.11"
+        },
+        {
+          "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+          "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+          "severity": "moderate",
+          "range": "<=8.5.22"
+        },
+        {
+          "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+          "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+          "severity": "high",
+          "range": "<=8.5.17"
+        },
+        {
+          "viaPackage": "nanoid"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss-import",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/postcss-import",
+          "version": "15.1.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "postcss"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss-js",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/postcss-js",
+          "version": "4.0.1",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "postcss"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss-load-config",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/postcss-load-config",
+          "version": "4.0.2",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "postcss"
+        },
+        {
+          "viaPackage": "yaml"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss-nested",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/postcss-nested",
+          "version": "6.2.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "postcss"
+        },
+        {
+          "viaPackage": "postcss-selector-parser"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "postcss-selector-parser",
+      "severity": "low",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/postcss-selector-parser",
+          "version": "6.1.2",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "postcss-selector-parser allows denial of service through uncontrolled AST recursion",
+          "url": "https://github.com/advisories/GHSA-w9m9-85wc-3x92",
+          "severity": "low",
+          "range": ">=6.1.0 <6.1.3"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "react-router",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/react-router",
+          "version": "6.30.1",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Router is bundled. Application uses BrowserRouter with fixed / and * routes; no data router, SSR hydration, untrusted redirect, Link or useNavigate input found. Advisory exploit paths not identified in current app.",
+      "releaseSeverity": "MEDIUM",
+      "releaseBlocking": false,
+      "recommendation": "Prioritize a separately reviewed router security update with navigation and production regression tests.",
+      "advisories": [
+        {
+          "viaPackage": "@remix-run/router"
+        },
+        {
+          "title": "React Router has unexpected external redirect via untrusted paths",
+          "url": "https://github.com/advisories/GHSA-9jcx-v3wj-wh4m",
+          "severity": "moderate",
+          "range": ">=6.0.0 <6.30.2"
+        },
+        {
+          "title": "React Router: Open redirect via backslash in <Link> and useNavigate (CVE-2025-68470 bypass)",
+          "url": "https://github.com/advisories/GHSA-wrjc-x8rr-h8h6",
+          "severity": "moderate",
+          "range": ">=6.0.0 <7.18.0"
+        },
+        {
+          "title": "React Router: Arbitrary Constructor Injection via deserializeErrors() in React Router SSR Hydration",
+          "url": "https://github.com/advisories/GHSA-337j-9hxr-rhxg",
+          "severity": "moderate",
+          "range": ">=6.4.0 <7.18.0"
+        },
+        {
+          "title": "React Router's same-origin redirect with path starting // causes open redirect via protocol-relative URL reinterpretation",
+          "url": "https://github.com/advisories/GHSA-2j2x-hqr9-3h42",
+          "severity": "moderate",
+          "range": ">=6.7.0 <6.30.4"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "react-router-dom",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/react-router-dom",
+          "version": "6.30.1",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Router is bundled. Application uses BrowserRouter with fixed / and * routes; no data router, SSR hydration, untrusted redirect, Link or useNavigate input found. Advisory exploit paths not identified in current app.",
+      "releaseSeverity": "MEDIUM",
+      "releaseBlocking": false,
+      "recommendation": "Prioritize a separately reviewed router security update with navigation and production regression tests.",
+      "advisories": [
+        {
+          "viaPackage": "@remix-run/router"
+        },
+        {
+          "viaPackage": "react-router"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "readdirp",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/readdirp",
+          "version": "3.6.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "picomatch"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "recharts",
+      "severity": "moderate",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/recharts",
+          "version": "2.15.4",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Installed dependency, but recharts/chart is not reachable from src/main.tsx; no lodash imports in application or Worker.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Review removal or update in dependency-maintenance phase.",
+      "advisories": [
+        {
+          "viaPackage": "lodash"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "rollup",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/rollup",
+          "version": "4.24.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "Rollup 4 has Arbitrary File Write via Path Traversal",
+          "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc",
+          "severity": "high",
+          "range": ">=4.0.0 <4.59.0"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "sucrase",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/sucrase",
+          "version": "3.35.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "glob"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "tailwindcss",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/tailwindcss",
+          "version": "3.4.17",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "chokidar"
+        },
+        {
+          "viaPackage": "fast-glob"
+        },
+        {
+          "viaPackage": "micromatch"
+        },
+        {
+          "viaPackage": "postcss"
+        },
+        {
+          "viaPackage": "postcss-import"
+        },
+        {
+          "viaPackage": "postcss-js"
+        },
+        {
+          "viaPackage": "postcss-load-config"
+        },
+        {
+          "viaPackage": "postcss-nested"
+        },
+        {
+          "viaPackage": "postcss-selector-parser"
+        },
+        {
+          "viaPackage": "sucrase"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "tailwindcss-animate",
+      "severity": "low",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/tailwindcss-animate",
+          "version": "1.0.7",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "tailwindcss"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "typescript-eslint",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/typescript-eslint",
+          "version": "8.38.0",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "@typescript-eslint/eslint-plugin"
+        },
+        {
+          "viaPackage": "@typescript-eslint/parser"
+        },
+        {
+          "viaPackage": "@typescript-eslint/typescript-estree"
+        },
+        {
+          "viaPackage": "@typescript-eslint/utils"
+        },
+        {
+          "viaPackage": "eslint"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "update-browserslist-db",
+      "severity": "high",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/update-browserslist-db",
+          "version": "1.1.3",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "viaPackage": "browserslist"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "vite",
+      "severity": "high",
+      "direct": true,
+      "installed": [
+        {
+          "path": "node_modules/vite",
+          "version": "5.4.19",
+          "dev": true
+        }
+      ],
+      "dependencyClass": "dev",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "Vite middleware may serve files starting with the same name with the public directory",
+          "url": "https://github.com/advisories/GHSA-g4jq-h2w9-997c",
+          "severity": "low",
+          "range": "<=5.4.19"
+        },
+        {
+          "title": "Vite's `server.fs` settings were not applied to HTML files",
+          "url": "https://github.com/advisories/GHSA-jqfw-vq24-v9c3",
+          "severity": "low",
+          "range": "<=5.4.19"
+        },
+        {
+          "title": "vite allows server.fs.deny bypass via backslash on Windows",
+          "url": "https://github.com/advisories/GHSA-93m4-6634-74q7",
+          "severity": "moderate",
+          "range": ">=5.2.6 <=5.4.20"
+        },
+        {
+          "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+          "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+          "severity": "moderate",
+          "range": "<=6.4.1"
+        },
+        {
+          "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+          "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+          "severity": "moderate",
+          "range": "<=6.4.2"
+        },
+        {
+          "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+          "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+          "severity": "high",
+          "range": "<=6.4.2"
+        },
+        {
+          "viaPackage": "esbuild"
+        },
+        {
+          "viaPackage": "postcss"
+        },
+        {
+          "viaPackage": "rollup"
+        }
+      ],
+      "fixAvailableReported": false
+    },
+    {
+      "name": "yaml",
+      "severity": "moderate",
+      "direct": false,
+      "installed": [
+        {
+          "path": "node_modules/yaml",
+          "version": "2.6.0",
+          "dev": false
+        }
+      ],
+      "dependencyClass": "production-or-shared-tree",
+      "productionReachability": "Build, CSS, lint or file-watching dependency; not imported by runtime application/Worker. Some packages are classified production/shared by lockfile through tailwindcss-animate peer dependency, not browser reachability.",
+      "releaseSeverity": "LOW",
+      "releaseBlocking": false,
+      "recommendation": "Update tooling in a separate dependency-maintenance phase; keep development/preview servers on loopback and do not process untrusted build inputs.",
+      "advisories": [
+        {
+          "title": "yaml is vulnerable to Stack Overflow via deeply nested YAML collections",
+          "url": "https://github.com/advisories/GHSA-48c2-rrv3-qjmp",
+          "severity": "moderate",
+          "range": ">=2.0.0 <2.8.3"
+        }
+      ],
+      "fixAvailableReported": false
+    }
+  ]
+}

@@ -1,27 +1,71 @@
-# dw2speedrunplanner
+# Digimon World 2 — Run Planner & Battle Simulator
 
-The idea is to allow the user to create a team to fight one of the many preset enemy teams.
-When creating a team, the user needs to pick up to 3 Digimon from the Digimon list and set their stats (Hp, Mp, Atk, Def, Spd) and up to 12 techs (also from a list). Multiple user teams can be saved for later use. After creating the team and picking the enemy team, the user can pick the floor specialty and simulate the battle a set number times (1 milion as default). The app will then simulate the battle, following the battle mechanics rules and record the fight statistics: min number of turns taken to finish (turn = each time a Digimon does something), min number of rounds taken to finish (round = each time all alive Digimon do something), and the entire turn history (Digimon, tech used, tech target, damage dealt) for the simulated battle that had the min amount of turns. Use the english language.
+An unofficial fan-made tool for planning routes and exploring battle strategies in Digimon World 2.
 
-This project was built with [Lovable](https://lovable.dev).
+[Live app](https://dw2speedrunplanner.lovable.app/) · [Source](https://github.com/glory-seeker-hub/dw2speedrunplanner) · [Issues and suggestions](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues)
 
-**Live app**: https://dw2speedrunplanner.lovable.app
+The published app may lag behind this repository. The current source includes Run Planner and Backup / Import; see [release readiness](docs/phase-2m-b/PRE_RELEASE_AUDIT.md) for the audited candidate and outstanding launch checks.
 
-## Build with Lovable
+## What you can do
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/25d3eac6-b6d9-426b-a521-6519eab7d5f0).
+- Create multiple saved runs, choose a starter, manage the roster and active Digiline, and track battles, growth, digivolution, DNA and trades.
+- Browse story encounters and Coliseum ranks. Use **Analyze Battle** to send a historical pre-battle copy to the Simulator without changing the run.
+- Build a manual team with customized stats and techniques.
+- Run Random Monte Carlo or Optimized Action Search, choose Fastest Potential, Average Victory or Success Rate, and inspect recommended orders, replay and search details.
+- Export a readable route for Print / Save as PDF, download a simulation Markdown report, or export restorable JSON backups.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Open **About → How to Use** for the complete guide, including Search Quality, Thoroughness, accuracy and the narrow supported scope of TAS Luck.
 
-## Development
+## Saved data and backups
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Planner runs are stored in this browser's local storage, on this site's origin. There are no accounts, cloud sync or automatic backups. Clearing site data, changing browsers or using a different origin can make your runs unavailable. Saved manual teams are session-only.
+
+Use **Run Planner → Backup / Import → Export Current Run** or **Export All Runs** to keep a copy outside the browser. Import validates a local JSON file and shows a preview before confirmation. It adds new runs, preserves existing runs, and gives conflicting names an Imported suffix. Cancel leaves saved runs unchanged.
+
+**Export Route is a readable document, not a restorable backup.** Simulation exports describe a frozen result, not a Planner save. Current formats are Planner schema 7, Simulation Report 1 and Backup Format 1.
+
+## Interpreting results
+
+Search is bounded and sampled. Fastest Route Found is the fastest winning execution observed in that search, not proof of a global optimum. Higher budgets and Standard, Thorough or Maximum thoroughness can increase coverage without improving the result. A search may finish with unused budget.
+
+The model excludes external menu/order-entry overhead. Player HP/MP depletion does not stop the offensive simulation; required recovery, revival, Guard or item actions are not inserted or counted. Read resource alerts and effect diagnostics before treating a result as an in-game route. TAS Luck controls only supported modeled status outcomes, not all RNG.
+
+Planner and backup processing are client-side. This is a static web app, not an offline PWA; a first load and uncached assets still require network access.
+
+## Local development
+
+Use Node.js and npm. No production environment variables, API credentials or backend are required.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+git clone https://github.com/glory-seeker-hub/dw2speedrunplanner.git
+cd dw2speedrunplanner
+npm ci
 npm run dev
 ```
+
+Use the URL printed by Vite. To test the production build locally:
+
+```sh
+npm run build
+npm run preview -- --host 127.0.0.1
+```
+
+The static output is `dist/`. Keep the Worker and other generated assets with the HTML. Deployments should serve the root and provide the SPA fallback for unknown paths. Publishing is a separate reviewed step.
+
+## Verification and feedback
+
+```sh
+node --test tests/*.test.cjs
+npx tsc -p tsconfig.app.json --noEmit
+npx tsc -p tsconfig.node.json --noEmit
+node scripts/checkBattleSkills.cjs
+node scripts/checkBattleEffectCoverage.cjs
+npm run lint
+npm audit
+```
+
+The release audit records the lint baseline and dependency findings; a nonzero lint/audit exit is not silently ignored. Workbook verification is optional for ordinary local use and requires the external source workbook: `python scripts/importBattleSkills.py "path/to/DW2 Modding Info.xlsx" --check`.
+
+Report bugs and suggestions through [GitHub Issues](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues), with reproduction steps, browser and relevant settings. Share a backup only if you intend to disclose its run names and route contents. At the audit date, the canonical GitHub pages returned 404 to signed-out visitors; public access must be verified before launch.
+
+Created by GlorySeeker, initially built with [Lovable](https://lovable.dev). Unofficial fan-made tool. Not affiliated with or endorsed by Bandai, Toei Animation, or the rights holders of Digimon.
