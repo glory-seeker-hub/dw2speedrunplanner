@@ -2,7 +2,7 @@ import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, SEARCH_STOP_LABELS } from '@/ut
 import { rngRequirementText } from '@/utils/battle/battleRngAudit';
 import type { OptimizedSearchResult } from '@/utils/battle/battleOptimizedSearch';
 import { OBJECTIVE_LABELS } from '@/utils/battle/battleSearchObjectives';
-import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, type DisplayCombatant } from '@/utils/battle/battlePresentation';
+import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, resolvedOrderTarget, type DisplayCombatant } from '@/utils/battle/battlePresentation';
 const value = (n: number | null) => n === null ? 'Unavailable' : n.toLocaleString('en-US', { maximumFractionDigits: 1 });
 export function OptimizedSearchResults({ result, combatants = [] }: { result: OptimizedSearchResult; combatants?: readonly DisplayCombatant[] }) {
   const fastest = result.objective === 'fastest-potential', route = result.fastestRoute, stats = result.recommendedStats;
@@ -22,9 +22,9 @@ export function OptimizedSearchResults({ result, combatants = [] }: { result: Op
     </section>
     <section aria-label="Recommended Player actions" className="rounded-lg border p-4 space-y-3">
       <h3 className="text-lg font-semibold">{fastest ? 'Recommended Player Orders' : 'Recommended Player Strategy'}</h3>
-      <p className="text-sm">{fastest ? 'Exact intended orders of the fastest observed route' : `${strategyTitle(result.objective)} — selected fair prefix`}</p>
+      <p className="text-sm">{fastest ? 'Player orders with resolved targets from the fastest observed route' : `${strategyTitle(result.objective)} — selected fair prefix`}</p>
       {!plans.length && <p>No intended orders retained.</p>}
-      {plans.map(plan => <div key={plan.key} className="space-y-2"><h4 className="font-semibold">Round {plan.round}</h4><ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{plan.orders.map(o => <li key={o.key} className="rounded bg-muted/30 p-3 text-sm break-words"><p className="font-semibold">{combatantLabel(combatants, o.actorId, o.actorName)}</p><p>{o.skillName} → {intendedTarget(o, combatants)}</p>{fastest && route && !route.actions.some(a => a.round === plan.round && a.actorId === o.actorId && a.state === 'resolved') && <p>Planned — not executed in retained execution</p>}</li>)}</ul></div>)}
+      {plans.map(plan => <div key={plan.key} className="space-y-2"><h4 className="font-semibold">Round {plan.round}</h4><ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{plan.orders.map(o => <li key={o.key} className="rounded bg-muted/30 p-3 text-sm break-words"><p className="font-semibold">{combatantLabel(combatants, o.actorId, o.actorName)}</p><p>{o.skillName} → {fastest && route ? resolvedOrderTarget(o, plan.round, route.actions, combatants).label : intendedTarget(o, combatants)}</p>{fastest && route && !resolvedOrderTarget(o, plan.round, route.actions, combatants).executed && <p>Planned — not executed in retained execution</p>}</li>)}</ul></div>)}
       <p className="text-sm text-muted-foreground">{RESULT_HELP.fair}</p>
     </section>
     {tas && !!route?.rngRequirements?.length && <section aria-label="TAS Requirements" className="rounded-lg border p-4 space-y-2"><h3 className="font-semibold">TAS Requirements</h3>{!fastest && <p>Requirements for the retained Fastest Route observation; these do not establish requirements for the selected screened strategy.</p>}{route.rngRequirements.map((r, i) => <p key={i}>Round {r.round} · {combatantLabel(combatants, r.actorId, r.actorName)} · {r.skillName} → {combatantLabel(combatants, r.targetId, r.targetName)}: {rngRequirementText(r)}</p>)}</section>}

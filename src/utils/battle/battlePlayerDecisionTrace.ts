@@ -27,12 +27,12 @@ export function createPlayerDecisionTrace() {
       const order: PlayerOrder = { actorId: actor.id, actorName: actor.name, skillKey: action.skill.key,
         canonicalSkillId: action.skill.canonicalSkillId, skillName: skill?.name ?? action.skill.legacyTech.name,
         targetIntent: structuredClone(action.targetIntent),
-        targetLabel: action.guard ? 'None' : randomTarget(action.skill) || necroTarget(action.skill) ? 'Random / engine policy' : self ? 'Self' : action.kind !== 'attack' ? 'Engine policy' : label(state, action.targetIntent), key: '' };
+        targetLabel: action.guard ? 'None' : randomTarget(action.skill) || necroTarget(action.skill) ? 'Random / engine policy' : self ? 'Self' : action.targetIntent.kind === 'combatants' || action.kind === 'attack' ? label(state, action.targetIntent) : 'Engine policy', key: '' };
       plan.orders.push(order); byAction.set(action.id, { order, plan, controlledSingle }); refresh(plan);
     },
     selectedTargets(state, action: PlannedAction, targetIds) {
       const entry = byAction.get(action.id);
-      if (!entry?.controlledSingle || !targetIds.length) return;
+      if (!entry?.controlledSingle || !targetIds.length || entry.order.targetIntent?.kind === 'combatants') return;
       // The engine calls this only for original, non-Confusion selections. Causal reaction targets are not inputs.
       entry.order.targetIntent = { kind: 'combatants', targetIds: [...targetIds] };
       entry.order.targetLabel = label(state, entry.order.targetIntent); refresh(entry.plan);

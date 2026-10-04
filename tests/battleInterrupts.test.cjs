@@ -5,7 +5,7 @@ const data=load('src/data/battleSkills.ts');
 const {createBattleState,linkLegacySkill}=load('src/utils/battle/battleInput.ts');
 const {planAction}=load('src/utils/battle/battleActions.ts');
 const {calculateActionOrder}=load('src/utils/battle/battleOrder.ts');
-const {potentiallyInterruptible,refreshPlayerReservations,reduceInterruptedDamage}=load('src/utils/battle/battleInterrupts.ts');
+const {potentiallyInterruptible,claimInterrupt,reduceInterruptedDamage}=load('src/utils/battle/battleInterrupts.ts');
 const {getStatusImmunity}=load('src/utils/battle/battleImmunity.ts');
 const {calculateActionDamage}=load('src/utils/battle/battleDamage.ts');
 const {createSeededBattleRng,createSequenceBattleRng}=load('src/utils/battle/battleRng.ts');
@@ -46,17 +46,17 @@ test('single Interrupt executor consumes no executor-choice RNG',()=>{const rand
 test('Enemy first-attacker follows actual initiative and skips earlier Miss',()=>{
  const random=rng({accuracy:[127,0,0,0]});const r=run([unit('Slow','Rock Fist',{spd:30}),unit('Fast','Rock Fist',{spd:100})],[I()],{rng:random});assert.equal(executed(r)[0].actorName,'Fast');assert.equal(ints(r)[0].interrupt.targetActorId,'player-0');
 });
-for(const pick of [0,1,2])test(`Player action reservation chooses ${pick} independently of SPD`,()=>{
- const random=rng({'interrupt-target-choice':[pick]});const r=run([I()],[unit('E0','Rock Fist',{spd:60}),unit('E1'),unit('E2','Rock Fist',{spd:20})],{rng:random});assert.equal(ints(r)[0].interrupt.targetActorId,`enemy-${pick}`);assert.equal(ints(r)[0].interrupt.targetPolicy,'player-random');assert.equal(random.draws.filter(d=>d.category==='interrupt-target-choice').length,1);
+for(const pick of [0,1,2])test(`Player explicitly selects ${pick} independently of SPD`,()=>{
+ const random=rng();const r=run([I()],[unit('E0','Rock Fist',{spd:60}),unit('E1'),unit('E2','Rock Fist',{spd:20})],{rng:random,playerDecisions:{beforeRound:()=>{},chooseAction:a=>({kind:'skill',skillKey:a.skills[0].key,targetIntent:{kind:'combatants',targetIds:[`enemy-${pick}`]}})}});assert.equal(ints(r)[0].interrupt.targetActorId,`enemy-${pick}`);assert.equal(ints(r)[0].interrupt.targetPolicy,'player-selected');assert.equal(random.draws.filter(d=>d.category==='interrupt-target-choice').length,0);
 });
-test('two Player reservations without replacement, executor chosen at claim time',()=>{
- const random=rng({'interrupt-target-choice':[1,0],'interrupt-user-choice':[1]});const r=run([I('I0'),I('I1')],[unit('E0'),unit('E1','Rock Fist',{spd:30})],{rng:random});assert.equal(ints(r)[0].actorName,'I1');assert.deepEqual(ints(r).map(a=>a.interrupt.targetActorId),['enemy-0','enemy-1']);assert.equal(new Set(ints(r).map(a=>a.interrupt.targetActionId)).size,2);assert.equal(random.draws.filter(d=>d.category==='interrupt-user-choice').length,1);
+test('two Player users honor their separate selected enemies',()=>{
+ const random=rng();const r=run([I('I0'),I('I1')],[unit('E0'),unit('E1','Rock Fist',{spd:30})],{rng:random,playerDecisions:{beforeRound:()=>{},chooseAction:a=>({kind:'skill',skillKey:a.skills[0].key,targetIntent:{kind:'combatants',targetIds:[a.name==='I0'?'enemy-1':'enemy-0']}})}});assert.equal(ints(r)[0].actorName,'I1');assert.deepEqual(ints(r).map(a=>a.interrupt.targetActorId),['enemy-0','enemy-1']);assert.equal(new Set(ints(r).map(a=>a.interrupt.targetActionId)).size,2);assert.equal(random.draws.filter(d=>d.category==='interrupt-user-choice').length,0);
 });
-test('reserved initial Miss releases reservation without consuming user and chooses remaining opportunity',()=>{
- const random=rng({'interrupt-target-choice':[0,0],accuracy:[127,0,0,0]});const r=run([I()],[unit('E0'),unit('E1','Rock Fist',{spd:30})],{rng:random});assert.equal(ints(r).length,1);assert.equal(ints(r)[0].interrupt.targetActorId,'enemy-1');assert.equal(random.draws.filter(d=>d.category==='interrupt-target-choice').length,2);
+test('selected initial Miss never retargets to the next hitting enemy',()=>{
+ const random=rng({accuracy:[127,0,0,0]});const r=run([I()],[unit('E0'),unit('E1','Rock Fist',{spd:30})],{rng:random});assert.equal(ints(r).length,0);assert.equal(random.draws.filter(d=>d.category==='interrupt-target-choice').length,0);assert.equal(r.actions.find(a=>a.kind==='interrupt').reason,'interrupt-no-eligible-target');
 });
-test('dead/promoted reservation invalidation preserves waiting executor and selects another action',()=>{
- for(const invalid of ['ko','activated','shared-trigger-promoted']){const {state,actions}=prepare([I()],[unit('Counter','Beast King Fist'),unit('E')]);const reserved=new Set([actions[1].id]);if(invalid==='ko')state.combatants[1].isAlive=false;else actions[1].counter.executionMode=invalid;const random=rng();refreshPlayerReservations(state,reserved,random);assert.deepEqual([...reserved],[actions[2].id]);assert.equal(actions[0].interrupt.state,'waiting');}
+test('dead/promoted selected enemy leaves intention waiting without retargeting',()=>{
+ for(const invalid of ['ko','activated','shared-trigger-promoted']){const {state,actions}=prepare([I()],[unit('Counter','Beast King Fist'),unit('E')]);if(invalid==='ko')state.combatants[1].isAlive=false;else actions[1].counter.executionMode=invalid;for(const a of actions.slice(1))a.prepared={initialAccuracy:{outcome:'hit'}};const random=rng();assert.equal(claimInterrupt(state,actions[1],random),null);assert.equal(claimInterrupt(state,actions[2],random),null);assert.deepEqual(actions[0].targetIntent.targetIds,['enemy-0']);assert.equal(actions[0].interrupt.state,'waiting');}
 });
 for(const status of ['paralysis','confusion'])test(`Interrupt user's ${status} remains; no recovery or Confusion behavior`,()=>{
  const random=rng({'paralysis-failure':[0]});const r=run([unit()],[I('I',0xa1,{}, {[status]:true})],{rng:random}),a=ints(r)[0];assert.equal(a.outcome,'hit');assert.equal(a.statusRecoveries.length,0);assert.equal(a.confusion.redirected,false);assert.equal(a.confusion.skipped,false);assert.equal(r.state.combatants[1].statuses[status],true);assert.ok(!random.draws.some(d=>d.category.startsWith('status-recovery')||d.category.startsWith('confusion-')));

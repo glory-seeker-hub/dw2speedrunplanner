@@ -1,0 +1,468 @@
+[
+  {
+    "name": "Explicit Interrupt",
+    "input": {
+      "player": [
+        {
+          "digimon": {
+            "id": "Kabuterimon",
+            "name": "Kabuterimon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-161",
+              "name": "Wing Blade",
+              "ap": 35,
+              "element": "Nature",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 161
+            }
+          ]
+        }
+      ],
+      "enemy": [
+        {
+          "digimon": {
+            "id": "Centarumon",
+            "name": "Centarumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 80
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 5,
+          "stats": {
+            "spd": 80
+          }
+        },
+        {
+          "digimon": {
+            "id": "Gabumon",
+            "name": "Gabumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 50
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 5,
+          "stats": {
+            "spd": 50
+          }
+        }
+      ],
+      "floorSpecialty": "None"
+    }
+  },
+  {
+    "name": "Counter original target",
+    "input": {
+      "player": [
+        {
+          "digimon": {
+            "id": "P-Mamemon",
+            "name": "P-Mamemon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-136",
+              "name": "Smiley Warhead",
+              "ap": 40,
+              "element": "Machine",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 136
+            }
+          ]
+        }
+      ],
+      "enemy": [
+        {
+          "digimon": {
+            "id": "Centarumon",
+            "name": "Centarumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-193",
+              "name": "Armor Coating",
+              "ap": 0,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 193
+            }
+          ],
+          "currentHp": 5
+        },
+        {
+          "digimon": {
+            "id": "Gabumon",
+            "name": "Gabumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-193",
+              "name": "Armor Coating",
+              "ap": 0,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 193
+            }
+          ],
+          "currentHp": 5
+        }
+      ],
+      "floorSpecialty": "None"
+    }
+  },
+  {
+    "name": "Counter activated AoE",
+    "input": {
+      "player": [
+        {
+          "digimon": {
+            "id": "P-Mamemon",
+            "name": "P-Mamemon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 40
+          },
+          "techs": [
+            {
+              "id": "waza-136",
+              "name": "Smiley Warhead",
+              "ap": 40,
+              "element": "Machine",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 136
+            }
+          ]
+        }
+      ],
+      "enemy": [
+        {
+          "digimon": {
+            "id": "Centarumon",
+            "name": "Centarumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 80
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 5,
+          "stats": {
+            "spd": 80
+          }
+        },
+        {
+          "digimon": {
+            "id": "Gabumon",
+            "name": "Gabumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 50
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 5,
+          "stats": {
+            "spd": 50
+          }
+        }
+      ],
+      "floorSpecialty": "None"
+    }
+  },
+  {
+    "name": "Assist recipient and ordinary Attack",
+    "input": {
+      "player": [
+        {
+          "digimon": {
+            "id": "Support",
+            "name": "Support",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 100
+          },
+          "techs": [
+            {
+              "id": "waza-188",
+              "name": "Small HP Cure",
+              "ap": 0,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 188
+            }
+          ],
+          "stats": {
+            "spd": 100
+          }
+        },
+        {
+          "digimon": {
+            "id": "Agumon",
+            "name": "Agumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 100,
+            "def": 20,
+            "spd": 20
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 10,
+          "stats": {
+            "spd": 20,
+            "atk": 100
+          }
+        }
+      ],
+      "enemy": [
+        {
+          "digimon": {
+            "id": "Gabumon",
+            "name": "Gabumon",
+            "type": "Data",
+            "specialty": "None",
+            "baseStats": {
+              "hp": 80,
+              "mp": 50,
+              "atk": 20,
+              "def": 20,
+              "spd": 20
+            }
+          },
+          "customStats": {
+            "hp": 1000,
+            "mp": 100,
+            "atk": 20,
+            "def": 20,
+            "spd": 60
+          },
+          "techs": [
+            {
+              "id": "waza-6",
+              "name": "Rock Fist",
+              "ap": 20,
+              "element": "None",
+              "target": "Single",
+              "isCounter": false,
+              "canonicalSkillId": 6
+            }
+          ],
+          "currentHp": 60,
+          "stats": {
+            "spd": 60
+          }
+        }
+      ],
+      "floorSpecialty": "None"
+    }
+  }
+]

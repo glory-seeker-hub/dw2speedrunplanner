@@ -12,35 +12,23 @@ export function potentiallyInterruptible(state: BattleState, action: PlannedActi
   return !counterDefinition(action)?.effects.some(e => e.kind === 'action-protection' && e.against === 'interrupt');
 }
 const waitingUsers = (state: BattleState, side: BattleSide) => state.plannedActions.filter(a => a.round === state.round
+  && ['planned', 'waiting'].includes(a.state)
   && actorById(state, a.actorId).revivedRound !== state.round && a.interrupt?.state === 'waiting' && actorById(state, a.actorId).side === side && actorById(state, a.actorId).isAlive
   && canPayRequiredMp(actorById(state, a.actorId), a.skill));
 
-/** Reservations belong to target opportunities, not to an executor. */
-export function refreshPlayerReservations(state: BattleState, reserved: Set<string>, rng: BattleRng): void {
-  const candidates = state.queue.map(id => state.plannedActions.find(a => a.id === id)!)
-    .filter(a => actorById(state, a.actorId).side === 'enemy' && potentiallyInterruptible(state, a));
-  for (const id of reserved) if (!candidates.some(a => a.id === id)) reserved.delete(id);
-  const count = waitingUsers(state, 'player').length;
-  const available = candidates.filter(a => !reserved.has(a.id));
-  while (reserved.size < count && available.length) {
-    const index = rng.nextIntExclusive(available.length, 'interrupt-target-choice');
-    reserved.add(available.splice(index, 1)[0].id);
-  }
-}
-export function claimInterrupt(state: BattleState, target: PlannedAction, reserved: Set<string>, rng: BattleRng): PlannedAction | null {
+/** The queue supplies opportunities in execution order; Player users match their fixed intention. */
+export function claimInterrupt(state: BattleState, target: PlannedAction, rng: BattleRng): PlannedAction | null {
   const prep = target.prepared;
-  if (!prep || prep.initialAccuracy.outcome !== 'hit' || !potentiallyInterruptible(state, target)) { reserved.delete(target.id); return null; }
+  if (!prep || prep.initialAccuracy.outcome !== 'hit' || !potentiallyInterruptible(state, target)) return null;
   const side = actorById(state, target.actorId).side === 'player' ? 'enemy' : 'player';
-  if (side === 'player' && !reserved.has(target.id)) return null;
-  const users = waitingUsers(state, side);
+  const users = waitingUsers(state, side).filter(a => side === 'enemy' || a.targetIntent.kind === 'combatants' && a.targetIntent.targetIds.includes(target.actorId));
   if (!users.length) return null;
   const user = users.length === 1 ? users[0] : users[rng.nextIntExclusive(users.length, 'interrupt-user-choice')];
-  reserved.delete(target.id);
   user.interrupt!.state = 'executing'; user.interrupt!.targetActionId = target.id; user.interrupt!.interruptedActorId = target.actorId;
-  user.targetIntent = { kind: 'combatants', targetIds: [target.actorId] }; user.state = 'planned';
+  user.state = 'planned';
   prep.interruptConsumed = true; prep.interruptedByActionId = user.id;
   prep.resolution = { targetActionId: target.id, targetActorId: target.actorId, targetActorName: actorById(state, target.actorId).name,
-    executorId: user.actorId, targetPolicy: side === 'player' ? 'player-random' : 'enemy-first-attacker', initialTargetOutcome: 'hit',
+    executorId: user.actorId, targetPolicy: side === 'player' ? 'player-selected' : 'enemy-first-attacker', initialTargetOutcome: 'hit',
     restarted: false, cancelled: false, sentLast: false };
   state.queue.unshift(user.id, target.id);
   return user;

@@ -184,7 +184,7 @@ test('policy-selected Assist keeps canonical kind and applies authoritative supp
 test('Interrupt canonical identity uses scheduled execution with measured prelude-inclusive timing', () => {
   const r = run([member('P', [tech('Electro Shocker')], { spd: 100 })], cases.single[1]);
   const a = executed(r)[0]; assert.equal(a.kind, 'interrupt'); assert.equal(a.canonicalSkillId, 0xa0);
-  assert.equal(assessBattleSkill(r.state.combatants[0].skills[0]).level, 'supported'); assert.equal(a.interrupt.targetPolicy,'player-random'); assert.equal(a.durationFrames,761);
+  assert.equal(assessBattleSkill(r.state.combatants[0].skills[0]).level, 'supported'); assert.equal(a.interrupt.targetPolicy,'player-selected'); assert.equal(a.durationFrames,761);
 });
 test('synthetic fallback is explicit, noncanonical and only for manual compatibility', () => {
   const r = run([member('P', [], { spd: 100 })], cases.single[1]); const a = executed(r)[0];

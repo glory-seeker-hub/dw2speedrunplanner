@@ -1,6 +1,7 @@
 import type { BattleSimulationReport, DeepReadonly } from './battleSimulationReport';
 import type { PlayerOrder } from './battleActionPlans';
 import type { OptimizationObjective } from './battleSearchObjectives';
+import type { BattleActionRecord } from './battleTypes';
 
 /** Presentation only; no ranking, simulation or mutation. */
 export const RESULT_HELP = {
@@ -27,6 +28,13 @@ export function intendedTarget(o: DeepReadonly<PlayerOrder>, team: readonly Disp
   if (/random/i.test(o.targetLabel)) return 'Random target';
   if (o.targetIntent?.kind === 'combatants') return o.targetIntent.targetIds.map(id => combatantLabel(team, id, /[0-9a-f]{8}-|player-instance-/i.test(o.targetLabel) ? 'Unknown combatant' : o.targetLabel)).join(', ');
   return o.targetLabel === 'All' ? 'All Enemies' : o.targetLabel;
+}
+/** A retained execution is evidence for this round's order, never for a screened strategy. */
+export function resolvedOrderTarget(o: DeepReadonly<PlayerOrder>, round: number, actions: readonly DeepReadonly<BattleActionRecord>[], team: readonly DisplayCombatant[]) {
+  const action = actions.find(a => a.round === round && a.actorId === o.actorId && !a.chainFromActionId && a.state === 'resolved');
+  if (!action) return { label: intendedTarget(o, team), executed: false };
+  const ids = action.effectiveTargetIds;
+  return { label: ids.length ? ids.map(id => combatantLabel(team, id)).join(', ') : intendedTarget(o, team), executed: true };
 }
 export function replayExplanation(r: BattleSimulationReport): string {
   if (!r.executedBattle.actions.length) return 'No completed victory replay was retained.';

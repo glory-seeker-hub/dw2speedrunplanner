@@ -1,8 +1,8 @@
 import { createPlayerDecisionTrace } from './battlePlayerDecisionTrace';
-import { MOTIVATION_GUARD, initializeMotivation, randomTarget, necroTarget } from './battleEffectCompletion';
+import { initializeMotivation } from './battleEffectCompletion';
 import { getBattleSkillById } from '@/data/battleSkills';
 import { selectableSkills } from './battleActions';
-import { selectableSingleOpponents } from './battleTargets';
+import { playerTargetChoices } from './battlePlayerTargets';
 import { completedOutcome } from './battleState';
 import { createBattleState } from './battleInput';
 import { simulateBattleCore } from './battleSimulation';
@@ -23,11 +23,7 @@ export function enumerateLegalPlayerOrders(state: BattleState, actor: BattleComb
   const orders = new Map<string, PlayerOrder>();
   for (const skill of selectableSkills(actor, state.combatants)) {
     const canonical = getBattleSkillById(skill.canonicalSkillId ?? -1);
-    const policyTarget = skill.kind !== 'attack' || canonical?.targetGroup === 'self'
-      || canonical?.effects.some(e => e.kind === 'target-mode-modifier' && e.mode === 'random-digimon');
-    const targets: { intent?: TargetIntent; label: string }[] = policyTarget ? [{ label: skill === MOTIVATION_GUARD ? 'None' : randomTarget(skill) || necroTarget(skill) ? 'Random / engine policy' : canonical?.targetGroup === 'self' ? 'Self' : 'Engine policy' }]
-      : skill.legacyTech.target === 'All' ? [{ label: 'All' }]
-      : selectableSingleOpponents(state, actor.id).map(t => ({ intent: { kind: 'combatants', targetIds: [t.id] }, label: t.name }));
+    const targets = playerTargetChoices(state.combatants, actor, skill);
     for (const target of targets) {
       // Include resource/effect semantics, but aliases of the same actual decision deduplicate.
       const semantics: Record<string, unknown> = { ...skill.legacyTech };

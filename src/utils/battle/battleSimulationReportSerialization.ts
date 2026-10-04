@@ -1,5 +1,5 @@
 import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, SEARCH_STOP_LABELS } from './battlePresentation';
-import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, replayExplanation, replayLimitation } from './battlePresentation';
+import { RESULT_HELP, strategyTitle, strategyHelp, combatantLabel, intendedTarget, resolvedOrderTarget, replayExplanation, replayLimitation } from './battlePresentation';
 import { isColiseumLocation } from '@/data/coliseumBattles';
 import type { BattleSimulationReport, DeepReadonly } from './battleSimulationReport';
 import type { PlayerRoundPlan, PlayerOrder } from './battleActionPlans';
@@ -35,12 +35,13 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   const field = (label: string, value: string | number | undefined | null) => { if (value !== undefined && value !== null) lines.push(`- ${label}: ${reportText(value)}`); };
   const combatants = [...report.playerTeam, ...report.enemyTeam];
   const actorLabel = (id: string) => combatantLabel(combatants, id);
-  const order = (o: DeepReadonly<PlayerOrder>) => {
-    const target = intendedTarget(o, combatants);
+  const order = (o: DeepReadonly<PlayerOrder>, round?: number) => {
+    const resolved = round === undefined ? null : resolvedOrderTarget(o, round, report.executedBattle.actions, combatants);
+    const target = resolved ? resolved.label + (resolved.executed ? '' : ' · Planned — not executed in retained execution') : intendedTarget(o, combatants);
     return `${reportText(actorLabel(o.actorId))} — ${reportText(o.skillName)} → ${reportText(target)}`;
   };
-  const orders = (plans: DeepReadonly<PlayerRoundPlan[]>) => {
-    for (const p of plans) { lines.push('', `### Round ${p.round}`, ''); for (const o of p.orders) lines.push(`- ${order(o)}`); }
+  const orders = (plans: DeepReadonly<PlayerRoundPlan[]>, concrete = false) => {
+    for (const p of plans) { lines.push('', `### Round ${p.round}`, ''); for (const o of p.orders) lines.push(`- ${order(o, concrete ? p.round : undefined)}`); }
   };
   const statistics = (s: DeepReadonly<import('./battleSearchObjectives').OptimizedCandidateStats> | null) => {
     if (!s) { lines.push('No completed fair-stage statistics retained.'); return; }
@@ -125,14 +126,14 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     lines.push('', 'Fair prefix orders (distinct from the global fastest observation):'); orders(selected.screenedPrefix.plans);
     if (selected.topCandidates.length) {
       lines.push('', '### Top Screened Strategies', '', RESULT_HELP.candidates, '', '| Rank / first-round orders | Rollouts | Fastest frames | Mean frames | Success | Divergence |', '| --- | ---: | ---: | ---: | ---: | ---: |');
-      selected.topCandidates.forEach((candidate, i) => { const s = candidate.statistics; lines.push(`| ${i + 1}. ${candidate.firstRoundOrders.map(order).join('; ')} | ${s.evaluations} | ${s.fastestFrames ?? ''} | ${s.averageVictoryFrames ?? ''} | ${s.successRate * 100}% | ${s.divergenceRate * 100}% |`); });
+      selected.topCandidates.forEach((candidate, i) => { const s = candidate.statistics; lines.push(`| ${i + 1}. ${candidate.firstRoundOrders.map(o => order(o)).join('; ')} | ${s.evaluations} | ${s.fastestFrames ?? ''} | ${s.averageVictoryFrames ?? ''} | ${s.successRate * 100}% | ${s.divergenceRate * 100}% |`); });
     }
   }
   section('Recommended Player Orders');
   if (report.playerStrategy.kind === 'not-retained') lines.push('Intended orders were not retained for Random Monte Carlo. See the executed observation below.');
-  else { field('Order source', report.playerStrategy.kind === 'observed-route' ? 'Exact intended orders of the retained fastest observation' : 'Selected screened strategy/prefix'); lines.push('These are intended orders. Orders can remain unexecuted if the battle ends earlier. Random/policy targets are resolved by the engine.'); orders(report.playerStrategy.plans); }
+  else { field('Order source', report.playerStrategy.kind === 'observed-route' ? 'Player orders with resolved targets from the retained fastest observation' : 'Selected screened strategy/prefix'); lines.push(report.playerStrategy.kind === 'observed-route' ? 'Executed orders show actual targets. Unexecuted orders retain their intended targets and are marked as planned.' : 'Targets describe strategy intentions. Random/policy targets can vary between rollouts.'); orders(report.playerStrategy.plans, report.playerStrategy.kind === 'observed-route'); }
   if (selected.kind === 'optimized-action-search' && selected.objective !== 'fastest-potential' && selected.fastestCompleteRoute) {
-    lines.push('', '### Global fastest observation — intended orders', '', 'These may differ from the selected fair strategy.'); orders(selected.fastestCompleteRoute.decisionTrace);
+    lines.push('', '### Global fastest observation — resolved orders', '', 'These may differ from the selected fair strategy.'); orders(selected.fastestCompleteRoute.decisionTrace, true);
   }
   if (report.rngRequirements.length) {
     section(c.rules.rngPolicy === 'tas-luck' ? 'TAS Luck Requirements' : 'TAS RNG Requirements');

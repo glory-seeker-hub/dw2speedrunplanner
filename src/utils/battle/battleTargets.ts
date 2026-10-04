@@ -4,13 +4,13 @@ import type { BattleState, PlannedAction } from './battleTypes';
 import { counterTargetForm, usesActivatedCounterMechanics } from './battleReactions';
 import { actorById } from './battleState';
 
-export function livingOpponents(state: BattleState, actorId: string) {
-  const actor = actorById(state, actorId);
+export function livingOpponents(state: { combatants: readonly BattleState['combatants'][number][] }, actorId: string) {
+  const actor = state.combatants.find(a => a.id === actorId)!;
   return state.combatants.filter(a => a.side !== actor.side && a.isAlive);
 }
 /** Shared Player selection restriction; execution of an explicit lock remains separate. */
-export function selectableSingleOpponents(state: BattleState, actorId: string) {
-  const actor = actorById(state, actorId);
+export function selectableSingleOpponents(state: { combatants: readonly BattleState['combatants'][number][] }, actorId: string) {
+  const actor = state.combatants.find(a => a.id === actorId)!;
   const candidates = livingOpponents(state, actorId);
   return actor.side === 'player' && state.combatants.filter(a => a.side === 'enemy' && a.currentHp > 0).length > 1
     ? candidates.filter(a => !a.statuses.invisibility) : candidates;
@@ -42,7 +42,7 @@ export function resolveEffectiveTargets(state: BattleState, action: PlannedActio
     candidates = candidates.filter(a => selectable.has(a!.id));
   }
   if (!candidates.length) return [];
-  if (action.kind === 'counter' && !confused && counterTargetForm(action) === 'single') return [candidates[rng.nextIntExclusive(candidates.length, 'target-choice')]!.id];
+  if (action.kind === 'counter' && !confused && counterTargetForm(action) === 'single' && intent.kind !== 'combatants') return [candidates[rng.nextIntExclusive(candidates.length, 'target-choice')]!.id];
   if (intent.kind === 'combatants' || intent.selection === 'all') return candidates.map(a => a!.id);
   return [candidates[rng.nextIntExclusive(candidates.length, confused ? 'confusion-target' : 'target-choice')]!.id];
 }

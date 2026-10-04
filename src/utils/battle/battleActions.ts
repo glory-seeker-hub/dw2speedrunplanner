@@ -1,5 +1,6 @@
 import { MOTIVATION_GUARD, mustGuard, canPayRequiredMp, randomTarget, necroTarget } from './battleEffectCompletion';
 import { assistEligible, isAttributeRestrictedAssist } from './battleSupportEffects';
+import { playerTargetChoices, playerControlsReactionTarget } from './battlePlayerTargets';
 import type { ActionChoice, ActionPolicy, BattleCombatantState, BattleState, PlannedAction, TargetIntent } from './battleTypes';
 import { BattleInputError } from './battleTypes';
 
@@ -7,6 +8,7 @@ function restrictedByReviewedRule(actor: BattleCombatantState, skill: BattleComb
   return actor.statuses['motivation-down'] && actor.motivationBlocked?.includes(skill.key)
     || (necroTarget(skill) || isAttributeRestrictedAssist(skill)) && !assistEligible(actor, skill, combatants)
     || !canPayRequiredMp(actor, skill)
+    || actor.side === 'player' && playerControlsReactionTarget(skill) && !playerTargetChoices(combatants, actor, skill).length
     || skill.canonicalSkillId === 0xf3 && actor.side === 'enemy' && actor.isBoss
       && !combatants.some(a => a.side === 'enemy' && a.id !== actor.id && a.currentHp === 0);
 }
@@ -24,7 +26,16 @@ export const legacyActionPolicy: ActionPolicy = {
       const restricted = actor.skills.some(s => restrictedByReviewedRule(actor, s, context.combatants));
       return { kind: restricted ? 'skip' : 'skill', skillKey: actor.skills[0].key };
     }
-    // The old synthetic fallback consumes no technique-choice draw.
+    if (actor.side === 'player' && skills.some(s => s.kind === 'interrupt' || s.kind === 'counter')) {
+      // Expand the newly controlled reaction decisions. Ordinary Attack randomness
+      // keeps its established execution-time policy in Random mode.
+      const orders = skills.flatMap(skill => (skill.kind === 'interrupt' || skill.kind === 'counter'
+        ? playerTargetChoices(context.combatants, actor, skill) : [{ intent: undefined }])
+        .map(target => ({ kind: 'skill' as const, skillKey: skill.key, ...(target.intent ? { targetIntent: target.intent } : {}) })));
+      if (orders.length) return orders.length === 1 && (skills[0].source === 'synthetic-legacy-fallback' || skills[0] === MOTIVATION_GUARD)
+        ? orders[0] : orders[rng.nextIntExclusive(orders.length, 'action-choice')];
+    }
+    // Enemy technique policy and its RNG remain unchanged.
     const skill = skills.length === 1 && (skills[0].source === 'synthetic-legacy-fallback' || skills[0] === MOTIVATION_GUARD)
       ? skills[0] : skills[rng.nextIntExclusive(skills.length, 'action-choice')];
     return { kind: 'skill', skillKey: skill.key };
@@ -40,7 +51,16 @@ export function planAction(state: BattleState, actor: BattleCombatantState, choi
   if (choice.kind === 'skip' && selectableSkills(actor, state.combatants).length) throw new BattleInputError('Cannot skip while a legal technique or Motivation Guard is available.');
   if (choice.kind !== 'skip' && (actor.statuses['motivation-down'] && actor.motivationBlocked?.includes(skill.key) || !canPayRequiredMp(actor, skill))) throw new BattleInputError('Technique is currently blocked or lacks required MP.');
   if ((randomTarget(skill) || necroTarget(skill)) && choice.targetIntent?.kind === 'combatants') throw new BattleInputError('This technique requires engine-policy targeting.');
-  const targetIntent: TargetIntent = skill === MOTIVATION_GUARD ? { kind: 'combatants', targetIds: [] } : choice.kind === 'skill' && choice.targetIntent ? structuredClone(choice.targetIntent) : {
+  // Older injected policies can omit a reaction target. Give them a stable planning
+  // intention; production Random policy supplies its sampled complete order above.
+  const manualReaction = actor.side === 'player' && playerControlsReactionTarget(skill);
+  const reactionChoices = manualReaction ? playerTargetChoices(state.combatants, actor, skill) : [];
+  const legalReactionIntent = !choice.targetIntent || reactionChoices.some(t => t.intent?.kind === 'combatants'
+    && choice.targetIntent?.kind === 'combatants' && choice.targetIntent.targetIds.length === 1 && t.intent.targetIds[0] === choice.targetIntent.targetIds[0]);
+  if (choice.kind !== 'skip' && manualReaction && (!reactionChoices.length || !legalReactionIntent))
+    throw new BattleInputError('Reaction target is not a legal Player choice.');
+  const selectedIntent = choice.targetIntent ?? reactionChoices[0]?.intent;
+  const targetIntent: TargetIntent = skill === MOTIVATION_GUARD ? { kind: 'combatants', targetIds: [] } : choice.kind === 'skill' && selectedIntent ? structuredClone(selectedIntent) : {
     kind: 'opponents', side: actor.side === 'player' ? 'enemy' : 'player', selection: skill?.legacyTech.target === 'All' ? 'all' : 'random-at-execution',
   };
   const base = { id: nextActionId(state), round: state.round, actorId: actor.id, targetIntent, state: 'planned' as const, initiative: null, priority: skill.kind === 'interrupt' ? 'interrupt-waiting' as const : skill.kind === 'counter' ? 'counter-last' as const : 'normal' as const, reaction: null, chainFromActionId: null };

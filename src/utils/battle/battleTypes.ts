@@ -34,7 +34,7 @@ export interface InterruptRuntimeState {
 }
 export interface InterruptResolution {
   targetActionId: string; targetActorId: string; targetActorName: string; executorId: string;
-  targetPolicy: 'player-random' | 'enemy-first-attacker';
+  targetPolicy: 'player-selected' | 'player-random' | 'enemy-first-attacker';
   initialTargetOutcome: 'hit'; interruptOutcome?: 'hit' | 'miss';
   restarted: boolean; cancelled: boolean; sentLast: boolean; cancellationReason?: 'action-deleted' | 'actor-ko';
   deleteActionRoll?: number; deletionImmunity?: 'boss'; forcedMissRoll?: number;
