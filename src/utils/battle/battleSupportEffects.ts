@@ -15,9 +15,15 @@ export const FIXED_HEALS: Readonly<Record<number, number>> = Object.freeze({ 0xb
 export const REVIVE_IDS = [0xb7, 0xce] as const;
 export const isRevive = (skill: BattleSkillSelection) => REVIVE_IDS.some(id => id === skill.canonicalSkillId);
 const definition = (skill: BattleSkillSelection) => getBattleSkillById(skill.canonicalSkillId ?? -1);
+/** Only these reviewed Assists require an opposing attribute; do not generalize future effects. */
+export const isAttributeRestrictedAssist = (skill: BattleSkillSelection) => [0xb4, 0xb6, 0xd6].includes(skill.canonicalSkillId ?? -1);
 export const isHealing = (skill: BattleSkillSelection) => FIXED_HEALS[skill.canonicalSkillId ?? -1] !== undefined || definition(skill)?.effects.some(e => e.kind === 'recovery' && e.mode === 'full-heal');
 const cures = (skill: BattleSkillSelection): Ailment[] => (definition(skill)?.effects ?? []).flatMap(e => e.kind === 'status-cure' ? [e.status] : []);
 export function assistEligible(actor: Readonly<BattleCombatantState>, skill: BattleSkillSelection, combatants: readonly BattleCombatantState[]): boolean {
+  if (necroTarget(skill)) return combatants.some(a => a.currentHp === 0 && a.currentMp > 0);
+  if (isAttributeRestrictedAssist(skill)) return (definition(skill)?.effects ?? []).some(effect =>
+    effect.kind === 'parameter-modifier' && effect.subject === 'target' && effect.attribute !== undefined
+    && combatants.some(target => target.side !== actor.side && target.currentHp > 0 && target.type === effect.attribute));
   const allies = combatants.filter(a => a.side === actor.side);
   if (isRevive(skill)) return allies.some(a => a.currentHp === 0 && a.maxHp > 0);
   if (isHealing(skill)) return actor.side === 'player' || allies.some(a => a.currentHp === 0 || a.currentHp / a.maxHp < 0.1);

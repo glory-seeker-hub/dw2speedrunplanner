@@ -6,6 +6,7 @@ export interface GuideSection {
   open?: boolean;
   paragraphs: readonly string[];
   items?: readonly string[];
+  video?: { embedUrl: string; watchUrl: string; title: string };
 }
 
 /** Display content only. No simulation, progression or policy calculation. */
@@ -16,6 +17,9 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
     'Manual workflow: Team Builder → Save Team → Battle Simulation → Results. Team Builder is not required after Analyze Battle.',
     'Tabs are ordered Run Planner, Team Builder, Battle Simulation, Results. Run Planner opens by default. The highlighted yellow tab is selected; keyboard and selected-tab semantics also identify it. Results is unavailable until a result exists. Finishing a simulation opens Results automatically.',
   ] },
+  { id: 'video', title: 'Video Tutorial', open: true, paragraphs: [
+    'Prefer a visual walkthrough? Watch the official video tutorial.',
+  ], video: { embedUrl: 'https://www.youtube-nocookie.com/embed/2mG2kCHFp4Y', watchUrl: 'https://www.youtube.com/watch?v=2mG2kCHFp4Y', title: 'Digimon World 2 Run Planner and Battle Simulator — Video Tutorial' } },
   { id: 'planner', title: 'Run Planner · Route and History', open: true, paragraphs: [
     'Choose your starter, optionally name the route, then select Start Run. The starter joins your roster and Current Digiline. New Run creates another route; Saved runs switches the active run. Runs are saved in this browser, not synchronized to an account.',
     'Roster holds your Digimon; Current Digiline is the active battle team. Removing a Digimon from the Digiline keeps it in the roster. Review levels, level caps, stored XP, stats, techniques and accumulated Total Bits as you record progression.',

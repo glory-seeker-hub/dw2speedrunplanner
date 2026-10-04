@@ -79,7 +79,7 @@ for(const status of ['completed','cancelled'])test('Results '+status+' shows str
 });
 test('AOE order renders All and recommended deferred effects stay diagnostic',()=>{
   const i=small();i.player=[unit('P',109)];const r=finish(createOptimizedSearch(i,64,options));const text=html(React.createElement(load('src/components/BattleResults.tsx').BattleResults,{results:r}));assert.ok(text.includes('All'));
-  i.player=[unit('P',0xd2)];const unresolved=finish(createOptimizedSearch(i,4,{...options,maxRounds:1}));assert.ok(!unresolved.optimized.diagnostics.some(d=>d.includes('MP transfer')));
+  i.player=[unit('P',0xd2)];i.enemy.push(unit('KO',2,{currentHp:0,currentMp:30}));const unresolved=finish(createOptimizedSearch(i,4,{...options,maxRounds:1}));assert.ok(!unresolved.optimized.diagnostics.some(d=>d.includes('MP transfer')));
 });
 for(const cancelled of [false,true])test('Planner '+(cancelled?'cancellation':'completion')+' never persists recommended strategy',()=>{
   const h=setup(),before=JSON.stringify([h.run,h.preset]);const i={player:h.preset.playerTeam,enemy:h.preset.enemyTeam,floorSpecialty:'None'},s=createOptimizedSearch(i,10000,options);

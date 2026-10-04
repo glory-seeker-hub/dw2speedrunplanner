@@ -1,10 +1,11 @@
 import { MOTIVATION_GUARD, mustGuard, canPayRequiredMp, randomTarget, necroTarget } from './battleEffectCompletion';
-import { assistEligible } from './battleSupportEffects';
+import { assistEligible, isAttributeRestrictedAssist } from './battleSupportEffects';
 import type { ActionChoice, ActionPolicy, BattleCombatantState, BattleState, PlannedAction, TargetIntent } from './battleTypes';
 import { BattleInputError } from './battleTypes';
 
 function restrictedByReviewedRule(actor: BattleCombatantState, skill: BattleCombatantState['skills'][number], combatants: readonly BattleCombatantState[]) {
   return actor.statuses['motivation-down'] && actor.motivationBlocked?.includes(skill.key)
+    || (necroTarget(skill) || isAttributeRestrictedAssist(skill)) && !assistEligible(actor, skill, combatants)
     || !canPayRequiredMp(actor, skill)
     || skill.canonicalSkillId === 0xf3 && actor.side === 'enemy' && actor.isBoss
       && !combatants.some(a => a.side === 'enemy' && a.id !== actor.id && a.currentHp === 0);

@@ -22,6 +22,11 @@ export function UserGuide() {
       <summary className="min-h-11 cursor-pointer rounded-md p-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"><h3 className="inline font-semibold">{s.title}</h3></summary>
       <div className="space-y-3 px-3 pb-4 leading-relaxed text-muted-foreground">
         {s.paragraphs.map(p => <p key={p}>{p}</p>)}
+        {s.video && <div className="min-w-0 space-y-2">
+          <iframe src={s.video.embedUrl} title={s.video.title} loading="lazy" className="aspect-video w-full max-w-full rounded border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+          <a href={s.video.watchUrl} target="_blank" rel="noopener noreferrer" className="text-info underline underline-offset-4">Watch on YouTube</a>
+        </div>}
         {s.items && <ul className="list-disc space-y-2 pl-5">{s.items.map(p => <li key={p}>{p}</li>)}</ul>}
       </div>
     </details>)}
