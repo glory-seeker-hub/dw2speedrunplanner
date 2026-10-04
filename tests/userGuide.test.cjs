@@ -72,16 +72,23 @@ test('glossary evaluation accounting and prefix depth are explicit',()=>{
  assert.equal(glossary.length,15);assert.match(glossary[0][1],/complete candidate fair sample[\s\S]*branches are not individually counted/);
  assert.match(glossary.find(([t])=>t==='Round Depth')[1],/battle can continue beyond/);
 });
-test('guide has five beginner disclosures open and advanced topics closed',()=>{
- assert.deepEqual(sections.filter(s=>s.open).map(s=>s.id),['workflows','planner','team','simulation','results']);
+test('guide has beginner disclosures and tutorial open and advanced topics closed',()=>{
+ assert.deepEqual(sections.filter(s=>s.open).map(s=>s.id),['workflows','video','planner','team','simulation','results']);
  for(const id of ['quality','advanced','tas','stats','limits'])assert.ok(!sections.find(s=>s.id===id).open);
 });
 test('guide semantic headings, unique destinations and native keyboard controls',()=>{
  const html=renderToStaticMarkup(React.createElement(UserGuide));const ids=[...html.matchAll(/ id="([^"]+)"/g)].map(m=>m[1]);
- assert.equal(ids.length,15);assert.equal(new Set(ids).size,ids.length);assert.equal((html.match(/<summary /g)||[]).length,16);
- assert.equal((html.match(/<h3 /g)||[]).length,15);assert.doesNotMatch(html,/<h[12456][ >]/);
+ assert.equal(ids.length,16);assert.equal(new Set(ids).size,ids.length);assert.equal((html.match(/<summary /g)||[]).length,17);
+ assert.equal((html.match(/<h3 /g)||[]).length,16);assert.doesNotMatch(html,/<h[12456][ >]/);
  for(const id of ids)assert.ok(html.includes(`aria-controls="${id}"`));
  assert.match(html,/aria-label="Guide topics"/);assert.match(html,/focus-visible:outline/);assert.doesNotMatch(html,/<table/);
+});
+
+test('official tutorial is responsive, accessible, lazy and has a safe fallback',()=>{
+ const html=renderToStaticMarkup(React.createElement(UserGuide));
+ assert.match(html,/<iframe[^>]*src="https:\/\/www.youtube-nocookie.com\/embed\/2mG2kCHFp4Y"[^>]*title="[^"]+"[^>]*loading="lazy"[^>]*aspect-video w-full max-w-full[^>]*allowfullscreen=""/);
+ assert.match(html,/<a href="https:\/\/www.youtube.com\/watch\?v=2mG2kCHFp4Y" target="_blank" rel="noopener noreferrer"[^>]*>Watch on YouTube<\/a>/);
+ assert.equal(sections[1].id,'video');
 });
 test('topic navigation opens disclosure, focuses summary and scrolls it into view',()=>{
  const tree=UserGuide();const nav=tree.props.children.find(x=>x?.type==='details').props.children[1];const button=nav.props.children.props.children[0];

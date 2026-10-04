@@ -3,6 +3,7 @@ import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, THOROUGHNESS_DESCRIPTIONS, SEAR
 import { RESULT_HELP } from '@/utils/battle/battlePresentation';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { createPlayerStatDrafts, resolvePlayerStatDrafts, resetPlayerStatDrafts, playerStatProvenance, SIMULATION_FIELDS, STAT_LABELS } from '@/utils/battle/battleStatOverrides';
+import { createPlayerTechniqueSelections, resolvePlayerTechniqueSelections, techniqueMemberKey, type PlayerTechniqueSelections } from '@/utils/battle/battleTechniqueOverrides';
 import { type BattleRngPolicy } from '@/utils/battle/battleRngPolicy';
 import { rootPlanInfo } from '@/utils/battle/battleActionPlans';
 import { OBJECTIVE_LABELS, type BattleSearchMethod, type OptimizationObjective } from '@/utils/battle/battleSearchObjectives';
@@ -52,6 +53,12 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const provenance = imported && localStats ? playerStatProvenance(imported.playerTeam, localStats.team) : undefined;
   const savedTeams = useMemo(() => imported ? [...manualTeams, localStats!.team, imported.enemyTeam] : manualTeams, [imported, localStats, manualTeams]);
   const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<number | null>(preset ? manualTeams.length : null);
+  const sourcePlayer = imported?.playerTeam ?? (selectedPlayerTeam === null ? undefined : manualTeams[selectedPlayerTeam]);
+  const [techniqueDraft, setTechniqueDraft] = useState<{ source: readonly TeamDigimon[]; selections: PlayerTechniqueSelections } | null>(null);
+  const techniqueSelections = useMemo(() => sourcePlayer && techniqueDraft?.source === sourcePlayer
+    ? techniqueDraft.selections : createPlayerTechniqueSelections(sourcePlayer ?? []), [sourcePlayer, techniqueDraft]);
+  const localTechniques = useMemo(() => resolvePlayerTechniqueSelections(localStats?.team ?? sourcePlayer ?? [], techniqueSelections), [localStats, sourcePlayer, techniqueSelections]);
+  const effectivePlayer = localTechniques.team;
   const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>(preset ? 'saved' : 'encounter');
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
   const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(preset ? manualTeams.length + 1 : null);
@@ -68,11 +75,11 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const isSimulating = search.running;
   const validCount = Number.isSafeInteger(simulationCount) && simulationCount > 0;
   const handleSimulate = () => {
-    if (selectedPlayerTeam === null || !validCount || isSimulating || localStats?.valid === false) return;
+    if (selectedPlayerTeam === null || !validCount || isSimulating || localStats?.valid === false || !localTechniques.valid) return;
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
-    search.start({ ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: savedTeams[selectedPlayerTeam], enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { searchThoroughness, optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
+    search.start({ ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: effectivePlayer, enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { searchThoroughness, optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -100,9 +107,10 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
 
   const root = useMemo(() => {
     if (selectedPlayerTeam === null || !selectedEnemyData) return null;
-    try { const { count, minimumBudget } = rootPlanInfo({ player: savedTeams[selectedPlayerTeam], enemy: selectedEnemyData, floorSpecialty }); return { count, minimumBudget, error: '' }; }
+    if (!localTechniques.valid) return null;
+    try { const { count, minimumBudget } = rootPlanInfo({ player: effectivePlayer, enemy: selectedEnemyData, floorSpecialty }); return { count, minimumBudget, error: '' }; }
     catch (cause) { return { count: 0, minimumBudget: 0, error: cause instanceof Error ? cause.message : 'Invalid battle input.' }; }
-  }, [savedTeams, selectedPlayerTeam, selectedEnemyData, floorSpecialty]);
+  }, [effectivePlayer, localTechniques.valid, selectedPlayerTeam, selectedEnemyData, floorSpecialty]);
   const rootDiagnostic = root?.error || (root?.count === 0 ? 'No complete legal Player round plan is available.' : root && simulationCount < root.minimumBudget ? 'Search budget too small. Minimum required for current first-round action space: ' + root.minimumBudget.toLocaleString() + '.' : '');
   return (
     <div className="space-y-6">
@@ -139,7 +147,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             </div>)}
             </details><div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) setStatDrafts(resetPlayerStatDrafts(imported.playerTeam, statDrafts)); }}>Reset stats to Planner values</Button>
-              <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) { setImported(structuredClone(preset!)); setStatDrafts(createPlayerStatDrafts(preset!.playerTeam)); } }}>Reset imported team</Button>
+              <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) { setImported(structuredClone(preset!)); setStatDrafts(createPlayerStatDrafts(preset!.playerTeam)); setTechniqueDraft(null); } }}>Reset imported team</Button>
               <Button variant="outline" size="sm" disabled={isSimulating} onClick={onClearPreset}>Use manual setup</Button>
             </div>
             {imported.diagnostics.filter(d => d.code !== 'planner-resource-history-unavailable').map((d, i) => <p key={i} className="text-xs text-muted-foreground">{d.message}</p>)}
@@ -151,7 +159,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             {savedTeams.length === 0 ? (
               <p className="text-sm text-muted-foreground">No saved teams available. Create a team first.</p>
             ) : (
-              <Select disabled={isSimulating} value={selectedPlayerTeam?.toString() || ''} onValueChange={(value) => setSelectedPlayerTeam(parseInt(value))}>
+              <Select disabled={isSimulating} value={selectedPlayerTeam?.toString() || ''} onValueChange={(value) => { if (!isSimulating) { setSelectedPlayerTeam(parseInt(value)); setTechniqueDraft(null); } }}>
                 <SelectTrigger id="player-team">
                   <SelectValue placeholder="Choose your team" />
                 </SelectTrigger>
@@ -228,6 +236,35 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           </div>
 
           </>}
+          {sourcePlayer && <section aria-label="Simulation techniques" className="min-w-0 space-y-3 rounded border p-3">
+            <details open={!localTechniques.valid}>
+              <summary className="cursor-pointer font-semibold">Advanced — simulation techniques</summary>
+              <p className="my-2 text-sm text-muted-foreground">Choose which techniques the simulator may use for each Player Digimon. These changes affect only this simulation and do not modify Run Planner or Team Builder.</p>
+              <div className="grid min-w-0 gap-3 md:grid-cols-3">
+                {sourcePlayer.map((member, slot) => {
+                  const key = techniqueMemberKey(member, slot), error = localTechniques.errors[key];
+                  return <fieldset key={key} disabled={isSimulating} className="min-w-0 space-y-1 rounded border p-2">
+                    <legend className="max-w-full break-words px-1 font-medium">Slot {slot + 1} — {member.digimon.name}</legend>
+                    {member.techs.map(tech => <label key={tech.id} className="flex min-h-11 cursor-pointer items-center gap-2 break-words text-sm">
+                      <input type="checkbox" className="h-4 w-4 shrink-0" checked={techniqueSelections[key]?.includes(tech.id) ?? false} disabled={isSimulating}
+                        aria-label={`Slot ${slot + 1} ${member.digimon.name}: ${tech.name}`} aria-invalid={!!error} aria-describedby={error ? `technique-error-${slot}` : undefined}
+                        onChange={e => {
+                          if (isSimulating) return;
+                          const enabled = e.target.checked, current = techniqueSelections[key] ?? [];
+                          setTechniqueDraft({ source: sourcePlayer, selections: { ...techniqueSelections, [key]: enabled ? [...new Set([...current, tech.id])] : current.filter(id => id !== tech.id) } });
+                          onSimulationSettingsChange?.();
+                        }} />
+                      <span className="min-w-0 break-words">{tech.name}</span>
+                    </label>)}
+                    {!member.techs.length && <p className="text-sm">No source techniques; existing engine fallback applies.</p>}
+                    {error && <p id={`technique-error-${slot}`} role="alert" className="text-sm text-destructive">{error}</p>}
+                  </fieldset>;
+                })}
+              </div>
+            </details>
+            <p className="text-sm">{localTechniques.changed ? 'Using filtered simulation techniques' : 'All source techniques enabled'}</p>
+            <Button variant="outline" size="sm" disabled={isSimulating} onClick={() => { if (!isSimulating) { setTechniqueDraft(null); onSimulationSettingsChange?.(); } }}>Reset techniques</Button>
+          </section>}
           <div className="space-y-2" role="group" aria-label="Search Method">
             <Label>Search Method</Label>
             <div className="flex flex-wrap gap-2">{([['optimized-action-search', 'Optimized Action Search'], ['random-monte-carlo', 'Random Monte Carlo']] as const).map(([method, label]) => <Button key={method} disabled={isSimulating} variant={searchMethod === method ? 'default' : 'outline'} aria-pressed={searchMethod === method} onClick={() => setSearchMethod(method)}>{label}</Button>)}</div>
@@ -304,7 +341,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Simulate Button */}
           <Button 
             onClick={handleSimulate} 
-            disabled={!canSimulate || !validCount || isSimulating || localStats?.valid === false || (searchMethod === 'optimized-action-search' && !!rootDiagnostic)}
+            disabled={!canSimulate || !validCount || isSimulating || localStats?.valid === false || !localTechniques.valid || (searchMethod === 'optimized-action-search' && !!rootDiagnostic)}
             className="w-full"
             size="lg"
           >
@@ -330,7 +367,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {savedTeams[selectedPlayerTeam].map((digimon, index) => (
+              {effectivePlayer.map((digimon, index) => (
                 <div key={index} className="p-3 bg-muted/20 rounded-lg">
                   <h4 className="font-semibold">{digimon.digimon.name}</h4>
                   <div className="text-sm text-muted-foreground">
