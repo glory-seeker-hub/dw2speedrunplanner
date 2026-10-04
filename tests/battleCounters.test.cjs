@@ -170,5 +170,5 @@ test('shared GAIA forced Miss consumes no accuracy draw and remains causally tar
 });
 test('Shadow Scythe initial Miss is free and never promotes; Counter cannot trigger a Counter in its repeat sequence',()=>{
  const p=attack();p.techs=[tech('Shadow Scythe')];const r=run([p],[unit('C')],{rng:rng({accuracy:[127]})});assert.equal(done(r)[0].mpAccounting.costCharged,0);assert.equal(counters(r)[0].counter.executionMode,'untriggered-end-of-turn');assert.ok(!r.actions.some(a=>a.chainFromActionId));
- const chain=run([p,unit('Waiting')],[attack('KO',{hp:1,spd:10}),unit('AOE',0x88)]);const waiting=counters(chain).find(a=>a.actorName==='Waiting');assert.equal(waiting.counter.executionMode,'untriggered-end-of-turn');assert.equal(waiting.counter.triggerActorId,undefined);
+ const chain=run([p,unit('Waiting')],[attack('KO',{hp:1,spd:10}),unit('AOE',0x88)]);const waiting=chain.actions.find(a=>a.actorName==='Waiting');assert.equal(waiting.counter.executionMode,'untriggered-end-of-turn');assert.equal(waiting.counter.triggerActorId,undefined);assert.equal(waiting.reason,'no-living-targets');assert.deepEqual(waiting.targetIntent.targetIds,['enemy-0']);
 });

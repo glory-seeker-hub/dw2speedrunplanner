@@ -19,7 +19,7 @@ import { accountActionMp, depletionAlert } from './battleResources';
 import { scheduleShadowScytheRepeat, SHADOW_SCYTHE_ID } from './battleChains';
 import { recoverStatuses, statusSnapshot, resolveImpactStatuses } from './battleStatuses';
 import { prepareConfusionAction } from './battleConfusion';
-import { claimInterrupt, refreshPlayerReservations, resolveInterruptEffects, reduceInterruptedDamage } from './battleInterrupts';
+import { claimInterrupt, resolveInterruptEffects, reduceInterruptedDamage } from './battleInterrupts';
 import { resolveSimulationRules } from './battleSimulationRules';
 import { resolveActionAccuracy } from './battleAccuracy';
 
@@ -114,9 +114,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
       // beforeActionOrder: future priority/status flags attach here.
       state.queue = calculateActionOrder(state, actions, rng);
       const acted = new Set<string>();
-      const playerReservations = new Set<string>();
       while (state.queue.length) {
-        refreshPlayerReservations(state, playerReservations, rng);
         const nextId = state.queue.shift()!;
         const action = state.plannedActions.find(a => a.id === nextId)!;
         const reason = action.prepared?.resolution?.cancelled ? 'cancelled-by-interrupt' : revalidateAction(state, action);
@@ -126,7 +124,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           record(action, reason ?? 'already-acted'); completeCounter(action); continue;
         }
         const actor = actorById(state, action.actorId);
-        rng.tasLuck?.action(state, action, () => ({records, executionCount, acted: [...acted], playerReservations: [...playerReservations], rngPosition: rng.position?.()}));
+        rng.tasLuck?.action(state, action, () => ({records, executionCount, acted: [...acted], rngPosition: rng.position?.()}));
         if (action.guard) {
           action.state = 'resolved'; acted.add(actor.id); executionCount++;
           const entry = record(action, 'Guard — Motivation Down');
@@ -164,7 +162,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           action.prepared = { targetIds, statusesBefore, statusesAfterRecovery, statusRecoveries, confusion, initialAccuracy, interruptConsumed: false };
         }
         const prepared = action.prepared;
-        if (!prepared.interruptConsumed && claimInterrupt(state, action, playerReservations, rng)) continue;
+        if (!prepared.interruptConsumed && claimInterrupt(state, action, rng)) continue;
         const targetIds = prepared.targetIds.filter(id => action.kind === 'assist' || actorById(state, id).isAlive);
         if (!targetIds.length && !randomTarget(action.skill) && !necroTarget(action.skill)) { action.state = 'skipped'; record(action, 'no-living-targets'); completeCounter(action); delete actor.confusionSuppressedForActionId; continue; }
         action.state = 'resolving';

@@ -91,7 +91,7 @@ for (const id of [0xa6,0xa8]) test('MP depleted before opportunity prevents Inte
   target.prepared = { initialAccuracy: { outcome: 'hit' }, interruptConsumed: false };
   s.combatants[1].currentMp = data.getBattleSkillById(id).mpCost-1;
   const { claimInterrupt } = load('src/utils/battle/battleInterrupts.ts');
-  assert.equal(claimInterrupt(s,target,new Set(),rng()),null);
+  assert.equal(claimInterrupt(s,target,rng()),null);
   assert.equal(target.prepared.interruptConsumed,false);
   assert.equal(target.prepared.interruptedByActionId,undefined);
 });

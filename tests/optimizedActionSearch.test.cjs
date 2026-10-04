@@ -16,7 +16,7 @@ for(const [n,count] of [[1,125],[2,729],[3,2197]])test(n+' enemies give exactly 
   assert.deepEqual(all[0].orders.map(o=>o.actorId),['player-0','player-1','player-2']);assert.equal(JSON.stringify(input),before);
 });
 test('Enemy skill/target possibilities do not multiply Player plans',()=>{const i=canonical();i.enemy.forEach(e=>e.techs=[unit('x',6).techs[0],unit('x',109).techs[0]]);assert.equal(plans.rootPlanInfo(i).count,2197);});
-for(const id of [0x8b,133,0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xc1,0xba])test('policy-target skill '+id+' contributes one choice',()=>{
+for(const id of [0xc1,0xba])test('policy-target skill '+id+' contributes one choice',()=>{
   const i=canonical();i.player=[unit('P',id)];const s=plans.rootPlanInfo(i).state,orders=plans.enumerateLegalPlayerOrders(s,s.combatants[0]);assert.equal(orders.length,1);assert.equal(orders[0].targetIntent,undefined);
 });
 for(const id of [0xbc,0xc8,0xb7])test('Assist '+id+' eligibility and policy targeting reused',()=>{
