@@ -42,6 +42,7 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
   ] },
   { id: 'simulation', title: 'Battle Simulation · Start and Cancel', open: true, paragraphs: [
     'Review Battle / Teams and Floor Specialty first. Choose Search Method and, for Optimized Action Search, Optimization Objective and Search Thoroughness. Set Accuracy Mode and RNG Policy independently, then the Search Quality / Rollout Budget (or Number of Simulations for Random). Review advanced exact stats if needed.',
+    'Simulation Techniques starts with all source techniques enabled. Disable techniques per Player Digimon to restrict Random and Optimized search, or reset to the source set. Filters combine with exact stat overrides and do not change the Planner run or Team Builder team. Optimized plan counts and minimum budget use the filtered set.',
     'Select Start Simulation once the setup is valid. If it is unavailable, check team selections, exact-stat validation and the minimum screening evaluations shown for optimized search.',
     'Progress reports work completed. Cancel stops future work; Partial/Cancelled Results may retain valid observations found so far, but are not a completed search. Export availability follows the retained report. Use Back to Simulator setup to adjust the next run.',
   ] },
@@ -73,9 +74,9 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
   ] },
   { id: 'results', title: 'Reading Results · Observation vs Strategy', open: true, paragraphs: [
     RESULT_HELP.fastest, RESULT_HELP.screened,
-    'Recommended Player Actions for Fastest follow the intended action trace of that concrete winning observation. For Average/Success they show the selected screened strategy/prefix. A prefix can end before the battle: later continuation can be path-dependent.',
+    'Recommended Player Actions for Fastest show actual targets from the retained winning execution, including Assist recipients and Counter or Interrupt targets. Planned orders that did not execute retain their intended targets and are marked. For Average/Success they show the selected screened strategy/prefix. A prefix can end before the battle: later continuation can be path-dependent.',
     'Important: for Average/Success, Executed Battle Replay and its TAS Requirements may belong to the retained Fastest Route rather than the selected screened strategy. Do not treat that replay as proof that the selected strategy executed those exact actions.',
-    '“Random target” in intended orders leaves targeting to the game/random policy. The replay shows the actual target in one execution; it does not replace the intended Random target.',
+    'Screened strategies retain “Random target” or “Engine policy” when the recipient can vary between rollouts. Showing the actual recipient from a concrete fastest execution does not replace the intended Random target or claim that recipient is fixed across the strategy.',
     RESULT_HELP.timing,
   ], items: [
     'Main Result: Fastest Route Found, Selected Average Victory Strategy or Selected Success Rate Strategy, according to the objective. With no completed victory, no winning route is fabricated.',

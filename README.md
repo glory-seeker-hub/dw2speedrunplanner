@@ -4,7 +4,7 @@ An unofficial fan-made tool for planning routes and exploring battle strategies 
 
 [Live app](https://dw2speedrunplanner.lovable.app/) · [Source](https://github.com/glory-seeker-hub/dw2speedrunplanner) · [Issues and suggestions](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues)
 
-The published app may lag behind this repository. The current source includes Run Planner and Backup / Import; see [release readiness](docs/phase-2m-b/PRE_RELEASE_AUDIT.md) for the audited candidate and outstanding launch checks.
+See the [v1.1.0 release notes](docs/releases/v1.1.0.md) for changes and the [release checklist](docs/releases/v1.1.0-release-checklist.md) for release verification status.
 
 ## What you can do
 
@@ -12,6 +12,7 @@ The published app may lag behind this repository. The current source includes Ru
 - Browse story encounters and Coliseum ranks. Use **Analyze Battle** to send a historical pre-battle copy to the Simulator without changing the run.
 - Build a manual team with customized stats and techniques.
 - Run Random Monte Carlo or Optimized Action Search, choose Fastest Potential, Average Victory or Success Rate, and inspect recommended orders, replay and search details.
+- Limit each Player Digimon's allowed simulation techniques and apply exact stat overrides without changing the source Planner run or manual team. Retained fastest executions show resolved targets; screened strategies show intended or policy targets.
 - Export a readable route for Print / Save as PDF, download a simulation Markdown report, or export restorable JSON backups.
 
 Open **About → How to Use** for the complete guide, including Search Quality, Thoroughness, accuracy and the narrow supported scope of TAS Luck.
