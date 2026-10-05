@@ -1,3 +1,4 @@
+import { validateCaptureTarget, evaluateCaptureObjective, type BattleCaptureTarget, type CaptureSummary } from './battleCaptureObjective';
 import { createSimulationSearch } from './battleSimulationSearch';
 import { collectRngRequirements, emptyRngOverrideCounts, addRngOverrideCounts } from './battleRngAudit';
 import type { SimulationResult } from '@/types/digimon';
@@ -7,13 +8,17 @@ import { createProductionBattleRng } from './battleRng';
 import { simulateBattleCore } from './battleSimulation';
 
 /** Aggregate streaming runs without retaining every canonical history in a batch. */
-export function createBattleAccumulator() {
+export function createBattleAccumulator(target?: BattleCaptureTarget) {
   const result: SimulationResult = {
     winRate: 0, totalSimulations: 0, completedSuccesses: 0, timedSuccesses: 0, incompleteTimingSuccesses: 0,
     outcomeCounts: { 'player-win': 0, 'enemy-win': 0, 'limit-reached': 0, invalid: 0, unsupported: 0 },
     minTurns: null, avgTurns: null, maxTurns: null, minFrames: null, avgFrames: null, maxFrames: null,
     fastestBattleHistory: [], fastestBattleByFrames: [], timingDiagnostics: [], resourceDiagnostics: [], runsWithResourceAlerts: 0,
   };
+  let capture: CaptureSummary | undefined = target ? { target, lastDefeated: null, satisfied: false, successes: 0, successRate: 0, timedSuccesses: 0, minFrames: null, averageFrames: null, maxFrames: null } : undefined;
+  let captureFrames = 0, captureTurns = Infinity;
+  let captureFound: number | null = null, captureOccurrences = 0;
+  let captureHistory: BattleRunResult['actions'] = [], captureTimedHistory: BattleRunResult['actions'] = [];
   const timingDiagnostics = new Set<string>(), resourceDiagnostics = new Set<string>();
   let turns = 0, frames = 0;
   let bestFoundAtSimulation: number | null = null, bestOccurrenceCount = 0;
@@ -29,6 +34,24 @@ export function createBattleAccumulator() {
     for (const action of run.actions) {
       action.timingDiagnostics.forEach(d => timingDiagnostics.add(d));
       action.resourceDiagnostics.forEach(d => resourceDiagnostics.add(d));
+    }
+    if (capture && target) {
+      const evaluation = evaluateCaptureObjective(run, target);
+      if (evaluation.satisfied) {
+        capture.successes++;
+        if (run.actionCount < captureTurns) {
+          captureTurns = run.actionCount; captureHistory = run.actions;
+          if (!captureTimedHistory.length) capture = { ...capture, ...evaluation };
+        }
+        if (run.timingCompleteness === 'complete' && run.totalFrames !== null) {
+          capture.timedSuccesses++; captureFrames += run.totalFrames;
+          if (capture.minFrames === null || run.totalFrames < capture.minFrames) {
+            capture = { ...capture, ...evaluation, minFrames: run.totalFrames }; captureTimedHistory = run.actions; captureFound = result.totalSimulations; captureOccurrences = 1;
+          }
+          else if (run.totalFrames === capture.minFrames) captureOccurrences++;
+          capture.maxFrames = Math.max(capture.maxFrames ?? 0, run.totalFrames);
+        }
+      }
     }
     if (run.outcome !== 'player-win') return;
     result.completedSuccesses++; turns += run.actionCount;
@@ -50,18 +73,23 @@ export function createBattleAccumulator() {
   result.avgTurns = result.completedSuccesses ? turns / result.completedSuccesses : null;
   result.avgFrames = result.timedSuccesses ? frames / result.timedSuccesses : null;
   result.timingDiagnostics = [...timingDiagnostics]; result.resourceDiagnostics = [...resourceDiagnostics];
-  return { ...result, ...(result.rngOverrideCounts ? { rngOverrideCounts: { ...result.rngOverrideCounts } } : {}), outcomeCounts: { ...result.outcomeCounts } };
+  if (capture) {
+    capture.successRate = result.totalSimulations ? capture.successes / result.totalSimulations * 100 : 0;
+    capture.averageFrames = capture.timedSuccesses ? captureFrames / capture.timedSuccesses : null;
+  }
+  return { ...result, ...(capture ? { capture: { ...capture }, fastestBattleHistory: captureHistory, fastestBattleByFrames: captureTimedHistory } : {}), ...(result.rngOverrideCounts ? { rngOverrideCounts: { ...result.rngOverrideCounts } } : {}), outcomeCounts: { ...result.outcomeCounts } };
   };
-  return { add, snapshot, convergence: () => ({ bestFoundAtSimulation, bestOccurrenceCount, simulationsSinceLastImprovement: bestFoundAtSimulation === null ? null : result.totalSimulations - bestFoundAtSimulation }) };
+  return { add, snapshot, convergence: () => target ? { bestFoundAtSimulation: captureFound, bestOccurrenceCount: captureOccurrences, simulationsSinceLastImprovement: captureFound === null ? null : result.totalSimulations - captureFound } : ({ bestFoundAtSimulation, bestOccurrenceCount, simulationsSinceLastImprovement: bestFoundAtSimulation === null ? null : result.totalSimulations - bestFoundAtSimulation }) };
 }
-export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): SimulationResult {
-  const accumulator = createBattleAccumulator();
+export function aggregateBattleRuns(runs: Iterable<BattleRunResult>, target?: BattleCaptureTarget): SimulationResult {
+  const accumulator = createBattleAccumulator(target);
   for (const run of runs) accumulator.add(run);
   return accumulator.snapshot();
 }
 /** Retain the existing UI input/callback boundary. Seconds are deliberately removed. */
 export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], enemy: readonly BattleTeamMember[] | Encounter, floorSpecialty: string, simulationCount: number, options: BattleEngineOptions = {}): SimulationResult {
   if (!Number.isSafeInteger(simulationCount) || simulationCount < 1) throw new Error('simulationCount must be a positive safe integer.');
+  validateCaptureTarget({ player, enemy, floorSpecialty }, options.captureObjective);
   if(options.simulationRules?.rngPolicy==='tas-luck'){const search=createSimulationSearch({player,enemy,floorSpecialty},simulationCount,options);while(!search.done)search.step();return search.result('completed',0);}
   const rng = options.rng ?? createProductionBattleRng();
   function* runs() {
@@ -72,6 +100,6 @@ export function runLegacyBattleSimulation(player: readonly BattleTeamMember[], e
       yield result;
     }
   }
-  const result = aggregateBattleRuns(runs());
+  const result = aggregateBattleRuns(runs(), options.captureObjective);
   return options.simulationRules ? { ...result, ...(options.simulationRules.rngPolicy === 'tas-favorable' ? { rngPolicy: options.simulationRules.rngPolicy } : {}), accuracyMode: options.simulationRules.accuracyMode } : result;
 }

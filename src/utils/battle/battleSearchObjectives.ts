@@ -1,3 +1,4 @@
+import { isCaptureQualifiedVictory, type BattleCaptureTarget } from './battleCaptureObjective';
 import type { BattleRunResult } from './battleTypes';
 export type BattleSearchMethod = 'random-monte-carlo' | 'optimized-action-search';
 export type OptimizationObjective = 'fastest-potential' | 'average-victory' | 'success-rate';
@@ -5,17 +6,19 @@ export const OBJECTIVE_LABELS: Record<OptimizationObjective, string> = {
   'fastest-potential': 'Fastest Potential', 'average-victory': 'Average Victory', 'success-rate': 'Success Rate',
 };
 export interface OptimizedCandidateStats {
+  rawVictories?: number;
   evaluations: number; validExecutions: number; victories: number; completeTimingVictories: number; diverged: number;
   sumFrames: number; fastestFrames: number | null; averageVictoryFrames: number | null; successRate: number; divergenceRate: number;
 }
 export const emptyCandidateStats = (): OptimizedCandidateStats => ({ evaluations: 0, validExecutions: 0, victories: 0,
   completeTimingVictories: 0, diverged: 0, sumFrames: 0, fastestFrames: null, averageVictoryFrames: null, successRate: 0, divergenceRate: 0 });
-export function addCandidateOutcome(stats: OptimizedCandidateStats, result: BattleRunResult, diverged: boolean) {
+export function addCandidateOutcome(stats: OptimizedCandidateStats, result: BattleRunResult, diverged: boolean, target?: BattleCaptureTarget) {
   stats.evaluations++;
   if (diverged) stats.diverged++;
   else {
     stats.validExecutions++;
-    if (result.outcome === 'player-win') {
+    if (target) stats.rawVictories = (stats.rawVictories ?? 0) + Number(result.outcome === 'player-win');
+    if (isCaptureQualifiedVictory(result, target)) {
       stats.victories++;
       if (result.timingCompleteness === 'complete' && result.totalFrames !== null) {
         stats.completeTimingVictories++; stats.sumFrames += result.totalFrames;

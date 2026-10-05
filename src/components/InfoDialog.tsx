@@ -39,6 +39,11 @@ export const InfoDialog = () => {
           <TabsContent value="how-to"><UserGuide /></TabsContent>
           <TabsContent value="mechanics" className="space-y-4">
             <Card><CardContent className="space-y-3 pt-6 text-sm">
+              <h3 className="font-semibold">Capture-aware battle search</h3>
+              <p>Analyze Battle automatically uses the capture target recorded in Run Planner. Manual Encounter simulation also offers an optional capture objective. The target must be the last Enemy defeated.</p>
+              <p>If one action or AoE defeats multiple Enemies simultaneously, the rightmost defeated Enemy wins the capture tie-break: E3 &gt; E2 &gt; E1. Separate actions follow chronological KO order.</p>
+              <p>With a capture objective, Fastest Potential searches for the fastest capture-qualified victory, Average Victory evaluates capture-qualified victories, and Success Rate requires both victory and correct capture. A Player battle victory can still fail the capture objective; Battle Win Rate and Capture Success Rate are separate.</p>
+              <p>Search is bounded by its configured effort. Finding no capture-qualified route does not prove that none exists, and a found route is not proof of global optimality.</p>
               <h3 className="font-semibold">Supported battle model</h3>
               <p>The Simulator models action timing, initiative, MP, supported status effects, Counter, Interrupt and Assist/support behavior. Availability depends on the technique and modeled effect; inspect action details and effect diagnostics for a specific execution.</p>
               <p>Accuracy Mode controls ordinary Hit Rate. RNG Policy separately controls supported status outcomes. See Accuracy and RNG and TAS Luck in How to Use for the supported scope.</p>

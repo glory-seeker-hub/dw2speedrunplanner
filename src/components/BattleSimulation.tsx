@@ -1,3 +1,4 @@
+import { captureTargetForSlot } from '@/utils/battle/battleCaptureObjective';
 import type { SearchThoroughness } from '@/utils/battle/battleSearchPasses';
 import { THOROUGHNESS_LABELS, THOROUGHNESS_HELP, THOROUGHNESS_DESCRIPTIONS, SEARCH_QUALITY_PRESETS } from '@/utils/battle/battlePresentation';
 import { RESULT_HELP } from '@/utils/battle/battlePresentation';
@@ -60,6 +61,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
   const localTechniques = useMemo(() => resolvePlayerTechniqueSelections(localStats?.team ?? sourcePlayer ?? [], techniqueSelections), [localStats, sourcePlayer, techniqueSelections]);
   const effectivePlayer = localTechniques.team;
   const [selectedEnemyTeam, setSelectedEnemyTeam] = useState<'encounter' | 'saved'>(preset ? 'saved' : 'encounter');
+  const [captureSlot, setCaptureSlot] = useState<number | null>(null);
   const [selectedEncounter, setSelectedEncounter] = useState<number | null>(null);
   const [selectedEnemySaved, setSelectedEnemySaved] = useState<number | null>(preset ? manualTeams.length + 1 : null);
   const [floorSpecialty, setFloorSpecialty] = useState<string>('none');
@@ -79,7 +81,8 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
     const enemy = selectedEnemyTeam === 'encounter' ? encounters.find(e => e.id === selectedEncounter)
       : selectedEnemySaved === null ? null : savedTeams[selectedEnemySaved];
     if (!enemy || (searchMethod === 'optimized-action-search' && rootDiagnostic)) return;
-    search.start({ ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: effectivePlayer, enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { searchThoroughness, optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
+    const captureObjective = imported?.captureObjective ?? (selectedEnemyTeam === 'encounter' && captureSlot !== null && !Array.isArray(enemy) ? captureTargetForSlot((enemy as import('@/types/encounter').Encounter).digimons.map(d => ({ encounterSlot: d.slot, digimon: { name: d.name } })), captureSlot) : undefined);
+    search.start({ ...(captureObjective ? { captureObjective } : {}), ...(imported ? { plannerProvenance: { source: imported.source, selectedBattle: imported.selectedBattle, historicalStateSummary: imported.historicalStateSummary, diagnostics: imported.diagnostics } } : {}), ...(provenance ? { playerStatProvenance: provenance } : {}), input: { player: effectivePlayer, enemy, floorSpecialty }, requestedSimulations: simulationCount, simulationRules: { accuracyMode, rngPolicy }, searchMethod, ...(searchMethod === 'optimized-action-search' ? { searchThoroughness, optimizationObjective: objective, optimizedConfig: optimizedConfigForBudget(simulationCount) } : {}) });
   };
 
   const canSimulate = selectedPlayerTeam !== null && 
@@ -152,6 +155,8 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
             </div>
             {imported.diagnostics.filter(d => d.code !== 'planner-resource-history-unavailable').map((d, i) => <p key={i} className="text-xs text-muted-foreground">{d.message}</p>)}
           </section>}
+          {imported?.captureObjective && <section aria-label="Capture objective"><h3>Capture target</h3><p>Slot {imported.captureObjective.encounterSlot} — {imported.captureObjective.name}</p><p>Must be the last Enemy defeated. Recorded by Run Planner.</p></section>}
+          {!imported && selectedEnemyTeam === 'encounter' && selectedEncounter !== null && <div className="space-y-2"><Label htmlFor="capture-objective">Capture objective</Label><select id="capture-objective" className="w-full rounded border bg-background p-2" value={captureSlot ?? ''} onChange={e => setCaptureSlot(e.target.value === '' ? null : Number(e.target.value))}><option value="">No capture objective</option>{encounters.find(e => e.id === selectedEncounter)?.digimons.map(d => <option key={d.slot} value={d.slot}>Slot {d.slot} — {d.name}</option>)}</select><p className="text-sm">Capture target must be the last Enemy defeated.</p></div>}
           {!imported && <>
           {/* Player Team Selection */}
           <div className="space-y-2">
@@ -177,7 +182,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
           {/* Enemy Team Selection */}
           <div className="space-y-4">
             <Label>Select Enemy Team</Label>
-            <Tabs value={selectedEnemyTeam} onValueChange={(value) => setSelectedEnemyTeam(value as 'encounter' | 'saved')}>
+            <Tabs value={selectedEnemyTeam} onValueChange={(value) => { setSelectedEnemyTeam(value as 'encounter' | 'saved'); setCaptureSlot(null); }}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger disabled={isSimulating} value="encounter">Enemy Encounters</TabsTrigger>
                 <TabsTrigger disabled={isSimulating} value="saved">Saved Teams</TabsTrigger>
@@ -190,7 +195,7 @@ export const BattleSimulation = ({ savedTeams: manualTeams, onSimulationComplete
                     value={encounterSearch}
                     onChange={(e) => setEncounterSearch(e.target.value)}
                   />
-                  <Select disabled={isSimulating} value={selectedEncounter?.toString() || ''} onValueChange={(value) => setSelectedEncounter(parseInt(value))}>
+                  <Select disabled={isSimulating} value={selectedEncounter?.toString() || ''} onValueChange={(value) => { setSelectedEncounter(parseInt(value)); setCaptureSlot(null); }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose enemy encounter" />
                     </SelectTrigger>

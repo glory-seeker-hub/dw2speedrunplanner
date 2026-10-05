@@ -1,3 +1,4 @@
+import { isCaptureQualifiedVictory, type BattleCaptureTarget } from './battleCaptureObjective';
 import type { BattleRng } from './battleRng';
 import type { RngResolution } from './battleRngPolicy';
 import type { BattleRunResult, BattleState, PlannedAction } from './battleTypes';
@@ -59,13 +60,13 @@ export function createTasLuckReplay(trace: readonly TasLuckDecision[], strict = 
 export interface TasLuckSample { result: BattleRunResult; diverged: boolean; decisionTrace: PlayerRoundPlan[]; nextState?: BattleState | null }
 const lexical=(a:string,b:string)=>a<b?-1:a>b?1:0;
 /** One sample/seed; multiple bounded replay branches; exactly one terminal observation. */
-export function createTasLuckSearch(execute: (control: TasLuckControl) => TasLuckSample, cap: number, reverseOutcomes = false) {
+export function createTasLuckSearch(execute: (control: TasLuckControl) => TasLuckSample, cap: number, reverseOutcomes = false, target?: BattleCaptureTarget) {
   if (![8,16,32].includes(cap)) throw new Error('Unsupported TAS frontier cap.');
   const summary=emptyTasLuckSummary(cap);
   let frontier: TasLuckDecisionTrace[] | null=null, best: TasLuckSample | null=null, started=false;
   let seen: Map<string,string> | null=null;
   const compare=(a:TasLuckSample,b:TasLuckSample)=>{
-    const win=(s:TasLuckSample)=>!s.diverged&&s.result.outcome==='player-win';
+    const win=(s:TasLuckSample)=>!s.diverged&&isCaptureQualifiedVictory(s.result,target);
     return Number(win(b))-Number(win(a)) || (win(a)?(a.result.totalFrames??Infinity)-(b.result.totalFrames??Infinity):0)
       || lexical(tasLuckTraceKey(a.result.tasLuckTrace??[]),tasLuckTraceKey(b.result.tasLuckTrace??[]))
       || lexical(playerDecisionTraceKey(a.decisionTrace),playerDecisionTraceKey(b.decisionTrace));
