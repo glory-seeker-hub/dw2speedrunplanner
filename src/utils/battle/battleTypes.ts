@@ -158,6 +158,7 @@ export interface PlayerDecisionProvider {
   chooseAction(actor: BattleCombatantState, state: BattleState): ActionChoice | undefined;
 }
 export interface BattleEngineOptions {
+  captureObjective?: import('./battleCaptureObjective').BattleCaptureTarget;
   tasLuck?: import('./battleTasLuck').TasLuckControl;
   tasFrontierCap?: number;
   playerDecisions?: PlayerDecisionProvider;

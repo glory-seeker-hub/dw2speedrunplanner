@@ -73,6 +73,16 @@ function mergeObservations(a: SimulationResult | null, b: SimulationResult): Sim
     r.tasLuckSummary = { ...b.tasLuckSummary, maxFrontier: Math.max(a.tasLuckSummary.maxFrontier, b.tasLuckSummary.maxFrontier) };
     for (const key of ['opportunities', 'branchesExplored', 'deduplicated', 'pruned'] as const) r.tasLuckSummary[key] += a.tasLuckSummary[key];
   }
+  if (a.capture && b.capture) {
+    const x = a.capture, y = b.capture, timedSuccesses = x.timedSuccesses + y.timedSuccesses;
+    const best = x.minFrames !== null && (y.minFrames === null || x.minFrames <= y.minFrames) ? x : y;
+    r.capture = { ...best, successes: x.successes + y.successes, timedSuccesses,
+      successRate: r.totalSimulations ? (x.successes + y.successes) / r.totalSimulations * 100 : 0,
+      averageFrames: timedSuccesses ? ((x.averageFrames ?? 0) * x.timedSuccesses + (y.averageFrames ?? 0) * y.timedSuccesses) / timedSuccesses : null,
+      maxFrames: x.maxFrames === null ? y.maxFrames : y.maxFrames === null ? x.maxFrames : Math.max(x.maxFrames, y.maxFrames) };
+    if (a.fastestBattleHistory.length && (!b.fastestBattleHistory.length || a.fastestBattleHistory.filter(a => a.state === 'resolved').length <= b.fastestBattleHistory.filter(a => a.state === 'resolved').length)) r.fastestBattleHistory = a.fastestBattleHistory;
+    else r.fastestBattleHistory = b.fastestBattleHistory;
+  }
   return r;
 }
 
@@ -149,7 +159,7 @@ export function createOptimizedPassSearch(input: BattleInput, budget: number, op
       observeFastest();
       const current = active.result(status, elapsedMs);
       const combined = active.done ? stored ?? current : mergeObservations(stored, current);
-      const selected = candidates(), winner = selected[0];
+      const selected = candidates(), winner = options.captureObjective ? selected.find(c => c.stats.victories > 0) : selected[0];
       const p = api.progress(elapsedMs);
       // result() is an observational snapshot; existing callers inspect Partial
       // snapshots while stepping. The Worker owns actual cancellation.
@@ -159,7 +169,7 @@ export function createOptimizedPassSearch(input: BattleInput, budget: number, op
         topCandidates: selected, depth: Math.max(maxDepth, current.optimized!.depth),
         fairStageEvaluations: fairEvaluations + (active.done ? 0 : current.optimized!.fairStageEvaluations),
         diagnostics: [...new Set([...diagnostics, ...current.optimized!.diagnostics])] };
-      return { ...combined, fastestBattleByFrames: fastest?.actions ?? [], optimized,
+      return { ...combined, ...(combined.capture && fastest?.capture ? { capture: { ...combined.capture, ...fastest.capture } } : {}), fastestBattleByFrames: fastest?.actions ?? [], optimized,
         search: { ...current.search!, ...p, status } };
     },
   };

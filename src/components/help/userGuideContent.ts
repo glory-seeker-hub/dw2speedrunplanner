@@ -50,6 +50,7 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
     'Random Monte Carlo repeatedly simulates the configured battle using the current randomized action/continuation behavior. Use it to observe success and timing variation and inspect a retained replay. It does not optimize Player actions or evaluate a user-authored fixed action script.',
     'Optimized Action Search enumerates legal Player round plans at expanded states, evaluates candidate strategies, retains promising alternatives and explores future Player decisions. Complete battle executions are observed along the way; this is not exhaustive enumeration of the entire battle tree.',
     RESULT_HELP.fastest, RESULT_HELP.average, RESULT_HELP.success,
+    'When a capture objective is active, Fastest Potential, Average Victory and Success Rate require a capture-qualified victory: the selected Enemy must be defeated last. One action defeating multiple Enemies uses the rightmost defeated Enemy (E3 > E2 > E1). Analyze Battle carries the recorded target automatically; manual Encounter setup offers an optional target.',
     'Fastest Potential asks which quickest winning execution was actually found. Average Victory and Success Rate select a repeatedly screened Player strategy; that selection can differ from the single fastest observation.',
   ] },
   { id: 'quality', title: 'Search Quality and Thoroughness', paragraphs: [

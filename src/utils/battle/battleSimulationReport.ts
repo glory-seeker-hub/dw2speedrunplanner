@@ -1,3 +1,4 @@
+import { CAPTURE_RULE, CAPTURE_TIE_RULE, NO_CAPTURE_ROUTE } from './battleCaptureObjective';
 import type { SearchThoroughness, SearchPassMetadata } from './battleSearchPasses';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { tasLuckCapForBudget } from './battleTasLuck';
@@ -25,6 +26,7 @@ function immutable<T>(value: T): DeepReadonly<T> {
   return copy as DeepReadonly<T>;
 }
 export interface SimulationReportJobRequest {
+  captureObjective?: import('./battleCaptureObjective').BattleCaptureTarget;
   input: BattleInput; requestedSimulations: number; searchMethod?: BattleSearchMethod;
   searchThoroughness?: SearchThoroughness; optimizationObjective?: OptimizationObjective; optimizedConfig?: OptimizedSearchConfig;
   simulationRules?: BattleSimulationRules; seed?: number; maxRounds?: number;
@@ -40,6 +42,7 @@ export interface SimulationReportJob {
   combatants: Combatant[];
   playerStatProvenance?: PlayerStatProvenance;
   configuration: {
+    captureObjective?: import('./battleCaptureObjective').BattleCaptureTarget;
     searchMethod: BattleSearchMethod; searchThoroughness?: SearchThoroughness; objective?: OptimizationObjective;
     rules: BattleSimulationRules; requestedEvaluations: number; floorSpecialty: string;
     optimizedConfig?: OptimizedSearchConfig; seed?: number; maxRounds: number; tasFrontierCap?: number;
@@ -58,7 +61,8 @@ export function snapshotSimulationReportJob(request: SimulationReportJobRequest)
   });
   return immutable({ input: r.input, source: r.plannerProvenance ? { kind: 'run-planner' as const, ...r.plannerProvenance } : { kind: 'manual' as const },
     combatants, playerStatProvenance: r.playerStatProvenance,
-    configuration: { searchMethod: method, rules: resolveSimulationRules(r.simulationRules), requestedEvaluations: r.requestedSimulations,
+    configuration: {
+    ...(r.captureObjective ? { captureObjective: r.captureObjective } : {}), searchMethod: method, rules: resolveSimulationRules(r.simulationRules), requestedEvaluations: r.requestedSimulations,
       ...(r.simulationRules?.rngPolicy==='tas-luck'?{tasFrontierCap:tasLuckCapForBudget(r.requestedSimulations)}:{}), floorSpecialty: r.input.floorSpecialty, maxRounds: r.maxRounds ?? 1000,
       ...(method === 'optimized-action-search' ? { searchThoroughness: r.searchThoroughness ?? 'standard', objective: r.optimizationObjective ?? 'fastest-potential', optimizedConfig: r.optimizedConfig ?? optimizedConfigForBudget(r.requestedSimulations), seed: r.seed ?? 0 } : r.seed === undefined ? {} : { seed: r.seed }) } });
 }
@@ -72,6 +76,7 @@ type SelectedResult = {
   topCandidates: { key: string; statistics: OptimizedCandidateStats; firstRoundOrders: PlayerRoundPlan['orders'] }[];
 };
 interface ReportData {
+  captureObjective?: import('./battleCaptureObjective').CaptureSummary & { rule: string; simultaneousKoRule: string; battleWinRate: number; diagnostic?: string };
   tasLuckSummary?: import('./battleTasLuck').TasLuckSummary;
   tasLuckRoute?: { seed: number; sampleIndex: number; sourcePlayerPrefix: PlayerRoundPlan[]; decisionTrace: PlayerRoundPlan[] };
   tasLuckTrace?: import('./battleTasLuck').TasLuckDecisionTrace;
@@ -109,7 +114,7 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
   if (o && o.objective !== 'fastest-potential') diagnostics.push('No representative replay of the selected fair strategy is retained. Executed Battle is the global fastest observation and may belong to another prefix.');
   if (!actions.length) diagnostics.push('No completed victory history is retained.');
   const encounterId = job.source.kind === 'run-planner' ? job.source.selectedBattle.encounterId : !Array.isArray(job.input.enemy) ? (job.input.enemy as { id?: number }).id : undefined;
-  return immutable({ ...(result.tasLuckSummary?{tasLuckSummary:result.tasLuckSummary,tasLuckTrace:route?.tasLuckTrace??[],...(route?{tasLuckRoute:{seed:route.seed,sampleIndex:route.sampleIndex,sourcePlayerPrefix:route.sourcePlayerPrefix??[],decisionTrace:route.decisionTrace}}:{})}:{}), reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: (job.source.kind === 'run-planner' ? getPlannerBattleLabel(job.source.selectedBattle) + ' · ' : '') + job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
+  return immutable({ ...(result.tasLuckSummary?{tasLuckSummary:result.tasLuckSummary,tasLuckTrace:route?.tasLuckTrace??[],...(route?{tasLuckRoute:{seed:route.seed,sampleIndex:route.sampleIndex,sourcePlayerPrefix:route.sourcePlayerPrefix??[],decisionTrace:route.decisionTrace}}:{})}:{}), ...(result.capture ? { captureObjective: { ...result.capture, rule: CAPTURE_RULE, simultaneousKoRule: CAPTURE_TIE_RULE, battleWinRate: result.winRate, ...(!result.capture.satisfied ? { diagnostic: NO_CAPTURE_ROUTE } : {}) } } : {}), reportVersion: 1, resultStatus: status, source: job.source, battle: { encounterId, label: (job.source.kind === 'run-planner' ? getPlannerBattleLabel(job.source.selectedBattle) + ' · ' : '') + job.combatants.filter(a => a.side === 'enemy').map(a => a.name).join(' + ') },
     effectiveInput: job.input, playerTeam: job.combatants.filter(a => a.side === 'player'), enemyTeam: job.combatants.filter(a => a.side === 'enemy'),
     playerStatProvenance: job.playerStatProvenance, simulationConfiguration: job.configuration,
     searchSummary: { evaluations: result.search?.completedSimulations ?? o?.evaluations ?? result.totalSimulations, elapsedMs: result.search?.elapsedMs,
@@ -123,6 +128,6 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
       : { kind: 'random-monte-carlo', winRate: result.winRate, minFrames: result.minFrames, averageFrames: result.avgFrames, maxFrames: result.maxFrames, minActions: result.minTurns, averageActions: result.avgTurns, maxActions: result.maxTurns },
     playerStrategy: { kind: o ? o.objective === 'fastest-potential' ? 'observed-route' : 'fair-prefix' : route ? 'observed-route' : 'not-retained', plans: o ? o.objective === 'fastest-potential' ? route?.decisionTrace ?? [] : o.recommendedPrefix : route?.decisionTrace ?? [] },
     rngRequirements: job.configuration.rules.rngPolicy !== 'natural' ? route?.rngRequirements ?? collectRngRequirements(actions) : [],
-    executedBattle: { kind: route ? 'global-fastest-observation' : result.fastestBattleByFrames.length ? 'fastest-timed-observation' : 'fewest-actions-observation', totalFrames: route?.totalFrames ?? (result.fastestBattleByFrames.length ? result.minFrames : null), rounds, actions },
+    executedBattle: { kind: route ? 'global-fastest-observation' : result.fastestBattleByFrames.length ? 'fastest-timed-observation' : 'fewest-actions-observation', totalFrames: route?.totalFrames ?? (result.fastestBattleByFrames.length ? result.capture?.minFrames ?? result.minFrames : null), rounds, actions },
     diagnostics: [...new Set(diagnostics)] }) as BattleSimulationReport;
 }

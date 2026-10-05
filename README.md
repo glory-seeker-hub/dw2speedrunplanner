@@ -11,6 +11,7 @@ See the [v1.1.0 release notes](docs/releases/v1.1.0.md) for changes and the [rel
 - Create multiple saved runs, choose a starter, manage the roster and active Digiline, and track battles, growth, digivolution, DNA and trades.
 - Browse story encounters and Coliseum ranks. Use **Analyze Battle** to send a historical pre-battle copy to the Simulator without changing the run.
 - Build a manual team with customized stats and techniques.
+- Capture-aware simulation uses the Planner-recorded target or an optional manual Encounter target. Success requires defeating that Enemy last; simultaneous KOs in one action use the rightmost Enemy (E3 > E2 > E1). Battle Win Rate remains separate from Capture Success Rate.
 - Run Random Monte Carlo or Optimized Action Search, choose Fastest Potential, Average Victory or Success Rate, and inspect recommended orders, replay and search details.
 - Limit each Player Digimon's allowed simulation techniques and apply exact stat overrides without changing the source Planner run or manual team. Retained fastest executions show resolved targets; screened strategies show intended or policy targets.
 - Export a readable route for Print / Save as PDF, download a simulation Markdown report, or export restorable JSON backups.

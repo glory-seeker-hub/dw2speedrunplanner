@@ -1,3 +1,4 @@
+import { isCaptureQualifiedVictory } from './battleCaptureObjective';
 import { createTasLuckReplay, TasLuckDivergence } from './battleTasLuck';
 import { replayPlayerPrefix } from './battleActionPlans';
 import { playerDecisionTraceKey } from './battlePlayerDecisionTrace';
@@ -12,6 +13,7 @@ export function replayTasLuckRoute(input: BattleInput, route: FastestRoute, opti
   const observation=replayPlayerPrefix(input,route.sourcePlayerPrefix,route.seed,{...options,tasLuck:replay.control,simulationRules:{accuracyMode:options.simulationRules?.accuracyMode??'game-accurate',rngPolicy:'tas-luck'}},false,true);
   replay.finish();
   if(observation.diverged || playerDecisionTraceKey(observation.decisionTrace)!==route.decisionTraceKey) throw new TasLuckDivergence('Player decision trace diverged during TAS replay.');
+  if ((options.captureObjective || route.capture) && !isCaptureQualifiedVictory(observation.result, options.captureObjective ?? route.capture?.target)) throw new TasLuckDivergence('Capture objective failed during TAS replay.');
   observation.result.tasLuckTrace=replay.visited;
   return observation;
 }

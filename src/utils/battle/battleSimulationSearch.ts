@@ -1,3 +1,4 @@
+import { validateCaptureTarget } from './battleCaptureObjective';
 import { createTasLuckSearch, emptyTasLuckSummary, addTasLuckSummary, tasLuckCapForBudget } from './battleTasLuck';
 import { createSeededBattleRng } from './battleRng';
 import { createPlayerDecisionTrace } from './battlePlayerDecisionTrace';
@@ -21,11 +22,12 @@ export interface SimulationSearchMetadata extends SearchProgress { rngPolicy?: i
 export function createSimulationSearch(input: BattleInput, requested: number, options: BattleEngineOptions = {}) {
   if (!Number.isSafeInteger(requested) || requested < 1) throw new Error('Number of simulations must be a positive safe integer.');
   const snapshot = structuredClone(input);
+  validateCaptureTarget(snapshot, options.captureObjective);
   const simulationRules = resolveSimulationRules(options.simulationRules);
   const rng = options.rng ?? createProductionBattleRng();
-  const accumulator = createBattleAccumulator();
+  const accumulator = createBattleAccumulator(options.captureObjective);
   let completed = 0;
-  const tasSummary=emptyTasLuckSummary(options.tasFrontierCap??tasLuckCapForBudget(requested)),fastest=createFastestRouteTracker();
+  const tasSummary=emptyTasLuckSummary(options.tasFrontierCap??tasLuckCapForBudget(requested)),fastest=createFastestRouteTracker(options.captureObjective);
   let pending: ReturnType<typeof createTasLuckSearch> | null=null, sampleSeed=0;
   let counted=emptyTasLuckSummary(tasSummary.frontierCap);
   return {
@@ -38,7 +40,7 @@ export function createSimulationSearch(input: BattleInput, requested: number, op
           sampleSeed=rng.nextIntExclusive(0x100000000);
           pending=createTasLuckSearch(tasLuck=>{const decisions=createPlayerDecisionTrace();
             const result=simulateBattleCore(snapshot,{...options,simulationRules,rng:createSeededBattleRng(sampleSeed),tasLuck,playerDecisionObserver:decisions.observer});
-            return {result,diverged:false,decisionTrace:decisions.trace};},tasSummary.frontierCap);
+            return {result,diverged:false,decisionTrace:decisions.trace};},tasSummary.frontierCap,false,options.captureObjective);
           counted=emptyTasLuckSummary(tasSummary.frontierCap);
         }
         pending.step();const delta={...pending.summary};for(const k of ['opportunities','branchesExplored','deduplicated','pruned'] as const)delta[k]-=counted[k];
@@ -53,12 +55,13 @@ export function createSimulationSearch(input: BattleInput, requested: number, op
     progress(elapsedMs: number): SearchProgress {
       const result = accumulator.snapshot();
       const speed = elapsedMs > 0 && completed > 0 ? completed / elapsedMs * 1000 : null;
-      return { completedSimulations: completed, requestedSimulations: requested, successfulVictories: result.completedSuccesses,
-        completeTimingVictories: result.timedSuccesses, bestFrames: result.minFrames, ...accumulator.convergence(),
+      return { completedSimulations: completed, requestedSimulations: requested, successfulVictories: result.capture?.successes ?? result.completedSuccesses,
+        completeTimingVictories: result.capture?.timedSuccesses ?? result.timedSuccesses, bestFrames: result.capture ? result.capture.minFrames : result.minFrames, ...accumulator.convergence(),
         elapsedMs, simulationsPerSecond: speed, etaMs: speed ? (requested - completed) / speed * 1000 : null };
     },
     result(status: SimulationSearchMetadata['status'], elapsedMs: number): SimulationResult {
-      return { ...accumulator.snapshot(), ...(simulationRules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary},...(fastest.best?{tasLuckRoute:fastest.best}:{}),fastestBattleByFrames:fastest.best?.actions??[]}:{}), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, ...(simulationRules.rngPolicy !== 'natural' ? { rngPolicy: simulationRules.rngPolicy } : {}), status } };
+      const observed = accumulator.snapshot();
+      return { ...observed, ...(observed.capture && fastest.best?.capture ? { capture: { ...observed.capture, ...fastest.best.capture } } : {}), ...(simulationRules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary},...(fastest.best?{tasLuckRoute:fastest.best}:{}),fastestBattleByFrames:fastest.best?.actions??[]}:{}), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, ...(simulationRules.rngPolicy !== 'natural' ? { rngPolicy: simulationRules.rngPolicy } : {}), status } };
     },
   };
 }

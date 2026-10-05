@@ -33,6 +33,16 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     `Search status: ${report.resultStatus === 'cancelled' ? 'Cancelled / Partial' : 'Completed'}`, ''];
   const section = (heading: string) => { lines.push('', `## ${heading}`, ''); };
   const field = (label: string, value: string | number | undefined | null) => { if (value !== undefined && value !== null) lines.push(`- ${label}: ${reportText(value)}`); };
+  if (report.captureObjective) {
+    const c = report.captureObjective;
+    section('Capture Objective');
+    field('Capture target', 'E' + (c.target.position + 1) + (c.target.encounterSlot === undefined ? '' : ' / Slot ' + c.target.encounterSlot) + ' — ' + c.target.name);
+    field('Rule', c.rule); field('Simultaneous KO rule', c.simultaneousKoRule);
+    field('Last Enemy defeated', c.lastDefeated ? 'E' + (c.lastDefeated.position + 1) + ' — ' + c.lastDefeated.name : 'No retained qualifying execution');
+    field('Status', c.satisfied ? 'Satisfied' : 'Failed');
+    field('Battle Win Rate', c.battleWinRate + '%'); field('Capture Success Rate', c.successRate + '%');
+    field('Capture-qualified average frames', c.averageFrames); field('Search diagnostic', c.diagnostic);
+  }
   const combatants = [...report.playerTeam, ...report.enemyTeam];
   const actorLabel = (id: string) => combatantLabel(combatants, id);
   const order = (o: DeepReadonly<PlayerOrder>, round?: number) => {
@@ -114,7 +124,8 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
   section('Result');
   const selected = report.selectedResult;
   if (selected.kind === 'random-monte-carlo') {
-    field('Success rate', `${selected.winRate}%`); field('Fastest victory (frames)', selected.minFrames); field('Average victory (frames)', selected.averageFrames); field('Slowest victory (frames)', selected.maxFrames);
+    if (report.captureObjective) lines.push('Raw battle victory statistics below include wrong-capture wins. Capture-qualified timing and Capture Success Rate are listed in Capture Objective; the retained replay is capture-qualified.');
+    field(report.captureObjective ? 'Battle Win Rate' : 'Success rate', `${selected.winRate}%`); field('Fastest victory (frames)', selected.minFrames); field('Average victory (frames)', selected.averageFrames); field('Slowest victory (frames)', selected.maxFrames);
     field('Fewest actions', selected.minActions); field('Average actions', selected.averageActions); field('Most actions', selected.maxActions);
   } else {
     if (selected.objective !== 'fastest-potential') { lines.push('### ' + strategyTitle(selected.objective), '', strategyHelp(selected.objective)); statistics(selected.screenedPrefix.statistics); }

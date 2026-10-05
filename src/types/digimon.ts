@@ -91,6 +91,7 @@ export interface BattleDigimon {
 }
 
 export interface SimulationResult {
+  capture?: import('@/utils/battle/battleCaptureObjective').CaptureSummary;
   tasLuckSummary?: import('@/utils/battle/battleTasLuck').TasLuckSummary;
   tasLuckRoute?: import('@/utils/battle/battleFastestRoute').FastestRoute;
   report?: import('@/utils/battle/battleSimulationReport').BattleSimulationReport;

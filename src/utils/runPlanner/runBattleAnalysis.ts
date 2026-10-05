@@ -1,3 +1,4 @@
+import { captureTargetForSlot, type BattleCaptureTarget } from '@/utils/battle/battleCaptureObjective';
 import type { RosterDigimon, RunPlan, RunBattleEvent } from '@/types/runPlanner';
 import type { Tech } from '@/types/digimon';
 import type { BattleTeamMember } from '@/utils/battle/battleTypes';
@@ -15,6 +16,7 @@ export interface PlannerBattleMember extends BattleTeamMember {
   levelCap: RosterDigimon['levelCap']; acquisition: RosterDigimon['source'];
 }
 export interface PlannerBattleAnalysisPreset {
+  captureObjective?: BattleCaptureTarget;
   source: { kind: 'run-planner-pre-battle'; runId: string; runName?: string; battleEventId: string; battleEventIndex: number; encounterId: number };
   selectedBattle: Pick<RunBattleEvent, 'domainId' | 'phase' | 'floor' | 'encounterId'>;
   historicalStateSummary: { bits: number; rosterInstanceIds: string[]; orderedDigilineIds: string[]; replayedEvents: number; stats: 'planner-expected-growth-floored'; resources: 'planner-resource-history-unavailable' };
@@ -78,5 +80,6 @@ export function buildPlannerBattleAnalysisPreset(run: RunPlan, eventId: string):
   return structuredClone({ source: { kind: 'run-planner-pre-battle', runId: run.id, runName: run.name, battleEventId: eventId, battleEventIndex: historical.eventIndex, encounterId: event.encounterId },
     selectedBattle: { domainId: event.domainId, phase: event.phase, floor: event.floor, encounterId: event.encounterId },
     historicalStateSummary: { bits: historical.totalBits, rosterInstanceIds: historical.roster.map(m => m.instanceId), orderedDigilineIds: historical.digiline, replayedEvents: historical.replayedEvents, stats: 'planner-expected-growth-floored', resources: 'planner-resource-history-unavailable' },
+    ...(event.capturedEnemySlot === null ? {} : { captureObjective: captureTargetForSlot(enemyTeam, event.capturedEnemySlot) }),
     playerTeam, enemyTeam, diagnostics });
 }

@@ -1,3 +1,4 @@
+import { isCaptureQualifiedVictory, validateCaptureTarget } from './battleCaptureObjective';
 import { createTasLuckSearch, createTasLuckReplay, emptyTasLuckSummary, addTasLuckSummary, tasLuckCapForBudget, type TasLuckDecisionTrace } from './battleTasLuck';
 import { createFastestRouteTracker, type FastestRoute } from './battleFastestRoute';
 import { createOptimizedPassSearch, type SearchThoroughness, type SearchPassMetadata } from './battleSearchPasses';
@@ -46,6 +47,7 @@ export interface OptimizedProgress {
   evaluations: number; rolloutBudget: number; bestStats: OptimizedCandidateStats | null;
 }
 export interface OptimizedSearchResult extends OptimizedProgress {
+  captureObjective?: import('./battleCaptureObjective').BattleCaptureTarget;
   rngPolicy?: import('./battleRngPolicy').BattleRngPolicy;
   status: 'completed' | 'cancelled'; rootSeed: number; config: OptimizedSearchConfig;
   primaryRecommendation: 'fastest-route' | 'fair-prefix'; fastestRoute: FastestRoute | null;
@@ -69,6 +71,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
   const objective = options.objective ?? 'fastest-potential', config = { ...(options.config ?? optimizedConfigForBudget(budget)) };
   if (!['fastest-potential', 'average-victory', 'success-rate'].includes(objective)) throw new Error('Unknown optimization objective.');
   for (const n of [config.beamWidth, config.maxDepth]) if (!Number.isSafeInteger(n) || n < 1) throw new Error('Invalid optimized search configuration.');
+  validateCaptureTarget(snapshot, options.captureObjective);
   const rootSeed = options.seed ?? 0;
   if (!Number.isInteger(rootSeed) || rootSeed < 0 || rootSeed > 0xffffffff) throw new Error('Invalid root search seed.');
   const engineOptions: BattleEngineOptions = { simulationRules: rules, ...(options.maxRounds === undefined ? {} : { maxRounds: options.maxRounds }) };
@@ -85,8 +88,8 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
   const commonStage = (minimum: number) => { for (let i = schedule.length - 1; i >= 0; i--) if (schedule[i] <= minimum) return schedule[i]; return schedule[0]; };
   let activeStageStart: number | null = null;
   const tasSummary = emptyTasLuckSummary(options.tasFrontierCap ?? tasLuckCapForBudget(budget));
-  const accumulator = createBattleAccumulator();
-  const fastest = createFastestRouteTracker();
+  const accumulator = createBattleAccumulator(options.captureObjective);
+  const fastest = createFastestRouteTracker(options.captureObjective);
   let bestTurnsSample: { turns: number; key: string; sampleIndex: number; actions: SimulationResult['fastestBattleHistory'] } | null = null;
   const pairedSeeds = new Map<string, number[]>();
   let evaluations = 0, depth = 0, depthReached = 0, candidateCount = 0, candidatesEvaluated = 0, beamSize = 0, done = false;
@@ -122,7 +125,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
     const seed = seeds[sampleIndex] ?? (seeds[sampleIndex] = rolloutSeed(rootSeed, candidate.plans.length, candidate.parentKey, sampleIndex));
     let sample;
     if (rules.rngPolicy === 'tas-luck') {
-      const search = createTasLuckSearch(tasLuck => replayPlayerPrefix(snapshot,candidate.plans,seed,{...engineOptions,tasLuck},false,true),tasSummary.frontierCap);
+      const search = createTasLuckSearch(tasLuck => replayPlayerPrefix(snapshot,candidate.plans,seed,{...engineOptions,tasLuck},false,true),tasSummary.frontierCap,false,options.captureObjective);
       let counted = emptyTasLuckSummary(tasSummary.frontierCap);
       while(!search.done) {
         search.step();
@@ -134,21 +137,23 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
       sample=search.best!;
     } else sample=replayPlayerPrefix(snapshot,candidate.plans,seed,engineOptions,false,true);
     const {result,diverged,decisionTrace}=sample;
+    const qualified = isCaptureQualifiedVictory(result, options.captureObjective);
     fastest.consider(result, diverged, decisionTrace, candidate.key, sampleIndex, seed, candidate.plans);
     if (!diverged && (result.outcome === 'invalid' || result.outcome === 'unsupported')) throw new Error(result.diagnostics.join(' '));
     if (!candidate.stats.evaluations) candidatesEvaluated++;
-    addCandidateOutcome(candidate.stats, result, diverged); evaluations++; depthReached = Math.max(depthReached, candidate.plans.length);
+    addCandidateOutcome(candidate.stats, result, diverged, options.captureObjective); evaluations++; depthReached = Math.max(depthReached, candidate.plans.length);
     if (!diverged) {
       accumulator.add(result);
       const earlier = (old: { key: string; sampleIndex: number }) => candidate.key < old.key || candidate.key === old.key && sampleIndex < old.sampleIndex;
-      if (result.outcome === 'player-win') {
+      if (qualified) {
         if (!bestTurnsSample || result.actionCount < bestTurnsSample.turns || result.actionCount === bestTurnsSample.turns && earlier(bestTurnsSample))
           bestTurnsSample = { turns: result.actionCount, key: candidate.key, sampleIndex, actions: result.actions };
       }
-      if (result.outcome === 'player-win' && result.timingCompleteness === 'complete' && result.totalFrames !== null)
+      if (qualified && result.timingCompleteness === 'complete' && result.totalFrames !== null)
         candidate.samples.push({ frames: result.totalFrames, sampleIndex, seed, rounds: result.rounds, ...(result.tasLuckTrace?{tasLuckTrace:result.tasLuckTrace}:{}) });
-      // Deterministic fallback: victory, then less remaining Enemy HP, then earlier sample.
-      const score = (result.outcome === 'player-win' ? 1e15 : 0) - result.state.combatants.filter(a => a.side === 'enemy').reduce((n, a) => n + a.currentHp, 0);
+      // Qualified victory outranks prefixes; terminal wrong captures rank below them.
+      // Unfinished prefixes keep the existing remaining-HP heuristic.
+      const score = (qualified ? 1e15 : options.captureObjective && result.outcome === 'player-win' ? -1e15 : 0) - result.state.combatants.filter(a => a.side === 'enemy').reduce((n, a) => n + a.currentHp, 0);
       if (options.explorationSeed !== undefined) (candidate.continuationSamples ??= []).push({ score, seed, sampleIndex, rounds: result.rounds, ...(result.tasLuckTrace ? { tasLuckTrace: result.tasLuckTrace } : {}) });
       if (!candidate.fallback || score > candidate.fallback.score) candidate.fallback = { score, seed, sampleIndex, rounds: result.rounds, ...(result.tasLuckTrace?{tasLuckTrace:result.tasLuckTrace}:{}) };
     }
@@ -223,7 +228,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
         const alreadyEnded = (representative?.rounds ?? c.fallback?.rounds ?? Infinity) <= c.plans.length;
         const replay = alreadyEnded ? { nextState: null } : replayPlayerPrefix(snapshot, c.plans, seed, {...engineOptions, ...(rules.rngPolicy==='tas-luck'?{tasLuck:createTasLuckReplay(representative?.tasLuckTrace??c.fallback?.tasLuckTrace??[]).control}:{})}, true);
         if (replay.nextState) parents.push({ plans: c.plans, state: replay.nextState, key: c.key });
-        else {
+        else if (!options.captureObjective || c.stats.victories > 0) {
           const bestStage = c.stages[commonStage(c.stats.evaluations)]!;
           const retained = { ...c, ...bestStage };
           const finished = [...completedPaths.filter(p => p.key !== c.key), retained];
@@ -266,7 +271,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
           if (coverage.status === 'deferred-unresolved') diagnostics.add(order.skillName + ': ' + coverage.boundary);
         }
       }
-      const optimized: OptimizedSearchResult = { ...details(), status, rootSeed, config, ...(rules.rngPolicy !== 'natural' ? { rngPolicy: rules.rngPolicy } : {}),
+      const optimized: OptimizedSearchResult = { ...details(), ...(options.captureObjective ? { captureObjective: options.captureObjective } : {}), status, rootSeed, config, ...(rules.rngPolicy !== 'natural' ? { rngPolicy: rules.rngPolicy } : {}),
         primaryRecommendation: objective === 'fastest-potential' ? 'fastest-route' : 'fair-prefix', fastestRoute: fastest.best,
         recommendedPrefix: fair[0]?.plans ?? [], recommendedStats: fair[0]?.stats ?? null,
         topCandidates: fair.slice(0, 5).map(({ key, plans, stats }) => ({ key, plans, stats })),
