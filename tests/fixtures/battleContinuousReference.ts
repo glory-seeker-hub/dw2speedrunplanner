@@ -1,4 +1,5 @@
-// Frozen committed Phase 2K-I aggregation/continuous loop for equivalence tests.
+// Phase 2K-I independent continuous reference, extended with Phase 2O-B timing metadata.
+import { summarizeBattleTiming } from '@/utils/battle/battleTiming';
 import type { SimulationResult } from '@/types/digimon';
 import type { Encounter } from '@/types/encounter';
 import type { BattleEngineOptions, BattleRunResult, BattleTeamMember } from '@/utils/battle/battleTypes';
@@ -16,6 +17,7 @@ export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): Simulation
   const timingDiagnostics = new Set<string>(), resourceDiagnostics = new Set<string>();
   let turns = 0, frames = 0;
   for (const run of runs) {
+    run.roundTransitions?.filter(t => t.frames === null).forEach(t => timingDiagnostics.add(`Round transition timing unavailable for ${t.livingPlayerAllies} living Player allies.`));
     result.totalSimulations++; result.outcomeCounts[run.outcome]++;
     if (run.actions.some(a => a.resourceAlerts.length)) result.runsWithResourceAlerts++;
     // Deduplicate action-level messages rather than storing one ID per batch run.
@@ -26,13 +28,13 @@ export function aggregateBattleRuns(runs: Iterable<BattleRunResult>): Simulation
     if (run.outcome !== 'player-win') continue;
     result.completedSuccesses++; turns += run.actionCount;
     if (result.minTurns === null || run.actionCount < result.minTurns) {
-      result.minTurns = run.actionCount; result.fastestBattleHistory = run.actions;
+      result.minTurns = run.actionCount; result.fastestBattleHistory = run.actions; result.fastestBattleHistoryTiming = summarizeBattleTiming(run.actions, run.roundTransitions);
     }
     result.maxTurns = Math.max(result.maxTurns ?? 0, run.actionCount);
     if (run.timingCompleteness !== 'complete' || run.totalFrames === null) { result.incompleteTimingSuccesses++; continue; }
     result.timedSuccesses++; frames += run.totalFrames;
     if (result.minFrames === null || run.totalFrames < result.minFrames) {
-      result.minFrames = run.totalFrames; result.fastestBattleByFrames = run.actions;
+      result.minFrames = run.totalFrames; result.fastestBattleByFrames = run.actions; result.fastestBattleByFramesTiming = summarizeBattleTiming(run.actions, run.roundTransitions);
     }
     result.maxFrames = Math.max(result.maxFrames ?? 0, run.totalFrames);
   }

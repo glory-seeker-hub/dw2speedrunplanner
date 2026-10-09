@@ -36,7 +36,7 @@ const checks=[
  ['intended Random target','results',/does not replace the intended Random target/],
  ['alternatives not branches','results',/not TAS branches or every explored candidate/],
  ['compact and expanded history','results',/Compact action cards[\s\S]*Expand Action details for MP/],
- ['timing scope','results',/external menu\/order-entry overhead is not included/],
+ ['timing scope','results',/measured inter-round processing\/order-entry overhead/],
  ['narrow eligible TAS conflict','tas',/only explicit TAS branch search[\s\S]*eligible normal action while both Confused AND Paralyzed[\s\S]*\(A\) Paralysis blocks[\s\S]*\(B\) Paralysis allows/],
  ['direct favorable TAS statuses','tas',/against Enemy succeeds; against Player it fails[\s\S]*recovery is unfavorable to Enemy and favorable to Player/],
  ['unsupported RNG remains natural','tas',/Unsupported RNG remains Natural\/current behavior/],

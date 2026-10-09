@@ -118,7 +118,7 @@ export const GUIDE_SECTIONS: readonly GuideSection[] = [
     'Player HP or MP depletion does not stop the offensive simulation. Recovery, revival, Guard and item actions required in-game are not inserted or counted. Inspect the resource alerts in Action details; a simulated victory and its frames do not establish that the route is executable without additional recovery.',
     'Optimized Search is bounded and uses sampled/stochastic continuations. Fastest Route Found is not proof of a global optimum or exact global minimum. More budget or thoroughness can increase coverage without improving the result; Maximum does not guarantee convergence and can legitimately finish with unused budget.',
     'Screened strategy and fastest individual observation answer different questions. Average/Success use completed fair samples. Average winning frames excludes losing samples and is not expected real-game completion time; observed success does not imply a confidence interval.',
-    'Battle timing excludes external menu/order-entry overhead, so it is not a full end-to-end speedrun segment time. TAS covers only supported modeled status RNG. Exact-stat changes remain simulation-local. Review resource and unsupported-effect diagnostics when interpreting an outcome.',
+    'Battle timing includes measured inter-round processing/order-entry overhead (319 / 385 / 452 frames for 1 / 2 / 3 living Player allies). Other external menu, recovery, item and setup time remains excluded, so it is not a full end-to-end speedrun segment time. TAS covers only supported modeled status RNG. Exact-stat changes remain simulation-local. Review resource and unsupported-effect diagnostics when interpreting an outcome.',
   ] },
 ];
 

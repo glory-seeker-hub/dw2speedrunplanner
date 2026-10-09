@@ -14,7 +14,7 @@ import { livingOpponents, resolveEffectiveTargets } from './battleTargets';
 import { calculateActionDamage, getTypeBonus } from './battleDamage';
 import { afterLegacyAction, applyLegacyImpactEffects, beforeLegacyAction, legacyChainContinues } from './battleLegacyEffects';
 import { completeCounter, promoteCounters, counterForcesMiss, counterTargetForm, counterDefinition, usesActivatedCounterMechanics, waitingTailBlade } from './battleReactions';
-import { classifySkillTiming, resolveActionTiming, summarizeBattleTiming } from './battleTiming';
+import { classifySkillTiming, resolveActionTiming, summarizeBattleTiming, roundTransitionTiming, type RoundTransitionTiming } from './battleTiming';
 import { accountActionMp, depletionAlert } from './battleResources';
 import { scheduleShadowScytheRepeat, SHADOW_SCYTHE_ID } from './battleChains';
 import { recoverStatuses, statusSnapshot, resolveImpactStatuses } from './battleStatuses';
@@ -23,18 +23,19 @@ import { claimInterrupt, resolveInterruptEffects, reduceInterruptedDamage } from
 import { resolveSimulationRules } from './battleSimulationRules';
 import { resolveActionAccuracy } from './battleAccuracy';
 
-export const BATTLE_ENGINE_VERSION = '2k-h-authoritative-support-v1';
+export const BATTLE_ENGINE_VERSION = '2o-b-authoritative-timing-v1';
 export const DEFAULT_MAX_ROUNDS = 1000;
 export function simulateBattleCore(input: BattleInput, options: BattleEngineOptions = {}): BattleRunResult {
   const rng = attachTasLuck(options.rng ?? createProductionBattleRng(), options.tasLuck);
   const policy = options.actionPolicy ?? legacyActionPolicy;
   let state: BattleState = { combatants: [], plannedActions: [], queue: [], round: 0, nextActionNumber: 1, simulationIndex: options.simulationIndex ?? 0 };
   const records: BattleActionRecord[] = [];
+  const roundTransitions: RoundTransitionTiming[] = [];
   let executionCount = 0;
   const result = (outcome: BattleRunResult['outcome'], diagnostics: string[] = []): BattleRunResult => ({
     engineVersion: BATTLE_ENGINE_VERSION, outcome, winner: outcome === 'player-win' ? 'player' : outcome === 'enemy-win' ? 'enemy' : null,
     rounds: state.round, actionCount: executionCount, actions: records, state, diagnostics,
-    ...summarizeBattleTiming(records),
+    ...summarizeBattleTiming(records, roundTransitions),
   });
   const record = (action: PlannedAction, reason?: string): BattleActionRecord => {
     const actor = actorById(state, action.actorId);
@@ -83,6 +84,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
     let outcome = completedOutcome(state);
     if (outcome) return result(outcome);
     for (let round = 1; round <= maxRounds; round++) {
+      if (round > 1) roundTransitions.push(roundTransitionTiming(round - 1, state.combatants));
       state.round = round;
       clearRoundEffects(state);
       options.playerDecisions?.beforeRound(state);
@@ -111,6 +113,9 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           if (actorById(state, action.actorId).side === 'player') options.playerDecisionObserver?.selectedTargets(state, action, action.targetIntent.targetIds);
         }
       }
+      // A missing/invalid lock is not a target defeated after valid planning.
+      const livingLocksAtPlanning = new Map(actions.map(action => [action.id,
+        action.targetIntent.kind === 'combatants' ? action.targetIntent.targetIds.filter(id => state.combatants.some(a => a.id === id && a.isAlive)) : []]));
       // beforeActionOrder: future priority/status flags attach here.
       state.queue = calculateActionOrder(state, actions, rng);
       const acted = new Set<string>();
@@ -124,7 +129,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           record(action, reason ?? 'already-acted'); completeCounter(action); continue;
         }
         const actor = actorById(state, action.actorId);
-        rng.tasLuck?.action(state, action, () => ({records, executionCount, acted: [...acted], rngPosition: rng.position?.()}));
+        rng.tasLuck?.action(state, action, () => ({records, roundTransitions, executionCount, acted: [...acted], rngPosition: rng.position?.()}));
         if (action.guard) {
           action.state = 'resolved'; acted.add(actor.id); executionCount++;
           const entry = record(action, 'Guard — Motivation Down');
@@ -153,7 +158,11 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
           const targetIds = action.kind === 'assist' ? assistTargetsAtExecution(state, action, rng)
             : action.interrupt ? [action.interrupt.interruptedActorId!] : resolveEffectiveTargets(state, action, rng, confusion.redirected);
           if (actor.side === 'player' && action.kind === 'attack' && !confusion.redirected) options.playerDecisionObserver?.selectedTargets(state, action, targetIds);
-          if (!targetIds.length && !randomTarget(action.skill) && !necroTarget(action.skill)) { action.state = 'skipped'; recordSkipped('no-living-targets'); completeCounter(action); continue; }
+          const lockedTargetLost = !confusion.redirected && (action.kind === 'attack' || action.kind === 'counter')
+            && action.skill.legacyTech.target === 'Single' && !randomTarget(action.skill) && !necroTarget(action.skill)
+            && (action.counter?.triggerActorId ? [action.counter.triggerActorId] : livingLocksAtPlanning.get(action.id) ?? [])
+              .some(id => state.combatants.some(a => a.id === id && !a.isAlive && a.currentHp === 0));
+          if (!targetIds.length && !lockedTargetLost && !randomTarget(action.skill) && !necroTarget(action.skill)) { action.state = 'skipped'; recordSkipped('no-living-targets'); completeCounter(action); continue; }
           const assistLost = action.kind === 'assist' && !necroTarget(action.skill) && !isRevive(action.skill) && targetIds.length === 1 && actorById(state, targetIds[0]).currentHp === 0;
           const initialAccuracy = !targetIds.length ? { outcome: 'miss' as const, cause: 'no-effective-target' as const, referenceTargetId: null } : assistLost ? { outcome: 'miss' as const, cause: 'assist-target-lost' as const, referenceTargetId: targetIds[0] } : counterForcesMiss(action)
             ? { outcome: 'miss' as const, cause: 'counter-not-activated' as const, referenceTargetId: null }
@@ -164,7 +173,10 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         const prepared = action.prepared;
         if (!prepared.interruptConsumed && claimInterrupt(state, action, rng)) continue;
         const targetIds = prepared.targetIds.filter(id => action.kind === 'assist' || actorById(state, id).isAlive);
-        if (!targetIds.length && !randomTarget(action.skill) && !necroTarget(action.skill)) { action.state = 'skipped'; record(action, 'no-living-targets'); completeCounter(action); delete actor.confusionSuppressedForActionId; continue; }
+        const preparedTargetLost = !targetIds.length && (prepared.initialAccuracy.cause === 'no-effective-target'
+          || prepared.targetIds.length > 0 && action.skill.legacyTech.target === 'Single'
+            && prepared.targetIds.every(id => !actorById(state, id).isAlive && actorById(state, id).currentHp === 0));
+        if (!targetIds.length && !preparedTargetLost && !randomTarget(action.skill) && !necroTarget(action.skill)) { action.state = 'skipped'; record(action, 'no-living-targets'); completeCounter(action); delete actor.confusionSuppressedForActionId; continue; }
         action.state = 'resolving';
         const entry = Object.assign(record(action), { statusesBefore: prepared.statusesBefore, statusesAfterRecovery: prepared.statusesAfterRecovery,
           statusRecoveries: prepared.statusRecoveries, confusion: prepared.confusion });
@@ -179,8 +191,10 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         entry.effectiveTargetIds = [...targetIds];
         acted.add(actor.id); executionCount++;
         beforeLegacyAction(actor, action);
-        if (prepared.interruptedByActionId) {
-          prepared.resolution!.restarted = true;
+        if (prepared.interruptedByActionId) prepared.resolution!.restarted = true;
+        if (preparedTargetLost) {
+          entry.accuracy = { outcome: 'miss', cause: 'no-effective-target', referenceTargetId: null };
+        } else if (prepared.interruptedByActionId) {
           entry.accuracy = prepared.resolution!.forceMiss
             ? { outcome: 'miss', cause: 'interrupt-forced-miss', referenceTargetId: null }
             : resolveActionAccuracy(actor, action.kind, targetIds.map(id => actorById(state, id)), rng,
