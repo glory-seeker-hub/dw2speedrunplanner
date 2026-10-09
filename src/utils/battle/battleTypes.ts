@@ -1,3 +1,4 @@
+import type { BattleTimingSummary } from './battleTiming';
 import type { DigimonStats, Tech, TeamDigimon } from '@/types/digimon';
 import type { ActionKind, Ailment, SkillElement } from '@/types/battleSkill';
 import type { Encounter } from '@/types/encounter';
@@ -140,12 +141,11 @@ export interface BattleState {
   simulationIndex: number;
 }
 export type BattleOutcome = 'player-win' | 'enemy-win' | 'limit-reached' | 'invalid' | 'unsupported';
-export interface BattleRunResult {
+export interface BattleRunResult extends BattleTimingSummary {
   tasLuckTrace?: import('./battleTasLuck').TasLuckDecisionTrace;
   engineVersion: string; outcome: BattleOutcome; winner: BattleSide | null;
   rounds: number; actionCount: number; actions: BattleActionRecord[];
   state: BattleState; diagnostics: string[];
-  totalFrames: number | null; knownFrames: number; timingCompleteness: 'complete' | 'incomplete'; timingDiagnostics: string[];
 }
 export type BattleTeamMember = TeamDigimon & { instanceId?: string; isBoss?: boolean; initialStatuses?: Partial<Record<BattleStatus | 'poison-body' | 'invincibility' | 'invisibility' | 'motivation-down', boolean>>; initialPowers?: Partial<Record<BattleStatus, boolean>>; initialElementalPower?: SkillElement; initialStages?: Partial<Record<'atk' | 'def' | 'spd', number>>; currentHp?: number; currentMp?: number };
 export interface BattleInput { player: readonly BattleTeamMember[]; enemy: readonly BattleTeamMember[] | Encounter; floorSpecialty: string }

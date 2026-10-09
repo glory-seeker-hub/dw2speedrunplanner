@@ -114,6 +114,8 @@ export interface SimulationResult {
   minFrames: number | null;
   avgFrames: number | null;
   maxFrames: number | null;
+  fastestBattleHistoryTiming?: import('@/utils/battle/battleTiming').BattleTimingSummary;
+  fastestBattleByFramesTiming?: import('@/utils/battle/battleTiming').BattleTimingSummary;
   fastestBattleHistory: BattleActionRecord[];
   fastestBattleByFrames: BattleActionRecord[];
   timingDiagnostics: string[];

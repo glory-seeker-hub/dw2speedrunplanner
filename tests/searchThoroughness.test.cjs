@@ -12,7 +12,7 @@ const opts={seed:42,config:{beamWidth:2,maxDepth:2},simulationRules:{accuracyMod
 const finish=s=>{let steps=0;while(!s.done){s.step();assert.ok(++steps<1000000);}return s.result('completed',100);};
 const base=finish(createOptimizedSearchPass(small(),300,opts));
 const stable=v=>Array.isArray(v)?v.map(stable):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;
-for(const row of JSON.parse(fs.readFileSync('tests/fixtures/searchThoroughnessBaseline.json')).rows)test('committed L3 full semantic hash: '+row.kind+' '+row.options.objective,()=>{
+for(const row of JSON.parse(fs.readFileSync('docs/phase-2o-b/search-hash-audit.json')))test('Phase 2O-B audited full semantic hash: '+row.kind+' '+row.options.objective,()=>{
  const r=finish(createOptimizedSearch(row.kind==='small'?small():canonical(),row.budget,row.options));
  assert.equal(r.optimized.passes.passesStarted,1);assert.equal(r.optimized.evaluations,row.evaluations);assert.deepEqual(r.optimized.effort.screeningSchedule,[4,16,64]);assert.deepEqual(r.optimized.config,row.options.config);
  for(const o of [r.optimized,r.search.optimized]){delete o.passes;delete o.effort;}
@@ -40,7 +40,7 @@ test('common fair-world prefix extends identically across all modes',()=>{
  assert.deepEqual(schedules.map(s=>s.length),[64,128,256]);assert.deepEqual(schedules[1].slice(0,64),schedules[0]);assert.deepEqual(schedules[2].slice(0,128),schedules[1]);assert.equal(new Set(schedules[2]).size,256);
  assert.equal(schedules[0][0],rolloutSeed(42,1,plans.prefixKey([]),0));
 });
-test('controlled real-battle witness: 4 samples prune eventual 128-sample winner, Thorough retains it',()=>{
+test('historical action-only pruning witness: 4 samples prune eventual 128-sample winner, Thorough retains it',()=>require('./helpers/actionOnlyCompatibility.cjs').withActionOnlyTiming(()=>{
  const options={seed:pruningSeed,maxRounds:12,objective:'average-victory',config:{beamWidth:1,maxDepth:1},simulationRules:{accuracyMode:'game-accurate'}};
  let initial;
  const s=createOptimizedSearchPass(stochastic,5000,{...options,onStage:(stage,rows)=>{if(stage.samples===4)initial=rows.map(c=>({key:c.key,stats:{...c.stats}}));}}),legacy=finish(s).optimized;
@@ -50,7 +50,7 @@ test('controlled real-battle witness: 4 samples prune eventual 128-sample winner
  assert.ok(!legacy.topCandidates.some(c=>c.key===best.key));assert.ok(thorough.topCandidates.some(c=>c.key===best.key));
  const oldAt128=oracle.topCandidates.find(c=>c.key===legacy.topCandidates[0].key);assert.ok(compareCandidates(best,oldAt128,'average-victory')<0);
  assert.equal(thorough.rootPlanCount,legacy.rootPlanCount);
-});
+}));
 test('wider retention grows useful beam without changing legal root universe or depth',()=>{
  const a=finish(createOptimizedSearch(branching,12000,{...opts,config:{beamWidth:4,maxDepth:4},maxRounds:12})).optimized;
  const b=finish(createOptimizedSearch(branching,12000,{...opts,config:{beamWidth:4,maxDepth:4},maxRounds:12,searchThoroughness:'thorough'})).optimized;

@@ -61,7 +61,7 @@ export function createSimulationSearch(input: BattleInput, requested: number, op
     },
     result(status: SimulationSearchMetadata['status'], elapsedMs: number): SimulationResult {
       const observed = accumulator.snapshot();
-      return { ...observed, ...(observed.capture && fastest.best?.capture ? { capture: { ...observed.capture, ...fastest.best.capture } } : {}), ...(simulationRules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary},...(fastest.best?{tasLuckRoute:fastest.best}:{}),fastestBattleByFrames:fastest.best?.actions??[]}:{}), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, ...(simulationRules.rngPolicy !== 'natural' ? { rngPolicy: simulationRules.rngPolicy } : {}), status } };
+      return { ...observed, ...(observed.capture && fastest.best?.capture ? { capture: { ...observed.capture, ...fastest.best.capture } } : {}), ...(simulationRules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary},...(fastest.best?{tasLuckRoute:fastest.best}:{}),fastestBattleByFrames:fastest.best?.actions??[],fastestBattleByFramesTiming:fastest.best?.timing}:{}), search: { ...this.progress(elapsedMs), accuracyMode: simulationRules.accuracyMode, ...(simulationRules.rngPolicy !== 'natural' ? { rngPolicy: simulationRules.rngPolicy } : {}), status } };
     },
   };
 }

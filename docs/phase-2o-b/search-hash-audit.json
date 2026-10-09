@@ -1,0 +1,176 @@
+[
+  {
+    "kind": "small",
+    "budget": 300,
+    "options": {
+      "seed": 42,
+      "objective": "fastest-potential",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 64,
+    "hash": "287c81e97bce03171b6eb7e9a0d4f5baab4e051a6d1562d61317a726bd61657f",
+    "previousHash": "ab85bd735e004ef5a056a095cada50b1df8c3fd48f145047ca80e0e1b30d35f0",
+    "timing": {
+      "actionFrames": 685,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 685,
+      "knownFrames": 685,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 685,
+    "misses": 0
+  },
+  {
+    "kind": "canonical",
+    "budget": 10000,
+    "options": {
+      "seed": 42,
+      "objective": "fastest-potential",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 8908,
+    "hash": "45919eb8e66d6c2947489bda70f925d27e50dada1fc2f5d7b5b75c9f1f1d9049",
+    "previousHash": "3ef3e16988b657a31f59d44bcf4de974985e3ab2540552ec335d26bc4483de75",
+    "timing": {
+      "actionFrames": 990,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 990,
+      "knownFrames": 990,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 2797.0336775931746,
+    "misses": 0
+  },
+  {
+    "kind": "small",
+    "budget": 300,
+    "options": {
+      "seed": 42,
+      "objective": "average-victory",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 64,
+    "hash": "c7d81eb3e6fe8ce3bed0ff63d5f79d487b63bb7d9bd197a18e776a9a521d9b87",
+    "previousHash": "2cfedcaf532b349f0e6ac1ee621d449d6a49afe6bd50ee0b43bef38b1074a95b",
+    "timing": {
+      "actionFrames": 685,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 685,
+      "knownFrames": 685,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 685,
+    "misses": 0
+  },
+  {
+    "kind": "canonical",
+    "budget": 10000,
+    "options": {
+      "seed": 42,
+      "objective": "average-victory",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 8908,
+    "hash": "6aa77fc19f2106d79be0f8310ae2f5d0e71671a9bdec6f5ee0161dfc4d1b045c",
+    "previousHash": "8e717a90f15d4c18189f813d2f008e9070bb250b7f655491e51eda453f6e4d5d",
+    "timing": {
+      "actionFrames": 990,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 990,
+      "knownFrames": 990,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 2797.0336775931746,
+    "misses": 0
+  },
+  {
+    "kind": "small",
+    "budget": 300,
+    "options": {
+      "seed": 42,
+      "objective": "success-rate",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 64,
+    "hash": "1ad7898172d3593971f836be52b964780c8056c80d1c4e734b24082a9afd9624",
+    "previousHash": "24134047ac02d273ad8f6dd9ff61aae4cb6f8b6d1bb051ae2f5b29a554effbe8",
+    "timing": {
+      "actionFrames": 685,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 685,
+      "knownFrames": 685,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 685,
+    "misses": 0
+  },
+  {
+    "kind": "canonical",
+    "budget": 10000,
+    "options": {
+      "seed": 42,
+      "objective": "success-rate",
+      "simulationRules": {
+        "accuracyMode": "strategy"
+      },
+      "config": {
+        "beamWidth": 2,
+        "maxDepth": 2
+      }
+    },
+    "evaluations": 8908,
+    "hash": "97aea26824b0a6438800d10093298e5f76b83f5e05f8645a1676078893f08e43",
+    "previousHash": "91094f2824fcf4284c72bfa14cb38d2daa65efa213b69fa16cddae37d0e91ded",
+    "timing": {
+      "actionFrames": 990,
+      "roundTransitionFrames": 0,
+      "roundTransitions": [],
+      "totalFrames": 990,
+      "knownFrames": 990,
+      "timingCompleteness": "complete",
+      "timingDiagnostics": []
+    },
+    "averageFrames": 2797.0336775931746,
+    "misses": 0
+  }
+]

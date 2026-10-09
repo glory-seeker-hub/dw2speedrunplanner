@@ -152,12 +152,20 @@ export function serializeBattleSimulationReportMarkdown(report: BattleSimulation
     for (const r of report.rngRequirements) lines.push(`- Round ${r.round} · ${reportText(actorLabel(r.actorId))} · ${reportText(r.skillName ?? 'Guard')} · ${reportText(actorLabel(r.targetId))} · ${r.phase}: ${reportText(rngRequirementText(r))}`);
   }
   section('Executed Battle Replay'); lines.push(replayExplanation(report)); if (replayNote) lines.push('', replayNote); field('Observation', report.executedBattle.kind); field('Total modeled frames', report.executedBattle.totalFrames); field('Rounds', report.executedBattle.rounds);
+  const timing = report.executedBattle.timing;
+  if (timing) {
+    field('Known action frames', timing.actionFrames); field('Known round-transition frames', timing.roundTransitionFrames);
+    field('Timing completeness', timing.timingCompleteness);
+    for (const t of timing.roundTransitions) lines.push(`- Round ${t.fromRound} -> ${t.toRound}: ${t.livingPlayerAllies} living Player allies · ${t.frames === null ? 'Unavailable' : '+' + t.frames + ' f'}`);
+  }
   let round = 0;
   for (const a of report.executedBattle.actions) {
     if (round !== a.round) { round = a.round; lines.push('', `### Round ${round}`, ''); }
     lines.push('', `#### ${a.sequence}. ${reportText(actorLabel(a.actorId))} — ${reportText(a.skillName ?? a.kind)}`, '');
     field('Outcome', a.outcome); field('State', a.state); field('Reason', a.reason); field('Action frames', a.durationFrames);
-    field('Actual targets', a.effectiveTargetIds.map(actorLabel).join(', '));
+    field('Intended target', a.targetIntent.kind === 'combatants' ? a.targetIntent.targetIds.map(actorLabel).join(', ') : a.targetIntent.selection);
+    field('Actual targets', a.effectiveTargetIds.map(actorLabel).join(', ') || 'None');
+    if (a.accuracy?.cause === 'no-effective-target') field('Miss cause', 'no-effective-target — target no longer available');
     lines.push('', '<details><summary>Action details — resources, status, RNG and effect audit</summary>', '');
     field('Internal action ID', a.id);
     for (const i of a.impacts) {

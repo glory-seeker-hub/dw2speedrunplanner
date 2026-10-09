@@ -1,6 +1,16 @@
 import { getBattleSkillById } from '@/data/battleSkills';
 import type { ActionKind } from '@/types/battleSkill';
-import type { BattleActionRecord, BattleSkillSelection } from './battleTypes';
+import type { BattleActionRecord, BattleSkillSelection, BattleCombatantState } from './battleTypes';
+
+export const ROUND_TRANSITION_TIMING_PROFILE = Object.freeze({ 1: 319, 2: 385, 3: 452 });
+export interface RoundTransitionTiming {
+  fromRound: number; toRound: number; livingPlayerAllies: number; frames: number | null;
+}
+export function roundTransitionTiming(fromRound: number, combatants: readonly BattleCombatantState[]): RoundTransitionTiming {
+  const livingPlayerAllies = combatants.filter(a => a.side === 'player' && a.currentHp > 0).length;
+  return { fromRound, toRound: fromRound + 1, livingPlayerAllies,
+    frames: (ROUND_TRANSITION_TIMING_PROFILE as Readonly<Record<number, number>>)[livingPlayerAllies] ?? null };
+}
 
 /** Project-authoritative measured frames supplied in the Phase 2K-D request.
  * Independent execution measurements, not WAZADATA bytes or converted seconds. */
@@ -57,11 +67,17 @@ export function classifySkillTiming(skill: BattleSkillSelection): TimingClass {
   if (canonical.targetGroup === 'all-enemies' && skill.legacyTech.target === 'All') return 'aoe';
   return 'unknown';
 }
-export function summarizeBattleTiming(actions: readonly BattleActionRecord[]) {
+export function summarizeBattleTiming(actions: readonly BattleActionRecord[], roundTransitions: readonly RoundTransitionTiming[] = []) {
   const executed = actions.filter(a => a.state === 'resolved');
   const unknown = executed.filter(a => a.durationFrames === null);
-  const knownFrames = executed.reduce((sum, a) => sum + (a.durationFrames ?? 0), 0);
-  return { totalFrames: unknown.length ? null : knownFrames, knownFrames,
-    timingCompleteness: unknown.length ? 'incomplete' as const : 'complete' as const,
-    timingDiagnostics: unknown.map(a => `${a.id}: ${a.timingDiagnostics.join(' ') || 'Unknown action duration.'}`) };
+  const actionFrames = executed.reduce((sum, a) => sum + (a.durationFrames ?? 0), 0);
+  const roundTransitionFrames = roundTransitions.reduce((sum, t) => sum + (t.frames ?? 0), 0);
+  const missingTransitions = roundTransitions.filter(t => t.frames === null);
+  const incomplete = unknown.length > 0 || missingTransitions.length > 0;
+  const knownFrames = actionFrames + roundTransitionFrames;
+  return { actionFrames, roundTransitionFrames, roundTransitions: [...roundTransitions], totalFrames: incomplete ? null : knownFrames, knownFrames,
+    timingCompleteness: incomplete ? 'incomplete' as const : 'complete' as const,
+    timingDiagnostics: [...unknown.map(a => `${a.id}: ${a.timingDiagnostics.join(' ') || 'Unknown action duration.'}`),
+      ...missingTransitions.map(t => `Round ${t.fromRound} -> ${t.toRound}: timing unavailable for ${t.livingPlayerAllies} living Player allies.`)] };
 }
+export type BattleTimingSummary = ReturnType<typeof summarizeBattleTiming>;

@@ -1,3 +1,4 @@
+import { summarizeBattleTiming, type BattleTimingSummary } from './battleTiming';
 import { isCaptureQualifiedVictory, evaluateCaptureObjective, type BattleCaptureTarget, type CaptureObjectiveEvaluation } from './battleCaptureObjective';
 import { tasLuckTraceKey, type TasLuckDecisionTrace } from './battleTasLuck';
 import { collectRngRequirements, type TasRngRequirement } from './battleRngAudit';
@@ -6,6 +7,7 @@ import type { PlayerRoundPlan } from './battleActionPlans';
 import { playerDecisionTraceKey } from './battlePlayerDecisionTrace';
 
 export interface FastestRoute {
+  timing?: BattleTimingSummary;
   capture?: CaptureObjectiveEvaluation;
   tasLuckTrace?: TasLuckDecisionTrace;
   sourcePlayerPrefix?: PlayerRoundPlan[];
@@ -20,7 +22,7 @@ export function createFastestRouteTracker(target?: BattleCaptureTarget) {
     get best() { return best; },
     consider(result: BattleRunResult, diverged: boolean, decisionTrace: PlayerRoundPlan[], sourcePrefixKey: string, sampleIndex: number, seed: number, sourcePlayerPrefix: PlayerRoundPlan[] = []) {
       if (diverged || !isCaptureQualifiedVictory(result, target) || result.timingCompleteness !== 'complete' || result.totalFrames === null) return;
-      const next: FastestRoute = { ...(target ? { capture: evaluateCaptureObjective(result, target) } : {}), totalFrames: result.totalFrames, sourcePrefixKey, sampleIndex, seed,
+      const next: FastestRoute = { timing: summarizeBattleTiming(result.actions, result.roundTransitions), ...(target ? { capture: evaluateCaptureObjective(result, target) } : {}), totalFrames: result.totalFrames, sourcePrefixKey, sampleIndex, seed,
         ...(result.tasLuckTrace ? {tasLuckTrace: result.tasLuckTrace,sourcePlayerPrefix:structuredClone(sourcePlayerPrefix)} : {}), decisionTrace, decisionTraceKey: playerDecisionTraceKey(decisionTrace), actions: result.actions };
       const lexical = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
       if (!best || (next.totalFrames - best.totalFrames || lexical(next.decisionTraceKey, best.decisionTraceKey)

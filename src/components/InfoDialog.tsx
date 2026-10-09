@@ -47,7 +47,10 @@ export const InfoDialog = () => {
               <h3 className="font-semibold">Supported battle model</h3>
               <p>The Simulator models action timing, initiative, MP, supported status effects, Counter, Interrupt and Assist/support behavior. Availability depends on the technique and modeled effect; inspect action details and effect diagnostics for a specific execution.</p>
               <p>Accuracy Mode controls ordinary Hit Rate. RNG Policy separately controls supported status outcomes. See Accuracy and RNG and TAS Luck in How to Use for the supported scope.</p>
-              <p>Reported frames cover modeled battle actions, excluding external menu/order-entry overhead. The model and bounded search do not establish an exact real-game optimum.</p>
+              <p>If a selected, locked target is defeated before its action executes, the attempted action is a Miss: 194 frames, zero MP and no effective target. Pending actions after battle end remain skipped.</p>
+              <p>Between rounds, processing/order-entry costs 319 frames for 1 living Player ally, 385 for 2, or 452 for 3. Living means current HP above zero when the next round starts; Enemy count does not affect this timing. Zero living allies has no measured timing and makes the total unavailable.</p>
+              <p>Only actual transitions to another round are charged: none before Round 1 or after the battle-ending round. Fewer-round strategies may be faster even when their action animations take slightly longer.</p>
+              <p>Reported frames cover modeled battle actions and measured inter-round processing/order-entry overhead. Other external menu, recovery, item and setup time remains excluded. The model and bounded search do not establish an exact real-game optimum.</p>
             </CardContent></Card>
           </TabsContent>
 

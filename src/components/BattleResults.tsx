@@ -28,10 +28,11 @@ export function ActionHistory({ actions, combatants = [] }: { actions: readonly 
           <span className="font-semibold text-digital-cyan">{label(action.actorId, action.actorName)}</span> · {action.skillName}
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'guard' ? 'Guard — Motivation Down' : action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'assist-target-lost' ? 'Assist target KO' : action.accuracy?.cause === 'invisibility' ? 'Invisibility forced Miss' : action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
+          <Badge variant="secondary">{action.state === 'resolved' ? action.outcome === 'guard' ? 'Guard — Motivation Down' : action.outcome === 'miss' ? `Miss — ${action.accuracy?.cause === 'no-effective-target' ? 'No effective target' : action.accuracy?.cause === 'assist-target-lost' ? 'Assist target KO' : action.accuracy?.cause === 'invisibility' ? 'Invisibility forced Miss' : action.accuracy?.cause === 'interrupt-forced-miss' ? 'Forced by Interrupt' : action.accuracy?.cause === 'paralysis' ? 'Paralysis' : action.accuracy?.cause === 'tail-blade-evasion' ? 'Tail Blade' : action.accuracy?.cause === 'counter-not-activated' ? 'Counter not activated' : 'Accuracy'}` : 'Hit' : action.reason === 'confusion-no-eligible-skill' ? 'Confusion skip' : action.state}</Badge>
           <span className="font-mono font-semibold text-info">{action.state === 'resolved' ? frames(action.durationFrames) : 'Not executed'}</span>
         </div>
       </div>
+      {action.targetIntent.kind === 'combatants' && <p className="text-sm">Intended target: {action.targetIntent.targetIds.map(id => label(id)).join(', ') || 'None'}</p>}
       <p className="text-sm">Actual targets: {action.effectiveTargetIds.map(id => label(id)).join(', ') || 'None'}</p>
       <div className="text-sm">{action.impacts.map((impact, i) => <p key={i}>{label(impact.targetId, impact.targetName)}: {impact.damage} damage · {impact.hpBefore} → {impact.hpAfter} HP{impact.statusApplications.filter(s => s.applied).map(s => ' · ' + stateLabel(s.status)).join('')}</p>)}</div>
       {(action.supportEvents ?? []).filter(e => e.kind === 'healing').map((e, i) => e.kind === 'healing' && <p key={i}>{label(e.targetId)}: Healed {e.appliedAmount} HP · {e.hpBefore} → {e.hpAfter}</p>)}
@@ -97,11 +98,16 @@ function ReplayPanel({ results, combatants }: { results: SimulationResult; comba
   const [fewest, setFewest] = useState(false);
   const retained = (results.report?.executedBattle.actions ?? results.optimized?.fastestRoute?.actions ?? (results.fastestBattleByFrames.length ? results.fastestBattleByFrames : results.fastestBattleHistory)) as readonly BattleActionRecord[];
   const actions = fewest ? results.fastestBattleHistory : retained;
+  const timing = fewest ? results.fastestBattleHistoryTiming : results.report?.executedBattle.timing ?? results.optimized?.fastestRoute?.timing ?? results.tasLuckRoute?.timing ?? (results.fastestBattleByFrames.length ? results.fastestBattleByFramesTiming : results.fastestBattleHistoryTiming);
   const alternate = results.fastestBattleHistory.length > 0 && JSON.stringify(results.fastestBattleHistory) !== JSON.stringify(retained);
   return <Card><CardHeader><CardTitle>Executed Battle Replay</CardTitle></CardHeader><CardContent className="space-y-3">
     <p>{fewest ? 'Fewest-actions victory observation. This is a separate retained execution, not the selected screened strategy.' : results.report ? replayExplanation(results.report) : results.fastestBattleByFrames.length ? 'Retained fastest timed victory observation.' : 'Retained fewest-actions victory observation; complete timing may be unavailable.'}</p>
     {!fewest && results.report && replayLimitation(results.report) && <p role="note">{replayLimitation(results.report)}</p>}
     {alternate && <div role="group" aria-label="Replay selection" className="flex flex-wrap gap-2"><Button variant="outline" aria-pressed={!fewest} onClick={() => setFewest(false)}>Retained fastest replay</Button><Button variant="outline" aria-pressed={fewest} onClick={() => setFewest(true)}>Fewest-actions replay</Button></div>}
+    {timing && <details><summary>Timing breakdown · Actions {frames(timing.actionFrames)} · Round transitions {frames(timing.roundTransitionFrames)} · Total {frames(timing.totalFrames)}</summary>
+      {timing.timingCompleteness === 'incomplete' && <p>Subtotals include known frames only; complete timing is unavailable.</p>}
+      {timing.roundTransitions.map(t => <p key={t.toRound}>Round {t.fromRound} → {t.toRound} · Processing / order-entry overhead · {t.livingPlayerAllies} living Player allies · {frames(t.frames)}</p>)}
+    </details>}
     <ActionHistory actions={actions} combatants={combatants} />
   </CardContent></Card>;
 }

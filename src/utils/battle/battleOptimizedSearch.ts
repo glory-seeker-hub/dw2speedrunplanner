@@ -1,3 +1,4 @@
+import { summarizeBattleTiming, type BattleTimingSummary } from './battleTiming';
 import { isCaptureQualifiedVictory, validateCaptureTarget } from './battleCaptureObjective';
 import { createTasLuckSearch, createTasLuckReplay, emptyTasLuckSummary, addTasLuckSummary, tasLuckCapForBudget, type TasLuckDecisionTrace } from './battleTasLuck';
 import { createFastestRouteTracker, type FastestRoute } from './battleFastestRoute';
@@ -90,7 +91,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
   const tasSummary = emptyTasLuckSummary(options.tasFrontierCap ?? tasLuckCapForBudget(budget));
   const accumulator = createBattleAccumulator(options.captureObjective);
   const fastest = createFastestRouteTracker(options.captureObjective);
-  let bestTurnsSample: { turns: number; key: string; sampleIndex: number; actions: SimulationResult['fastestBattleHistory'] } | null = null;
+  let bestTurnsSample: { timing: BattleTimingSummary; turns: number; key: string; sampleIndex: number; actions: SimulationResult['fastestBattleHistory'] } | null = null;
   const pairedSeeds = new Map<string, number[]>();
   let evaluations = 0, depth = 0, depthReached = 0, candidateCount = 0, candidatesEvaluated = 0, beamSize = 0, done = false;
   let phase: OptimizedProgress['phase'] = 'enumerating', fairStageEvaluations = 0;
@@ -147,7 +148,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
       const earlier = (old: { key: string; sampleIndex: number }) => candidate.key < old.key || candidate.key === old.key && sampleIndex < old.sampleIndex;
       if (qualified) {
         if (!bestTurnsSample || result.actionCount < bestTurnsSample.turns || result.actionCount === bestTurnsSample.turns && earlier(bestTurnsSample))
-          bestTurnsSample = { turns: result.actionCount, key: candidate.key, sampleIndex, actions: result.actions };
+          bestTurnsSample = { timing: summarizeBattleTiming(result.actions, result.roundTransitions), turns: result.actionCount, key: candidate.key, sampleIndex, actions: result.actions };
       }
       if (qualified && result.timingCompleteness === 'complete' && result.totalFrames !== null)
         candidate.samples.push({ frames: result.totalFrames, sampleIndex, seed, rounds: result.rounds, ...(result.tasLuckTrace?{tasLuckTrace:result.tasLuckTrace}:{}) });
@@ -277,7 +278,7 @@ export function createOptimizedSearchPass(input: BattleInput, budget: number, op
         topCandidates: fair.slice(0, 5).map(({ key, plans, stats }) => ({ key, plans, stats })),
         diagnostics: [...diagnostics], fairStageEvaluations };
       const observed = accumulator.snapshot();
-      return { ...observed, ...(rules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary}}:{}), timingDiagnostics: [...observed.timingDiagnostics].sort(), resourceDiagnostics: [...observed.resourceDiagnostics].sort(), fastestBattleByFrames: fastest.best?.actions ?? [], fastestBattleHistory: bestTurnsSample?.actions ?? [], accuracyMode: rules.accuracyMode,
+      return { ...observed, ...(rules.rngPolicy==='tas-luck'?{tasLuckSummary:{...tasSummary}}:{}), timingDiagnostics: [...observed.timingDiagnostics].sort(), resourceDiagnostics: [...observed.resourceDiagnostics].sort(), fastestBattleByFrames: fastest.best?.actions ?? [], fastestBattleByFramesTiming: fastest.best?.timing, fastestBattleHistory: bestTurnsSample?.actions ?? [], fastestBattleHistoryTiming: bestTurnsSample?.timing, accuracyMode: rules.accuracyMode,
         search: { ...this.progress(elapsedMs), accuracyMode: rules.accuracyMode, ...(rules.rngPolicy !== 'natural' ? { rngPolicy: rules.rngPolicy } : {}), status }, optimized };
     },
   };

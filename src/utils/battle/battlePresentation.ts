@@ -14,7 +14,7 @@ export const RESULT_HELP = {
   tas: 'TAS Luck uses favorable outcomes for supported status RNG. If an Enemy is both Confused and Paralyzed when acting, the Simulator compares a Paralysis Miss with allowing the Confusion action to proceed. Unsupported RNG remains Natural.',
   conditional: 'Statistics are conditional on TAS Luck behavior and sampled unsupported RNG; they are not natural game probabilities.',
   natural: "Uses the game's implemented RNG normally. Ordinary Hit Rate is controlled separately by Accuracy Mode.",
-  timing: 'Battle-action frames modeled by the Simulator; external menu/order-entry overhead is not included.',
+  timing: 'Modeled action frames plus measured inter-round processing/order-entry overhead; other external menu, recovery, item and setup time is excluded.',
   limitation: 'Beam pruning, stochastic/fair rollouts and bounded TAS conflict search where applicable do not prove a global optimum.',
 } as const;
 export const strategyTitle = (o: OptimizationObjective) => o === 'average-victory' ? 'Selected Average Victory Strategy' : o === 'success-rate' ? 'Selected Success Rate Strategy' : 'Best Screened Strategy';

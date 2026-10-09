@@ -30,7 +30,7 @@ Use **Run Planner → Backup / Import → Export Current Run** or **Export All R
 
 Search is bounded and sampled. Fastest Route Found is the fastest winning execution observed in that search, not proof of a global optimum. Higher budgets and Standard, Thorough or Maximum thoroughness can increase coverage without improving the result. A search may finish with unused budget.
 
-The model excludes external menu/order-entry overhead. Player HP/MP depletion does not stop the offensive simulation; required recovery, revival, Guard or item actions are not inserted or counted. Read resource alerts and effect diagnostics before treating a result as an in-game route. TAS Luck controls only supported modeled status outcomes, not all RNG.
+Battle timing includes measured inter-round processing/order-entry overhead: 319 / 385 / 452 frames for 1 / 2 / 3 Players with current HP above zero, independent of Enemy count. Only actual next-round starts are charged. A locked target defeated before execution causes a 194-frame Miss with no MP cost. Other external menu, recovery, item and setup time remains excluded. Player HP/MP depletion does not stop the offensive simulation; required recovery, revival, Guard or item actions are not inserted or counted. Read resource alerts and effect diagnostics before treating a result as an in-game route. TAS Luck controls only supported modeled status outcomes, not all RNG.
 
 Planner and backup processing are client-side. This is a static web app, not an offline PWA; a first load and uncached assets still require network access.
 

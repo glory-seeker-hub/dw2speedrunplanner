@@ -62,7 +62,7 @@ function mergeObservations(a: SimulationResult | null, b: SimulationResult): Sim
     r[average] = r[count] ? ((a[average] ?? 0) * a[count] + (b[average] ?? 0) * b[count]) / r[count] : null;
   for (const key of ['minTurns', 'minFrames'] as const) r[key] = a[key] === null ? b[key] : b[key] === null ? a[key] : Math.min(a[key]!, b[key]!);
   for (const key of ['maxTurns', 'maxFrames'] as const) r[key] = a[key] === null ? b[key] : b[key] === null ? a[key] : Math.max(a[key]!, b[key]!);
-  if (a.minTurns !== null && (b.minTurns === null || a.minTurns <= b.minTurns)) r.fastestBattleHistory = a.fastestBattleHistory;
+  if (a.minTurns !== null && (b.minTurns === null || a.minTurns <= b.minTurns)) { r.fastestBattleHistory = a.fastestBattleHistory; r.fastestBattleHistoryTiming = a.fastestBattleHistoryTiming; }
   for (const key of ['timingDiagnostics', 'resourceDiagnostics'] as const) r[key] = [...new Set([...a[key], ...b[key]])];
   if (a.rngOverrideCounts) {
     r.rngOverrideCounts = { ...(b.rngOverrideCounts ?? a.rngOverrideCounts) };
@@ -80,8 +80,8 @@ function mergeObservations(a: SimulationResult | null, b: SimulationResult): Sim
       successRate: r.totalSimulations ? (x.successes + y.successes) / r.totalSimulations * 100 : 0,
       averageFrames: timedSuccesses ? ((x.averageFrames ?? 0) * x.timedSuccesses + (y.averageFrames ?? 0) * y.timedSuccesses) / timedSuccesses : null,
       maxFrames: x.maxFrames === null ? y.maxFrames : y.maxFrames === null ? x.maxFrames : Math.max(x.maxFrames, y.maxFrames) };
-    if (a.fastestBattleHistory.length && (!b.fastestBattleHistory.length || a.fastestBattleHistory.filter(a => a.state === 'resolved').length <= b.fastestBattleHistory.filter(a => a.state === 'resolved').length)) r.fastestBattleHistory = a.fastestBattleHistory;
-    else r.fastestBattleHistory = b.fastestBattleHistory;
+    if (a.fastestBattleHistory.length && (!b.fastestBattleHistory.length || a.fastestBattleHistory.filter(a => a.state === 'resolved').length <= b.fastestBattleHistory.filter(a => a.state === 'resolved').length)) { r.fastestBattleHistory = a.fastestBattleHistory; r.fastestBattleHistoryTiming = a.fastestBattleHistoryTiming; }
+    else { r.fastestBattleHistory = b.fastestBattleHistory; r.fastestBattleHistoryTiming = b.fastestBattleHistoryTiming; }
   }
   return r;
 }
@@ -169,7 +169,7 @@ export function createOptimizedPassSearch(input: BattleInput, budget: number, op
         topCandidates: selected, depth: Math.max(maxDepth, current.optimized!.depth),
         fairStageEvaluations: fairEvaluations + (active.done ? 0 : current.optimized!.fairStageEvaluations),
         diagnostics: [...new Set([...diagnostics, ...current.optimized!.diagnostics])] };
-      return { ...combined, ...(combined.capture && fastest?.capture ? { capture: { ...combined.capture, ...fastest.capture } } : {}), fastestBattleByFrames: fastest?.actions ?? [], optimized,
+      return { ...combined, ...(combined.capture && fastest?.capture ? { capture: { ...combined.capture, ...fastest.capture } } : {}), fastestBattleByFrames: fastest?.actions ?? [], fastestBattleByFramesTiming: fastest?.timing, optimized,
         search: { ...current.search!, ...p, status } };
     },
   };

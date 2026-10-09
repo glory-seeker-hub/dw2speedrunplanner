@@ -1,3 +1,4 @@
+import { summarizeBattleTiming, type BattleTimingSummary } from './battleTiming';
 import { validateCaptureTarget, evaluateCaptureObjective, type BattleCaptureTarget, type CaptureSummary } from './battleCaptureObjective';
 import { createSimulationSearch } from './battleSimulationSearch';
 import { collectRngRequirements, emptyRngOverrideCounts, addRngOverrideCounts } from './battleRngAudit';
@@ -16,6 +17,7 @@ export function createBattleAccumulator(target?: BattleCaptureTarget) {
     fastestBattleHistory: [], fastestBattleByFrames: [], timingDiagnostics: [], resourceDiagnostics: [], runsWithResourceAlerts: 0,
   };
   let capture: CaptureSummary | undefined = target ? { target, lastDefeated: null, satisfied: false, successes: 0, successRate: 0, timedSuccesses: 0, minFrames: null, averageFrames: null, maxFrames: null } : undefined;
+  let captureHistoryTiming: BattleTimingSummary | undefined, captureTimedHistoryTiming: BattleTimingSummary | undefined;
   let captureFrames = 0, captureTurns = Infinity;
   let captureFound: number | null = null, captureOccurrences = 0;
   let captureHistory: BattleRunResult['actions'] = [], captureTimedHistory: BattleRunResult['actions'] = [];
@@ -23,6 +25,8 @@ export function createBattleAccumulator(target?: BattleCaptureTarget) {
   let turns = 0, frames = 0;
   let bestFoundAtSimulation: number | null = null, bestOccurrenceCount = 0;
   const add = (run: BattleRunResult) => {
+    const timing = () => summarizeBattleTiming(run.actions, run.roundTransitions);
+    run.roundTransitions?.filter(t => t.frames === null).forEach(t => timingDiagnostics.add(`Round transition timing unavailable for ${t.livingPlayerAllies} living Player allies.`));
     const requirements = collectRngRequirements(run.actions);
     if (requirements.length) {
       result.rngOverrideCounts ??= emptyRngOverrideCounts();
@@ -40,13 +44,13 @@ export function createBattleAccumulator(target?: BattleCaptureTarget) {
       if (evaluation.satisfied) {
         capture.successes++;
         if (run.actionCount < captureTurns) {
-          captureTurns = run.actionCount; captureHistory = run.actions;
+          captureTurns = run.actionCount; captureHistory = run.actions; captureHistoryTiming = timing();
           if (!captureTimedHistory.length) capture = { ...capture, ...evaluation };
         }
         if (run.timingCompleteness === 'complete' && run.totalFrames !== null) {
           capture.timedSuccesses++; captureFrames += run.totalFrames;
           if (capture.minFrames === null || run.totalFrames < capture.minFrames) {
-            capture = { ...capture, ...evaluation, minFrames: run.totalFrames }; captureTimedHistory = run.actions; captureFound = result.totalSimulations; captureOccurrences = 1;
+            capture = { ...capture, ...evaluation, minFrames: run.totalFrames }; captureTimedHistory = run.actions; captureTimedHistoryTiming = timing(); captureFound = result.totalSimulations; captureOccurrences = 1;
           }
           else if (run.totalFrames === capture.minFrames) captureOccurrences++;
           capture.maxFrames = Math.max(capture.maxFrames ?? 0, run.totalFrames);
@@ -56,13 +60,13 @@ export function createBattleAccumulator(target?: BattleCaptureTarget) {
     if (run.outcome !== 'player-win') return;
     result.completedSuccesses++; turns += run.actionCount;
     if (result.minTurns === null || run.actionCount < result.minTurns) {
-      result.minTurns = run.actionCount; result.fastestBattleHistory = run.actions;
+      result.minTurns = run.actionCount; result.fastestBattleHistory = run.actions; result.fastestBattleHistoryTiming = timing();
     }
     result.maxTurns = Math.max(result.maxTurns ?? 0, run.actionCount);
     if (run.timingCompleteness !== 'complete' || run.totalFrames === null) { result.incompleteTimingSuccesses++; return; }
     result.timedSuccesses++; frames += run.totalFrames;
     if (result.minFrames === null || run.totalFrames < result.minFrames) {
-      result.minFrames = run.totalFrames; result.fastestBattleByFrames = run.actions;
+      result.minFrames = run.totalFrames; result.fastestBattleByFrames = run.actions; result.fastestBattleByFramesTiming = timing();
       bestFoundAtSimulation = result.totalSimulations; bestOccurrenceCount = 1;
     }
     else if (run.totalFrames === result.minFrames) bestOccurrenceCount++;
@@ -77,7 +81,7 @@ export function createBattleAccumulator(target?: BattleCaptureTarget) {
     capture.successRate = result.totalSimulations ? capture.successes / result.totalSimulations * 100 : 0;
     capture.averageFrames = capture.timedSuccesses ? captureFrames / capture.timedSuccesses : null;
   }
-  return { ...result, ...(capture ? { capture: { ...capture }, fastestBattleHistory: captureHistory, fastestBattleByFrames: captureTimedHistory } : {}), ...(result.rngOverrideCounts ? { rngOverrideCounts: { ...result.rngOverrideCounts } } : {}), outcomeCounts: { ...result.outcomeCounts } };
+  return { ...result, ...(capture ? { capture: { ...capture }, fastestBattleHistory: captureHistory, fastestBattleByFrames: captureTimedHistory, fastestBattleHistoryTiming: captureHistoryTiming, fastestBattleByFramesTiming: captureTimedHistoryTiming } : {}), ...(result.rngOverrideCounts ? { rngOverrideCounts: { ...result.rngOverrideCounts } } : {}), outcomeCounts: { ...result.outcomeCounts } };
   };
   return { add, snapshot, convergence: () => target ? { bestFoundAtSimulation: captureFound, bestOccurrenceCount: captureOccurrences, simulationsSinceLastImprovement: captureFound === null ? null : result.totalSimulations - captureFound } : ({ bestFoundAtSimulation, bestOccurrenceCount, simulationsSinceLastImprovement: bestFoundAtSimulation === null ? null : result.totalSimulations - bestFoundAtSimulation }) };
 }

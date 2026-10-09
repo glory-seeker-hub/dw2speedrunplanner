@@ -1,4 +1,5 @@
 import { CAPTURE_RULE, CAPTURE_TIE_RULE, NO_CAPTURE_ROUTE } from './battleCaptureObjective';
+import type { BattleTimingSummary } from './battleTiming';
 import type { SearchThoroughness, SearchPassMetadata } from './battleSearchPasses';
 import { getPlannerBattleLabel } from '@/utils/plannerBattleLabel';
 import { tasLuckCapForBudget } from './battleTasLuck';
@@ -91,11 +92,11 @@ interface ReportData {
   selectedResult: SelectedResult;
   playerStrategy: { kind: 'observed-route' | 'fair-prefix' | 'not-retained'; plans: PlayerRoundPlan[] };
   rngRequirements: ReturnType<typeof collectRngRequirements>;
-  executedBattle: { kind: 'global-fastest-observation' | 'fastest-timed-observation' | 'fewest-actions-observation'; totalFrames: number | null; rounds: number; actions: BattleActionRecord[] };
+  executedBattle: { timing?: BattleTimingSummary; kind: 'global-fastest-observation' | 'fastest-timed-observation' | 'fewest-actions-observation'; totalFrames: number | null; rounds: number; actions: BattleActionRecord[] };
   diagnostics: string[];
 }
 export type BattleSimulationReport = DeepReadonly<ReportData>;
-export const TIMING_SCOPE = 'Frame totals cover modeled battle actions. External real-game UI and order-menu overhead is not modeled.';
+export const TIMING_SCOPE = 'Frame totals include modeled battle actions and measured inter-round processing/order-entry overhead. Other external menu, recovery, item and setup time remains excluded.';
 /** Observational only: consumes retained results and a detached dispatch snapshot. */
 export function buildBattleSimulationReport(result: SimulationResult, job: DeepReadonly<SimulationReportJob>): BattleSimulationReport | null {
   if ((result.search?.completedSimulations ?? result.optimized?.evaluations ?? result.totalSimulations) === 0 && !(job.configuration.rules.rngPolicy==='tas-luck' && (result.optimized?.fastestRoute || result.tasLuckRoute))) return null;
@@ -128,6 +129,6 @@ export function buildBattleSimulationReport(result: SimulationResult, job: DeepR
       : { kind: 'random-monte-carlo', winRate: result.winRate, minFrames: result.minFrames, averageFrames: result.avgFrames, maxFrames: result.maxFrames, minActions: result.minTurns, averageActions: result.avgTurns, maxActions: result.maxTurns },
     playerStrategy: { kind: o ? o.objective === 'fastest-potential' ? 'observed-route' : 'fair-prefix' : route ? 'observed-route' : 'not-retained', plans: o ? o.objective === 'fastest-potential' ? route?.decisionTrace ?? [] : o.recommendedPrefix : route?.decisionTrace ?? [] },
     rngRequirements: job.configuration.rules.rngPolicy !== 'natural' ? route?.rngRequirements ?? collectRngRequirements(actions) : [],
-    executedBattle: { kind: route ? 'global-fastest-observation' : result.fastestBattleByFrames.length ? 'fastest-timed-observation' : 'fewest-actions-observation', totalFrames: route?.totalFrames ?? (result.fastestBattleByFrames.length ? result.capture?.minFrames ?? result.minFrames : null), rounds, actions },
+    executedBattle: { timing: route?.timing ?? (result.fastestBattleByFrames.length ? result.fastestBattleByFramesTiming : result.fastestBattleHistoryTiming), kind: route ? 'global-fastest-observation' : result.fastestBattleByFrames.length ? 'fastest-timed-observation' : 'fewest-actions-observation', totalFrames: route?.totalFrames ?? (result.fastestBattleByFrames.length ? result.capture?.minFrames ?? result.minFrames : null), rounds, actions },
     diagnostics: [...new Set(diagnostics)] }) as BattleSimulationReport;
 }

@@ -1,3 +1,4 @@
+const {withActionOnlyTiming}=require('./helpers/actionOnlyCompatibility.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {canonical,small,load,unit}=require('./helpers/optimizedFixtures.cjs');
 const plans=load('src/utils/battle/battleActionPlans.ts');
@@ -40,7 +41,7 @@ for(const kind of ['target-ko','invisibility','actor','skill'])test('scripted '+
 });
 test('battle ending before an unused later order is harmless',()=>{const i=small(),p=[...plans.enumeratePlayerRoundPlans(plans.rootPlanInfo(i).state)][0];const r=plans.replayPlayerPrefix(i,[p,{round:2,key:'invalid-later',orders:[]}],42,options);assert.equal(r.diverged,false);assert.equal(r.result.outcome,'player-win');});
 test('random tail and Enemy policy remain identical when prefix is empty',()=>{for(const accuracyMode of modes){const i=canonical(1),opts={simulationRules:{accuracyMode}};assert.deepEqual(plans.replayPlayerPrefix(i,[],42,opts).result,simulateBattleCore(i,{...opts,rng:createSeededBattleRng(42)}));}});
-for(const accuracyMode of modes)test(accuracyMode+' committed Monte Carlo output unchanged',()=>{const {cases}=require('./helpers/battleFixtures.cjs');const s=createSimulationSearch({player:cases.single[0],enemy:cases.single[1],floorSpecialty:'None'},100,{simulationRules:{accuracyMode},rng:createSeededBattleRng(42)});while(!s.done)s.step();assert.deepEqual(s.result('completed',100),require('./fixtures/optimizedMonteCarloBaseline.json')[accuracyMode]);});
+for(const accuracyMode of modes)test(accuracyMode+' committed Monte Carlo action-only compatibility',()=>withActionOnlyTiming(()=>{const {cases}=require('./helpers/battleFixtures.cjs');const s=createSimulationSearch({player:cases.single[0],enemy:cases.single[1],floorSpecialty:'None'},100,{simulationRules:{accuracyMode},rng:createSeededBattleRng(42)});while(!s.done)s.step();assert.deepEqual(require('./helpers/actionOnlyCompatibility.cjs').stripTiming(s.result('completed',100)),require('./fixtures/optimizedMonteCarloBaseline.json')[accuracyMode]);}));
 for(const sampleIndex of [0,1,2,15,63])test('paired sibling seed stable at sample '+sampleIndex,()=>{
   const a=['a','b','c'].map(()=>objectives.rolloutSeed(42,2,'parent',sampleIndex));const b=['c','b','a'].map(()=>objectives.rolloutSeed(42,2,'parent',sampleIndex));assert.deepEqual(a,b);assert.equal(new Set(a).size,1);assert.notEqual(a[0],objectives.rolloutSeed(42,2,'parent',sampleIndex+1));
 });

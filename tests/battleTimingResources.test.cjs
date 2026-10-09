@@ -56,11 +56,11 @@ test('custom targeting allies does not claim measured opposing Attack timing',()
  assert.equal(executed(r)[0].timingClass,'unknown');assert.equal(executed(r)[0].durationFrames,null);
 });
 test('total equals measured executed actions; cancelled and skipped contribute no charge',()=>{
- const r=run(...cases.koSkip);assert.equal(r.totalFrames,executed(r).reduce((sum,a)=>sum+a.durationFrames,0));assert.ok(r.actions.some(a=>a.state==='skipped'));
+ const r=run(...cases.koSkip);assert.equal(r.totalFrames,executed(r).reduce((sum,a)=>sum+a.durationFrames,0)+385);assert.deepEqual(r.roundTransitions.map(t=>t.livingPlayerAllies),[2]);assert.ok(r.actions.some(a=>a.state==='skipped'));
  assert.ok(r.actions.filter(a=>a.state==='skipped').every(a=>a.durationFrames===null));
 });
 test('Counter Single hits use measured timing',()=>{
- const r=run(...cases.counter);assert.equal(r.timingCompleteness,'complete');assert.equal(r.totalFrames,r.knownFrames);
+ const r=run(...cases.counter);assert.equal(r.timingCompleteness,'incomplete');assert.equal(r.totalFrames,null);assert.ok(r.roundTransitions.some(t=>t.livingPlayerAllies===0&&t.frames===null));
  assert.ok(executed(r).filter(a=>a.kind==='counter').every(a=>a.durationFrames===685 && !a.timingDiagnostics.length));
 });
 test('one impact Miss never infers a full action Miss',()=>{
@@ -210,7 +210,7 @@ test('no complete timed victories yields null aggregates, no Infinity or invente
  const empty=aggregateBattleRuns([]);assert.equal(empty.minTurns,null);assert.equal(empty.avgTurns,null);assert.equal(empty.maxTurns,null);
 });
 test('public result contains frames and action histories, no obsolete seconds fields',()=>{
- const r=runBattleSimulation(...cases.single,'None',2,{rng:seeded(42)});assert.ok(r.minFrames>0);assert.ok(r.fastestBattleByFrames.length);assert.ok(!('minTime'in r));assert.ok(!('fastestBattleByTime'in r));assert.ok(!JSON.stringify(r).includes('timeSeconds'));
+ const r=runBattleSimulation(...cases.single,'None',2,{rng:seeded(42)});assert.equal(r.minFrames,null);assert.equal(r.incompleteTimingSuccesses,2);assert.ok(r.fastestBattleHistory.length);assert.ok(!('minTime'in r));assert.ok(!('fastestBattleByTime'in r));assert.ok(!JSON.stringify(r).includes('timeSeconds'));
 });
 test('programmed successful simulations consume accuracy but no unrelated status RNG',()=>{
  const rng=sequence(Array(10000).fill(0));const r=run(...cases.aoe,{rng});assert.ok(executed(r).every(a=>a.outcome==='hit'));assert.ok(rng.draws.every(d=>['action-choice','initiative','target-choice','accuracy'].includes(d.category)));
