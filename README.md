@@ -4,7 +4,7 @@ An unofficial fan-made tool for planning routes and exploring battle strategies 
 
 [Live app](https://dw2speedrunplanner.lovable.app/) · [Source](https://github.com/glory-seeker-hub/dw2speedrunplanner) · [Issues and suggestions](https://github.com/glory-seeker-hub/dw2speedrunplanner/issues)
 
-See the [v1.2.0 release notes](docs/releases/v1.2.0.md) for changes and the [release checklist](docs/releases/v1.2.0-release-checklist.md) for release verification status.
+See the [v1.3.0 release notes](docs/releases/v1.3.0.md) for changes and the [release checklist](docs/releases/v1.3.0-release-checklist.md) for release verification status.
 
 ## What you can do
 
