@@ -61,7 +61,7 @@ for(const id of [0x83,0x87,0x88,0x86])for(const activated of [false,true])test(`
  const state=createBattleState(i);state.round=1;const action=planAction(state,state.combatants[0],pick('enemy-2').chooseAction(state.combatants[0]));
  action.counter.executionMode=activated?'activated':'untriggered-end-of-turn';action.counter.activatedMechanics=activated;if(activated)action.counter.triggerActorId='enemy-0';
  const random=rng(),targets=resolveEffectiveTargets(state,action,random),all=activated&&id!==0x86;assert.deepEqual(targets,all?['enemy-0','enemy-1','enemy-2']:[activated?'enemy-0':'enemy-2']);assert.deepEqual(action.targetIntent.targetIds,['enemy-2']);assert.equal(random.draws.length,0);
- const ap={131:20,135:30,136:40,134:32.5}[id];for(const targetId of targets){const enemy=state.combatants.find(a=>a.id===targetId);const base=Math.floor(Math.floor(ap)*23/enemy.baseStats.def),expected=activated&&[0x86,0x88].includes(id)?Math.floor(base*3/2):base;assert.equal(calculateActionDamage(state.combatants[0],enemy,action,'None',state),expected);}
+ const ap={131:20,135:30,136:40,134:32.5}[id];for(const targetId of targets){const enemy=state.combatants.find(a=>a.id===targetId);const base=Math.floor(ap*23/enemy.baseStats.def),expected=activated&&[0x86,0x88].includes(id)?Math.floor(base*3/2):base;assert.equal(calculateActionDamage(state.combatants[0],enemy,action,'None',state),expected);}
 });
 test('Smiley Warhead floor-sensitive output multiplication differs from AP multiplication',()=>{
  const {state,actions}=prepare(0x88),a=actions[0],p=state.combatants[0],e=state.combatants[1];p.baseStats.atk=23;e.baseStats.def=27;a.counter.executionMode='activated';a.counter.activatedMechanics=true;

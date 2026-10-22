@@ -28,7 +28,9 @@ export function validateCombatant(actor: BattleCombatantState): void {
   }
 }
 export function effectiveParameter(actor: BattleCombatantState, stat: 'atk' | 'def' | 'spd'): number {
-  return finite(actor.baseStats[stat] * stageMultiplier(actor.parametersSuppressed ? 0 : actor[`${stat}Stage`]) * (actor.parameterModifiers[stat] ?? 1)
+  // Canonical stages floor from base first; legacy multipliers and halfDefense
+  // remain independent and apply afterward without another parameter floor.
+  return finite(applyParameterStage(actor.baseStats[stat], actor.parametersSuppressed ? 0 : actor[`${stat}Stage`], stat) * (actor.parameterModifiers[stat] ?? 1)
     * (stat === 'def' && actor.halfDefense ? 0.5 : 1), `effective ${stat}`);
 }
 export const actorById = (state: BattleState, id: string): BattleCombatantState => {
@@ -41,4 +43,11 @@ export function completedOutcome(state: BattleState): 'player-win' | null {
   return null;
 }
 
-export function stageMultiplier(stage: number): number { return [0.5, 1 / Math.SQRT2, 1, Math.SQRT2, 2][stage + 2]; }
+/** Resolve directly from base, preserving Planner fractional stats at stage zero.
+ * ATK/DEF +1 = 3/2 is experimentally validated; DEF -1 = 180/256 is an
+ * empirical fit, not a disassembly result. ATK down and all SPD stages retain
+ * the preceding Phase 2P-A model and are not validated by these experiments. */
+export function applyParameterStage(baseStat: number, stage: number, stat: 'atk' | 'def' | 'spd'): number {
+  const numerator = stage === 1 && stat !== 'spd' ? 384 : [128, 180, 256, 362, 512][stage + 2];
+  return stage === 0 ? baseStat : Math.floor(baseStat * numerator / 256);
+}
