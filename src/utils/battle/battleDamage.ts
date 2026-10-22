@@ -73,11 +73,17 @@ export function calculateLegacyDamage(
   const defense = effectiveParameter(defender, 'def');
   const defenderBonus = getDefenderBonus(defender.specialty, floorSpecialty);
 
-  const baseDamage = Math.floor(attackPower * apRatio[0] * Math.round(typeBonus * 5) * Math.round(specialtyBonus * 5) * Math.round(tileBonus * 5) / (125 * apRatio[1]));
-  const adjustedDefense = Math.floor(defense * defenderBonus);
-  const finalDamage = Math.floor((baseDamage * attack) / adjustedDefense);
+  // Measured order: truncate effective ATK, then apply type and truncate again.
+  // Keep fractional AP and specialty factors until the final division.
+  const typeAdjustedAttack = Math.floor(Math.floor(attack) * Math.round(typeBonus * 5) / 5);
+  // Preserve terrain's existing placement: offensive tile in the numerator,
+  // defender tile before the DEF floor. Its interaction with the new ATK/type
+  // boundaries is not experimentally validated (measurements used neutral tiles).
+  const offensiveNumerator = attackPower * typeAdjustedAttack * apRatio[0] * Math.round(specialtyBonus * 5) * Math.round(tileBonus * 5);
+  const adjustedDefense = Math.floor(defense * Math.round(defenderBonus * 5) / 5);
+  const finalDamage = Math.floor(offensiveNumerator / (25 * apRatio[1] * adjustedDefense));
 
-  if (![attackPower, attack, defense, baseDamage, adjustedDefense, finalDamage].every(Number.isFinite) || adjustedDefense <= 0 || finalDamage < 0) throw new BattleInputError('Invalid damage arithmetic or effective DEF.');
+  if (![attackPower, attack, defense, offensiveNumerator, adjustedDefense, finalDamage].every(Number.isFinite) || adjustedDefense <= 0 || finalDamage < 0) throw new BattleInputError('Invalid damage arithmetic or effective DEF.');
   return finalDamage;
 }
 
