@@ -26,7 +26,7 @@ export interface CounterRuntimeState {
   activatedMechanics: boolean;
   triggerActionId?: string; triggerActorId?: string; triggerActorName?: string;
   triggerImpactTargetId?: string; damageReceivedFromTrigger?: number;
-  targetRule?: 'causal-attacker' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement' | 'random-policy';
+  targetRule?: 'causal-attacker' | 'friendly-trigger-random-opponent' | 'base-single' | 'base-aoe' | 'activated-aoe' | 'confusion-replacement' | 'random-policy';
   replacedByConfusion?: boolean;
 }
 export interface InterruptRuntimeState {

@@ -1,8 +1,12 @@
 import { resolvePolicyTarget } from './battleEffectCompletion';
+import { getBattleSkillById } from '@/data/battleSkills';
 import type { BattleRng } from './battleRng';
-import type { BattleState, PlannedAction } from './battleTypes';
+import type { BattleSkillSelection, BattleState, PlannedAction } from './battleTypes';
 import { counterTargetForm, usesActivatedCounterMechanics } from './battleReactions';
 import { actorById } from './battleState';
+
+export const isOwnSideAttack = (skill: BattleSkillSelection) => skill.kind === 'attack'
+  && getBattleSkillById(skill.canonicalSkillId ?? -1)?.targetGroup === 'one-ally';
 
 export function livingOpponents(state: { combatants: readonly BattleState['combatants'][number][] }, actorId: string) {
   const actor = state.combatants.find(a => a.id === actorId)!;
@@ -25,8 +29,14 @@ export function resolveEffectiveTargets(state: BattleState, action: PlannedActio
       return livingOpponents(state, action.actorId).map(a => a.id);
     }
     if (action.counter.triggerActorId) {
-      action.counter.targetRule = 'causal-attacker';
       const target = state.combatants.find(a => a.id === action.counter!.triggerActorId);
+      if (target?.side === actorById(state, action.actorId).side) {
+        action.counter.targetRule = 'friendly-trigger-random-opponent';
+        const opponents = livingOpponents(state, action.actorId);
+        return opponents.length ? [opponents[opponents.length === 1 ? 0
+          : rng.nextIntExclusive(opponents.length, 'counter-friendly-trigger-target')].id] : [];
+      }
+      action.counter.targetRule = 'causal-attacker';
       return target?.isAlive ? [target.id] : [];
     }
     action.counter.targetRule = 'base-single';
@@ -36,6 +46,7 @@ export function resolveEffectiveTargets(state: BattleState, action: PlannedActio
     ? [...new Set(intent.targetIds)].map(id => state.combatants.find(a => a.id === id)).filter(a => a?.isAlive)
     : state.combatants.filter(a => a.side === intent.side && a.isAlive);
   const actor = actorById(state, action.actorId);
+  if (!confused && isOwnSideAttack(action.skill)) candidates = candidates.filter(a => a!.side === actor.side);
   const single = action.kind === 'counter' ? counterTargetForm(action) === 'single' : action.skill.legacyTech.target === 'Single';
   if (!confused && single && actor.side === 'player' && intent.kind === 'opponents' && intent.side === 'enemy') {
     const selectable = new Set(selectableSingleOpponents(state, actor.id).map(a => a.id));
