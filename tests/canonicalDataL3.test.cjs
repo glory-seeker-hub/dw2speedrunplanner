@@ -91,7 +91,7 @@ test('Wing Blade does not trigger a Counter reaction',()=>{
  assert.equal(i.kind,'interrupt');assert.ok(!r.actions.some(a=>a.counter?.triggerActionId===i.id));assert.equal(action(r,'C').counter.executionMode,'untriggered-end-of-turn');
 });
 test('canonical self-checks enforce both reviewed identities',()=>{
- const checks=load('src/utils/dataSelfChecks.ts').runDataSelfChecks();assert.equal(checks.length,63);assert.ok(checks.every(c=>c.passed));
+ const checks=load('src/utils/dataSelfChecks.ts').runDataSelfChecks();assert.equal(checks.length,64);assert.ok(checks.every(c=>c.passed));
  assert.ok(checks.some(c=>c.name.includes('P-Sukamon')));assert.ok(checks.some(c=>c.name.includes('Wing Blade')));
 });
 test('report JSON and Markdown retain species/skill metadata without serializer exceptions',()=>{
