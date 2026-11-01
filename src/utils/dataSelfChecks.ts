@@ -76,6 +76,8 @@ const roster = (partial: Partial<RosterDigimon>): RosterDigimon => ({
 export const runDataSelfChecks = (): SelfCheckResult[] => {
   const results: SelfCheckResult[] = runBattleSkillSelfChecks();
 
+  check(results, 'Reviewed MasterTyrannomon specialty is None', () => getSpecies('mastertyrannomon')?.specialty === 'None' || 'MasterTyrannomon specialty regression');
+
   check(results, 'Reviewed P-Sukamon specialty is Machine', () => getSpecies('p-sukamon')?.specialty === 'Machine' || 'P-Sukamon specialty regression');
 
   check(results, '33 playable Domain variants allocated exactly once', () => validateStoryDomains().join('; ') || true);

@@ -685,7 +685,7 @@ export const DIGIMONS: Digimon[] = [
     name: 'MasterTyrannomon',
     baseStats: { hp: 1000, mp: 200, atk: 150, def: 120, spd: 100 },
     type: 'Vaccine',
-    specialty: 'Machine',
+    specialty: 'None',
   },
   {
     id: 'megadramon',

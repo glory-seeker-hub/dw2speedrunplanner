@@ -133,7 +133,7 @@ test('storage access failures are reported without throwing', () => {
 });
 test('all existing Phase 1.6a data self-checks still pass', () => {
   const checks = runDataSelfChecks();
-  assert.equal(checks.length, 63); // Original 61 + two L3 canonical identity checks.
+  assert.equal(checks.length, 64); // Original 61 + two L3 and one Phase 2P-C canonical identity checks.
   assert.deepEqual(checks.filter((check) => !check.passed), []);
 });
 
