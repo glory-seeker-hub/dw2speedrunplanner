@@ -10,7 +10,7 @@ import {
  * DOMAIN / LOCATION MAPPINGS
  *
  * DOMAINS is derived from the fully resolved external group list in domainGroups.ts
- * (456 strict CSV matches + 17 explicit contextual corrections = 473/473).
+ * (455 strict CSV matches + 18 explicit contextual corrections = 473/473).
  *
  * Encounter stats are NEVER duplicated here — domains only reference encounter IDs.
  * XP/Bits come from the reward source records (see utils/rewardMatching.ts), which the

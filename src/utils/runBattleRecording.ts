@@ -37,7 +37,7 @@ export const recordRunBattle = (run: RunPlan, request: RecordBattleRequest): Rec
   const unresolved = run.roster.find(member => run.digiline.includes(member.instanceId) &&
     member.levelCap.resolved === null && member.level >= member.levelCap.min);
   if (unresolved && getBattleProgressionPolicy(request.encounterId).resolveLevelUp) throw new Error('Maximum EL is unresolved for ' + unresolved.name + '. This battle cannot be recorded safely.');
-  const option = getRecordingEncounter(request);
+  const option = getRecordingEncounter(request, run.starterDefinitionId);
   if (!option?.preview) throw new Error('Select a valid Domain, phase, floor and encounter.');
   if (!option.preview.reward) throw new Error('Reward metadata is missing. This battle cannot be recorded.');
   const slot = request.capturedEnemySlot ?? null;

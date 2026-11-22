@@ -4,6 +4,7 @@ import { encounters } from '@/data/encounters';
 import { DomainPhase } from '@/types/encounter';
 import { getPlannerBattleReward } from '@/utils/battleProgressionPolicy';
 import { COLISEUM_BATTLES, COLISEUM_LOCATION, getColiseumBattle, isColiseumLocation } from '@/data/coliseumBattles';
+import { CORE_TOWER_GUARDIAN_IDS, getCoreTowerGuardianEncounterId, isCoreTowerGuardianLocation } from '@/utils/coreTowerGuardian';
 
 export const getDomainsForPhase = (phase: DomainPhase) =>
   DOMAINS.filter((domain) => domain.variants.some((variant) => variant.phase === phase));
@@ -18,9 +19,18 @@ export const getBattlePreview = (encounterId: number) => {
 };
 
 /** Keep location metadata separate from canonical battle stats and rewards. */
-export const getEncountersForFloor = (domainId: string, phase: DomainPhase, floor: number) => {
+export const getEncountersForFloor = (domainId: string, phase: DomainPhase, floor: number, starterDefinitionId?: string) => {
   const groups = DOMAIN_GROUPS.filter((group) =>
     !getColiseumBattle(group.encounterId) && group.domainId === domainId && group.phase === phase && group.floors.includes(floor));
+  if (isCoreTowerGuardianLocation({ domainId, phase, floor })) {
+    const anchor = groups.find(group => group.groupId === 438 && group.isBoss);
+    if (!anchor) return [];
+    // Context-free inspection/history exposes all variants in canonical ID order.
+    // New recording always supplies the Run's starter; an unknown ID fails closed.
+    const resolved = starterDefinitionId === undefined ? undefined : getCoreTowerGuardianEncounterId(starterDefinitionId);
+    const ids = starterDefinitionId === undefined ? CORE_TOWER_GUARDIAN_IDS : resolved === undefined ? [] : [resolved];
+    return ids.map(encounterId => ({ encounterId, groupIds: [anchor.groupId], isBoss: true, preview: getBattlePreview(encounterId) }));
+  }
   return [...new Set(groups.map((group) => group.encounterId))].map((encounterId) => ({
     encounterId,
     groupIds: groups.filter((group) => group.encounterId === encounterId).map((group) => group.groupId),
@@ -32,9 +42,9 @@ export const getEncountersForFloor = (domainId: string, phase: DomainPhase, floo
 export const getColiseumOptions = () => COLISEUM_BATTLES.map(b => ({
   ...b, groupIds: [] as number[], isBoss: false, preview: getBattlePreview(b.encounterId),
 }));
-export const getSelectedBattleOption = (selection: BattleSelection) =>
+export const getSelectedBattleOption = (selection: BattleSelection, starterDefinitionId?: string) =>
   isColiseumLocation(selection) ? getColiseumOptions().find(b => b.encounterId === selection.encounterId)
-    : selection.floor === null ? undefined : getEncountersForFloor(selection.domainId, selection.phase, selection.floor).find(b => b.encounterId === selection.encounterId);
+    : selection.floor === null ? undefined : getEncountersForFloor(selection.domainId, selection.phase, selection.floor, starterDefinitionId).find(b => b.encounterId === selection.encounterId);
 
 export interface BattleSelection {
   phase: DomainPhase;

@@ -1,13 +1,13 @@
 import { DomainPhase } from '@/types/encounter';
 
 /**
- * GENERATED — do not edit by hand.
+ * Generated source mapping with documented Planner contextual corrections.
  *
  * Sources:
  * - metalkid_domain_group_mapping.csv (473 groups: 456 strict unique, 17 unmatched)
  * - DW2_Lovable_JSON_Pack_v2 / domain_mapping_corrections.json (exactly those 17 groups)
  *
- * Every group is resolved: 456 via strict signature match, 17 via explicit contextual
+ * Every group is resolved: 455 via strict signature match, 18 via explicit contextual
  * correction. Corrections are GROUP-LEVEL ONLY — they are never promoted to global
  * species aliases (e.g. MetalTyrannomon is NOT globally aliased to MasterTyrannomon).
  *
@@ -470,7 +470,7 @@ export const DOMAIN_GROUPS: DomainGroup[] = [
   { groupId: 435, domainId: 'core-tower', domainName: 'Core Tower', phase: 'after-blood-knights', floors: [22], isBoss: false, encounterId: 58, resolution: 'csv-unique', siteSignature: 'S-Mammothmon Lv33; H-Kabuterimon Lv33' },
   { groupId: 436, domainId: 'core-tower', domainName: 'Core Tower', phase: 'after-blood-knights', floors: [22], isBoss: false, encounterId: 88, resolution: 'csv-unique', siteSignature: 'MetalEtemon Lv33; GranKuwagamon Lv33; Puppetmon Lv33' },
   { groupId: 437, domainId: 'core-tower', domainName: 'Core Tower', phase: 'after-blood-knights', floors: [22], isBoss: false, encounterId: 28, resolution: 'csv-unique', siteSignature: 'M-Seadramon Lv33; Preciomon Lv33' },
-  { groupId: 438, domainId: 'core-tower', domainName: 'Core Tower', phase: 'after-blood-knights', floors: [17], isBoss: true, encounterId: 150, resolution: 'csv-unique', siteSignature: 'Guardian-Virus Lv0' },
+  { groupId: 438, domainId: 'core-tower', domainName: 'Core Tower', phase: 'after-blood-knights', floors: [24], isBoss: true, encounterId: 150, resolution: 'contextual-correction', siteSignature: 'Guardian-Virus Lv0', correctionIssue: 'Guardian floor and starter variant', correctionNote: 'Core Tower Floor 24; group 438 anchors one boss location. Initial starter type resolves Vaccine=148, Data=146, Virus=150. See docs/phase-2p-d/BATTLE-MAPPING-CORRECTIONS.md.' },
   { groupId: 439, domainId: 'chaos-tower', domainName: 'Chaos Tower', phase: 'after-blood-knights', floors: [1], isBoss: false, encounterId: 49, resolution: 'csv-unique', siteSignature: 'Kabuterimon Lv15; Apemon Lv15; MetalGreymon Lv22' },
   { groupId: 440, domainId: 'chaos-tower', domainName: 'Chaos Tower', phase: 'after-blood-knights', floors: [1], isBoss: false, encounterId: 50, resolution: 'csv-unique', siteSignature: 'WereGarurumon Lv22; WereGarurumon Lv22; Giromon Lv22' },
   { groupId: 441, domainId: 'chaos-tower', domainName: 'Chaos Tower', phase: 'after-blood-knights', floors: [1, 4], isBoss: false, encounterId: 51, resolution: 'csv-unique', siteSignature: 'Giromon Lv23; Garudamon Lv23; Monzaemon Lv23' },

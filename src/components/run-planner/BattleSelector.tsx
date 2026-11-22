@@ -21,7 +21,7 @@ export const BattleSelector = ({ hasParticipants, onRecord, run }: { hasParticip
   const domains = getStoryDomains(segment);
   const domain = domains.find((entry) => entry.domainId === domainId);
   const floors = getFloorsForDomain(domainId, phase);
-  const options = isColiseum ? getColiseumOptions() : floor === null ? [] : getEncountersForFloor(domainId, phase, floor);
+  const options = isColiseum ? getColiseumOptions() : floor === null ? [] : getEncountersForFloor(domainId, phase, floor, run?.starterDefinitionId);
   const selected = options.find((entry) => entry.encounterId === encounterId);
 
   return (

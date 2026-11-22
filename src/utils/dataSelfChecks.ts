@@ -244,12 +244,12 @@ export const runDataSelfChecks = (): SelfCheckResult[] => {
     DOMAIN_GROUPS.length === 473 ? true : `found ${DOMAIN_GROUPS.length} groups`
   );
 
-  check(results, 'exactly 17 contextual corrections and 456 strict matches', () => {
+  check(results, 'exactly 18 contextual corrections and 455 strict matches', () => {
     const corrections = DOMAIN_GROUPS.filter(
       (g) => g.resolution === 'contextual-correction'
     );
     const strict = DOMAIN_GROUPS.filter((g) => g.resolution === 'csv-unique');
-    return corrections.length === 17 && strict.length === 456
+    return corrections.length === 18 && strict.length === 455
       ? true
       : `strict ${strict.length}, corrections ${corrections.length}`;
   });

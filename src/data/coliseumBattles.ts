@@ -3,7 +3,7 @@ import type { DomainPhase } from '@/types/encounter';
 
 export interface ColiseumBattle { encounterId: number; category: 'coliseum'; rank: number; round: 'A' | 'B' | 'C'; label: string }
 export const COLISEUM_BATTLES: readonly ColiseumBattle[] = Array.from({ length: 8 }, (_, i) => i + 2).flatMap(rank =>
-  (['A', 'B', 'C'] as const).map((round, i) => ({ encounterId: 158 + (rank - 2) * 3 + i, category: 'coliseum', rank, round, label: `Rank ${rank}-${round}` })));
+  (['A', 'B', 'C'] as const).map((round, i) => ({ encounterId: rank === 8 ? [176, 178, 177][i] : 158 + (rank - 2) * 3 + i, category: 'coliseum', rank, round, label: `Rank ${rank}-${round}` })));
 export const getColiseumBattle = (encounterId: number | null) => COLISEUM_BATTLES.find(b => b.encounterId === encounterId);
 /** V7 compatibility encoding only; never added to DOMAINS or shown as a dungeon/floor. */
 export const COLISEUM_LOCATION: { domainId: string; phase: DomainPhase; floor: number } = { domainId: 'coliseum', phase: 'after-blood-knights', floor: 0 };
@@ -16,8 +16,14 @@ export const validateColiseumBattles = (): string[] => {
   if (new Set(COLISEUM_BATTLES.map(b => b.encounterId)).size !== 24) errors.push('Duplicate Coliseum encounter');
   if (new Set(COLISEUM_BATTLES.map(b => b.label)).size !== 24) errors.push('Duplicate Coliseum label');
   COLISEUM_BATTLES.forEach((b, i) => {
-    if (b.encounterId !== 158 + i || b.rank !== 2 + Math.floor(i / 3) || b.round !== ['A', 'B', 'C'][i % 3] || b.label !== `Rank ${b.rank}-${b.round}`) errors.push(`Invalid Coliseum order: ${i}`);
+    if (b.rank !== 2 + Math.floor(i / 3) || b.round !== ['A', 'B', 'C'][i % 3] || b.label !== `Rank ${b.rank}-${b.round}`) errors.push(`Invalid Coliseum order: ${i}`);
     if (encounters.filter(e => e.id === b.encounterId).length !== 1) errors.push(`Missing/duplicate canonical encounter: ${b.encounterId}`);
   });
+  for (let id = 158; id <= 181; id++) {
+    if (!COLISEUM_BATTLES.some(b => b.encounterId === id)) errors.push(`Missing intended Coliseum encounter: ${id}`);
+  }
+  for (const [round, id] of Object.entries({ A: 176, B: 178, C: 177 })) {
+    if (COLISEUM_BATTLES.find(b => b.rank === 8 && b.round === round)?.encounterId !== id) errors.push(`Invalid Rank 8-${round} encounter`);
+  }
   return errors;
 };
