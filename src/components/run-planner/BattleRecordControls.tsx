@@ -1,4 +1,5 @@
 import { getBattleProgressionPolicy } from '@/utils/battleProgressionPolicy';
+import { isCoreTowerGuardianLocation } from '@/utils/coreTowerGuardian';
 import { useState } from 'react';
 import { RunPlan } from '@/types/runPlanner';
 import { getBattleLearningWarnings } from '@/utils/battleLearningWarnings';
@@ -26,13 +27,14 @@ export const BattleRecordControls = ({ selection, hasParticipants, onRecord, run
   const [result, setResult] = useState<BattleResolution | null>(null);
   const [review, setReview] = useState<{ response: BattleChoiceReview; request: RecordBattleRequest } | null>(null);
   const [selections, setSelections] = useState<TechniqueSelection[]>([]);
-  const option = getRecordingEncounter(selection);
+  const option = getRecordingEncounter(selection, run?.starterDefinitionId);
   const warnings = run ? getBattleLearningWarnings(run, selection) : [];
   const choices = getCaptureChoices(selection);
   const policy = getBattleProgressionPolicy(selection.encounterId);
   const cap = choices.find(enemy => String(enemy.slot) === capture)?.levelCap;
   const capRequired = cap?.resolved === null;
   const blocked = !hasParticipants ? 'Add at least one Digimon to the Digiline before recording a battle.'
+    : !run && isCoreTowerGuardianLocation(selection) ? 'Select a Run to resolve its starter-dependent Guardian before recording.'
     : capRequired && !getLevelCapChoices(cap).includes(Number(selectedCap)) ? 'Select the exact Maximum EL before recording capture.'
     : !option?.preview?.reward ? 'Reward metadata is missing. This battle cannot be recorded.' : null;
   const submit = (request: RecordBattleRequest) => {
