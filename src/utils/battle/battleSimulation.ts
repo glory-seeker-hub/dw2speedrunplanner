@@ -1,3 +1,4 @@
+import { isRandomElementSkillId } from '@/utils/battleSkillSemantics';
 import { attachTasLuck } from './battleTasLuck';
 import { initializeMotivation, clearRoundEffects, copyNegativeStatuses, randomTarget, necroTarget, bypassAccuracy, postUseHalfDefense, effectsOf } from './battleEffectCompletion';
 import { classifyEffect } from './battleEffectCoverage';
@@ -204,7 +205,7 @@ export function simulateBattleCore(input: BattleInput, options: BattleEngineOpti
         entry.outcome = entry.accuracy.outcome;
         accountActionMp(actor, action, entry, state);
         if (entry.accuracy.standardRollSkipped && bypassAccuracy(action.skill)) (entry.effectAudit ??= []).push('Standard accuracy bypassed — ' + action.skill.legacyTech.name);
-        if (entry.outcome === 'hit' && action.skill.canonicalSkillId === 0xf4) {
+        if (entry.outcome === 'hit' && isRandomElementSkillId(action.skill.canonicalSkillId)) {
           action.effectiveElement = (['Water','Fire','Nature','Machine','Darkness'] as const)[rng.nextIntExclusive(5,'fantasmic-element')];
           (entry.effectAudit ??= []).push('Random attack element: ' + action.effectiveElement);
         }

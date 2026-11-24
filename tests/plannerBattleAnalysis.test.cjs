@@ -15,6 +15,30 @@ const small=route(4),first=small.history[0];
 const freeze=value=>{if(value&&typeof value==='object'){Object.freeze(value);Object.values(value).forEach(freeze);}return value;};
 const throws=(fn,code)=>assert.throws(fn,e=>e instanceof BattleAnalysisError&&e.diagnostic.code===code);
 
+for(const [encounterId,name,skillName,skillId] of [[151,'GAIA1','Fantasmic Bomb',0xf1],[152,'GAIA2','Fantasmic Ray',0xf4]])test(name+' recorded Chaos Tower battle produces canonical Analyze Battle preset',()=>{
+  const location={domainId:'chaos-tower',phase:'after-blood-knights',floor:20,encounterId};
+  const recorded=record(route(0),location),event=recorded.history[0];
+  const preset=build(recorded,event.id);
+  assert.deepEqual(preset.selectedBattle,location);
+  const encounter=getEncountersForFloor(location.domainId,location.phase,location.floor).find(e=>e.encounterId===encounterId).preview.encounter;
+  assert.equal(preset.enemyTeam.length,encounter.digimons.length);
+  const enemy=preset.enemyTeam.find(e=>e.digimon.name===name);
+  assert.ok(enemy);
+  const original=encounter.digimons.find(e=>e.name===name);
+  assert.equal(enemy.level,original.level);
+  assert.deepEqual(enemy.customStats,{hp:original.hp,mp:original.mp,atk:original.atk,def:original.def,spd:original.spd});
+  assert.deepEqual(enemy.techs.map(t=>t.name),original.techs);
+  if(encounterId===151)assert.deepEqual(enemy.techs.map(t=>t.name),['Titan Laser','Fantasmic Bomb','GAIA Gear']);
+  const fantasmic=enemy.techs.find(t=>t.name===skillName);
+  assert.equal(fantasmic.canonicalSkillId,skillId);
+  assert.equal(getBattleSkillById(skillId).element,null);
+  assert.equal(fantasmic.element,'None'); // Internal placeholder, never a fixed attack element.
+  const state=createBattleState({player:preset.playerTeam,enemy:preset.enemyTeam,floorSpecialty:'None'});
+  const boss=state.combatants.find(c=>c.name===name);
+  assert.deepEqual(boss.skills.map(s=>s.canonicalSkillId),enemy.techs.map(t=>t.canonicalSkillId));
+  assert.ok(boss.skills.every(s=>s.source!=='synthetic-legacy-fallback'));
+});
+
 test('first battle starts at initial state; selected rewards/stats/XP excluded',()=>{const s=replay(small,first.id);assert.deepEqual(s.roster,first.preActionCheckpoint.roster);assert.deepEqual(s.digiline,first.digilineInstanceIds);assert.equal(s.totalBits,1030);assert.equal(s.replayedEvents,0);assert.equal(s.roster[0].level,1);assert.equal(s.roster[0].totalXp,0);});
 for(let index=0;index<4;index++)test('forward replay boundary '+index+' equals complete pre-checkpoint',()=>{const e=small.history[index],s=replay(small,e.id);assert.deepEqual(s.roster,e.preActionCheckpoint.roster);assert.deepEqual(s.digiline,e.preActionCheckpoint.digiline);assert.equal(s.totalBits,e.preActionCheckpoint.totalBits);assert.equal(s.eventIndex,index);assert.equal(s.beforeEventId,e.id);assert.equal(s.replayedEvents,index);assert.deepEqual(replay(small,index),s);});
 for(const field of ['roster','digiline','totalBits','updatedAt'])test('current final '+field+' cannot leak backward',()=>{const r=structuredClone(small);r[field]=field==='roster'?[]:field==='digiline'?[]:field==='totalBits'?99999999:'future';assert.deepEqual(build(r,first.id),build(small,first.id));});
