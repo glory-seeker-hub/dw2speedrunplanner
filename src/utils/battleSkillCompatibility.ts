@@ -1,3 +1,4 @@
+import { isRandomElementSkillId } from '@/utils/battleSkillSemantics';
 import type { BattleSkillDefinition } from '@/types/battleSkill';
 import type { Tech } from '@/types/digimon';
 
@@ -5,10 +6,11 @@ import type { Tech } from '@/types/digimon';
  * Temporary lossy projection for the existing simulator, not the authoritative API.
  * Existing resolution approximations (AP vs damage multiplier, drain quantity,
  * stack limits, consecutive cap) stay in the engine for its later redesign.
- * No identity/name controls a mechanical field here.
+ * Known random-element IDs accept a None compatibility placeholder only;
+ * their real damage element is selected into action.effectiveElement at execution.
  */
 export function toLegacyTech(skill: BattleSkillDefinition, id: string, name: string): Tech {
-  if (skill.attackPower === null || !skill.element && skill.id !== 0xf4 || !skill.actionKind || !skill.targetGroup) {
+  if (skill.attackPower === null || !skill.element && !isRandomElementSkillId(skill.id) || !skill.actionKind || !skill.targetGroup) {
     throw new Error(`Cannot project unresolved WAZADATA skill ${skill.id} into Tech`);
   }
   let specialEffect: Tech['specialEffect'];
